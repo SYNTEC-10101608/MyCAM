@@ -48,10 +48,10 @@
 			this.m_tsmiCAD = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSimulation = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsbSetting = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsbCNCConnection = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiSetting = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCNCConnection = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiLanguage = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsbController = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiController = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiCNC = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsCAMFunction = new System.Windows.Forms.ToolStrip();
 			this.m_tsMachiningFunction = new System.Windows.Forms.ToolStrip();
@@ -84,18 +84,18 @@
 			this.m_tsbConvertNC = new System.Windows.Forms.ToolStripButton();
 			this.m_tscLevel1Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsSimuFunc = new System.Windows.Forms.ToolStrip();
-			this.m_btnPlay = new System.Windows.Forms.ToolStripButton();
-			this.m_btnPause = new System.Windows.Forms.ToolStripButton();
-			this.m_btnStop = new System.Windows.Forms.ToolStripButton();
-			this.m_btnPreviousPath = new System.Windows.Forms.ToolStripButton();
-			this.m_btnNextPath = new System.Windows.Forms.ToolStripButton();
-			this.m_btnPreCollision = new System.Windows.Forms.ToolStripButton();
-			this.m_btnNextCol = new System.Windows.Forms.ToolStripButton();
-			this.m_btnPrePoint = new System.Windows.Forms.ToolStripButton();
-			this.m_btnNextPoint = new System.Windows.Forms.ToolStripButton();
-			this.m_btnSpeedUp = new System.Windows.Forms.ToolStripButton();
-			this.m_btnSlowDonw = new System.Windows.Forms.ToolStripButton();
-			this.m_btnCheck = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbPlay = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbPause = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbStop = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbPreviousPath = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbNextPath = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbPreCollision = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbNextCol = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbPrePoint = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbNextPoint = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbSpeedUp = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbSlowDown = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbCheck = new System.Windows.Forms.ToolStripButton();
 			this.m_tsFileFunction = new System.Windows.Forms.ToolStrip();
 			this.m_tsbImport3DFile = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddRevolution = new System.Windows.Forms.ToolStripButton();
@@ -117,15 +117,15 @@
 			this.m_tsbMeasureCAD = new System.Windows.Forms.ToolStripButton();
 			this.m_tscLevel2Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tscLevel3Container = new System.Windows.Forms.ToolStripContainer();
-			this.m_panCNCVertical = new System.Windows.Forms.Panel();
-			this.m_panVerticalAlarm = new System.Windows.Forms.Panel();
-			this.m_panTreeView = new System.Windows.Forms.Panel();
+			this.m_pnlCNCVertical = new System.Windows.Forms.Panel();
+			this.m_pnlVerticalAlarm = new System.Windows.Forms.Panel();
+			this.m_pnlTreeView = new System.Windows.Forms.Panel();
 			this.m_pnlLog = new System.Windows.Forms.Panel();
 			this.m_pnlMessages = new System.Windows.Forms.Panel();
-			this.m_panViewer = new System.Windows.Forms.Panel();
-			this.m_panCNC = new System.Windows.Forms.Panel();
-			this.m_panCNCInfo = new System.Windows.Forms.Panel();
-			this.m_tlpBottom = new System.Windows.Forms.TableLayoutPanel();
+			this.m_pnlViewer = new System.Windows.Forms.Panel();
+			this.m_pnlCNC = new System.Windows.Forms.Panel();
+			this.m_pnlCNCInfo = new System.Windows.Forms.Panel();
+			this.m_pnlBottom = new System.Windows.Forms.TableLayoutPanel();
 			this.m_tsLayer = new System.Windows.Forms.ToolStrip();
 			this.m_tsbLayer1 = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbLayer2 = new System.Windows.Forms.ToolStripButton();
@@ -147,14 +147,14 @@
 			this.m_tsbYNeg = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbZPos = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbZNeg = new System.Windows.Forms.ToolStripButton();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssViewerToolBar = new System.Windows.Forms.ToolStripSeparator();
 			this.m_tsbShowVec = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowOrder = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowOrientation = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowTraverse = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowMarker = new System.Windows.Forms.ToolStripButton();
-			this.m_panBackGround = new System.Windows.Forms.TableLayoutPanel();
-			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.m_pnlBackGround = new System.Windows.Forms.TableLayoutPanel();
+			this.m_cmsMain = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_tsMachiningFunction.SuspendLayout();
@@ -165,11 +165,11 @@
 			this.m_tsCADFunction.SuspendLayout();
 			this.m_tscLevel2Container.SuspendLayout();
 			this.m_tscLevel3Container.SuspendLayout();
-			this.m_panViewer.SuspendLayout();
+			this.m_pnlViewer.SuspendLayout();
 			this.m_tsLayer.SuspendLayout();
 			this.m_tsViewerToolBar.SuspendLayout();
-			this.m_panBackGround.SuspendLayout();
-			this.m_tlpBottom.SuspendLayout();
+			this.m_pnlBackGround.SuspendLayout();
+			this.m_pnlBottom.SuspendLayout();
 			this.m_pnlMessages.SuspendLayout();
 			this.SuspendLayout();
 			//
@@ -182,7 +182,7 @@
             this.m_tsmiCAM,
             this.m_tsmiSimulation,
             this.m_tsmiCNC,
-            this.m_tsbSetting} );
+            this.m_tsmiSetting} );
 			this.m_msMode.Location = new System.Drawing.Point(0, 0);
 			this.m_msMode.Name = "m_msMode";
 			this.m_msMode.Size = new System.Drawing.Size(1596, 24);
@@ -217,22 +217,22 @@
 			this.m_tsmiSimulation.Text = "模擬";
 			this.m_tsmiSimulation.Click += new System.EventHandler(this.m_tsmiSimulation_Click);
 			//
-			// m_tsbSetting
+			// m_tsmiSetting
 			//
-			this.m_tsbSetting.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsbCNCConnection,
-			this.m_tsbController,
+			this.m_tsmiSetting.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiCNCConnection,
+			this.m_tsmiController,
 			this.m_tsmiLanguage});
-			this.m_tsbSetting.Name = "m_tsbSetting";
-			this.m_tsbSetting.Size = new System.Drawing.Size(43, 20);
-			this.m_tsbSetting.Text = "設定";
+			this.m_tsmiSetting.Name = "m_tsmiSetting";
+			this.m_tsmiSetting.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiSetting.Text = "設定";
 			//
-			// m_tsbCNCConnection
+			// m_tsmiCNCConnection
 			//
-			this.m_tsbCNCConnection.Name = "m_tsbCNCConnection";
-			this.m_tsbCNCConnection.Size = new System.Drawing.Size(148, 22);
-			this.m_tsbCNCConnection.Text = "CNC連線設定";
-			this.m_tsbCNCConnection.Click += new System.EventHandler(this.m_tsbCNCConnection_Click);
+			this.m_tsmiCNCConnection.Name = "m_tsmiCNCConnection";
+			this.m_tsmiCNCConnection.Size = new System.Drawing.Size(148, 22);
+			this.m_tsmiCNCConnection.Text = "CNC連線設定";
+			this.m_tsmiCNCConnection.Click += new System.EventHandler(this.m_tsmiCNCConnection_Click);
 			//
 			// m_tsmiLanguage
 			//
@@ -240,12 +240,12 @@
 			this.m_tsmiLanguage.Size = new System.Drawing.Size(148, 22);
 			this.m_tsmiLanguage.Text = "語系切換";
 			//
-			// m_tsbController
+			// m_tsmiController
 			//
-			this.m_tsbController.Name = "m_tsbController";
-			this.m_tsbController.Size = new System.Drawing.Size(55, 20);
-			this.m_tsbController.Text = "控制器進階設定";
-			this.m_tsbController.Click += new System.EventHandler(this.m_tsbController_Click);
+			this.m_tsmiController.Name = "m_tsmiController";
+			this.m_tsmiController.Size = new System.Drawing.Size(55, 20);
+			this.m_tsmiController.Text = "控制器進階設定";
+			this.m_tsmiController.Click += new System.EventHandler(this.m_tsmiController_Click);
 			//
 			// m_tsmiCNC
 			//
@@ -598,143 +598,143 @@
 			this.m_tsSimuFunc.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_tsSimuFunc.ImageScalingSize = new System.Drawing.Size(40, 40);
 			this.m_tsSimuFunc.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_btnPlay,
-            this.m_btnPause,
-            this.m_btnStop,
-            this.m_btnPreviousPath,
-            this.m_btnNextPath,
-            this.m_btnPreCollision,
-            this.m_btnNextCol,
-            this.m_btnPrePoint,
-            this.m_btnNextPoint,
-            this.m_btnSpeedUp,
-            this.m_btnSlowDonw,
-            this.m_btnCheck});
+            this.m_tsbPlay,
+            this.m_tsbPause,
+            this.m_tsbStop,
+            this.m_tsbPreviousPath,
+            this.m_tsbNextPath,
+            this.m_tsbPreCollision,
+            this.m_tsbNextCol,
+            this.m_tsbPrePoint,
+            this.m_tsbNextPoint,
+            this.m_tsbSpeedUp,
+            this.m_tsbSlowDown,
+            this.m_tsbCheck});
 			this.m_tsSimuFunc.Location = new System.Drawing.Point(0, 0);
 			this.m_tsSimuFunc.Name = "m_tsSimuFunc";
 			this.m_tsSimuFunc.Size = new System.Drawing.Size(1596, 50);
 			this.m_tsSimuFunc.TabIndex = 5;
 			this.m_tsSimuFunc.Text = "模擬功能";
 			//
-			// m_btnPlay
+			// m_tsbPlay
 			//
-			this.m_btnPlay.Image = global::MyCAM.Properties.Resources.Simu_Play;
-			this.m_btnPlay.Name = "m_btnPlay";
-			this.m_btnPlay.Size = new System.Drawing.Size(44, 47);
-			this.m_btnPlay.Text = "播放";
-			this.m_btnPlay.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnPlay.ToolTipText = "播放模擬";
-			this.m_btnPlay.Click += new System.EventHandler(this.m_btnPlay_Click);
+			this.m_tsbPlay.Image = global::MyCAM.Properties.Resources.Simu_Play;
+			this.m_tsbPlay.Name = "m_tsbPlay";
+			this.m_tsbPlay.Size = new System.Drawing.Size(44, 47);
+			this.m_tsbPlay.Text = "播放";
+			this.m_tsbPlay.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbPlay.ToolTipText = "播放模擬";
+			this.m_tsbPlay.Click += new System.EventHandler(this.m_tsbPlay_Click);
 			//
-			// m_btnPause
+			// m_tsbPause
 			//
-			this.m_btnPause.Image = global::MyCAM.Properties.Resources.Simu_Pause;
-			this.m_btnPause.Name = "m_btnPause";
-			this.m_btnPause.Size = new System.Drawing.Size(44, 47);
-			this.m_btnPause.Text = "暫停";
-			this.m_btnPause.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnPause.ToolTipText = "暫停模擬";
-			this.m_btnPause.Click += new System.EventHandler(this.m_btnPause_Click);
+			this.m_tsbPause.Image = global::MyCAM.Properties.Resources.Simu_Pause;
+			this.m_tsbPause.Name = "m_tsbPause";
+			this.m_tsbPause.Size = new System.Drawing.Size(44, 47);
+			this.m_tsbPause.Text = "暫停";
+			this.m_tsbPause.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbPause.ToolTipText = "暫停模擬";
+			this.m_tsbPause.Click += new System.EventHandler(this.m_tsbPause_Click);
 			//
-			// m_btnStop
+			// m_tsbStop
 			//
-			this.m_btnStop.Image = global::MyCAM.Properties.Resources.Simu_Stop;
-			this.m_btnStop.Name = "m_btnStop";
-			this.m_btnStop.Size = new System.Drawing.Size(44, 47);
-			this.m_btnStop.Text = "停止";
-			this.m_btnStop.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnStop.ToolTipText = "停止模擬並回到模擬起點";
-			this.m_btnStop.Click += new System.EventHandler(this.m_btnStop_Click);
+			this.m_tsbStop.Image = global::MyCAM.Properties.Resources.Simu_Stop;
+			this.m_tsbStop.Name = "m_tsbStop";
+			this.m_tsbStop.Size = new System.Drawing.Size(44, 47);
+			this.m_tsbStop.Text = "停止";
+			this.m_tsbStop.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbStop.ToolTipText = "停止模擬並回到模擬起點";
+			this.m_tsbStop.Click += new System.EventHandler(this.m_tsbStop_Click);
 			//
-			// m_btnPreviousPath
+			// m_tsbPreviousPath
 			//
-			this.m_btnPreviousPath.Image = global::MyCAM.Properties.Resources.Simu_PreviousPath;
-			this.m_btnPreviousPath.Name = "m_btnPreviousPath";
-			this.m_btnPreviousPath.Size = new System.Drawing.Size(47, 47);
-			this.m_btnPreviousPath.Text = "前路徑";
-			this.m_btnPreviousPath.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnPreviousPath.ToolTipText = "跳往前一路徑";
-			this.m_btnPreviousPath.Click += new System.EventHandler(this.m_btnPreviousPath_Click);
+			this.m_tsbPreviousPath.Image = global::MyCAM.Properties.Resources.Simu_PreviousPath;
+			this.m_tsbPreviousPath.Name = "m_tsbPreviousPath";
+			this.m_tsbPreviousPath.Size = new System.Drawing.Size(47, 47);
+			this.m_tsbPreviousPath.Text = "前路徑";
+			this.m_tsbPreviousPath.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbPreviousPath.ToolTipText = "跳往前一路徑";
+			this.m_tsbPreviousPath.Click += new System.EventHandler(this.m_tsbPreviousPath_Click);
 			//
-			// m_btnNextPath
+			// m_tsbNextPath
 			//
-			this.m_btnNextPath.Image = global::MyCAM.Properties.Resources.Simu_NextPath;
-			this.m_btnNextPath.Name = "m_btnNextPath";
-			this.m_btnNextPath.Size = new System.Drawing.Size(47, 47);
-			this.m_btnNextPath.Text = "後路徑";
-			this.m_btnNextPath.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnNextPath.ToolTipText = "跳往後一路徑";
-			this.m_btnNextPath.Click += new System.EventHandler(this.m_btnNextPath_Click);
+			this.m_tsbNextPath.Image = global::MyCAM.Properties.Resources.Simu_NextPath;
+			this.m_tsbNextPath.Name = "m_tsbNextPath";
+			this.m_tsbNextPath.Size = new System.Drawing.Size(47, 47);
+			this.m_tsbNextPath.Text = "後路徑";
+			this.m_tsbNextPath.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbNextPath.ToolTipText = "跳往後一路徑";
+			this.m_tsbNextPath.Click += new System.EventHandler(this.m_tsbNextPath_Click);
 			//
-			// m_btnPreCollision
+			// m_tsbPreCollision
 			//
-			this.m_btnPreCollision.Image = global::MyCAM.Properties.Resources.Simu_PreviousCol;
-			this.m_btnPreCollision.Name = "m_btnPreCollision";
-			this.m_btnPreCollision.Size = new System.Drawing.Size(59, 47);
-			this.m_btnPreCollision.Text = "前碰撞點";
-			this.m_btnPreCollision.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnPreCollision.ToolTipText = "跳往前一碰撞點";
-			this.m_btnPreCollision.Click += new System.EventHandler(this.m_btnPreCollision_Click);
+			this.m_tsbPreCollision.Image = global::MyCAM.Properties.Resources.Simu_PreviousCol;
+			this.m_tsbPreCollision.Name = "m_tsbPreCollision";
+			this.m_tsbPreCollision.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbPreCollision.Text = "前碰撞點";
+			this.m_tsbPreCollision.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbPreCollision.ToolTipText = "跳往前一碰撞點";
+			this.m_tsbPreCollision.Click += new System.EventHandler(this.m_tsbPreCollision_Click);
 			//
-			// m_btnNextCol
+			// m_tsbNextCol
 			//
-			this.m_btnNextCol.Image = global::MyCAM.Properties.Resources.Simu_NextCol;
-			this.m_btnNextCol.Name = "m_btnNextCol";
-			this.m_btnNextCol.Size = new System.Drawing.Size(59, 47);
-			this.m_btnNextCol.Text = "後碰撞點";
-			this.m_btnNextCol.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnNextCol.ToolTipText = "跳往後一碰撞點";
-			this.m_btnNextCol.Click += new System.EventHandler(this.m_btnNextCol_Click);
+			this.m_tsbNextCol.Image = global::MyCAM.Properties.Resources.Simu_NextCol;
+			this.m_tsbNextCol.Name = "m_tsbNextCol";
+			this.m_tsbNextCol.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbNextCol.Text = "後碰撞點";
+			this.m_tsbNextCol.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbNextCol.ToolTipText = "跳往後一碰撞點";
+			this.m_tsbNextCol.Click += new System.EventHandler(this.m_tsbNextCol_Click);
 			//
-			// m_btnPrePoint
+			// m_tsbPrePoint
 			//
-			this.m_btnPrePoint.Image = global::MyCAM.Properties.Resources.Simu_PrePoint;
-			this.m_btnPrePoint.Name = "m_btnPrePoint";
-			this.m_btnPrePoint.Size = new System.Drawing.Size(47, 47);
-			this.m_btnPrePoint.Text = "上一步";
-			this.m_btnPrePoint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnPrePoint.ToolTipText = "步進到前一步";
-			this.m_btnPrePoint.Click += new System.EventHandler(this.m_btnPrePoint_Click);
+			this.m_tsbPrePoint.Image = global::MyCAM.Properties.Resources.Simu_PrePoint;
+			this.m_tsbPrePoint.Name = "m_tsbPrePoint";
+			this.m_tsbPrePoint.Size = new System.Drawing.Size(47, 47);
+			this.m_tsbPrePoint.Text = "上一步";
+			this.m_tsbPrePoint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbPrePoint.ToolTipText = "步進到前一步";
+			this.m_tsbPrePoint.Click += new System.EventHandler(this.m_tsbPrePoint_Click);
 			//
-			// m_btnNextPoint
+			// m_tsbNextPoint
 			//
-			this.m_btnNextPoint.Image = global::MyCAM.Properties.Resources.Simu_NextPoint;
-			this.m_btnNextPoint.Name = "m_btnNextPoint";
-			this.m_btnNextPoint.Size = new System.Drawing.Size(47, 47);
-			this.m_btnNextPoint.Text = "下一步";
-			this.m_btnNextPoint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnNextPoint.ToolTipText = "步進到後一步";
-			this.m_btnNextPoint.Click += new System.EventHandler(this.m_btnNextPoint_Click);
+			this.m_tsbNextPoint.Image = global::MyCAM.Properties.Resources.Simu_NextPoint;
+			this.m_tsbNextPoint.Name = "m_tsbNextPoint";
+			this.m_tsbNextPoint.Size = new System.Drawing.Size(47, 47);
+			this.m_tsbNextPoint.Text = "下一步";
+			this.m_tsbNextPoint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbNextPoint.ToolTipText = "步進到後一步";
+			this.m_tsbNextPoint.Click += new System.EventHandler(this.m_tsbNextPoint_Click);
 			//
-			// m_btnSpeedUp
+			// m_tsbSpeedUp
 			//
-			this.m_btnSpeedUp.Image = global::MyCAM.Properties.Resources.Simu_SpeedUp;
-			this.m_btnSpeedUp.Name = "m_btnSpeedUp";
-			this.m_btnSpeedUp.Size = new System.Drawing.Size(44, 47);
-			this.m_btnSpeedUp.Text = "加速";
-			this.m_btnSpeedUp.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnSpeedUp.ToolTipText = "加快模擬速度";
-			this.m_btnSpeedUp.Click += new System.EventHandler(this.m_btnSpeedUp_Click);
+			this.m_tsbSpeedUp.Image = global::MyCAM.Properties.Resources.Simu_SpeedUp;
+			this.m_tsbSpeedUp.Name = "m_tsbSpeedUp";
+			this.m_tsbSpeedUp.Size = new System.Drawing.Size(44, 47);
+			this.m_tsbSpeedUp.Text = "加速";
+			this.m_tsbSpeedUp.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbSpeedUp.ToolTipText = "加快模擬速度";
+			this.m_tsbSpeedUp.Click += new System.EventHandler(this.m_tsbSpeedUp_Click);
 			//
-			// m_btnSlowDonw
+			// m_tsbSlowDown
 			//
-			this.m_btnSlowDonw.Image = global::MyCAM.Properties.Resources.Simu_SlowDown;
-			this.m_btnSlowDonw.Name = "m_btnSlowDonw";
-			this.m_btnSlowDonw.Size = new System.Drawing.Size(44, 47);
-			this.m_btnSlowDonw.Text = "減速";
-			this.m_btnSlowDonw.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnSlowDonw.ToolTipText = "減慢模擬速度";
-			this.m_btnSlowDonw.Click += new System.EventHandler(this.m_btnSlowDonw_Click);
+			this.m_tsbSlowDown.Image = global::MyCAM.Properties.Resources.Simu_SlowDown;
+			this.m_tsbSlowDown.Name = "m_tsbSlowDown";
+			this.m_tsbSlowDown.Size = new System.Drawing.Size(44, 47);
+			this.m_tsbSlowDown.Text = "減速";
+			this.m_tsbSlowDown.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbSlowDown.ToolTipText = "減慢模擬速度";
+			this.m_tsbSlowDown.Click += new System.EventHandler(this.m_tsbSlowDown_Click);
 			//
-			// m_btnCheck
+			// m_tsbCheck
 			//
-			this.m_btnCheck.Image = global::MyCAM.Properties.Resources.Simu_Check;
-			this.m_btnCheck.Name = "m_btnCheck";
-			this.m_btnCheck.Size = new System.Drawing.Size(59, 47);
-			this.m_btnCheck.Text = "碰撞檢查";
-			this.m_btnCheck.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnCheck.ToolTipText = "檢查是否有碰撞";
-			this.m_btnCheck.Click += new System.EventHandler(this.m_btnCheck_Click);
+			this.m_tsbCheck.Image = global::MyCAM.Properties.Resources.Simu_Check;
+			this.m_tsbCheck.Name = "m_tsbCheck";
+			this.m_tsbCheck.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbCheck.Text = "碰撞檢查";
+			this.m_tsbCheck.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbCheck.ToolTipText = "檢查是否有碰撞";
+			this.m_tsbCheck.Click += new System.EventHandler(this.m_tsbCheck_Click);
 			//
 			// m_tsFileFunction
 			//
@@ -976,35 +976,35 @@
 			this.m_tscLevel3Container.Text = "toolStripContainer1";
 			this.m_tscLevel3Container.TopToolStripPanelVisible = false;
 			//
-			// m_panCNCVertical
+			// m_pnlCNCVertical
 			//
-			this.m_panCNCVertical.Controls.Add( this.m_panVerticalAlarm );
-			this.m_panBackGround.SetColumnSpan( this.m_panCNCVertical, 3 );
-			this.m_panCNCVertical.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panCNCVertical.Location = new System.Drawing.Point( 3, 478 );
-			this.m_panCNCVertical.Name = "m_panCNCVertical";
-			this.m_panCNCVertical.Size = new System.Drawing.Size( 1590, 418 );
-			this.m_panCNCVertical.TabIndex = 4;
+			this.m_pnlCNCVertical.Controls.Add( this.m_pnlVerticalAlarm );
+			this.m_pnlBackGround.SetColumnSpan( this.m_pnlCNCVertical, 3 );
+			this.m_pnlCNCVertical.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_pnlCNCVertical.Location = new System.Drawing.Point( 3, 478 );
+			this.m_pnlCNCVertical.Name = "m_pnlCNCVertical";
+			this.m_pnlCNCVertical.Size = new System.Drawing.Size( 1590, 418 );
+			this.m_pnlCNCVertical.TabIndex = 4;
 			//
-			// m_panVerticalAlarm
+			// m_pnlVerticalAlarm
 			//
-			this.m_panVerticalAlarm.Location = new System.Drawing.Point( 3, 296 );
-			this.m_panVerticalAlarm.Name = "m_panVerticalAlarm";
-			this.m_panVerticalAlarm.Size = new System.Drawing.Size( 630, 119 );
-			this.m_panVerticalAlarm.TabIndex = 0;
+			this.m_pnlVerticalAlarm.Location = new System.Drawing.Point( 3, 296 );
+			this.m_pnlVerticalAlarm.Name = "m_pnlVerticalAlarm";
+			this.m_pnlVerticalAlarm.Size = new System.Drawing.Size( 630, 119 );
+			this.m_pnlVerticalAlarm.TabIndex = 0;
 			//
-			// m_panTreeView
+			// m_pnlTreeView
 			//
-			this.m_panTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panTreeView.Location = new System.Drawing.Point(3, 3);
-			this.m_panTreeView.Name = "m_panTreeView";
-			this.m_panTreeView.Size = new System.Drawing.Size(233, 417);
-			this.m_panTreeView.TabIndex = 0;
+			this.m_pnlTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_pnlTreeView.Location = new System.Drawing.Point(3, 3);
+			this.m_pnlTreeView.Name = "m_pnlTreeView";
+			this.m_pnlTreeView.Size = new System.Drawing.Size(233, 417);
+			this.m_pnlTreeView.TabIndex = 0;
 			//
 			// m_pnlLog
 			//
 			this.m_pnlLog.AutoScroll = true;
-			this.m_panBackGround.SetColumnSpan(this.m_pnlLog, 2);
+			this.m_pnlBackGround.SetColumnSpan(this.m_pnlLog, 2);
 			this.m_pnlLog.Dock = System.Windows.Forms.DockStyle.None;
 			this.m_pnlLog.Location = new System.Drawing.Point( 0, 0 );
 			this.m_pnlLog.Name = "m_pnlLog";
@@ -1020,53 +1020,53 @@
 			this.m_pnlMessages.Size = new System.Drawing.Size( 353, 47 );
 			this.m_pnlMessages.SizeChanged += new System.EventHandler( this.OnMessagesSizeChanged );
 			//
-			// m_panViewer
+			// m_pnlViewer
 			//
-			this.m_panViewer.Controls.Add(this.m_tsLayer);
-			this.m_panViewer.Controls.Add(this.m_tsViewerToolBar);
-			this.m_panViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panViewer.Location = new System.Drawing.Point(242, 3);
-			this.m_panViewer.Name = "m_panViewer";
-			this.m_panViewer.Size = new System.Drawing.Size(1351, 417);
-			this.m_panViewer.TabIndex = 1;
+			this.m_pnlViewer.Controls.Add(this.m_tsLayer);
+			this.m_pnlViewer.Controls.Add(this.m_tsViewerToolBar);
+			this.m_pnlViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_pnlViewer.Location = new System.Drawing.Point(242, 3);
+			this.m_pnlViewer.Name = "m_pnlViewer";
+			this.m_pnlViewer.Size = new System.Drawing.Size(1351, 417);
+			this.m_pnlViewer.TabIndex = 1;
 			//
-			// m_panCNC
+			// m_pnlCNC
 			//
-			this.m_panCNC.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panBackGround.SetRowSpan( this.m_panCNC, 2 );
-			this.m_panCNC.Location = new System.Drawing.Point( 1358, 3 );
-			this.m_panCNC.Name = "m_panCNC";
-			this.m_panCNC.Size = new System.Drawing.Size( 235, 416 );
-			this.m_panCNC.TabIndex = 8;
-			this.m_panCNC.Visible = false;
+			this.m_pnlCNC.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_pnlBackGround.SetRowSpan( this.m_pnlCNC, 2 );
+			this.m_pnlCNC.Location = new System.Drawing.Point( 1358, 3 );
+			this.m_pnlCNC.Name = "m_pnlCNC";
+			this.m_pnlCNC.Size = new System.Drawing.Size( 235, 416 );
+			this.m_pnlCNC.TabIndex = 8;
+			this.m_pnlCNC.Visible = false;
 			//
-			// m_panCNCInfo
+			// m_pnlCNCInfo
 			//
-			this.m_panCNCInfo.AutoScroll = false;
-			this.m_panCNCInfo.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panCNCInfo.Location = new System.Drawing.Point( 1200, 425 );
-			this.m_panCNCInfo.Margin = new System.Windows.Forms.Padding( 3, 3, 0, 3 );
-			this.m_panCNCInfo.Name = "m_panCNCInfo";
-			this.m_panCNCInfo.Size = new System.Drawing.Size( 390, 47 );
-			this.m_panCNCInfo.TabIndex = 9;
-			this.m_panCNCInfo.Visible = false;
+			this.m_pnlCNCInfo.AutoScroll = false;
+			this.m_pnlCNCInfo.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_pnlCNCInfo.Location = new System.Drawing.Point( 1200, 425 );
+			this.m_pnlCNCInfo.Margin = new System.Windows.Forms.Padding( 3, 3, 0, 3 );
+			this.m_pnlCNCInfo.Name = "m_pnlCNCInfo";
+			this.m_pnlCNCInfo.Size = new System.Drawing.Size( 390, 47 );
+			this.m_pnlCNCInfo.TabIndex = 9;
+			this.m_pnlCNCInfo.Visible = false;
 			//
-			// m_tlpBottom
+			// m_pnlBottom
 			//
-			this.m_tlpBottom.ColumnCount = 2;
-			this.m_tlpBottom.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 30F ) );
-			this.m_tlpBottom.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 70F ) );
-			this.m_tlpBottom.Controls.Add( this.m_pnlMessages, 0, 0 );
-			this.m_tlpBottom.Controls.Add( this.m_panCNCInfo, 1, 0 );
-			this.m_panBackGround.SetColumnSpan( this.m_tlpBottom, 2 );
-			this.m_tlpBottom.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_tlpBottom.Location = new System.Drawing.Point( 0, 422 );
-			this.m_tlpBottom.Margin = new System.Windows.Forms.Padding( 0 );
-			this.m_tlpBottom.Name = "m_tlpBottom";
-			this.m_tlpBottom.RowCount = 1;
-			this.m_tlpBottom.RowStyles.Add( new System.Windows.Forms.RowStyle( System.Windows.Forms.SizeType.Percent, 100F ) );
-			this.m_tlpBottom.Size = new System.Drawing.Size( 1197, 53 );
-			this.m_tlpBottom.TabIndex = 10;
+			this.m_pnlBottom.ColumnCount = 2;
+			this.m_pnlBottom.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 30F ) );
+			this.m_pnlBottom.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 70F ) );
+			this.m_pnlBottom.Controls.Add( this.m_pnlMessages, 0, 0 );
+			this.m_pnlBottom.Controls.Add( this.m_pnlCNCInfo, 1, 0 );
+			this.m_pnlBackGround.SetColumnSpan( this.m_pnlBottom, 2 );
+			this.m_pnlBottom.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_pnlBottom.Location = new System.Drawing.Point( 0, 422 );
+			this.m_pnlBottom.Margin = new System.Windows.Forms.Padding( 0 );
+			this.m_pnlBottom.Name = "m_pnlBottom";
+			this.m_pnlBottom.RowCount = 1;
+			this.m_pnlBottom.RowStyles.Add( new System.Windows.Forms.RowStyle( System.Windows.Forms.SizeType.Percent, 100F ) );
+			this.m_pnlBottom.Size = new System.Drawing.Size( 1197, 53 );
+			this.m_pnlBottom.TabIndex = 10;
 			//
 			// m_tsLayer
 			//
@@ -1231,7 +1231,7 @@
             this.m_tsbYNeg,
             this.m_tsbZPos,
             this.m_tsbZNeg,
-            this.toolStripSeparator1,
+            this.m_tssViewerToolBar,
             this.m_tsbShowVec,
             this.m_tsbShowOrder,
             this.m_tsbShowOrientation,
@@ -1314,10 +1314,10 @@
 			this.m_tsbZNeg.ToolTipText = "Z-";
 			this.m_tsbZNeg.Click += new System.EventHandler(this.m_tsbZNeg_Click);
 			//
-			// toolStripSeparator1
+			// m_tssViewerToolBar
 			//
-			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(22, 6);
+			this.m_tssViewerToolBar.Name = "m_tssViewerToolBar";
+			this.m_tssViewerToolBar.Size = new System.Drawing.Size(22, 6);
 			//
 			// m_tsbShowVec
 			//
@@ -1374,39 +1374,39 @@
 			this.m_tsbShowMarker.Size = new System.Drawing.Size(22, 24);
 			this.m_tsbShowMarker.CheckedChanged += new System.EventHandler(this.m_tsbShowMarker_CheckedChanged);
 			//
-			// m_panBackGround
+			// m_pnlBackGround
 			//
-			this.m_panBackGround.ColumnCount = 3;
-			this.m_panBackGround.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
-			this.m_panBackGround.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 60F ) );
-			this.m_panBackGround.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 25F ) );
-			this.m_panBackGround.Controls.Add( this.m_panCNCVertical, 0, 2 );
-			this.m_panBackGround.Controls.Add(this.m_panTreeView, 0, 0);
-			this.m_panBackGround.Controls.Add( this.m_tlpBottom, 0, 1 );
-			this.m_panBackGround.Controls.Add(this.m_panViewer, 1, 0);
-			this.m_panBackGround.Controls.Add( this.m_panCNC, 2, 0 );
-			this.m_panBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panBackGround.Location = new System.Drawing.Point(0, 153);
-			this.m_panBackGround.Name = "m_panBackGround";
-			this.m_panBackGround.RowCount = 3;
-			this.m_panBackGround.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 59F));
-			this.m_panBackGround.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6F));
-			this.m_panBackGround.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 35F));
-			this.m_panBackGround.Size = new System.Drawing.Size(1596, 902);
-			this.m_panBackGround.TabIndex = 9;
+			this.m_pnlBackGround.ColumnCount = 3;
+			this.m_pnlBackGround.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+			this.m_pnlBackGround.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 60F ) );
+			this.m_pnlBackGround.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 25F ) );
+			this.m_pnlBackGround.Controls.Add( this.m_pnlCNCVertical, 0, 2 );
+			this.m_pnlBackGround.Controls.Add(this.m_pnlTreeView, 0, 0);
+			this.m_pnlBackGround.Controls.Add( this.m_pnlBottom, 0, 1 );
+			this.m_pnlBackGround.Controls.Add(this.m_pnlViewer, 1, 0);
+			this.m_pnlBackGround.Controls.Add( this.m_pnlCNC, 2, 0 );
+			this.m_pnlBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_pnlBackGround.Location = new System.Drawing.Point(0, 153);
+			this.m_pnlBackGround.Name = "m_pnlBackGround";
+			this.m_pnlBackGround.RowCount = 3;
+			this.m_pnlBackGround.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 59F));
+			this.m_pnlBackGround.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6F));
+			this.m_pnlBackGround.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 35F));
+			this.m_pnlBackGround.Size = new System.Drawing.Size(1596, 902);
+			this.m_pnlBackGround.TabIndex = 9;
 			//
-			// contextMenuStrip1
+			// m_cmsMain
 			//
-			this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-			this.contextMenuStrip1.Name = "contextMenuStrip1";
-			this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
+			this.m_cmsMain.ImageScalingSize = new System.Drawing.Size(20, 20);
+			this.m_cmsMain.Name = "m_cmsMain";
+			this.m_cmsMain.Size = new System.Drawing.Size(61, 4);
 			//
 			// StartupForm
 			//
 			this.AutoScroll = true;
 			this.AutoSize = true;
 			this.ClientSize = new System.Drawing.Size(1596, 1055);
-			this.Controls.Add(this.m_panBackGround);
+			this.Controls.Add(this.m_pnlBackGround);
 			this.Controls.Add(this.m_tscLevel3Container);
 			this.Controls.Add(this.m_tscLevel2Container);
 			this.Controls.Add(this.m_tscLevel1Container);
@@ -1437,14 +1437,14 @@
 			this.m_tscLevel2Container.PerformLayout();
 			this.m_tscLevel3Container.ResumeLayout(false);
 			this.m_tscLevel3Container.PerformLayout();
-			this.m_panViewer.ResumeLayout(false);
-			this.m_panViewer.PerformLayout();
+			this.m_pnlViewer.ResumeLayout(false);
+			this.m_pnlViewer.PerformLayout();
 			this.m_tsLayer.ResumeLayout(false);
 			this.m_tsLayer.PerformLayout();
 			this.m_tsViewerToolBar.ResumeLayout(false);
 			this.m_tsViewerToolBar.PerformLayout();
-			this.m_panBackGround.ResumeLayout(false);
-			this.m_tlpBottom.ResumeLayout( false );
+			this.m_pnlBackGround.ResumeLayout(false);
+			this.m_pnlBottom.ResumeLayout( false );
 			this.m_pnlMessages.ResumeLayout( false );
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -1496,16 +1496,16 @@
 		private System.Windows.Forms.ToolStripButton m_tsbDesignSupportBracket;
 		private System.Windows.Forms.ToolStripButton m_tsbPatternSetting;
 		private System.Windows.Forms.ToolStripButton m_tsbFixedToolVec;
-		private System.Windows.Forms.Panel m_panCNCVertical;
-		private System.Windows.Forms.Panel m_panVerticalAlarm;
-		private System.Windows.Forms.Panel m_panTreeView;
+		private System.Windows.Forms.Panel m_pnlCNCVertical;
+		private System.Windows.Forms.Panel m_pnlVerticalAlarm;
+		private System.Windows.Forms.Panel m_pnlTreeView;
 		private System.Windows.Forms.Panel m_pnlLog;
 		private System.Windows.Forms.Panel m_pnlMessages;
-		private System.Windows.Forms.Panel m_panViewer;
+		private System.Windows.Forms.Panel m_pnlViewer;
 		private System.Windows.Forms.ToolStrip m_tsViewerToolBar;
-		private System.Windows.Forms.Panel m_panCNC;
-		private System.Windows.Forms.Panel m_panCNCInfo;
-		private System.Windows.Forms.TableLayoutPanel m_tlpBottom;
+		private System.Windows.Forms.Panel m_pnlCNC;
+		private System.Windows.Forms.Panel m_pnlCNCInfo;
+		private System.Windows.Forms.TableLayoutPanel m_pnlBottom;
 		private System.Windows.Forms.ToolStripButton m_tsbAXO;
 		private System.Windows.Forms.ToolStripButton m_tsbXPos;
 		private System.Windows.Forms.ToolStripButton m_tsbXNeg;
@@ -1513,34 +1513,34 @@
 		private System.Windows.Forms.ToolStripButton m_tsbYNeg;
 		private System.Windows.Forms.ToolStripButton m_tsbZPos;
 		private System.Windows.Forms.ToolStripButton m_tsbZNeg;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.ToolStripSeparator m_tssViewerToolBar;
 		private System.Windows.Forms.ToolStripButton m_tsbShowVec;
 		private System.Windows.Forms.ToolStripButton m_tsbShowOrder;
 		private System.Windows.Forms.ToolStripButton m_tsbShowOrientation;
 		private System.Windows.Forms.ToolStripButton m_tsbShowTraverse;
 		private System.Windows.Forms.ToolStripButton m_tsbShowMarker;
-		private System.Windows.Forms.TableLayoutPanel m_panBackGround;
-		private System.Windows.Forms.ToolStripMenuItem m_tsbSetting;
-		private System.Windows.Forms.ToolStripMenuItem m_tsbCNCConnection;
+		private System.Windows.Forms.TableLayoutPanel m_pnlBackGround;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiSetting;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiCNCConnection;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSimulation;
 		private System.Windows.Forms.ToolStrip m_tsSimuFunc;
-		private System.Windows.Forms.ToolStripButton m_btnPlay;
-		private System.Windows.Forms.ToolStripButton m_btnPause;
-		private System.Windows.Forms.ToolStripButton m_btnStop;
-		private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-		private System.Windows.Forms.ToolStripButton m_btnPreviousPath;
-		private System.Windows.Forms.ToolStripButton m_btnNextPath;
-		private System.Windows.Forms.ToolStripButton m_btnPreCollision;
-		private System.Windows.Forms.ToolStripButton m_btnNextCol;
-		private System.Windows.Forms.ToolStripButton m_btnSpeedUp;
-		private System.Windows.Forms.ToolStripButton m_btnSlowDonw;
-		private System.Windows.Forms.ToolStripButton m_btnCheck;
+		private System.Windows.Forms.ToolStripButton m_tsbPlay;
+		private System.Windows.Forms.ToolStripButton m_tsbPause;
+		private System.Windows.Forms.ToolStripButton m_tsbStop;
+		private System.Windows.Forms.ContextMenuStrip m_cmsMain;
+		private System.Windows.Forms.ToolStripButton m_tsbPreviousPath;
+		private System.Windows.Forms.ToolStripButton m_tsbNextPath;
+		private System.Windows.Forms.ToolStripButton m_tsbPreCollision;
+		private System.Windows.Forms.ToolStripButton m_tsbNextCol;
+		private System.Windows.Forms.ToolStripButton m_tsbSpeedUp;
+		private System.Windows.Forms.ToolStripButton m_tsbSlowDown;
+		private System.Windows.Forms.ToolStripButton m_tsbCheck;
 		private System.Windows.Forms.ToolStripButton m_tsbPathEdit;
 		private System.Windows.Forms.ToolStripButton m_tsbPathCompensation;
 		private System.Windows.Forms.ToolStripButton m_tsbContourEdit;
-		private System.Windows.Forms.ToolStripButton m_btnPrePoint;
-		private System.Windows.Forms.ToolStripButton m_btnNextPoint;
-		private System.Windows.Forms.ToolStripMenuItem m_tsbController;
+		private System.Windows.Forms.ToolStripButton m_tsbPrePoint;
+		private System.Windows.Forms.ToolStripButton m_tsbNextPoint;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiController;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiCNC;
 		private System.Windows.Forms.ToolStrip m_tsLayer;
 		private System.Windows.Forms.ToolStripButton m_tsbLayer1;

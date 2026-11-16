@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="ToolVectorDlg" Content="飞边姿态" />
-	<Message ID="m_secToolVecInfo" Content="单点姿态信息" />
+	<Message ID="m_pnlToolVecInfo" Content="单点姿态信息" />
 	<Message ID="m_lblADeg" Content="前倾角" />
 	<Message ID="m_lblBDeg" Content="侧倾角" />
 	<Message ID="m_lblInterpolateType" Content="插补方案" />
-	<Message ID="m_secQuickSet" Content="姿态方向快捷键" />
+	<Message ID="m_pnlQuickSet" Content="姿态方向快捷键" />
 	<Message ID="m_btnZDir" Content="朝Z方向" />
 	<Message ID="m_btnKeep" Content="保持前姿态" />
 	<Message ID="m_btnRevert" Content="原始" />
@@ -13,11 +13,11 @@
 	<Message ID="m_btnSwitchStartEnd" Content="起/终" />
 	<Message ID="m_lblStartOrEnd_Start" Content="当前位置：起点" />
 	<Message ID="m_lblStartOrEnd_End" Content="当前位置：终点" />
-	<Message ID="m_secSetting" Content="姿态设置" />
+	<Message ID="m_pnlSetting" Content="姿态设置" />
 	<Message ID="m_btnAdd" Content="新增" />
 	<Message ID="m_btnRemove" Content="删除" />
 	<Message ID="m_btnClear" Content="清除所有控制点" />
-	<Message ID="m_secMovePnt" Content="控制点移动" />
+	<Message ID="m_pnlMovePnt" Content="控制点移动" />
 	<Message ID="m_lblStartPnt" Content="起终点转换" />
 	<Message ID="m_btnToStart" Content="至起点" />
 	<Message ID="m_lblPnt" Content="前后点转换" />

@@ -2,13 +2,13 @@
 <ResMap>
 	<Message ID="m_lblAxisHeader" Content="Ось" />
 	<Message ID="m_lblCoordinateHeader" Content="Коорд." />
-	<Message ID="m_grpCoordinates" Content="Координаты осей" />
-	<Message ID="m_grpHeight" Content="Ось высоты" />
+	<Message ID="m_pnlCoordinates" Content="Координаты осей" />
+	<Message ID="m_pnlHeight" Content="Ось высоты" />
 	<Message ID="m_lblCapacitanceTitle" Content="Ёмкость" />
 	<Message ID="m_lblHeightTitle" Content="Коорд. оси" />
 	<Message ID="m_lblFollowHeightTitle" Content="Выс. слеж." />
 	<Message ID="m_lblActualHeightTitle" Content="Факт. выс." />
-	<Message ID="m_grpMachining" Content="Состояние" />
+	<Message ID="m_pnlMachining" Content="Состояние" />
 	<Message ID="m_lblMainProgramTitle" Content="Имя файла" />
 	<Message ID="m_lblSpeedTitle" Content="Подача" />
 	<Message ID="m_lblPowerTitle" Content="Мощность" />

@@ -3,15 +3,15 @@
 	<Message ID="DesignSupportBracketDlg" Content="Design Support Fixture" />
 	<Message ID="m_lblHint" Content="Click to select the bottom or side face of the workpiece for fixture placement&#13;&#10;(Ctrl: multi-select; double-click: select continuous faces)" />
 	<Message ID="m_btnNext" Content="Next" />
-	<Message ID="m_secBase" Content="Base Size" />
+	<Message ID="m_pnlBase" Content="Base Size" />
 	<Message ID="m_lblXExtension" Content="X-Direction Extension Distance" />
 	<Message ID="m_lblYExtension" Content="Y-Direction Extension Distance" />
-	<Message ID="m_secBracket" Content="Support Fixture Position" />
+	<Message ID="m_pnlBracket" Content="Support Fixture Position" />
 	<Message ID="m_lblXPositionsTitle" Content="X-Direction Support Fixture Position" />
 	<Message ID="m_lblYPositionsTitle" Content="Y-Direction Support Fixture Position" />
 	<Message ID="m_btnAddXPosition" Content="+ Add X Support Fixture Position" />
 	<Message ID="m_btnAddYPosition" Content="+ Add Y Support Fixture Position" />
-	<Message ID="m_secBracketHeight" Content="Support Fixture Height" />
+	<Message ID="m_pnlBracketHeight" Content="Support Fixture Height" />
 	<Message ID="m_lblBaseThickness" Content="Connection Height (D - Base Plate Thickness)" />
 	<Message ID="m_lblEngagementDepth" Content="Support Fixture Engagement Depth (A)" />
 	<Message ID="m_lblXPinCount" Content="X-Direction Connection Quantity" />
@@ -20,10 +20,10 @@
 	<Message ID="m_lblRibHeight" Content="Support Fixture Base Height" />
 	<Message ID="m_lblZExtension" Content="Workpiece Clearance Height" />
 	<Message ID="m_lblPinLength" Content="Connection Length (B)" />
-	<Message ID="m_secCrossFit" Content="Engagement Design" />
-	<Message ID="m_secBracketCount" Content="Base Connection Quantity" />
+	<Message ID="m_pnlCrossFit" Content="Engagement Design" />
+	<Message ID="m_pnlBracketCount" Content="Base Connection Quantity" />
 	<Message ID="m_btnResetPositions" Content="Reset Position" />
-	<Message ID="m_secBottomPinSize" Content="Base Pin Size" />
+	<Message ID="m_pnlBottomPinSize" Content="Base Pin Size" />
 	<Message ID="m_btnBack" Content="Back" />
 	<Message ID="m_btnGenerate" Content="Generate" />
 	<Message ID="m_lblSaveDxfHint" Content="Select DXF save path" />
@@ -35,5 +35,4 @@
 	<Message ID="Warn_BelowMinimum" Content="{0} is below minimum {1}" />
 	<Message ID="Warn_AboveMaximum" Content="{0} exceeds maximum {1}" />
 	<Message ID="m_lblFilletRadius" Content="Fillet Radius" />
-	<Message ID="m_btnImportParams" Content="Import Parameters" />
 </ResMap>

@@ -12,17 +12,17 @@ namespace MyCAM.Editor
 		public MicroJointDlg()
 		{
 			InitializeComponent();
-			m_tbxMicroJointLength.SilentSetValue = (decimal)DEFAULT_LENGTH;
+			m_numMicroJointLength.SilentSetValue = (decimal)DEFAULT_LENGTH;
 		}
 
 		public void SetMicroJointLength( double length )
 		{
-			m_tbxMicroJointLength.SilentSetValue = (decimal)length;
+			m_numMicroJointLength.SilentSetValue = (decimal)length;
 		}
 
 		public double GetMicroJointLength()
 		{
-			double result = (double)m_tbxMicroJointLength.Value;
+			double result = (double)m_numMicroJointLength.Value;
 			return result > 0 ? result : DEFAULT_LENGTH;
 		}
 
@@ -38,7 +38,7 @@ namespace MyCAM.Editor
 
 		const double DEFAULT_LENGTH = 2.0;
 
-		void m_tbxMicroJointLength_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numMicroJointLength_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			double newLength = GetMicroJointLength();
 			LengthChangedAction?.Invoke( newLength );

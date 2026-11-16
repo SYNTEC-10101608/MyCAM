@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ResMap>
 	<Message ID="CalibrationREFDlg" Content="Трёхточечная калибровка" />
-	<Message ID="m_gbPnt1" Content="Опорная точка 1" />
-	<Message ID="m_gbPnt2" Content="Опорная точка 2" />
-	<Message ID="m_gbPnt3" Content="Опорная точка 3" />
+	<Message ID="m_pnlPnt1" Content="Опорная точка 1" />
+	<Message ID="m_pnlPnt2" Content="Опорная точка 2" />
+	<Message ID="m_pnlPnt3" Content="Опорная точка 3" />
 	<Message ID="m_btnDelete" Content="Удалить" />
 	<Message ID="m_btnDeletAll" Content="Удалить все" />
 	<Message ID="NeedThreeRefPoints" Content="Требуется три опорные точки" />

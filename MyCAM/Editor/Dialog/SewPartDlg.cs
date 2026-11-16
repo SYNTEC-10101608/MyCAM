@@ -7,12 +7,12 @@ namespace MyCAM.Editor
 		public SewPartDlg( double dSewTolerance )
 		{
 			InitializeComponent();
-			m_txbSewTol.Value = (decimal)dSewTolerance;
+			m_numSewTol.Value = (decimal)dSewTolerance;
 		}
 
 		void m_btnOK_Click( object sender, EventArgs e )
 		{
-			double dTol = (double)m_txbSewTol.Value;
+			double dTol = (double)m_numSewTol.Value;
 			RaiseConfirm( dTol );
 		}
 	}

@@ -43,16 +43,18 @@ namespace CncUI.Controls
 			try {
 				foreach( Item item in m_Items ) {
 					Rectangle original = item.Bounds;
+
+					// controls in the title bar (card actions) keep their design size and stay at the right edge
+					bool isInTitleBar = original.Top < m_TitleHeight;
+					if( isInTitleBar ) {
+						int titleLeft = original.Left + layoutSize.Width - m_DesignSize.Width;
+						item.Control.SetBounds( titleLeft, original.Top, original.Width, original.Height );
+						continue;
+					}
 					int left = (int)Math.Round( original.Left * scaleX );
 					int right = (int)Math.Round( original.Right * scaleX );
-					int top = original.Top;
-					int bottom = original.Bottom;
-
-					// controls in the title bar (card actions) keep their design height and position
-					if( original.Top >= m_TitleHeight ) {
-						top = m_TitleHeight + (int)Math.Round( ( original.Top - m_TitleHeight ) * scaleY );
-						bottom = m_TitleHeight + (int)Math.Round( ( original.Bottom - m_TitleHeight ) * scaleY );
-					}
+					int top = m_TitleHeight + (int)Math.Round( ( original.Top - m_TitleHeight ) * scaleY );
+					int bottom = m_TitleHeight + (int)Math.Round( ( original.Bottom - m_TitleHeight ) * scaleY );
 					item.Control.SetBounds( left, top, Math.Max( 1, right - left ), Math.Max( 1, bottom - top ) );
 					item.Children?.Apply( item.Control );
 				}

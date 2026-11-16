@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
     <Message ID="AddPathDlg" Content="新增路径" />
-    <Message ID="m_grpStep1" Content="路径生成方式" />
+    <Message ID="m_pnlStep1" Content="路径生成方式" />
     <Message ID="m_rdoAutoHat" Content="自动生成路径-异形盖件" />
     <Message ID="m_rdoAutoTube" Content="自动生成路径-管拉件" />
     <Message ID="m_rdoManual" Content="手动生成路径" />
-    <Message ID="m_grpStep3" Content="路径生成方式" />
+    <Message ID="m_pnlStep3" Content="路径生成方式" />
     <Message ID="m_rdoAutoFromFace" Content="自动生成路径" />
     <Message ID="m_rdoManualWire" Content="手动选择路径" />
     <Message ID="m_chkShowAdvanced" Content="进阶参数" />
-    <Message ID="m_grpAdvanced" Content="进阶参数" />
+    <Message ID="m_pnlAdvanced" Content="进阶参数" />
     <Message ID="m_lblD1Threshold" Content="D1 连续阀值:" />
     <Message ID="m_lblDiscreteMode" Content="离散方式:" />
     <Message ID="m_lblMaxChordError" Content="弦高误差:" />

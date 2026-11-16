@@ -9,10 +9,10 @@
 	<Message ID="m_tsmiCAD" Content="CAD" />
 	<Message ID="m_tsmiCAM" Content="CAM" />
 	<Message ID="m_tsmiSimulation" Content="Simulation" />
-	<Message ID="m_tsbSetting" Content="Settings" />
-	<Message ID="m_tsbCNCConnection" Content="CNC Connection" />
+	<Message ID="m_tsmiSetting" Content="Settings" />
+	<Message ID="m_tsmiCNCConnection" Content="CNC Connection" />
 	<Message ID="m_tsmiLanguage" Content="Language" />
-	<Message ID="m_tsbController" Content="Controller" />
+	<Message ID="m_tsmiController" Content="Controller" />
 	<Message ID="m_tsmiControllerAdvancedSettings" Content="Advanced Controller Settings" />
 	<Message ID="m_tsmiMachining" Content="Machining" />
 	<Message ID="m_tsbSetOffset" Content="Set Offset" />
@@ -109,38 +109,32 @@
 	<Message ID="m_tsbMeasureCAM_ToolTip" Content="Measure distance or angle" />
 	
 	<!-- 新增路徑子工具列 -->
-	<Message ID="m_tsAddPathForHat" Content="Custom Cover - Generate Toolpath" />
-	<Message ID="m_tsAddPathForTube" Content="Drawn Tube - Generate Toolpath" />
-	<Message ID="m_tsbSelectD1ContFace" Content="D1 Continuous" />
-	<Message ID="m_tsbSelPath_FreeBound" Content="All Face Boundaries" />
-	<Message ID="m_tsbSelPath_Manual" Content="Manual Selection" />
-	<Message ID="m_tsbManualSelectPathOK" Content="Confirm Selection" />
 	
 	<!-- 模擬工具列 -->
-	<Message ID="m_btnPlay" Content="Play" />
-	<Message ID="m_btnPlay_ToolTip" Content="Play simulation" />
-	<Message ID="m_btnPause" Content="Pause" />
-	<Message ID="m_btnPause_ToolTip" Content="Pause simulation" />
-	<Message ID="m_btnStop" Content="Stop" />
-	<Message ID="m_btnStop_ToolTip" Content="Stop simulation and return to the start" />
-	<Message ID="m_btnPreviousPath" Content="Previous Toolpath" />
-	<Message ID="m_btnPreviousPath_ToolTip" Content="Jump to the previous toolpath" />
-	<Message ID="m_btnNextPath" Content="Next Toolpath" />
-	<Message ID="m_btnNextPath_ToolTip" Content="Jump to the next toolpath" />
-	<Message ID="m_btnPreCollision" Content="Previous Collision Point" />
-	<Message ID="m_btnPreCollision_ToolTip" Content="Jump to the previous collision point" />
-	<Message ID="m_btnNextCol" Content="Next Collision Point" />
-	<Message ID="m_btnNextCol_ToolTip" Content="Jump to the next collision point" />
-	<Message ID="m_btnPrePoint" Content="Previous Step" />
-	<Message ID="m_btnPrePoint_ToolTip" Content="Move back one step" />
-	<Message ID="m_btnNextPoint" Content="Next Step" />
-	<Message ID="m_btnNextPoint_ToolTip" Content="Move forward one step" />
-	<Message ID="m_btnSpeedUp" Content="Speed Up" />
-	<Message ID="m_btnSpeedUp_ToolTip" Content="Increase simulation speed" />
-	<Message ID="m_btnSlowDonw" Content="Slow Down" />
-	<Message ID="m_btnSlowDonw_ToolTip" Content="Decrease simulation speed" />
-	<Message ID="m_btnCheck" Content="Collision Check" />
-	<Message ID="m_btnCheck_ToolTip" Content="Check for collisions" />
+	<Message ID="m_tsbPlay" Content="Play" />
+	<Message ID="m_tsbPlay_ToolTip" Content="Play simulation" />
+	<Message ID="m_tsbPause" Content="Pause" />
+	<Message ID="m_tsbPause_ToolTip" Content="Pause simulation" />
+	<Message ID="m_tsbStop" Content="Stop" />
+	<Message ID="m_tsbStop_ToolTip" Content="Stop simulation and return to the start" />
+	<Message ID="m_tsbPreviousPath" Content="Previous Toolpath" />
+	<Message ID="m_tsbPreviousPath_ToolTip" Content="Jump to the previous toolpath" />
+	<Message ID="m_tsbNextPath" Content="Next Toolpath" />
+	<Message ID="m_tsbNextPath_ToolTip" Content="Jump to the next toolpath" />
+	<Message ID="m_tsbPreCollision" Content="Previous Collision Point" />
+	<Message ID="m_tsbPreCollision_ToolTip" Content="Jump to the previous collision point" />
+	<Message ID="m_tsbNextCol" Content="Next Collision Point" />
+	<Message ID="m_tsbNextCol_ToolTip" Content="Jump to the next collision point" />
+	<Message ID="m_tsbPrePoint" Content="Previous Step" />
+	<Message ID="m_tsbPrePoint_ToolTip" Content="Move back one step" />
+	<Message ID="m_tsbNextPoint" Content="Next Step" />
+	<Message ID="m_tsbNextPoint_ToolTip" Content="Move forward one step" />
+	<Message ID="m_tsbSpeedUp" Content="Speed Up" />
+	<Message ID="m_tsbSpeedUp_ToolTip" Content="Increase simulation speed" />
+	<Message ID="m_tsbSlowDown" Content="Slow Down" />
+	<Message ID="m_tsbSlowDown_ToolTip" Content="Decrease simulation speed" />
+	<Message ID="m_tsbCheck" Content="Collision Check" />
+	<Message ID="m_tsbCheck_ToolTip" Content="Check for collisions" />
 	
 	<!-- 提示字串 -->
 	<Message ID="ShowVec" Content="Show Orientation" />

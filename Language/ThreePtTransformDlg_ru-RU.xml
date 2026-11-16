@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ResMap>
 	<Message ID="ThreePtTransformDlg" Content="Трёхточечное преобразование" />
-	<Message ID="m_gbCADCoord" Content="CAD координаты" />
-	<Message ID="m_gbMachineCoord" Content="Механические координаты" />
-	<Message ID="label1" Content="Первая точка" />
-	<Message ID="label2" Content="Вторая точка" />
-	<Message ID="label3" Content="Третья точка" />
+	<Message ID="m_pnlCADCoord" Content="CAD координаты" />
+	<Message ID="m_pnlMachineCoord" Content="Механические координаты" />
+	<Message ID="m_lblCADPoint1" Content="Первая точка" />
+	<Message ID="m_lblCADPoint2" Content="Вторая точка" />
+	<Message ID="m_lblCADPoint3" Content="Третья точка" />
 	<Message ID="InvalidMachineCoord" Content="Координаты механической точки недействительны" />
 	<Message ID="MachinePointsCoincident" Content="Механические точки не могут совпадать" />
 	<Message ID="MachinePointsCollinear" Content="Механические точки не могут быть коллинеарными" />

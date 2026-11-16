@@ -19,6 +19,7 @@ namespace CncUI
 			SetStyle( ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer |
 				ControlStyles.ResizeRedraw, true );
 			InitializeComponent();
+			m_DesignSize = Size;
 			m_Values = new Dictionary<CNCInfoField, Label> {
 				{ CNCInfoField.X, m_lblXValue },
 				{ CNCInfoField.Y, m_lblYValue },
@@ -44,7 +45,7 @@ namespace CncUI
 				{ m_lblCTitle, C_AXIS_COLOR }
 			};
 			m_btnCoordinates.Click += ( sender, e ) => CoordinateModeClicked?.Invoke();
-			m_grpCoordinates.Paint += OnCoordinatesPaint;
+			m_pnlCoordinates.Paint += OnCoordinatesPaint;
 			m_Layout = new ResponsiveLayout( this );
 			m_VerticalLayout = CreateVerticalLayout( out m_VerticalDesignSize );
 			ApplyResources();
@@ -81,19 +82,13 @@ namespace CncUI
 
 		public override Size GetPreferredSize( Size proposedSize )
 		{
-			float scale = DeviceDpi / 96F;
-			return new Size( (int)Math.Ceiling( 672 * scale ), (int)Math.Ceiling( 236 * scale ) );
+			// the landscape designer size
+			return m_DesignSize;
 		}
 
 		protected override void OnSizeChanged( EventArgs e )
 		{
 			base.OnSizeChanged( e );
-			UpdateResponsiveLayout();
-		}
-
-		protected override void OnDpiChangedAfterParent( EventArgs e )
-		{
-			base.OnDpiChangedAfterParent( e );
 			UpdateResponsiveLayout();
 		}
 
@@ -115,7 +110,7 @@ namespace CncUI
 					m_Layout.Apply( this );
 				}
 				m_lblCoordinateHeader.Left = m_lblXValue.Right - m_lblCoordinateHeader.Width;
-				int gap = (int)Math.Ceiling( VERTICAL_COLUMN_GAP * DeviceDpi / 96F );
+				int gap = ThemeMetrics.CONTROL_GAP;
 				int titleWidth = TextRenderer.MeasureText( m_lblMainProgramTitle.Text, m_lblMainProgramTitle.Font ).Width;
 				int titleRight = Math.Min( m_lblMainProgramTitle.Left + titleWidth, m_lblSpeedValue.Right - gap - 1 );
 				m_lblMainProgramTitle.Width = Math.Max( 1, titleRight - m_lblMainProgramTitle.Left );
@@ -130,15 +125,15 @@ namespace CncUI
 
 		ResponsiveLayout CreateVerticalLayout( out Size designSize )
 		{
-			Panel[] cards = { m_grpCoordinates, m_grpHeight, m_grpMachining };
+			Panel[] cards = { m_pnlCoordinates, m_pnlHeight, m_pnlMachining };
 			int width = 0;
 			foreach( Panel card in cards ) {
 				width = Math.Max( width, card.Width );
 			}
-			int top = VERTICAL_CARD_GAP;
+			int top = ThemeMetrics.PANEL_MARGIN;
 			foreach( Panel card in cards ) {
 				ResponsiveLayout contents = new ResponsiveLayout( card );
-				card.SetBounds( VERTICAL_CARD_GAP, top, width, card.Height );
+				card.SetBounds( ThemeMetrics.PANEL_MARGIN, top, width, card.Height );
 				contents.Apply( card );
 				SortedDictionary<int, List<Control>> rows = new SortedDictionary<int, List<Control>>();
 				foreach( Control control in card.Controls ) {
@@ -148,28 +143,28 @@ namespace CncUI
 					}
 					row.Add( control );
 				}
-				// a titled card starts its rows below the title bar; card actions in the title bar stay there
+				// rows keep the read-out row grid of the landscape layout from the first content row;
+				// card actions in the title bar stay there
 				bool isTitled = !string.IsNullOrEmpty( card.Text );
-				int rowTop = isTitled ? ThemeMetrics.SECTION_TITLE_HEIGHT : VERTICAL_CARD_GAP;
+				int rowTop = isTitled ? ThemeMetrics.SECTION_CONTENT_TOP : ThemeMetrics.SECTION_PADDING;
+				int rowBottom = rowTop;
 				foreach( KeyValuePair<int, List<Control>> rowEntry in rows ) {
 					if( isTitled && rowEntry.Key < ThemeMetrics.SECTION_TITLE_HEIGHT ) {
 						continue;
 					}
-					List<Control> row = rowEntry.Value;
-					int rowHeight = 0;
-					foreach( Control control in row ) {
-						int padding = control is Button ? VERTICAL_BUTTON_PADDING : VERTICAL_ROW_PADDING;
-						rowHeight = Math.Max( rowHeight, control.Font.Height + padding );
+					foreach( Control control in rowEntry.Value ) {
+						control.SetBounds( control.Left, rowTop, control.Width, ThemeMetrics.INFO_ROW_HEIGHT );
 					}
-					foreach( Control control in row ) {
-						control.SetBounds( control.Left, rowTop, control.Width, rowHeight );
-					}
-					rowTop += rowHeight;
+					rowBottom = rowTop + ThemeMetrics.INFO_ROW_HEIGHT;
+					rowTop += ThemeMetrics.INFO_ROW_PITCH;
 				}
-				card.Height = rowTop + VERTICAL_CARD_GAP;
-				top += card.Height + VERTICAL_CARD_GAP;
+				card.Height = rowBottom + ThemeMetrics.SECTION_PADDING;
+				top += card.Height + ThemeMetrics.SECTION_GAP;
 			}
-			designSize = new Size( width + VERTICAL_CARD_GAP * 2, top );
+
+			// the last card is followed by the panel margin instead of a card gap
+			designSize = new Size( width + ThemeMetrics.PANEL_MARGIN * 2,
+				top - ThemeMetrics.SECTION_GAP + ThemeMetrics.PANEL_MARGIN );
 			return new ResponsiveLayout( this, designSize );
 		}
 
@@ -192,8 +187,8 @@ namespace CncUI
 			foreach( Label unit in units ) {
 				unitWidth = Math.Max( unitWidth, TextRenderer.MeasureText( unit.Text, unit.Font ).Width );
 			}
-			int gap = (int)Math.Ceiling( VERTICAL_COLUMN_GAP * DeviceDpi / 96F );
-			int rightPadding = (int)Math.Ceiling( VERTICAL_CARD_GAP * DeviceDpi / 96F );
+			int gap = ThemeMetrics.CONTROL_GAP;
+			int rightPadding = ThemeMetrics.SECTION_PADDING;
 			valueRight = Math.Min( valueRight, cardWidth - rightPadding - gap - unitWidth );
 			foreach( Label value in m_Values.Values ) {
 				value.SetBounds( valueLeft, value.Top, Math.Max( 1, valueRight - valueLeft ), value.Height );
@@ -315,6 +310,7 @@ namespace CncUI
 		readonly ResponsiveLayout m_Layout;
 		readonly ResponsiveLayout m_VerticalLayout;
 		readonly Size m_VerticalDesignSize;
+		readonly Size m_DesignSize;
 		bool m_IsVertical;
 		bool m_ApplyingLayout;
 		CncAxisRole? m_FirstAxisRole = CncAxisRole.Head;
@@ -322,10 +318,6 @@ namespace CncUI
 		CncStatus? m_MachiningStatus;
 		bool m_MachineCoordinates;
 
-		const int VERTICAL_CARD_GAP = 4;
-		const int VERTICAL_COLUMN_GAP = 4;
-		const int VERTICAL_ROW_PADDING = 2;
-		const int VERTICAL_BUTTON_PADDING = 6;
 		const int AXIS_MARKER_OFFSET = 12;
 
 		const string AXIS_HEADER = "軸";

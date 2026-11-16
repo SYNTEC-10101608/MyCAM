@@ -3,19 +3,19 @@
 	<Message ID="FlyCutDlg" Content="Точка начала реза" />
 
 	<Message ID="m_lblFlyCut" Content="Тип" />
-	<Message ID="m_rbtnCircularFlyCut" Content="Круговой FlyCut" />
+	<Message ID="m_rdoCircularFlyCut" Content="Круговой FlyCut" />
 
-	<Message ID="m_gbxSetting" Content="Параметры FlyCut" />
+	<Message ID="m_pnlSetting" Content="Параметры FlyCut" />
 
 	<Message ID="m_lblStartPosition" Content="Начальная позиция" />
-	<Message ID="m_rbtnLeftTop" Content="Верхний левый" />
-	<Message ID="m_rbtnLeftBottom" Content="Нижний левый" />
-	<Message ID="m_rbtnRightTop" Content="Верхний правый" />
-	<Message ID="m_rbtnRightBottom" Content="Нижний правый" />
+	<Message ID="m_rdoLeftTop" Content="Верхний левый" />
+	<Message ID="m_rdoLeftBottom" Content="Нижний левый" />
+	<Message ID="m_rdoRightTop" Content="Верхний правый" />
+	<Message ID="m_rdoRightBottom" Content="Нижний правый" />
 
 	<Message ID="m_lblDirection" Content="Направление" />
-	<Message ID="m_rbtnVertical" Content="Вертикальное" />
-	<Message ID="m_rbtnHorizontal" Content="Горизонтальное" />
+	<Message ID="m_rdoVertical" Content="Вертикальное" />
+	<Message ID="m_rdoHorizontal" Content="Горизонтальное" />
 	<Message ID="GroupWidth" Content="Шаг" />
 	<Message ID="GroupAngle" Content="Угол" />
 

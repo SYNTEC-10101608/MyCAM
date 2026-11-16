@@ -27,24 +27,24 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_secParam = new CommonUI.Controls.SectionPanel();
+			this.m_pnlParam = new CommonUI.Controls.SectionPanel();
 			this.m_lblOverCutLength = new System.Windows.Forms.Label();
-			this.m_tbxOverCutLength = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_OverCutUnit = new CommonUI.Controls.ThemedLabel();
+			this.m_numOverCutLength = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblOverCutUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_btnSure = new CommonUI.Controls.ThemedButton();
-			this.m_secParam.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxOverCutLength)).BeginInit();
+			this.m_pnlParam.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numOverCutLength)).BeginInit();
 			this.SuspendLayout();
 			//
-			// m_secParam
+			// m_pnlParam
 			//
-			this.m_secParam.Controls.Add(this.m_lblOverCutLength);
-			this.m_secParam.Controls.Add(this.m_tbxOverCutLength);
-			this.m_secParam.Controls.Add(this.m_OverCutUnit);
-			this.m_secParam.Location = new System.Drawing.Point(12, 12);
-			this.m_secParam.Name = "m_secParam";
-			this.m_secParam.Size = new System.Drawing.Size(296, 43);
-			this.m_secParam.TabIndex = 0;
+			this.m_pnlParam.Controls.Add(this.m_lblOverCutLength);
+			this.m_pnlParam.Controls.Add(this.m_numOverCutLength);
+			this.m_pnlParam.Controls.Add(this.m_lblOverCutUnit);
+			this.m_pnlParam.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlParam.Name = "m_pnlParam";
+			this.m_pnlParam.Size = new System.Drawing.Size(296, 43);
+			this.m_pnlParam.TabIndex = 0;
 			//
 			// m_lblOverCutLength
 			//
@@ -55,34 +55,34 @@
 			this.m_lblOverCutLength.TabIndex = 0;
 			this.m_lblOverCutLength.Text = "過切長度:";
 			//
-			// m_tbxOverCutLength
+			// m_numOverCutLength
 			//
-			this.m_tbxOverCutLength.DecimalPlaces = 3;
-			this.m_tbxOverCutLength.Increment = new decimal(new int[] {
+			this.m_numOverCutLength.DecimalPlaces = 3;
+			this.m_numOverCutLength.Increment = new decimal(new int[] {
             5,
             0,
             0,
             65536});
-			this.m_tbxOverCutLength.Location = new System.Drawing.Point(100, 10);
-			this.m_tbxOverCutLength.Maximum = new decimal(new int[] {
+			this.m_numOverCutLength.Location = new System.Drawing.Point(100, 10);
+			this.m_numOverCutLength.Maximum = new decimal(new int[] {
             99999,
             0,
             0,
             0});
-			this.m_tbxOverCutLength.Name = "m_tbxOverCutLength";
-			this.m_tbxOverCutLength.Size = new System.Drawing.Size(150, 23);
-			this.m_tbxOverCutLength.TabIndex = 1;
-			this.m_tbxOverCutLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxOverCutLength_DebouncedValueChanged);
+			this.m_numOverCutLength.Name = "m_numOverCutLength";
+			this.m_numOverCutLength.Size = new System.Drawing.Size(150, 23);
+			this.m_numOverCutLength.TabIndex = 1;
+			this.m_numOverCutLength.DebouncedValueChanged += new System.EventHandler(this.m_numOverCutLength_DebouncedValueChanged);
 			//
-			// m_OverCutUnit
+			// m_lblOverCutUnit
 			//
-			this.m_OverCutUnit.AutoSize = true;
-			this.m_OverCutUnit.Location = new System.Drawing.Point(256, 14);
-			this.m_OverCutUnit.Name = "m_OverCutUnit";
-			this.m_OverCutUnit.Role = CommonUI.Theme.TextRole.Secondary;
-			this.m_OverCutUnit.Size = new System.Drawing.Size(30, 16);
-			this.m_OverCutUnit.TabIndex = 2;
-			this.m_OverCutUnit.Text = "mm";
+			this.m_lblOverCutUnit.AutoSize = true;
+			this.m_lblOverCutUnit.Location = new System.Drawing.Point(256, 14);
+			this.m_lblOverCutUnit.Name = "m_lblOverCutUnit";
+			this.m_lblOverCutUnit.Role = CommonUI.Theme.TextRole.Secondary;
+			this.m_lblOverCutUnit.Size = new System.Drawing.Size(30, 16);
+			this.m_lblOverCutUnit.TabIndex = 2;
+			this.m_lblOverCutUnit.Text = "mm";
 			//
 			// m_btnSure
 			//
@@ -98,23 +98,23 @@
 			// OverCutDlg
 			//
 			this.ClientSize = new System.Drawing.Size(320, 111);
-			this.Controls.Add(this.m_secParam);
+			this.Controls.Add(this.m_pnlParam);
 			this.Controls.Add(this.m_btnSure);
 			this.Name = "OverCutDlg";
 			this.Text = "過切";
-			this.m_secParam.ResumeLayout(false);
-			this.m_secParam.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxOverCutLength)).EndInit();
+			this.m_pnlParam.ResumeLayout(false);
+			this.m_pnlParam.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numOverCutLength)).EndInit();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_secParam;
+		private CommonUI.Controls.SectionPanel m_pnlParam;
 		private System.Windows.Forms.Label m_lblOverCutLength;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxOverCutLength;
-		private CommonUI.Controls.ThemedLabel m_OverCutUnit;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numOverCutLength;
+		private CommonUI.Controls.ThemedLabel m_lblOverCutUnit;
 		private CommonUI.Controls.ThemedButton m_btnSure;
 	}
 }

@@ -29,13 +29,13 @@
 		{
 			this.m_pnlExtendedGCode = new CommonUI.Controls.SectionPanel();
 			this.m_lblInsertType = new System.Windows.Forms.Label();
-			this.m_flpnlRadioButton = new System.Windows.Forms.Panel();
-			this.m_rbtnTraverseStart = new System.Windows.Forms.RadioButton();
-			this.m_rbtnTraverseEnd = new System.Windows.Forms.RadioButton();
-			this.m_rbtnPathStart = new System.Windows.Forms.RadioButton();
-			this.m_rbtnPathEnd = new System.Windows.Forms.RadioButton();
-			this.m_rbtnControlPoint = new System.Windows.Forms.RadioButton();
-			this.m_flpnlToStartOrEnd = new System.Windows.Forms.Panel();
+			this.m_pnlRadioButton = new System.Windows.Forms.Panel();
+			this.m_rdoTraverseStart = new System.Windows.Forms.RadioButton();
+			this.m_rdoTraverseEnd = new System.Windows.Forms.RadioButton();
+			this.m_rdoPathStart = new System.Windows.Forms.RadioButton();
+			this.m_rdoPathEnd = new System.Windows.Forms.RadioButton();
+			this.m_rdoControlPoint = new System.Windows.Forms.RadioButton();
+			this.m_pnlToStartOrEnd = new System.Windows.Forms.Panel();
 			this.m_lblToStartOrEnd = new System.Windows.Forms.Label();
 			this.m_btnToStartOrEnd = new CommonUI.Controls.ThemedButton();
 			this.m_lblIsStartOrEnd = new System.Windows.Forms.Label();
@@ -46,15 +46,15 @@
 			this.m_btnDelete = new CommonUI.Controls.ThemedButton();
 			this.m_btnDone = new CommonUI.Controls.ThemedButton();
 			this.m_pnlExtendedGCode.SuspendLayout();
-			this.m_flpnlRadioButton.SuspendLayout();
-			this.m_flpnlToStartOrEnd.SuspendLayout();
+			this.m_pnlRadioButton.SuspendLayout();
+			this.m_pnlToStartOrEnd.SuspendLayout();
 			this.SuspendLayout();
 			//
 			// m_pnlExtendedGCode
 			//
 			this.m_pnlExtendedGCode.Controls.Add(this.m_lblInsertType);
-			this.m_pnlExtendedGCode.Controls.Add(this.m_flpnlRadioButton);
-			this.m_pnlExtendedGCode.Controls.Add(this.m_flpnlToStartOrEnd);
+			this.m_pnlExtendedGCode.Controls.Add(this.m_pnlRadioButton);
+			this.m_pnlExtendedGCode.Controls.Add(this.m_pnlToStartOrEnd);
 			this.m_pnlExtendedGCode.Controls.Add(this.m_lblGCode);
 			this.m_pnlExtendedGCode.Controls.Add(this.m_lblIsMixData);
 			this.m_pnlExtendedGCode.Controls.Add(this.m_txtGCode);
@@ -72,82 +72,82 @@
 			this.m_lblInsertType.TabIndex = 0;
 			this.m_lblInsertType.Text = "插入位置";
 			//
-			// m_flpnlRadioButton
+			// m_pnlRadioButton
 			//
-			this.m_flpnlRadioButton.Controls.Add(this.m_rbtnTraverseStart);
-			this.m_flpnlRadioButton.Controls.Add(this.m_rbtnTraverseEnd);
-			this.m_flpnlRadioButton.Controls.Add(this.m_rbtnPathStart);
-			this.m_flpnlRadioButton.Controls.Add(this.m_rbtnPathEnd);
-			this.m_flpnlRadioButton.Controls.Add(this.m_rbtnControlPoint);
-			this.m_flpnlRadioButton.Location = new System.Drawing.Point(10, 40);
-			this.m_flpnlRadioButton.Name = "m_flpnlRadioButton";
-			this.m_flpnlRadioButton.Size = new System.Drawing.Size(456, 23);
-			this.m_flpnlRadioButton.TabIndex = 1;
+			this.m_pnlRadioButton.Controls.Add(this.m_rdoTraverseStart);
+			this.m_pnlRadioButton.Controls.Add(this.m_rdoTraverseEnd);
+			this.m_pnlRadioButton.Controls.Add(this.m_rdoPathStart);
+			this.m_pnlRadioButton.Controls.Add(this.m_rdoPathEnd);
+			this.m_pnlRadioButton.Controls.Add(this.m_rdoControlPoint);
+			this.m_pnlRadioButton.Location = new System.Drawing.Point(10, 40);
+			this.m_pnlRadioButton.Name = "m_pnlRadioButton";
+			this.m_pnlRadioButton.Size = new System.Drawing.Size(456, 23);
+			this.m_pnlRadioButton.TabIndex = 1;
 			//
-			// m_rbtnTraverseStart
+			// m_rdoTraverseStart
 			//
-			this.m_rbtnTraverseStart.AutoSize = true;
-			this.m_rbtnTraverseStart.Location = new System.Drawing.Point(0, 2);
-			this.m_rbtnTraverseStart.Name = "m_rbtnTraverseStart";
-			this.m_rbtnTraverseStart.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnTraverseStart.TabIndex = 0;
-			this.m_rbtnTraverseStart.TabStop = true;
-			this.m_rbtnTraverseStart.Text = "空移開始";
-			this.m_rbtnTraverseStart.CheckedChanged += new System.EventHandler(this.RadioButtonCheckedhanged);
+			this.m_rdoTraverseStart.AutoSize = true;
+			this.m_rdoTraverseStart.Location = new System.Drawing.Point(0, 2);
+			this.m_rdoTraverseStart.Name = "m_rdoTraverseStart";
+			this.m_rdoTraverseStart.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoTraverseStart.TabIndex = 0;
+			this.m_rdoTraverseStart.TabStop = true;
+			this.m_rdoTraverseStart.Text = "空移開始";
+			this.m_rdoTraverseStart.CheckedChanged += new System.EventHandler(this.RadioButtonCheckedhanged);
 			//
-			// m_rbtnTraverseEnd
+			// m_rdoTraverseEnd
 			//
-			this.m_rbtnTraverseEnd.AutoSize = true;
-			this.m_rbtnTraverseEnd.Location = new System.Drawing.Point(90, 2);
-			this.m_rbtnTraverseEnd.Name = "m_rbtnTraverseEnd";
-			this.m_rbtnTraverseEnd.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnTraverseEnd.TabIndex = 1;
-			this.m_rbtnTraverseEnd.TabStop = true;
-			this.m_rbtnTraverseEnd.Text = "空移結束";
-			this.m_rbtnTraverseEnd.CheckedChanged += new System.EventHandler(this.RadioButtonCheckedhanged);
+			this.m_rdoTraverseEnd.AutoSize = true;
+			this.m_rdoTraverseEnd.Location = new System.Drawing.Point(90, 2);
+			this.m_rdoTraverseEnd.Name = "m_rdoTraverseEnd";
+			this.m_rdoTraverseEnd.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoTraverseEnd.TabIndex = 1;
+			this.m_rdoTraverseEnd.TabStop = true;
+			this.m_rdoTraverseEnd.Text = "空移結束";
+			this.m_rdoTraverseEnd.CheckedChanged += new System.EventHandler(this.RadioButtonCheckedhanged);
 			//
-			// m_rbtnPathStart
+			// m_rdoPathStart
 			//
-			this.m_rbtnPathStart.AutoSize = true;
-			this.m_rbtnPathStart.Location = new System.Drawing.Point(180, 2);
-			this.m_rbtnPathStart.Name = "m_rbtnPathStart";
-			this.m_rbtnPathStart.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnPathStart.TabIndex = 2;
-			this.m_rbtnPathStart.TabStop = true;
-			this.m_rbtnPathStart.Text = "路徑開始";
-			this.m_rbtnPathStart.CheckedChanged += new System.EventHandler(this.RadioButtonCheckedhanged);
+			this.m_rdoPathStart.AutoSize = true;
+			this.m_rdoPathStart.Location = new System.Drawing.Point(180, 2);
+			this.m_rdoPathStart.Name = "m_rdoPathStart";
+			this.m_rdoPathStart.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoPathStart.TabIndex = 2;
+			this.m_rdoPathStart.TabStop = true;
+			this.m_rdoPathStart.Text = "路徑開始";
+			this.m_rdoPathStart.CheckedChanged += new System.EventHandler(this.RadioButtonCheckedhanged);
 			//
-			// m_rbtnPathEnd
+			// m_rdoPathEnd
 			//
-			this.m_rbtnPathEnd.AutoSize = true;
-			this.m_rbtnPathEnd.Location = new System.Drawing.Point(270, 2);
-			this.m_rbtnPathEnd.Name = "m_rbtnPathEnd";
-			this.m_rbtnPathEnd.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnPathEnd.TabIndex = 3;
-			this.m_rbtnPathEnd.TabStop = true;
-			this.m_rbtnPathEnd.Text = "路徑結束";
-			this.m_rbtnPathEnd.CheckedChanged += new System.EventHandler(this.RadioButtonCheckedhanged);
+			this.m_rdoPathEnd.AutoSize = true;
+			this.m_rdoPathEnd.Location = new System.Drawing.Point(270, 2);
+			this.m_rdoPathEnd.Name = "m_rdoPathEnd";
+			this.m_rdoPathEnd.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoPathEnd.TabIndex = 3;
+			this.m_rdoPathEnd.TabStop = true;
+			this.m_rdoPathEnd.Text = "路徑結束";
+			this.m_rdoPathEnd.CheckedChanged += new System.EventHandler(this.RadioButtonCheckedhanged);
 			//
-			// m_rbtnControlPoint
+			// m_rdoControlPoint
 			//
-			this.m_rbtnControlPoint.AutoSize = true;
-			this.m_rbtnControlPoint.Location = new System.Drawing.Point(360, 2);
-			this.m_rbtnControlPoint.Name = "m_rbtnControlPoint";
-			this.m_rbtnControlPoint.Size = new System.Drawing.Size(61, 20);
-			this.m_rbtnControlPoint.TabIndex = 4;
-			this.m_rbtnControlPoint.TabStop = true;
-			this.m_rbtnControlPoint.Text = "控制點";
-			this.m_rbtnControlPoint.CheckedChanged += new System.EventHandler(this.RadioButtonCheckedhanged);
+			this.m_rdoControlPoint.AutoSize = true;
+			this.m_rdoControlPoint.Location = new System.Drawing.Point(360, 2);
+			this.m_rdoControlPoint.Name = "m_rdoControlPoint";
+			this.m_rdoControlPoint.Size = new System.Drawing.Size(61, 20);
+			this.m_rdoControlPoint.TabIndex = 4;
+			this.m_rdoControlPoint.TabStop = true;
+			this.m_rdoControlPoint.Text = "控制點";
+			this.m_rdoControlPoint.CheckedChanged += new System.EventHandler(this.RadioButtonCheckedhanged);
 			//
-			// m_flpnlToStartOrEnd
+			// m_pnlToStartOrEnd
 			//
-			this.m_flpnlToStartOrEnd.Controls.Add(this.m_lblToStartOrEnd);
-			this.m_flpnlToStartOrEnd.Controls.Add(this.m_btnToStartOrEnd);
-			this.m_flpnlToStartOrEnd.Controls.Add(this.m_lblIsStartOrEnd);
-			this.m_flpnlToStartOrEnd.Location = new System.Drawing.Point(10, 70);
-			this.m_flpnlToStartOrEnd.Name = "m_flpnlToStartOrEnd";
-			this.m_flpnlToStartOrEnd.Size = new System.Drawing.Size(456, 23);
-			this.m_flpnlToStartOrEnd.TabIndex = 2;
+			this.m_pnlToStartOrEnd.Controls.Add(this.m_lblToStartOrEnd);
+			this.m_pnlToStartOrEnd.Controls.Add(this.m_btnToStartOrEnd);
+			this.m_pnlToStartOrEnd.Controls.Add(this.m_lblIsStartOrEnd);
+			this.m_pnlToStartOrEnd.Location = new System.Drawing.Point(10, 70);
+			this.m_pnlToStartOrEnd.Name = "m_pnlToStartOrEnd";
+			this.m_pnlToStartOrEnd.Size = new System.Drawing.Size(456, 23);
+			this.m_pnlToStartOrEnd.TabIndex = 2;
 			//
 			// m_lblToStartOrEnd
 			//
@@ -249,10 +249,10 @@
 			this.Deactivate += new System.EventHandler(this.ExtendedGCodeDlg_Deactivate);
 			this.m_pnlExtendedGCode.ResumeLayout(false);
 			this.m_pnlExtendedGCode.PerformLayout();
-			this.m_flpnlRadioButton.ResumeLayout(false);
-			this.m_flpnlRadioButton.PerformLayout();
-			this.m_flpnlToStartOrEnd.ResumeLayout(false);
-			this.m_flpnlToStartOrEnd.PerformLayout();
+			this.m_pnlRadioButton.ResumeLayout(false);
+			this.m_pnlRadioButton.PerformLayout();
+			this.m_pnlToStartOrEnd.ResumeLayout(false);
+			this.m_pnlToStartOrEnd.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -261,13 +261,13 @@
 
 		private CommonUI.Controls.SectionPanel m_pnlExtendedGCode;
 		private System.Windows.Forms.Label m_lblInsertType;
-		private System.Windows.Forms.Panel m_flpnlRadioButton;
-		private System.Windows.Forms.RadioButton m_rbtnTraverseStart;
-		private System.Windows.Forms.RadioButton m_rbtnTraverseEnd;
-		private System.Windows.Forms.RadioButton m_rbtnPathStart;
-		private System.Windows.Forms.RadioButton m_rbtnPathEnd;
-		private System.Windows.Forms.RadioButton m_rbtnControlPoint;
-		private System.Windows.Forms.Panel m_flpnlToStartOrEnd;
+		private System.Windows.Forms.Panel m_pnlRadioButton;
+		private System.Windows.Forms.RadioButton m_rdoTraverseStart;
+		private System.Windows.Forms.RadioButton m_rdoTraverseEnd;
+		private System.Windows.Forms.RadioButton m_rdoPathStart;
+		private System.Windows.Forms.RadioButton m_rdoPathEnd;
+		private System.Windows.Forms.RadioButton m_rdoControlPoint;
+		private System.Windows.Forms.Panel m_pnlToStartOrEnd;
 		private System.Windows.Forms.Label m_lblToStartOrEnd;
 		private CommonUI.Controls.ThemedButton m_btnToStartOrEnd;
 		private System.Windows.Forms.Label m_lblIsStartOrEnd;

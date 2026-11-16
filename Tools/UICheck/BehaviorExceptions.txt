@@ -2,37 +2,43 @@
 # Only items decided in Doc/UIStyleNotes.md may be listed here.
 
 # numeric inputs become DebouncedNumericUpDown (decision 2026-11-15 "數值輸入")
-B6 AutoSortPathDlg m_nudExtrusionBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
-B6 AutoSortPathDlg m_nudRotationBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
+B6 AutoSortPathDlg m_numExtrusionBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
+B6 AutoSortPathDlg m_numRotationBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
 
 # read-only coordinate fields become labels (decision 2026-11-15 "只顯示座標的欄位"); confirmed read-only: always ReadOnly, code only sets / reads Text
-B6 CalibrationREFDlg m_tbxPnt* TextBox -> Label, the value can no longer be selected or copied
-B6 AxisTransformDlg m_nud* NumericUpDown -> DebouncedNumericUpDown; ranges are set in code, one increment per wheel notch as before (the custom MouseWheel handler is no longer needed)
-B6 AxisTransformDlg m_txbStep* TextBox -> DebouncedNumericUpDown (0.001 to 99999, 3 decimals); the Leave / Enter handlers still parse the text
-B6 AddPathDlg m_txb* TextBox -> DebouncedNumericUpDown (D1 0.001 to 90 / 3 decimals, chord error 0.0001 to 99999 / 4 decimals, line length 0.001 to 99999 / 3 decimals); the Validating / Enter / TextChanged handlers still parse the text
+B6 CalibrationREFDlg m_lblPnt*Value TextBox -> Label, the value can no longer be selected or copied
+B6 AxisTransformDlg m_num* NumericUpDown -> DebouncedNumericUpDown; ranges are set in code, one increment per wheel notch as before (the custom MouseWheel handler is no longer needed)
+B6 AxisTransformDlg m_numStep* TextBox -> DebouncedNumericUpDown (0.001 to 99999, 3 decimals); the Leave / Enter handlers still parse the text
+B6 AddPathDlg m_num* TextBox -> DebouncedNumericUpDown (D1 0.001 to 90 / 3 decimals, chord error 0.0001 to 99999 / 4 decimals, line length 0.001 to 99999 / 3 decimals); the Validating / Enter / TextChanged handlers still parse the text
 
 # section title labels become SectionPanel titles (decision 2026-11-15 "區塊標題")
-B6 LeadDlg m_lblLeadIn title moved to m_secLeadIn
-B6 LeadDlg label3 title moved to m_secLeadOut
+B6 LeadDlg m_lblLeadIn title moved to m_pnlLeadIn
+B6 LeadDlg label3 title moved to m_pnlLeadOut
 B6 PatternSettingDlg label1 renamed to m_lblPathType (its language ID)
-B6 PatternSettingDlg m_txb* TextBox -> DebouncedNumericUpDown (default range, 3 decimals); the Leave / Enter handlers still validate the text
-B6 ToolVectorDlg m_lblOnePntToolVecAdjust title moved to m_secToolVecInfo
-B6 ToolVectorDlg m_lblToolDirQuickSetBtn title moved to m_secQuickSet
-B6 ToolVectorDlg m_lblSetBtn title moved to m_secSetting
+B6 PatternSettingDlg m_num* TextBox -> DebouncedNumericUpDown (default range, 3 decimals); the Leave / Enter handlers still validate the text
+B6 ToolVectorDlg m_lblOnePntToolVecAdjust title moved to m_pnlToolVecInfo
+B6 ToolVectorDlg m_lblToolDirQuickSetBtn title moved to m_pnlQuickSet
+B6 ToolVectorDlg m_lblSetBtn title moved to m_pnlSetting
 B6 ToolVectorDlg m renamed to m_lblInterpolateType (its language ID)
-B6 CNCThreePointDlg m_txtDrawing* TextBox -> Label, confirmed read-only (ReadOnly, TabStop false, code only sets Text / Enabled)
+B6 CNCThreePointDlg m_lblDrawing*Value TextBox -> Label, confirmed read-only (ReadOnly, TabStop false, code only sets Text / Enabled)
 B6 CNCThreePointDlg m_lbl*Step step labels become the titles of their sections (Highlighted marks the current step)
 B6 CNCThreePointDlg m_lbl*Title section title labels removed; the step title names the section
-B6 ThreePtTransformDlg tbxCAD* TextBox -> Label, confirmed display only (disabled, code only sets Text)
-B6 ThreePtTransformDlg tbxMachine* TextBox -> DebouncedNumericUpDown (3 decimals, same default values); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
-B6 DesignSupportBracketDlg m_lblSection* section title labels moved to the m_sec* section titles
-B6 CNCAlarmPanel m_lblTitle title moved to the m_secAlarm section title
+B6 ThreePtTransformDlg m_lblCAD*Value TextBox -> Label, confirmed display only (disabled, code only sets Text)
+B6 ThreePtTransformDlg m_numMachine* TextBox -> DebouncedNumericUpDown (3 decimals, same default values); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
+B6 DesignSupportBracketDlg m_lblSection* section title labels moved to the m_pnl* section titles
+B6 CNCAlarmPanel m_lblTitle title moved to the m_pnlAlarm section title
 
 # CNC panel titles become card titles (decision 2026-11-16 "卡片規格不因所在 UI 類別而分裂"); no code referenced them
-B6 CNCPanel m_lblAuxiliaryTitle title moved to m_grpAuxiliary
-B6 CNCPanel m_lblJogTitle title moved to m_grpJog
-B6 CNCPanel m_lblHomeTitle title moved to m_grpHome
-B6 CNCPanel m_lblStrategyTitle title moved to m_grpStrategy
-B6 CNCPanel m_lblMachiningTitle title moved to m_grpMachining
-B6 CNCInfoPanel m_lblHeightGroupTitle title moved to m_grpHeight
-B6 CNCInfoPanel m_lblMachiningTitle title moved to m_grpMachining
+B6 CNCPanel m_lblAuxiliaryTitle title moved to m_pnlAuxiliary
+B6 CNCPanel m_lblJogTitle title moved to m_pnlJog
+B6 CNCPanel m_lblHomeTitle title moved to m_pnlHome
+B6 CNCPanel m_lblStrategyTitle title moved to m_pnlStrategy
+B6 CNCPanel m_lblMachiningTitle title moved to m_pnlMachining
+B6 CNCInfoPanel m_lblHeightGroupTitle title moved to m_pnlHeight
+B6 CNCInfoPanel m_lblMachiningTitle title moved to m_pnlMachining
+
+# code statements that follow the step labels / sections above (B8)
+B8 AddPathDlg m_pnlStepHint the step hint labels moved into the m_pnlStepHint card, which is shown at the same time as the labels
+B8 CNCThreePointDlg m_lblWorkpieceStep step labels became section titles; m_pnlCalculation is shown / hidden instead of m_lblCalculationStep, the hand-sized ClientSize is replaced by SectionStack
+B8 CNCThreePointDlg m_pnlWorkpiece same statement as above, written without the removed step labels
+B8 ToolVectorDlg m_pnlStartEndSwitch the start / end switch row left m_pnlIndexParam; its panel is enabled at the same time (decision 2026-11-16 ToolVectorDlg)

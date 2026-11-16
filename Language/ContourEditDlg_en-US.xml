@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="ContourEditDlg" Content="Contour Edit" />
-	<Message ID="m_gbxIndexParam" Content="Control Point Parameters" />
+	<Message ID="m_pnlIndexParam" Content="Control Point Parameters" />
 
 	<Message ID="m_lblRefCoordType" Content="Coordinate System" />
-	<Message ID="m_rbtnWorldCoord" Content="World Coordinate System" />
-	<Message ID="m_rbtnLocalCoord" Content="Local Coordinate System" />
+	<Message ID="m_rdoWorldCoord" Content="World Coordinate System" />
+	<Message ID="m_rdoLocalCoord" Content="Local Coordinate System" />
 
 	<Message ID="m_lblToStartOrEnd" Content="Switch Start/End Point" />
-	<Message ID="m_rbtnToStart" Content="Start Point" />
-	<Message ID="m_rbtnToEnd" Content="End Point" />
+	<Message ID="m_rdoToStart" Content="Start Point" />
+	<Message ID="m_rdoToEnd" Content="End Point" />
 
 	<Message ID="m_lblDX" Content="X Offset" />
 	<Message ID="m_lblDY" Content="Y Offset" />

@@ -21,13 +21,13 @@ namespace MyCAM.Editor.Dialog
 			m_lastValidMaxChordError = AdvancedParams.MaxChordError;
 			m_lastValidMaxLineLength = AdvancedParams.MaxLineLength;
 
-			m_txbD1Threshold.TextChanged += m_txbD1Threshold_TextChanged;
-			m_txbD1Threshold.Validating += m_txbD1Threshold_Validating;
-			m_txbD1Threshold.KeyDown += m_txbAdvanced_KeyDown;
-			m_txbMaxChordError.Validating += m_txbMaxChordError_Validating;
-			m_txbMaxChordError.KeyDown += m_txbAdvanced_KeyDown;
-			m_txbMaxLineLength.Validating += m_txbMaxLineLength_Validating;
-			m_txbMaxLineLength.KeyDown += m_txbAdvanced_KeyDown;
+			m_numD1Threshold.TextChanged += m_numD1Threshold_TextChanged;
+			m_numD1Threshold.Validating += m_numD1Threshold_Validating;
+			m_numD1Threshold.KeyDown += m_txbAdvanced_KeyDown;
+			m_numMaxChordError.Validating += m_numMaxChordError_Validating;
+			m_numMaxChordError.KeyDown += m_txbAdvanced_KeyDown;
+			m_numMaxLineLength.Validating += m_numMaxLineLength_Validating;
+			m_numMaxLineLength.KeyDown += m_txbAdvanced_KeyDown;
 
 			m_lblStepDescription.Visible = false;
 			m_lblStepHints.Visible = false;
@@ -75,12 +75,12 @@ namespace MyCAM.Editor.Dialog
 			m_currentStep = step;
 			ClearError();
 
-			m_grpStep1.Visible = false;
-			m_grpStep3.Visible = false;
+			m_pnlStep1.Visible = false;
+			m_pnlStep3.Visible = false;
 
 			switch( step ) {
 				case EDialogStep.ChooseMode:
-					m_grpStep1.Visible = true;
+					m_pnlStep1.Visible = true;
 					break;
 				case EDialogStep.SelectFace:
 					m_hasFaceSelection = false;
@@ -88,7 +88,7 @@ namespace MyCAM.Editor.Dialog
 					m_lblStepHints.Text = m_LanguageManager.TryGetString( "Desc_Step2_Hints", DESC_STEP2_HINTS );
 					break;
 				case EDialogStep.ChooseWireMode:
-					m_grpStep3.Visible = true;
+					m_pnlStep3.Visible = true;
 					m_rdoAutoFromFace.Checked = true;
 					break;
 				case EDialogStep.SelectWire:
@@ -141,15 +141,15 @@ namespace MyCAM.Editor.Dialog
 			bool isStepWithLabels = ( m_currentStep == EDialogStep.SelectFace || m_currentStep == EDialogStep.SelectWire );
 			m_lblStepDescription.Visible = isStepWithLabels;
 			m_lblStepHints.Visible = isStepWithLabels;
-			m_secStepHint.Visible = isStepWithLabels;
+			m_pnlStepHint.Visible = isStepWithLabels;
 
-			m_grpAdvanced.Visible = m_chkShowAdvanced.Checked;
+			m_pnlAdvanced.Visible = m_chkShowAdvanced.Checked;
 
 			// stack the section of the current step, the options and the advanced parameters
 			Control stepSection = GetStepSection( isStepWithLabels );
 			int nContentBottom = m_chkShowAdvanced.Checked
-				? SectionStack.Arrange( stepSection, m_secOptions, m_grpAdvanced )
-				: SectionStack.Arrange( stepSection, m_secOptions );
+				? SectionStack.Arrange( stepSection, m_pnlOptions, m_pnlAdvanced )
+				: SectionStack.Arrange( stepSection, m_pnlOptions );
 			SectionStack.PlaceButtonBar( this, nContentBottom, m_btnNext, m_btnConfirm );
 
 			this.ResumeLayout( true );
@@ -159,9 +159,9 @@ namespace MyCAM.Editor.Dialog
 		{
 			// face and wire selection steps only show their description
 			if( isStepWithLabels ) {
-				return m_secStepHint;
+				return m_pnlStepHint;
 			}
-			return m_currentStep == EDialogStep.ChooseWireMode ? (Control)m_grpStep3 : m_grpStep1;
+			return m_currentStep == EDialogStep.ChooseWireMode ? (Control)m_pnlStep3 : m_pnlStep1;
 		}
 
 		void OnStep1RadioChanged( object sender, EventArgs e )
@@ -258,37 +258,37 @@ namespace MyCAM.Editor.Dialog
 			}
 			e.SuppressKeyPress = true;
 			var dummy = new System.ComponentModel.CancelEventArgs();
-			if( sender == m_txbD1Threshold ) {
-				m_txbD1Threshold_Validating( sender, dummy );
+			if( sender == m_numD1Threshold ) {
+				m_numD1Threshold_Validating( sender, dummy );
 			}
-			else if( sender == m_txbMaxChordError ) {
-				m_txbMaxChordError_Validating( sender, dummy );
+			else if( sender == m_numMaxChordError ) {
+				m_numMaxChordError_Validating( sender, dummy );
 			}
-			else if( sender == m_txbMaxLineLength ) {
-				m_txbMaxLineLength_Validating( sender, dummy );
+			else if( sender == m_numMaxLineLength ) {
+				m_numMaxLineLength_Validating( sender, dummy );
 			}
 		}
 
-		void m_txbD1Threshold_TextChanged( object sender, EventArgs e )
+		void m_numD1Threshold_TextChanged( object sender, EventArgs e )
 		{
 			if( TryGetValidD1ThresholdFromTextBox( out double d1Threshold ) ) {
 				D1ThresholdChanged?.Invoke( d1Threshold );
 			}
 		}
 
-		void m_txbD1Threshold_Validating( object sender, System.ComponentModel.CancelEventArgs e )
+		void m_numD1Threshold_Validating( object sender, System.ComponentModel.CancelEventArgs e )
 		{
-			ValidatePositiveTextBox( m_txbD1Threshold, ref m_lastValidD1Threshold, IsD1ThresholdInRange );
+			ValidatePositiveTextBox( m_numD1Threshold, ref m_lastValidD1Threshold, IsD1ThresholdInRange );
 		}
 
-		void m_txbMaxChordError_Validating( object sender, System.ComponentModel.CancelEventArgs e )
+		void m_numMaxChordError_Validating( object sender, System.ComponentModel.CancelEventArgs e )
 		{
-			ValidatePositiveTextBox( m_txbMaxChordError, ref m_lastValidMaxChordError );
+			ValidatePositiveTextBox( m_numMaxChordError, ref m_lastValidMaxChordError );
 		}
 
-		void m_txbMaxLineLength_Validating( object sender, System.ComponentModel.CancelEventArgs e )
+		void m_numMaxLineLength_Validating( object sender, System.ComponentModel.CancelEventArgs e )
 		{
-			ValidatePositiveTextBox( m_txbMaxLineLength, ref m_lastValidMaxLineLength );
+			ValidatePositiveTextBox( m_numMaxLineLength, ref m_lastValidMaxLineLength );
 		}
 
 		void ValidatePositiveTextBox( Control txb, ref double lastValid, Func<double, bool> rangeCheck = null )
@@ -309,7 +309,7 @@ namespace MyCAM.Editor.Dialog
 
 		bool TryGetValidD1ThresholdFromTextBox( out double value )
 		{
-			return double.TryParse( m_txbD1Threshold.Text, out value ) && IsD1ThresholdInRange( value );
+			return double.TryParse( m_numD1Threshold.Text, out value ) && IsD1ThresholdInRange( value );
 		}
 
 		void ReadAdvancedParams()

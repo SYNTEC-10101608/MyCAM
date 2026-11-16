@@ -11,14 +11,14 @@ namespace MyCAM.Editor.Dialog
 		public ConnectDlg()
 		{
 			InitializeComponent();
-			m_txbIP.Text = MyApp.AppSetting.CNCIP;
+			m_txtIP.Text = MyApp.AppSetting.CNCIP;
 		}
 
 		public event System.Action<string> ConfirmEvent;
 
 		void m_btnConfirm_Click( object sender, System.EventArgs e )
 		{
-			string ip = m_txbIP.Text?.Trim();
+			string ip = m_txtIP.Text?.Trim();
 			if( string.IsNullOrEmpty( ip ) || !IsValidIP( ip ) ) {
 				m_lblTips.Text = m_LanguageManager.TryGetString( "Error_InvalidIPFormat", m_lblTips.Text );
 				m_lblTips.Role = TextRole.Error;

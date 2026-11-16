@@ -235,7 +235,7 @@ namespace UICheck
 
 		#region Checks
 
-		static void CheckChildren( Control parent, List<string> problemList )
+		internal static void CheckChildren( Control parent, List<string> problemList )
 		{
 			List<Control> visibleList = parent.Controls.Cast<Control>().Where( c => c.Visible ).ToList();
 			bool isScrolling = parent is ScrollableControl && ( (ScrollableControl)parent ).AutoScroll;
@@ -392,12 +392,13 @@ namespace UICheck
 		// FormBase is the behavior base of the dialogs, not a screen
 		static readonly HashSet<string> SKIP_TYPE_LIST = new HashSet<string> { "StartupForm", "CNCDlg", "FormBase" };
 
-		// embedded panels are hosted at a typical size of their area in the main window
+		// embedded panels are hosted at their designer size, the smallest size the main window gives them;
+		// the sizes in the main window are checked by MainWindowRunner
 		static readonly Dictionary<string, Size> PANEL_SIZE_MAP = new Dictionary<string, Size>
 		{
-			{ "CNCPanel", new Size( 320, 900 ) },
-			{ "CNCInfoPanel", new Size( 1000, 260 ) },
-			{ "CNCAlarmPanel", new Size( 600, 220 ) }
+			{ "CNCPanel", new Size( 288, 756 ) },
+			{ "CNCInfoPanel", new Size( 736, 240 ) },
+			{ "CNCAlarmPanel", new Size( 380, 180 ) }
 		};
 	}
 }

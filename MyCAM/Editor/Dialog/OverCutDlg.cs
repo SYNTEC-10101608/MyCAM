@@ -9,12 +9,12 @@ namespace MyCAM.Editor.Dialog
 		{
 			InitializeComponent();
 			m_OverCutLength = overCutLength;
-			m_tbxOverCutLength.SilentSetValue = (decimal)m_OverCutLength;
+			m_numOverCutLength.SilentSetValue = (decimal)m_OverCutLength;
 		}
 
 		public Func<double, bool> CheckValueGeomRestriction;
 
-		void m_tbxOverCutLength_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numOverCutLength_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			PreviewOverCutResult();
 		}
@@ -35,7 +35,7 @@ namespace MyCAM.Editor.Dialog
 
 		bool IsValidParam()
 		{
-			double dOverCutLength = (double)m_tbxOverCutLength.Value;
+			double dOverCutLength = (double)m_numOverCutLength.Value;
 			if( dOverCutLength < 0 ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Error_NegativeLength", ERROR_NEGATIVE_LENGTH ), MyApp.NoticeType.Warning );
 				return false;

@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="LeadDlg" Content="引線設置" />
-	<Message ID="m_secLeadIn" Content="進入引線" />
-	<Message ID="m_secLeadOut" Content="退出引線" />
+	<Message ID="m_pnlLeadIn" Content="進入引線" />
+	<Message ID="m_pnlLeadOut" Content="退出引線" />
 	<Message ID="m_lblLeadLineLength" Content="直線長度" />
 	<Message ID="m_lblAngle" Content="角度" />
 	<Message ID="m_lblRadius" Content="半徑" />

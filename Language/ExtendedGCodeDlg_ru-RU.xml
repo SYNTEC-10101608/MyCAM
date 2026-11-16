@@ -4,11 +4,11 @@
     
     <Message ID="m_lblInsertType" Content="Позиция вставки" />
     
-    <Message ID="m_rbtnTraverseStart" Content="Начало перемещения" />
-    <Message ID="m_rbtnTraverseEnd" Content="Конец перемещения" />
-    <Message ID="m_rbtnPathStart" Content="Начало пути" />
-    <Message ID="m_rbtnPathEnd" Content="Конец пути" />
-    <Message ID="m_rbtnControlPoint" Content="Контрольная точка" />
+    <Message ID="m_rdoTraverseStart" Content="Начало перемещения" />
+    <Message ID="m_rdoTraverseEnd" Content="Конец перемещения" />
+    <Message ID="m_rdoPathStart" Content="Начало пути" />
+    <Message ID="m_rdoPathEnd" Content="Конец пути" />
+    <Message ID="m_rdoControlPoint" Content="Контрольная точка" />
     
     <Message ID="m_lblToStartOrEnd" Content="Переключение начала и конца" />
     <Message ID="m_btnToStartOrEnd" Content="Начало/Конец" />

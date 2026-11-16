@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ResMap>
 	<Message ID="ToolVectorDlg" Content="Регулировка позы" />
-	<Message ID="m_secToolVecInfo" Content="Информация об ориентации одной точки" />
+	<Message ID="m_pnlToolVecInfo" Content="Информация об ориентации одной точки" />
 	<Message ID="m_lblADeg" Content="Угол наклона вперед" />
 	<Message ID="m_lblBDeg" Content="Угол бокового наклона" />
 	<Message ID="m_lblInterpolateType" Content="Схема интерполяции" />
-	<Message ID="m_secQuickSet" Content="Быстрые клавиши направления позы" />
+	<Message ID="m_pnlQuickSet" Content="Быстрые клавиши направления позы" />
 	<Message ID="m_btnZDir" Content="К направлению Z" />
 	<Message ID="m_btnKeep" Content="Сохранить предыдущую позу" />
 	<Message ID="m_btnRevert" Content="Исходное" />
@@ -13,11 +13,11 @@
 	<Message ID="m_btnSwitchStartEnd" Content="Начало/Конец" />
 	<Message ID="m_lblStartOrEnd_Start" Content="Текущая позиция: начальная точка" />
 	<Message ID="m_lblStartOrEnd_End" Content="Текущая позиция: конечная точка" />
-	<Message ID="m_secSetting" Content="Настройка позы" />
+	<Message ID="m_pnlSetting" Content="Настройка позы" />
 	<Message ID="m_btnAdd" Content="Добавить" />
 	<Message ID="m_btnRemove" Content="Удалить" />
 	<Message ID="m_btnClear" Content="Очистить все контрольные точки" />
-	<Message ID="m_secMovePnt" Content="Перемещение по точкам" />
+	<Message ID="m_pnlMovePnt" Content="Перемещение по точкам" />
 	<Message ID="m_lblStartPnt" Content="Переключение начальной/конечной точки" />
 	<Message ID="m_btnToStart" Content="К начальной точке" />
 	<Message ID="m_lblPnt" Content="Переключение предыдущей/следующей точки" />

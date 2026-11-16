@@ -29,20 +29,20 @@
 		{
 			this.m_pnlCompemsate = new CommonUI.Controls.SectionPanel();
 			this.m_lblCompensate = new System.Windows.Forms.Label();
-			this.m_NumUpDownCompensate = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numCompensate = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblTotalCompensate = new System.Windows.Forms.Label();
 			this.m_lblTotalCompensateValue = new System.Windows.Forms.Label();
 			this.m_btnReset = new CommonUI.Controls.ThemedButton();
 			this.m_btnClear = new CommonUI.Controls.ThemedButton();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
 			this.m_pnlCompemsate.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownCompensate)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numCompensate)).BeginInit();
 			this.SuspendLayout();
 			//
 			// m_pnlCompemsate
 			//
 			this.m_pnlCompemsate.Controls.Add(this.m_lblCompensate);
-			this.m_pnlCompemsate.Controls.Add(this.m_NumUpDownCompensate);
+			this.m_pnlCompemsate.Controls.Add(this.m_numCompensate);
 			this.m_pnlCompemsate.Controls.Add(this.m_lblTotalCompensate);
 			this.m_pnlCompemsate.Controls.Add(this.m_lblTotalCompensateValue);
 			this.m_pnlCompemsate.Location = new System.Drawing.Point(12, 12);
@@ -59,26 +59,26 @@
 			this.m_lblCompensate.TabIndex = 0;
 			this.m_lblCompensate.Text = "補償距離";
 			//
-			// m_NumUpDownCompensate
+			// m_numCompensate
 			//
-			this.m_NumUpDownCompensate.DecimalPlaces = 3;
-			this.m_NumUpDownCompensate.Location = new System.Drawing.Point(100, 10);
-			this.m_NumUpDownCompensate.Maximum = new decimal(new int[] {
+			this.m_numCompensate.DecimalPlaces = 3;
+			this.m_numCompensate.Location = new System.Drawing.Point(100, 10);
+			this.m_numCompensate.Maximum = new decimal(new int[] {
             99999,
             0,
             0,
             0});
-			this.m_NumUpDownCompensate.Minimum = new decimal(new int[] {
+			this.m_numCompensate.Minimum = new decimal(new int[] {
             99999,
             0,
             0,
             -2147483648});
-			this.m_NumUpDownCompensate.Name = "m_NumUpDownCompensate";
-			this.m_NumUpDownCompensate.RestrictInvalidCharacters = false;
-			this.m_NumUpDownCompensate.Size = new System.Drawing.Size(150, 23);
-			this.m_NumUpDownCompensate.TabIndex = 1;
-			this.m_NumUpDownCompensate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.m_NumUpDownCompensate.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownCompensate_DebouncedValueChanged);
+			this.m_numCompensate.Name = "m_numCompensate";
+			this.m_numCompensate.RestrictInvalidCharacters = false;
+			this.m_numCompensate.Size = new System.Drawing.Size(150, 23);
+			this.m_numCompensate.TabIndex = 1;
+			this.m_numCompensate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			this.m_numCompensate.DebouncedValueChanged += new System.EventHandler(this.m_numCompensate_DebouncedValueChanged);
 			//
 			// m_lblTotalCompensate
 			//
@@ -139,7 +139,7 @@
 			this.Text = "路徑補償";
 			this.m_pnlCompemsate.ResumeLayout(false);
 			this.m_pnlCompemsate.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownCompensate)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numCompensate)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -148,7 +148,7 @@
 
 		private CommonUI.Controls.SectionPanel m_pnlCompemsate;
 		private System.Windows.Forms.Label m_lblCompensate;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumUpDownCompensate;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numCompensate;
 		private System.Windows.Forms.Label m_lblTotalCompensate;
 		private System.Windows.Forms.Label m_lblTotalCompensateValue;
 		private CommonUI.Controls.ThemedButton m_btnReset;

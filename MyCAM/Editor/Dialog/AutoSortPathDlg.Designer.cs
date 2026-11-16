@@ -35,7 +35,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_secSort = new CommonUI.Controls.SectionPanel();
+			this.m_pnlSort = new CommonUI.Controls.SectionPanel();
 			this.m_lblSortMethod = new System.Windows.Forms.Label();
 			this.m_cmbSortMethod = new System.Windows.Forms.ComboBox();
 			this.m_lblPathHint = new System.Windows.Forms.Label();
@@ -47,42 +47,42 @@
 			this.m_lblRotationDir = new System.Windows.Forms.Label();
 			this.m_cmbRotationDir = new System.Windows.Forms.ComboBox();
 			this.m_lblExtrusionBandwidth = new System.Windows.Forms.Label();
-			this.m_nudExtrusionBandwidth = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numExtrusionBandwidth = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblExtrusionUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_lblRotationBandwidth = new System.Windows.Forms.Label();
-			this.m_nudRotationBandwidth = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numRotationBandwidth = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblRotationUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_picPreview = new System.Windows.Forms.PictureBox();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
-			this.m_secSort.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudExtrusionBandwidth)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRotationBandwidth)).BeginInit();
+			this.m_pnlSort.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numExtrusionBandwidth)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numRotationBandwidth)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_picPreview)).BeginInit();
 			this.SuspendLayout();
 			//
-			// m_secSort
+			// m_pnlSort
 			//
-			this.m_secSort.Controls.Add(this.m_lblSortMethod);
-			this.m_secSort.Controls.Add(this.m_cmbSortMethod);
-			this.m_secSort.Controls.Add(this.m_lblPathHint);
-			this.m_secSort.Controls.Add(this.m_lblSelectedPath);
-			this.m_secSort.Controls.Add(this.m_lblCylinderAxis);
-			this.m_secSort.Controls.Add(this.m_cmbCylinderAxis);
-			this.m_secSort.Controls.Add(this.m_lblExtrusionDir);
-			this.m_secSort.Controls.Add(this.m_cmbExtrusionDir);
-			this.m_secSort.Controls.Add(this.m_lblRotationDir);
-			this.m_secSort.Controls.Add(this.m_cmbRotationDir);
-			this.m_secSort.Controls.Add(this.m_lblExtrusionBandwidth);
-			this.m_secSort.Controls.Add(this.m_nudExtrusionBandwidth);
-			this.m_secSort.Controls.Add(this.m_lblExtrusionUnit);
-			this.m_secSort.Controls.Add(this.m_lblRotationBandwidth);
-			this.m_secSort.Controls.Add(this.m_nudRotationBandwidth);
-			this.m_secSort.Controls.Add(this.m_lblRotationUnit);
-			this.m_secSort.Controls.Add(this.m_picPreview);
-			this.m_secSort.Location = new System.Drawing.Point(12, 12);
-			this.m_secSort.Name = "m_secSort";
-			this.m_secSort.Size = new System.Drawing.Size(296, 477);
-			this.m_secSort.TabIndex = 0;
+			this.m_pnlSort.Controls.Add(this.m_lblSortMethod);
+			this.m_pnlSort.Controls.Add(this.m_cmbSortMethod);
+			this.m_pnlSort.Controls.Add(this.m_lblPathHint);
+			this.m_pnlSort.Controls.Add(this.m_lblSelectedPath);
+			this.m_pnlSort.Controls.Add(this.m_lblCylinderAxis);
+			this.m_pnlSort.Controls.Add(this.m_cmbCylinderAxis);
+			this.m_pnlSort.Controls.Add(this.m_lblExtrusionDir);
+			this.m_pnlSort.Controls.Add(this.m_cmbExtrusionDir);
+			this.m_pnlSort.Controls.Add(this.m_lblRotationDir);
+			this.m_pnlSort.Controls.Add(this.m_cmbRotationDir);
+			this.m_pnlSort.Controls.Add(this.m_lblExtrusionBandwidth);
+			this.m_pnlSort.Controls.Add(this.m_numExtrusionBandwidth);
+			this.m_pnlSort.Controls.Add(this.m_lblExtrusionUnit);
+			this.m_pnlSort.Controls.Add(this.m_lblRotationBandwidth);
+			this.m_pnlSort.Controls.Add(this.m_numRotationBandwidth);
+			this.m_pnlSort.Controls.Add(this.m_lblRotationUnit);
+			this.m_pnlSort.Controls.Add(this.m_picPreview);
+			this.m_pnlSort.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlSort.Name = "m_pnlSort";
+			this.m_pnlSort.Size = new System.Drawing.Size(296, 477);
+			this.m_pnlSort.TabIndex = 0;
 			//
 			// m_lblSortMethod
 			//
@@ -119,7 +119,7 @@
 			this.m_lblSelectedPath.Name = "m_lblSelectedPath";
 			this.m_lblSelectedPath.Role = CommonUI.Theme.TextRole.Error;
 			this.m_lblSelectedPath.Size = new System.Drawing.Size(43, 16);
-			this.m_lblSelectedPath.TabIndex = 3;
+			this.m_lblSelectedPath.TabIndex = 4;
 			this.m_lblSelectedPath.Text = "未選取";
 			//
 			// m_lblCylinderAxis
@@ -128,7 +128,7 @@
 			this.m_lblCylinderAxis.Location = new System.Drawing.Point(10, 44);
 			this.m_lblCylinderAxis.Name = "m_lblCylinderAxis";
 			this.m_lblCylinderAxis.Size = new System.Drawing.Size(58, 16);
-			this.m_lblCylinderAxis.TabIndex = 4;
+			this.m_lblCylinderAxis.TabIndex = 3;
 			this.m_lblCylinderAxis.Text = "圓管軸向:";
 			this.m_lblCylinderAxis.Visible = false;
 			//
@@ -148,7 +148,7 @@
 			this.m_lblExtrusionDir.Location = new System.Drawing.Point(10, 74);
 			this.m_lblExtrusionDir.Name = "m_lblExtrusionDir";
 			this.m_lblExtrusionDir.Size = new System.Drawing.Size(70, 16);
-			this.m_lblExtrusionDir.TabIndex = 6;
+			this.m_lblExtrusionDir.TabIndex = 7;
 			this.m_lblExtrusionDir.Text = "拉伸軸方向:";
 			this.m_lblExtrusionDir.Visible = false;
 			//
@@ -159,7 +159,7 @@
 			this.m_cmbExtrusionDir.Location = new System.Drawing.Point(100, 70);
 			this.m_cmbExtrusionDir.Name = "m_cmbExtrusionDir";
 			this.m_cmbExtrusionDir.Size = new System.Drawing.Size(186, 24);
-			this.m_cmbExtrusionDir.TabIndex = 7;
+			this.m_cmbExtrusionDir.TabIndex = 8;
 			this.m_cmbExtrusionDir.Visible = false;
 			this.m_cmbExtrusionDir.SelectedIndexChanged += new System.EventHandler(this.m_cmbExtrusionDir_SelectedIndexChanged);
 			//
@@ -169,7 +169,7 @@
 			this.m_lblRotationDir.Location = new System.Drawing.Point(10, 74);
 			this.m_lblRotationDir.Name = "m_lblRotationDir";
 			this.m_lblRotationDir.Size = new System.Drawing.Size(70, 16);
-			this.m_lblRotationDir.TabIndex = 8;
+			this.m_lblRotationDir.TabIndex = 6;
 			this.m_lblRotationDir.Text = "旋轉軸方向:";
 			this.m_lblRotationDir.Visible = false;
 			//
@@ -190,22 +190,22 @@
 			this.m_lblExtrusionBandwidth.Location = new System.Drawing.Point(10, 104);
 			this.m_lblExtrusionBandwidth.Name = "m_lblExtrusionBandwidth";
 			this.m_lblExtrusionBandwidth.Size = new System.Drawing.Size(58, 16);
-			this.m_lblExtrusionBandwidth.TabIndex = 10;
+			this.m_lblExtrusionBandwidth.TabIndex = 11;
 			this.m_lblExtrusionBandwidth.Text = "分組帶寬:";
 			this.m_lblExtrusionBandwidth.Visible = false;
 			//
-			// m_nudExtrusionBandwidth
+			// m_numExtrusionBandwidth
 			//
-			this.m_nudExtrusionBandwidth.DecimalPlaces = 1;
-			this.m_nudExtrusionBandwidth.Increment = new decimal( new int[] { 5, 0, 0, 65536 } );
-			this.m_nudExtrusionBandwidth.Location = new System.Drawing.Point(100, 100);
-			this.m_nudExtrusionBandwidth.Maximum = new decimal( new int[] { 1000, 0, 0, 0 } );
-			this.m_nudExtrusionBandwidth.Minimum = new decimal( new int[] { 1, 0, 0, 65536 } );
-			this.m_nudExtrusionBandwidth.Name = "m_nudExtrusionBandwidth";
-			this.m_nudExtrusionBandwidth.Size = new System.Drawing.Size(100, 23);
-			this.m_nudExtrusionBandwidth.TabIndex = 11;
-			this.m_nudExtrusionBandwidth.Value = new decimal( new int[] { 100, 0, 0, 65536 } );
-			this.m_nudExtrusionBandwidth.Visible = false;
+			this.m_numExtrusionBandwidth.DecimalPlaces = 1;
+			this.m_numExtrusionBandwidth.Increment = new decimal( new int[] { 5, 0, 0, 65536 } );
+			this.m_numExtrusionBandwidth.Location = new System.Drawing.Point(100, 100);
+			this.m_numExtrusionBandwidth.Maximum = new decimal( new int[] { 1000, 0, 0, 0 } );
+			this.m_numExtrusionBandwidth.Minimum = new decimal( new int[] { 1, 0, 0, 65536 } );
+			this.m_numExtrusionBandwidth.Name = "m_numExtrusionBandwidth";
+			this.m_numExtrusionBandwidth.Size = new System.Drawing.Size(100, 23);
+			this.m_numExtrusionBandwidth.TabIndex = 13;
+			this.m_numExtrusionBandwidth.Value = new decimal( new int[] { 100, 0, 0, 65536 } );
+			this.m_numExtrusionBandwidth.Visible = false;
 			//
 			// m_lblExtrusionUnit
 			//
@@ -214,7 +214,7 @@
 			this.m_lblExtrusionUnit.Name = "m_lblExtrusionUnit";
 			this.m_lblExtrusionUnit.Role = CommonUI.Theme.TextRole.Secondary;
 			this.m_lblExtrusionUnit.Size = new System.Drawing.Size(20, 16);
-			this.m_lblExtrusionUnit.TabIndex = 12;
+			this.m_lblExtrusionUnit.TabIndex = 14;
 			this.m_lblExtrusionUnit.Text = "mm";
 			this.m_lblExtrusionUnit.Visible = false;
 			//
@@ -224,22 +224,22 @@
 			this.m_lblRotationBandwidth.Location = new System.Drawing.Point(10, 104);
 			this.m_lblRotationBandwidth.Name = "m_lblRotationBandwidth";
 			this.m_lblRotationBandwidth.Size = new System.Drawing.Size(58, 16);
-			this.m_lblRotationBandwidth.TabIndex = 13;
+			this.m_lblRotationBandwidth.TabIndex = 10;
 			this.m_lblRotationBandwidth.Text = "分組帶寬:";
 			this.m_lblRotationBandwidth.Visible = false;
 			//
-			// m_nudRotationBandwidth
+			// m_numRotationBandwidth
 			//
-			this.m_nudRotationBandwidth.DecimalPlaces = 1;
-			this.m_nudRotationBandwidth.Increment = new decimal( new int[] { 5, 0, 0, 65536 } );
-			this.m_nudRotationBandwidth.Location = new System.Drawing.Point(100, 100);
-			this.m_nudRotationBandwidth.Maximum = new decimal( new int[] { 180, 0, 0, 0 } );
-			this.m_nudRotationBandwidth.Minimum = new decimal( new int[] { 1, 0, 0, 65536 } );
-			this.m_nudRotationBandwidth.Name = "m_nudRotationBandwidth";
-			this.m_nudRotationBandwidth.Size = new System.Drawing.Size(100, 23);
-			this.m_nudRotationBandwidth.TabIndex = 14;
-			this.m_nudRotationBandwidth.Value = new decimal( new int[] { 30, 0, 0, 65536 } );
-			this.m_nudRotationBandwidth.Visible = false;
+			this.m_numRotationBandwidth.DecimalPlaces = 1;
+			this.m_numRotationBandwidth.Increment = new decimal( new int[] { 5, 0, 0, 65536 } );
+			this.m_numRotationBandwidth.Location = new System.Drawing.Point(100, 100);
+			this.m_numRotationBandwidth.Maximum = new decimal( new int[] { 180, 0, 0, 0 } );
+			this.m_numRotationBandwidth.Minimum = new decimal( new int[] { 1, 0, 0, 65536 } );
+			this.m_numRotationBandwidth.Name = "m_numRotationBandwidth";
+			this.m_numRotationBandwidth.Size = new System.Drawing.Size(100, 23);
+			this.m_numRotationBandwidth.TabIndex = 12;
+			this.m_numRotationBandwidth.Value = new decimal( new int[] { 30, 0, 0, 65536 } );
+			this.m_numRotationBandwidth.Visible = false;
 			//
 			// m_lblRotationUnit
 			//
@@ -277,14 +277,14 @@
 			// AutoSortPathDlg
 			//
 			this.ClientSize = new System.Drawing.Size(320, 545);
-			this.Controls.Add(this.m_secSort);
+			this.Controls.Add(this.m_pnlSort);
 			this.Controls.Add(this.m_btnConfirm);
 			this.Name = "AutoSortPathDlg";
 			this.Text = "自動排序";
-			this.m_secSort.ResumeLayout(false);
-			this.m_secSort.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudExtrusionBandwidth)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRotationBandwidth)).EndInit();
+			this.m_pnlSort.ResumeLayout(false);
+			this.m_pnlSort.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numExtrusionBandwidth)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numRotationBandwidth)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_picPreview)).EndInit();
 			this.ResumeLayout(false);
 
@@ -292,7 +292,7 @@
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_secSort;
+		private CommonUI.Controls.SectionPanel m_pnlSort;
 		private System.Windows.Forms.Label m_lblSortMethod;
 		private System.Windows.Forms.ComboBox m_cmbSortMethod;
 		private System.Windows.Forms.Label m_lblPathHint;
@@ -304,10 +304,10 @@
 		private System.Windows.Forms.Label m_lblRotationDir;
 		private System.Windows.Forms.ComboBox m_cmbRotationDir;
 		private System.Windows.Forms.Label m_lblExtrusionBandwidth;
-		private CommonUI.Controls.DebouncedNumericUpDown m_nudExtrusionBandwidth;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numExtrusionBandwidth;
 		private CommonUI.Controls.ThemedLabel m_lblExtrusionUnit;
 		private System.Windows.Forms.Label m_lblRotationBandwidth;
-		private CommonUI.Controls.DebouncedNumericUpDown m_nudRotationBandwidth;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numRotationBandwidth;
 		private CommonUI.Controls.ThemedLabel m_lblRotationUnit;
 		private System.Windows.Forms.PictureBox m_picPreview;
 		private CommonUI.Controls.ThemedButton m_btnConfirm;

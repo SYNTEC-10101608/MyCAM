@@ -51,5 +51,17 @@ namespace CommonUI.Controls
 				nContentBottom + ThemeMetrics.DIALOG_MARGIN;
 			form.ClientSize = new System.Drawing.Size( form.ClientSize.Width, nClientHeight );
 		}
+
+		/// <summary>
+		/// Fit the form to the one page of a wizard that is shown; the page sits at the top-left margin and holds
+		/// its own sections and buttons.
+		/// </summary>
+		/// <param name="form">Dialog to resize.</param>
+		/// <param name="page">Page that is shown.</param>
+		public static void FitToPage( Form form, Control page )
+		{
+			form.ClientSize = new System.Drawing.Size( page.Right + ThemeMetrics.DIALOG_MARGIN,
+				page.Bottom + ThemeMetrics.DIALOG_MARGIN );
+		}
 	}
 }

@@ -100,18 +100,18 @@ namespace MyCAM.Editor.Dialog
 
 		internal void ShowSelectFacePanel()
 		{
-			ShowPanel( m_pnlSelectFace );
+			ShowPanel( m_pnlSelectFacePage );
 		}
 
 		internal void ShowInputParametersPanel()
 		{
-			ShowPanel( m_pnlInputParameters );
+			ShowPanel( m_pnlInputParametersPage );
 		}
 
 		internal void ShowSaveDxfPanel( string defaultOutputDir )
 		{
-			m_txbSavePath.Text = defaultOutputDir;
-			ShowPanel( m_pnlSaveDxf );
+			m_txtSavePath.Text = defaultOutputDir;
+			ShowPanel( m_pnlSaveDxfPage );
 		}
 
 		void ShowPanel( Panel activePanel )
@@ -124,13 +124,11 @@ namespace MyCAM.Editor.Dialog
 			SuspendLayout();
 
 			// Hide all panels first so the window resizes without showing stale content
-			m_pnlSelectFace.Visible = false;
-			m_pnlInputParameters.Visible = false;
-			m_pnlSaveDxf.Visible = false;
+			m_pnlSelectFacePage.Visible = false;
+			m_pnlInputParametersPage.Visible = false;
+			m_pnlSaveDxfPage.Visible = false;
 
-			ClientSize = new System.Drawing.Size(
-				activePanel.Right + activePanel.Left,
-				activePanel.Bottom + activePanel.Top );
+			SectionStack.FitToPage( this, activePanel );
 			ResumeLayout( false );
 			PerformLayout();
 
@@ -161,19 +159,19 @@ namespace MyCAM.Editor.Dialog
 		{
 			return new SupportBracketData
 			{
-				XExtension = (double)m_txbXExtension.Value,
-				YExtension = (double)m_txbYExtension.Value,
-				BaseThick = (double)m_txbBaseThickness.Value,
+				XExtension = (double)m_numXExtension.Value,
+				YExtension = (double)m_numYExtension.Value,
+				BaseThick = (double)m_numBaseThickness.Value,
 				XPositions = CollectPositions( m_XRows ),
 				YPositions = CollectPositions( m_YRows ),
-				CrossGap = (double)m_txbEngagementDepth.Value,
-				XPinCount = (int)m_txbXPinCount.Value,
-				YPinCount = (int)m_txbYPinCount.Value,
-				WallThick = (double)m_txbWallThickness.Value,
-				RibHeight = (double)m_txbRibHeight.Value,
-				ZExtension = (double)m_txbZExtension.Value,
-				PinLength = (double)m_txbPinLength.Value,
-				FilletRadius = (double)m_txbFilletRadius.Value,
+				CrossGap = (double)m_numEngagementDepth.Value,
+				XPinCount = (int)m_numXPinCount.Value,
+				YPinCount = (int)m_numYPinCount.Value,
+				WallThick = (double)m_numWallThickness.Value,
+				RibHeight = (double)m_numRibHeight.Value,
+				ZExtension = (double)m_numZExtension.Value,
+				PinLength = (double)m_numPinLength.Value,
+				FilletRadius = (double)m_numFilletRadius.Value,
 			};
 		}
 
@@ -208,7 +206,7 @@ namespace MyCAM.Editor.Dialog
 
 		void m_btnSaveDxf_Click( object sender, EventArgs e )
 		{
-			SaveDxf?.Invoke( m_txbSavePath.Text );
+			SaveDxf?.Invoke( m_txtSavePath.Text );
 		}
 
 		void m_btnSkipSave_Click( object sender, EventArgs e )
@@ -228,17 +226,17 @@ namespace MyCAM.Editor.Dialog
 				return;
 			}
 
-			m_txbXExtension.SilentSetValue = (decimal)parameters.XExtension;
-			m_txbYExtension.SilentSetValue = (decimal)parameters.YExtension;
-			m_txbBaseThickness.SilentSetValue = (decimal)parameters.BaseThick;
-			m_txbEngagementDepth.SilentSetValue = (decimal)parameters.CrossGap;
-			m_txbXPinCount.SilentSetValue = (decimal)parameters.XPinCount;
-			m_txbYPinCount.SilentSetValue = (decimal)parameters.YPinCount;
-			m_txbWallThickness.SilentSetValue = (decimal)parameters.WallThick;
-			m_txbRibHeight.SilentSetValue = (decimal)parameters.RibHeight;
-			m_txbZExtension.SilentSetValue = (decimal)parameters.ZExtension;
-			m_txbPinLength.SilentSetValue = (decimal)parameters.PinLength;
-			m_txbFilletRadius.SilentSetValue = (decimal)parameters.FilletRadius;
+			m_numXExtension.SilentSetValue = (decimal)parameters.XExtension;
+			m_numYExtension.SilentSetValue = (decimal)parameters.YExtension;
+			m_numBaseThickness.SilentSetValue = (decimal)parameters.BaseThick;
+			m_numEngagementDepth.SilentSetValue = (decimal)parameters.CrossGap;
+			m_numXPinCount.SilentSetValue = (decimal)parameters.XPinCount;
+			m_numYPinCount.SilentSetValue = (decimal)parameters.YPinCount;
+			m_numWallThickness.SilentSetValue = (decimal)parameters.WallThick;
+			m_numRibHeight.SilentSetValue = (decimal)parameters.RibHeight;
+			m_numZExtension.SilentSetValue = (decimal)parameters.ZExtension;
+			m_numPinLength.SilentSetValue = (decimal)parameters.PinLength;
+			m_numFilletRadius.SilentSetValue = (decimal)parameters.FilletRadius;
 
 			ResetPositionListsFromBBox( parameters.XPositions, parameters.YPositions );
 			if( raiseChanged ) {
@@ -335,17 +333,17 @@ namespace MyCAM.Editor.Dialog
 		{
 			// Preview params (affects live preview)
 			foreach( DebouncedNumericUpDown nud in new[] {
-					m_txbXExtension, m_txbYExtension,
-					m_txbRibHeight, m_txbZExtension } ) {
+					m_numXExtension, m_numYExtension,
+					m_numRibHeight, m_numZExtension } ) {
 				nud.DebouncedValueChanged += OnPreviewParamChanged;
 			}
 			foreach( DebouncedNumericUpDown nud in new[] {
-					m_txbXExtension, m_txbYExtension,
-					m_txbZExtension, m_txbRibHeight,
-					m_txbEngagementDepth, m_txbBaseThickness,
-					m_txbWallThickness, m_txbPinLength,
-					m_txbFilletRadius,
-					m_txbXPinCount, m_txbYPinCount } ) {
+					m_numXExtension, m_numYExtension,
+					m_numZExtension, m_numRibHeight,
+					m_numEngagementDepth, m_numBaseThickness,
+					m_numWallThickness, m_numPinLength,
+					m_numFilletRadius,
+					m_numXPinCount, m_numYPinCount } ) {
 				nud.RestrictInvalidCharacters = true;
 				nud.ValueRejected += OnValueRejected;
 			}
@@ -369,10 +367,10 @@ namespace MyCAM.Editor.Dialog
 		{
 			using( var dlg = new FolderBrowserDialog() ) {
 				dlg.Description = m_LanguageManager.TryGetString( "m_dlgBrowseSavePath_Description", DefaultBrowseSavePathDescription );
-				dlg.SelectedPath = m_txbSavePath.Text;
+				dlg.SelectedPath = m_txtSavePath.Text;
 				dlg.ShowNewFolderButton = true;
 				if( dlg.ShowDialog( this ) == DialogResult.OK ) {
-					m_txbSavePath.Text = dlg.SelectedPath;
+					m_txtSavePath.Text = dlg.SelectedPath;
 				}
 			}
 		}

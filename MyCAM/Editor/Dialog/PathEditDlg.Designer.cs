@@ -27,47 +27,47 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_gpbMove = new CommonUI.Controls.SectionPanel();
+			this.m_pnlMove = new CommonUI.Controls.SectionPanel();
 			this.m_lblRefCoordType = new System.Windows.Forms.Label();
 			this.m_cmbRefCoordType = new System.Windows.Forms.ComboBox();
 			this.m_lblTotalDiff = new System.Windows.Forms.Label();
 			this.m_lblX = new System.Windows.Forms.Label();
-			this.m_NumUpDownX = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numX = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblTotalDX = new System.Windows.Forms.Label();
 			this.m_lblY = new System.Windows.Forms.Label();
-			this.m_NumUpDownY = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numY = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblTotalDY = new System.Windows.Forms.Label();
 			this.m_lblZ = new System.Windows.Forms.Label();
-			this.m_NumUpDownZ = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numZ = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblTotalDZ = new System.Windows.Forms.Label();
 			this.m_btnReset = new CommonUI.Controls.ThemedButton();
 			this.m_btnClear = new CommonUI.Controls.ThemedButton();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
-			this.m_gpbMove.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownX)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownY)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownZ)).BeginInit();
+			this.m_pnlMove.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numX)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numY)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numZ)).BeginInit();
 			this.SuspendLayout();
 			//
-			// m_gpbMove
+			// m_pnlMove
 			//
-			this.m_gpbMove.Controls.Add(this.m_lblRefCoordType);
-			this.m_gpbMove.Controls.Add(this.m_cmbRefCoordType);
-			this.m_gpbMove.Controls.Add(this.m_lblTotalDiff);
-			this.m_gpbMove.Controls.Add(this.m_lblX);
-			this.m_gpbMove.Controls.Add(this.m_NumUpDownX);
-			this.m_gpbMove.Controls.Add(this.m_lblTotalDX);
-			this.m_gpbMove.Controls.Add(this.m_lblY);
-			this.m_gpbMove.Controls.Add(this.m_NumUpDownY);
-			this.m_gpbMove.Controls.Add(this.m_lblTotalDY);
-			this.m_gpbMove.Controls.Add(this.m_lblZ);
-			this.m_gpbMove.Controls.Add(this.m_NumUpDownZ);
-			this.m_gpbMove.Controls.Add(this.m_lblTotalDZ);
-			this.m_gpbMove.Location = new System.Drawing.Point(12, 12);
-			this.m_gpbMove.Name = "m_gpbMove";
-			this.m_gpbMove.Size = new System.Drawing.Size(336, 159);
-			this.m_gpbMove.TabIndex = 0;
-			this.m_gpbMove.Text = "平移";
+			this.m_pnlMove.Controls.Add(this.m_lblRefCoordType);
+			this.m_pnlMove.Controls.Add(this.m_cmbRefCoordType);
+			this.m_pnlMove.Controls.Add(this.m_lblTotalDiff);
+			this.m_pnlMove.Controls.Add(this.m_lblX);
+			this.m_pnlMove.Controls.Add(this.m_numX);
+			this.m_pnlMove.Controls.Add(this.m_lblTotalDX);
+			this.m_pnlMove.Controls.Add(this.m_lblY);
+			this.m_pnlMove.Controls.Add(this.m_numY);
+			this.m_pnlMove.Controls.Add(this.m_lblTotalDY);
+			this.m_pnlMove.Controls.Add(this.m_lblZ);
+			this.m_pnlMove.Controls.Add(this.m_numZ);
+			this.m_pnlMove.Controls.Add(this.m_lblTotalDZ);
+			this.m_pnlMove.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlMove.Name = "m_pnlMove";
+			this.m_pnlMove.Size = new System.Drawing.Size(336, 159);
+			this.m_pnlMove.TabIndex = 0;
+			this.m_pnlMove.Text = "平移";
 			//
 			// m_lblRefCoordType
 			//
@@ -108,26 +108,26 @@
 			this.m_lblX.TabIndex = 3;
 			this.m_lblX.Text = "X偏移";
 			//
-			// m_NumUpDownX
+			// m_numX
 			//
-			this.m_NumUpDownX.DecimalPlaces = 3;
-			this.m_NumUpDownX.Location = new System.Drawing.Point(100, 66);
-			this.m_NumUpDownX.Maximum = new decimal(new int[] {
+			this.m_numX.DecimalPlaces = 3;
+			this.m_numX.Location = new System.Drawing.Point(100, 66);
+			this.m_numX.Maximum = new decimal(new int[] {
             99999,
             0,
             0,
             0});
-			this.m_NumUpDownX.Minimum = new decimal(new int[] {
+			this.m_numX.Minimum = new decimal(new int[] {
             99999,
             0,
             0,
             -2147483648});
-			this.m_NumUpDownX.Name = "m_NumUpDownX";
-			this.m_NumUpDownX.RestrictInvalidCharacters = false;
-			this.m_NumUpDownX.Size = new System.Drawing.Size(130, 23);
-			this.m_NumUpDownX.TabIndex = 4;
-			this.m_NumUpDownX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.m_NumUpDownX.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownX_DebouncedValueChanged);
+			this.m_numX.Name = "m_numX";
+			this.m_numX.RestrictInvalidCharacters = false;
+			this.m_numX.Size = new System.Drawing.Size(130, 23);
+			this.m_numX.TabIndex = 4;
+			this.m_numX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			this.m_numX.DebouncedValueChanged += new System.EventHandler(this.m_numX_DebouncedValueChanged);
 			//
 			// m_lblTotalDX
 			//
@@ -147,26 +147,26 @@
 			this.m_lblY.TabIndex = 6;
 			this.m_lblY.Text = "Y偏移";
 			//
-			// m_NumUpDownY
+			// m_numY
 			//
-			this.m_NumUpDownY.DecimalPlaces = 3;
-			this.m_NumUpDownY.Location = new System.Drawing.Point(100, 96);
-			this.m_NumUpDownY.Maximum = new decimal(new int[] {
+			this.m_numY.DecimalPlaces = 3;
+			this.m_numY.Location = new System.Drawing.Point(100, 96);
+			this.m_numY.Maximum = new decimal(new int[] {
             99999,
             0,
             0,
             0});
-			this.m_NumUpDownY.Minimum = new decimal(new int[] {
+			this.m_numY.Minimum = new decimal(new int[] {
             99999,
             0,
             0,
             -2147483648});
-			this.m_NumUpDownY.Name = "m_NumUpDownY";
-			this.m_NumUpDownY.RestrictInvalidCharacters = false;
-			this.m_NumUpDownY.Size = new System.Drawing.Size(130, 23);
-			this.m_NumUpDownY.TabIndex = 7;
-			this.m_NumUpDownY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.m_NumUpDownY.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownY_DebouncedValueChanged);
+			this.m_numY.Name = "m_numY";
+			this.m_numY.RestrictInvalidCharacters = false;
+			this.m_numY.Size = new System.Drawing.Size(130, 23);
+			this.m_numY.TabIndex = 7;
+			this.m_numY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			this.m_numY.DebouncedValueChanged += new System.EventHandler(this.m_numY_DebouncedValueChanged);
 			//
 			// m_lblTotalDY
 			//
@@ -186,26 +186,26 @@
 			this.m_lblZ.TabIndex = 9;
 			this.m_lblZ.Text = "Z偏移";
 			//
-			// m_NumUpDownZ
+			// m_numZ
 			//
-			this.m_NumUpDownZ.DecimalPlaces = 3;
-			this.m_NumUpDownZ.Location = new System.Drawing.Point(100, 126);
-			this.m_NumUpDownZ.Maximum = new decimal(new int[] {
+			this.m_numZ.DecimalPlaces = 3;
+			this.m_numZ.Location = new System.Drawing.Point(100, 126);
+			this.m_numZ.Maximum = new decimal(new int[] {
             99999,
             0,
             0,
             0});
-			this.m_NumUpDownZ.Minimum = new decimal(new int[] {
+			this.m_numZ.Minimum = new decimal(new int[] {
             99999,
             0,
             0,
             -2147483648});
-			this.m_NumUpDownZ.Name = "m_NumUpDownZ";
-			this.m_NumUpDownZ.RestrictInvalidCharacters = false;
-			this.m_NumUpDownZ.Size = new System.Drawing.Size(130, 23);
-			this.m_NumUpDownZ.TabIndex = 10;
-			this.m_NumUpDownZ.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.m_NumUpDownZ.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownZ_DebouncedValueChanged);
+			this.m_numZ.Name = "m_numZ";
+			this.m_numZ.RestrictInvalidCharacters = false;
+			this.m_numZ.Size = new System.Drawing.Size(130, 23);
+			this.m_numZ.TabIndex = 10;
+			this.m_numZ.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			this.m_numZ.DebouncedValueChanged += new System.EventHandler(this.m_numZ_DebouncedValueChanged);
 			//
 			// m_lblTotalDZ
 			//
@@ -249,36 +249,36 @@
 			// PathEditDlg
 			//
 			this.ClientSize = new System.Drawing.Size(360, 227);
-			this.Controls.Add(this.m_gpbMove);
+			this.Controls.Add(this.m_pnlMove);
 			this.Controls.Add(this.m_btnReset);
 			this.Controls.Add(this.m_btnClear);
 			this.Controls.Add(this.m_btnConfirm);
 			this.Name = "PathEditDlg";
 			this.Text = "路徑編輯";
 			this.Shown += new System.EventHandler(this.PathEditDlg_Shown);
-			this.m_gpbMove.ResumeLayout(false);
-			this.m_gpbMove.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownX)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownY)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownZ)).EndInit();
+			this.m_pnlMove.ResumeLayout(false);
+			this.m_pnlMove.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numX)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numY)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numZ)).EndInit();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_gpbMove;
+		private CommonUI.Controls.SectionPanel m_pnlMove;
 		private System.Windows.Forms.Label m_lblRefCoordType;
 		private System.Windows.Forms.ComboBox m_cmbRefCoordType;
 		private System.Windows.Forms.Label m_lblTotalDiff;
 		private System.Windows.Forms.Label m_lblX;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumUpDownX;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numX;
 		private System.Windows.Forms.Label m_lblTotalDX;
 		private System.Windows.Forms.Label m_lblY;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumUpDownY;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numY;
 		private System.Windows.Forms.Label m_lblTotalDY;
 		private System.Windows.Forms.Label m_lblZ;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumUpDownZ;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numZ;
 		private System.Windows.Forms.Label m_lblTotalDZ;
 		private CommonUI.Controls.ThemedButton m_btnReset;
 		private CommonUI.Controls.ThemedButton m_btnClear;

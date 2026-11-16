@@ -13,6 +13,11 @@
 #       IDs; the language file is named after the class
 #   S7  language: a control whose name is an ID is not given another text in code (auto-applied texts would win)
 #   S8  section titles (section 4.5): a card title is SectionPanel.Text; no emphasized label in a card's title bar
+#   S9  control field names start with the prefix of their type (section 3), also in the main window
+#   S10 tab order follows the layout: rows from top to bottom, left to right (FixTabOrder.ps1 renumbers)
+#   S11 dialog code sets no font, color, location or size of its controls (the designer layout is what runs)
+#   S12 no DPI scaling (DeviceDpi): the layout is designed for 96 DPI
+#   S13 language: an ID written like a control name belongs to a control of the class or is used by its code
 #
 # Exceptions are listed in StaticExceptions.txt: "<rule> <class> <control> <reason>". Exit code 1 on a problem.
 
@@ -35,13 +40,73 @@ $ALLOWED_TYPES = @(
 	"System.Windows.Forms.ToolTip", "System.Windows.Forms.Timer", "System.ComponentModel.IContainer" )
 
 # non-numeric text fields (section 3)
-$ALLOWED_TEXTBOX = @( "ConnectDlg.m_txbIP", "MeasureDlg.m_txtResult", "ExtendedGCodeDlg.m_txtGCode",
-	"DesignSupportBracketDlg.m_txbSavePath", "GlassDXFImportDlg.m_txbFilePath" )
+$ALLOWED_TEXTBOX = @( "ConnectDlg.m_txtIP", "MeasureDlg.m_txtResult", "ExtendedGCodeDlg.m_txtGCode",
+	"DesignSupportBracketDlg.m_txtSavePath" )
 
 $FORBIDDEN_FORM_PROPS = @( "AutoScaleMode", "AutoScaleDimensions", "FormBorderStyle", "StartPosition", "MaximizeBox",
 	"MinimizeBox", "ShowIcon", "ShowInTaskbar", "Font", "BackColor", "ForeColor" )
 $FORBIDDEN_CONTROL_PROPS = @( "Font", "BackColor", "ForeColor", "FlatStyle", "UseVisualStyleBackColor", "Dock",
 	"Anchor", "AutoScaleMode", "AutoScaleDimensions", "BorderStyle", "ImageTransparentColor" )
+
+# field name prefix of each control type (section 3)
+$PREFIX_MAP = @{
+	"SectionPanel" = "m_pnl"; "Panel" = "m_pnl"; "TableLayoutPanel" = "m_pnl"
+	"ThemedButton" = "m_btn"; "ThemedLabel" = "m_lbl"; "Label" = "m_lbl"; "DebouncedNumericUpDown" = "m_num"
+	"TextBox" = "m_txt"; "CheckBox" = "m_chk"; "RadioButton" = "m_rdo"; "ComboBox" = "m_cmb"
+	"CheckedListBox" = "m_clb"; "TrackBar" = "m_trb"; "PictureBox" = "m_pic"; "ThemedDataGridView" = "m_dgv"
+	"DataGridView" = "m_dgv"; "DataGridViewTextBoxColumn" = "m_col"; "ToolTip" = "m_ttp"; "Timer" = "m_tmr"
+	"MultiSelectTreeView" = "m_tv"; "TreeView" = "m_tv"; "LoadingBar" = "m_prg"; "RoundedProgressBar" = "m_prg"
+	"MenuStrip" = "m_ms"; "ToolStrip" = "m_ts"; "ToolStripContainer" = "m_tsc"; "ToolStripButton" = "m_tsb"
+	"ToolStripMenuItem" = "m_tsmi"; "ToolStripSeparator" = "m_tss"; "ContextMenuStrip" = "m_cms"
+}
+
+function Test-FieldNames( $screen ) {
+	foreach ($name in $screen.Fields.Keys) {
+		$szType = ($screen.Fields[$name] -split "\.")[-1]
+		if ($szType -eq "IContainer") {
+			continue
+		}
+		if (-not $PREFIX_MAP.ContainsKey($szType)) {
+			Report "S9" $screen.ClassName $name "no prefix defined for $szType"
+			continue
+		}
+		$szPrefix = $PREFIX_MAP[$szType]
+		if ($name -cnotmatch "^$($szPrefix)[A-Z0-9]") {
+			Report "S9" $screen.ClassName $name "$szType field must be named $szPrefix<Name>"
+		}
+	}
+}
+
+function Test-OrphanIds( $screen, [string]$szCodePath ) {
+	$ids = Get-LanguageIds $screen.ClassName "zh-TW"
+	if ($null -eq $ids) {
+		return
+	}
+	$code = if (Test-Path $szCodePath) { Get-Content $szCodePath -Raw -Encoding UTF8 } else { "" }
+	foreach ($id in $ids.Keys) {
+		$isControlName = $id -cmatch "^m_[a-z]+[A-Z0-9]"
+		if ($isControlName -and -not $screen.Fields.ContainsKey($id) -and $code -notmatch "`"$id`"") {
+			Report "S13" $screen.ClassName $id "language ID looks like a control name but no control or code uses it"
+		}
+	}
+}
+
+function Test-TabOrder( $screen ) {
+	foreach ($szContainer in @( $screen.Children.Keys )) {
+		$nPrevious = -1
+		foreach ($name in (Get-LayoutOrder $screen $szContainer)) {
+			$props = $screen.Props[$name]
+			if ($null -eq $props -or -not $props.ContainsKey("TabIndex")) {
+				continue
+			}
+			$nTabIndex = [int]$props["TabIndex"]
+			if ($nTabIndex -le $nPrevious) {
+				Report "S10" $screen.ClassName $name "TabIndex $nTabIndex is not after the control before it in the layout ($szContainer)"
+			}
+			$nPrevious = $nTabIndex
+		}
+	}
+}
 
 # ThemeMetrics.SECTION_TITLE_HEIGHT
 $TITLE_BAR_HEIGHT = 32
@@ -50,7 +115,7 @@ $exceptions = @{}
 $exceptionFile = Join-Path $PSScriptRoot "StaticExceptions.txt"
 if (Test-Path $exceptionFile) {
 	foreach ($line in Get-Content $exceptionFile -Encoding UTF8) {
-		if ($line -match "^\s*(S\d)\s+(\S+)\s+(\S+)") {
+		if ($line -match "^\s*(S\d+)\s+(\S+)\s+(\S+)") {
 			$exceptions["$($Matches[1]) $($Matches[2]) $($Matches[3])"] = $true
 		}
 	}
@@ -361,6 +426,18 @@ foreach ($file in $designerFiles) {
 
 	# S6 / S7 language
 	Test-ScreenLanguage $screen $file
+
+	# S9 names, S10 tab order, S13 language IDs
+	Test-FieldNames $screen
+	Test-TabOrder $screen
+	Test-OrphanIds $screen ($file.FullName -replace "\.Designer\.cs$", ".cs")
+}
+
+# S9 the main window follows the same naming; its layout is computed by MainLayout, so S10 does not apply
+$mainScreen = Read-DesignerFile (Join-Path $Root "MyCAM\StartupForm.Designer.cs")
+if (-not $Only -or $mainScreen.ClassName -like $Only) {
+	Test-FieldNames $mainScreen
+	Test-OrphanIds $mainScreen (Join-Path $Root "MyCAM\StartupForm.cs")
 }
 
 # ---------------------------------------------------------------- code
@@ -381,9 +458,20 @@ foreach ($file in $codeFiles) {
 	if ($Only -and $szClass -notlike $Only) {
 		continue
 	}
+	# a dialog's code-behind: its designer file is in a screen folder and it is not an embedded panel
+	$designerPath = $file.FullName -replace "\.cs$", ".Designer.cs"
+	$isScreenFolder = @( $SCREEN_DIRS | Where-Object { $file.DirectoryName -eq (Join-Path $Root $_) } ).Count -gt 0
+	$isDialogCode = $isScreenFolder -and (Test-Path $designerPath) -and ($file.FullName -notmatch "\\CncUI\\Panel\\")
 	$nLine = 0
 	foreach ($line in Get-Content $file.FullName -Encoding UTF8) {
 		$nLine++
+		if ($line -match "\bDeviceDpi\b") {
+			Report "S12" $szClass "line$nLine" "DPI scaling is not used (96 DPI only): $($line.Trim())"
+		}
+		$isAppearanceCode = $line -match "(\bm_\w+\.|\bthis\.|^\s*)(Font|ForeColor|BackColor|Location|Size|ClientSize|Left|Top|Width|Height|Bounds)\s*=[^=]|\bm_\w+\.SetBounds\("
+		if ($isDialogCode -and $isAppearanceCode) {
+			Report "S11" $szClass "line$nLine" "appearance set in code; lay it out in the designer: $($line.Trim())"
+		}
 		# Color.Empty (default) and Color.Transparent (no fill) are not colors and are allowed
 		if ($line -notmatch "(?<![\w])(Color\.(FromArgb|(?!(Empty|Transparent)\b)[A-Z]\w*)|SystemColors\.\w+|new (System\.Drawing\.)?Font\s*\()") {
 			continue

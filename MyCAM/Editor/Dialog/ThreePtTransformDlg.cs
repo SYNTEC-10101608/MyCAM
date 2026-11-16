@@ -37,32 +37,32 @@ namespace MyCAM.Editor
 			m_LanguageManager = new LanguageManager.LanguageManager( "ThreePtTransformDlg" );
 
 			// init cad textbox
-			tbxCADX1.Text = transParam.MachineP1.X().ToString( "F3" );
-			tbxCADY1.Text = transParam.MachineP1.Y().ToString( "F3" );
-			tbxCADZ1.Text = transParam.MachineP1.Z().ToString( "F3" );
+			m_lblCADX1Value.Text = transParam.MachineP1.X().ToString( "F3" );
+			m_lblCADY1Value.Text = transParam.MachineP1.Y().ToString( "F3" );
+			m_lblCADZ1Value.Text = transParam.MachineP1.Z().ToString( "F3" );
 
-			tbxCADX2.Text = transParam.MachineP2.X().ToString( "F3" );
-			tbxCADY2.Text = transParam.MachineP2.Y().ToString( "F3" );
-			tbxCADZ2.Text = transParam.MachineP2.Z().ToString( "F3" );
+			m_lblCADX2Value.Text = transParam.MachineP2.X().ToString( "F3" );
+			m_lblCADY2Value.Text = transParam.MachineP2.Y().ToString( "F3" );
+			m_lblCADZ2Value.Text = transParam.MachineP2.Z().ToString( "F3" );
 
-			tbxCADX3.Text = transParam.MachineP3.X().ToString( "F3" );
-			tbxCADY3.Text = transParam.MachineP3.Y().ToString( "F3" );
-			tbxCADZ3.Text = transParam.MachineP3.Z().ToString( "F3" );
+			m_lblCADX3Value.Text = transParam.MachineP3.X().ToString( "F3" );
+			m_lblCADY3Value.Text = transParam.MachineP3.Y().ToString( "F3" );
+			m_lblCADZ3Value.Text = transParam.MachineP3.Z().ToString( "F3" );
 
 		}
 
-		void btnOK_Click( object sender, EventArgs e )
+		void m_btnOK_Click( object sender, EventArgs e )
 		{
 			// get machine point coordinates
-			if( !double.TryParse( tbxMachineX1.Text, out double x1 ) ||
-				!double.TryParse( tbxMachineY1.Text, out double y1 ) ||
-				!double.TryParse( tbxMachineZ1.Text, out double z1 ) ||
-				!double.TryParse( tbxMachineX2.Text, out double x2 ) ||
-				!double.TryParse( tbxMachineY2.Text, out double y2 ) ||
-				!double.TryParse( tbxMachineZ2.Text, out double z2 ) ||
-				!double.TryParse( tbxMachineX3.Text, out double x3 ) ||
-				!double.TryParse( tbxMachineY3.Text, out double y3 ) ||
-				!double.TryParse( tbxMachineZ3.Text, out double z3 ) ) {
+			if( !double.TryParse( m_numMachineX1.Text, out double x1 ) ||
+				!double.TryParse( m_numMachineY1.Text, out double y1 ) ||
+				!double.TryParse( m_numMachineZ1.Text, out double z1 ) ||
+				!double.TryParse( m_numMachineX2.Text, out double x2 ) ||
+				!double.TryParse( m_numMachineY2.Text, out double y2 ) ||
+				!double.TryParse( m_numMachineZ2.Text, out double z2 ) ||
+				!double.TryParse( m_numMachineX3.Text, out double x3 ) ||
+				!double.TryParse( m_numMachineY3.Text, out double y3 ) ||
+				!double.TryParse( m_numMachineZ3.Text, out double z3 ) ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "InvalidMachineCoord", INVALID_MACHINE_COORD ), MyApp.NoticeType.Warning );
 				return;
 			}

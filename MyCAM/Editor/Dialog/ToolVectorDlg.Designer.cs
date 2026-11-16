@@ -27,29 +27,29 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_gbxIndexParam = new System.Windows.Forms.Panel();
-			this.m_secToolVecInfo = new CommonUI.Controls.SectionPanel();
+			this.m_pnlIndexParam = new System.Windows.Forms.Panel();
+			this.m_pnlToolVecInfo = new CommonUI.Controls.SectionPanel();
 			this.m_lblADeg = new System.Windows.Forms.Label();
-			this.m_tbxAngleA = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numAngleA = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblBDeg = new System.Windows.Forms.Label();
-			this.m_tbxAngleB = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numAngleB = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblMaster = new CommonUI.Controls.ThemedLabel();
-			this.m_tbxMaster = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numMaster = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblSlave = new CommonUI.Controls.ThemedLabel();
-			this.m_tbxSlave = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numSlave = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_btnRotaryPos = new CommonUI.Controls.ThemedButton();
 			this.m_btnRotaryNeg = new CommonUI.Controls.ThemedButton();
 			this.m_lblInterpolateType = new System.Windows.Forms.Label();
-			this.m_cbxInterpolateType = new System.Windows.Forms.ComboBox();
-			this.m_secQuickSet = new CommonUI.Controls.SectionPanel();
+			this.m_cmbInterpolateType = new System.Windows.Forms.ComboBox();
+			this.m_pnlQuickSet = new CommonUI.Controls.SectionPanel();
 			this.m_btnZDir = new CommonUI.Controls.ThemedButton();
 			this.m_btnKeep = new CommonUI.Controls.ThemedButton();
 			this.m_btnRevert = new CommonUI.Controls.ThemedButton();
-			this.m_secSetting = new CommonUI.Controls.SectionPanel();
+			this.m_pnlSetting = new CommonUI.Controls.SectionPanel();
 			this.m_btnAdd = new CommonUI.Controls.ThemedButton();
 			this.m_btnRemove = new CommonUI.Controls.ThemedButton();
 			this.m_btnClear = new CommonUI.Controls.ThemedButton();
-			this.m_secMovePnt = new CommonUI.Controls.SectionPanel();
+			this.m_pnlMovePnt = new CommonUI.Controls.SectionPanel();
 			this.m_lblStartPnt = new System.Windows.Forms.Label();
 			this.m_btnToStart = new CommonUI.Controls.ThemedButton();
 			this.m_btnToEnd = new CommonUI.Controls.ThemedButton();
@@ -73,62 +73,62 @@
 			this.m_lblLegendMaster = new System.Windows.Forms.Label();
 			this.m_pnlColorSlave = new System.Windows.Forms.Panel();
 			this.m_lblLegendSlave = new System.Windows.Forms.Label();
-			this.m_gbxIndexParam.SuspendLayout();
-			this.m_secToolVecInfo.SuspendLayout();
-			this.m_secQuickSet.SuspendLayout();
-			this.m_secSetting.SuspendLayout();
-			this.m_secMovePnt.SuspendLayout();
+			this.m_pnlIndexParam.SuspendLayout();
+			this.m_pnlToolVecInfo.SuspendLayout();
+			this.m_pnlQuickSet.SuspendLayout();
+			this.m_pnlSetting.SuspendLayout();
+			this.m_pnlMovePnt.SuspendLayout();
 			this.m_pnlStartEndSwitch.SuspendLayout();
 			this.m_pnlColorNormal.SuspendLayout();
 			this.m_pnlColorRotary.SuspendLayout();
 			this.m_pnlColorBevel.SuspendLayout();
 			this.m_pnlColorMaster.SuspendLayout();
 			this.m_pnlColorSlave.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxAngleA)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxAngleB)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxMaster)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxSlave)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numAngleA)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numAngleB)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numMaster)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numSlave)).BeginInit();
 			this.SuspendLayout();
 			// 
-			// m_gbxIndexParam
+			// m_pnlIndexParam
 			// 
-			this.m_gbxIndexParam.Controls.Add(this.m_secToolVecInfo);
-			this.m_gbxIndexParam.Controls.Add(this.m_secQuickSet);
-			this.m_gbxIndexParam.Controls.Add(this.m_secSetting);
-			this.m_gbxIndexParam.Location = new System.Drawing.Point(12, 12);
-			this.m_gbxIndexParam.Name = "m_gbxIndexParam";
-			this.m_gbxIndexParam.Size = new System.Drawing.Size(452, 373);
-			this.m_gbxIndexParam.TabIndex = 0;
+			this.m_pnlIndexParam.Controls.Add(this.m_pnlToolVecInfo);
+			this.m_pnlIndexParam.Controls.Add(this.m_pnlQuickSet);
+			this.m_pnlIndexParam.Controls.Add(this.m_pnlSetting);
+			this.m_pnlIndexParam.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlIndexParam.Name = "m_pnlIndexParam";
+			this.m_pnlIndexParam.Size = new System.Drawing.Size(452, 373);
+			this.m_pnlIndexParam.TabIndex = 0;
 			// 
-			// m_secToolVecInfo
+			// m_pnlToolVecInfo
 			// 
-			this.m_secToolVecInfo.Controls.Add(this.m_lblADeg);
-			this.m_secToolVecInfo.Controls.Add(this.m_tbxAngleA);
-			this.m_secToolVecInfo.Controls.Add(this.m_lblBDeg);
-			this.m_secToolVecInfo.Controls.Add(this.m_tbxAngleB);
-			this.m_secToolVecInfo.Controls.Add(this.m_lblMaster);
-			this.m_secToolVecInfo.Controls.Add(this.m_tbxMaster);
-			this.m_secToolVecInfo.Controls.Add(this.m_lblSlave);
-			this.m_secToolVecInfo.Controls.Add(this.m_tbxSlave);
-			this.m_secToolVecInfo.Controls.Add(this.m_btnRotaryPos);
-			this.m_secToolVecInfo.Controls.Add(this.m_btnRotaryNeg);
-			this.m_secToolVecInfo.Controls.Add(this.m_lblInterpolateType);
-			this.m_secToolVecInfo.Controls.Add(this.m_cbxInterpolateType);
-			this.m_secToolVecInfo.Controls.Add(this.m_pnlColorNormal);
-			this.m_secToolVecInfo.Controls.Add(this.m_lblLegendNormal);
-			this.m_secToolVecInfo.Controls.Add(this.m_pnlColorRotary);
-			this.m_secToolVecInfo.Controls.Add(this.m_lblLegendRotary);
-			this.m_secToolVecInfo.Controls.Add(this.m_pnlColorBevel);
-			this.m_secToolVecInfo.Controls.Add(this.m_lblLegendBevel);
-			this.m_secToolVecInfo.Controls.Add(this.m_pnlColorMaster);
-			this.m_secToolVecInfo.Controls.Add(this.m_lblLegendMaster);
-			this.m_secToolVecInfo.Controls.Add(this.m_pnlColorSlave);
-			this.m_secToolVecInfo.Controls.Add(this.m_lblLegendSlave);
-			this.m_secToolVecInfo.Location = new System.Drawing.Point(0, 0);
-			this.m_secToolVecInfo.Name = "m_secToolVecInfo";
-			this.m_secToolVecInfo.Size = new System.Drawing.Size(452, 219);
-			this.m_secToolVecInfo.TabIndex = 0;
-			this.m_secToolVecInfo.Text = "單點姿態資訊";
+			this.m_pnlToolVecInfo.Controls.Add(this.m_lblADeg);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_numAngleA);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_lblBDeg);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_numAngleB);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_lblMaster);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_numMaster);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_lblSlave);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_numSlave);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_btnRotaryPos);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_btnRotaryNeg);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_lblInterpolateType);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_cmbInterpolateType);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_pnlColorNormal);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_lblLegendNormal);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_pnlColorRotary);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_lblLegendRotary);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_pnlColorBevel);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_lblLegendBevel);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_pnlColorMaster);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_lblLegendMaster);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_pnlColorSlave);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_lblLegendSlave);
+			this.m_pnlToolVecInfo.Location = new System.Drawing.Point(0, 0);
+			this.m_pnlToolVecInfo.Name = "m_pnlToolVecInfo";
+			this.m_pnlToolVecInfo.Size = new System.Drawing.Size(452, 219);
+			this.m_pnlToolVecInfo.TabIndex = 0;
+			this.m_pnlToolVecInfo.Text = "單點姿態資訊";
 			// 
 			// m_lblADeg
 			// 
@@ -139,17 +139,17 @@
 			this.m_lblADeg.TabIndex = 0;
 			this.m_lblADeg.Text = "前傾角";
 			// 
-			// m_tbxAngleA
+			// m_numAngleA
 			// 
-			this.m_tbxAngleA.DecimalPlaces = 3;
-			this.m_tbxAngleA.Location = new System.Drawing.Point(100, 36);
-			this.m_tbxAngleA.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_tbxAngleA.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_tbxAngleA.Name = "m_tbxAngleA";
-			this.m_tbxAngleA.RestrictInvalidCharacters = false;
-			this.m_tbxAngleA.Size = new System.Drawing.Size(120, 23);
-			this.m_tbxAngleA.TabIndex = 1;
-			this.m_tbxAngleA.DebouncedValueChanged += new System.EventHandler(this.m_tbxAngleA_DebouncedValueChanged);
+			this.m_numAngleA.DecimalPlaces = 3;
+			this.m_numAngleA.Location = new System.Drawing.Point(100, 36);
+			this.m_numAngleA.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numAngleA.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numAngleA.Name = "m_numAngleA";
+			this.m_numAngleA.RestrictInvalidCharacters = false;
+			this.m_numAngleA.Size = new System.Drawing.Size(120, 23);
+			this.m_numAngleA.TabIndex = 1;
+			this.m_numAngleA.DebouncedValueChanged += new System.EventHandler(this.m_numAngleA_DebouncedValueChanged);
 			// 
 			// m_lblBDeg
 			// 
@@ -160,17 +160,17 @@
 			this.m_lblBDeg.TabIndex = 2;
 			this.m_lblBDeg.Text = "側傾角";
 			// 
-			// m_tbxAngleB
+			// m_numAngleB
 			// 
-			this.m_tbxAngleB.DecimalPlaces = 3;
-			this.m_tbxAngleB.Location = new System.Drawing.Point(322, 36);
-			this.m_tbxAngleB.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_tbxAngleB.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_tbxAngleB.Name = "m_tbxAngleB";
-			this.m_tbxAngleB.RestrictInvalidCharacters = false;
-			this.m_tbxAngleB.Size = new System.Drawing.Size(120, 23);
-			this.m_tbxAngleB.TabIndex = 3;
-			this.m_tbxAngleB.DebouncedValueChanged += new System.EventHandler(this.m_tbxAngleB_DebouncedValueChanged);
+			this.m_numAngleB.DecimalPlaces = 3;
+			this.m_numAngleB.Location = new System.Drawing.Point(322, 36);
+			this.m_numAngleB.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numAngleB.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numAngleB.Name = "m_numAngleB";
+			this.m_numAngleB.RestrictInvalidCharacters = false;
+			this.m_numAngleB.Size = new System.Drawing.Size(120, 23);
+			this.m_numAngleB.TabIndex = 3;
+			this.m_numAngleB.DebouncedValueChanged += new System.EventHandler(this.m_numAngleB_DebouncedValueChanged);
 			// 
 			// m_lblMaster
 			// 
@@ -182,17 +182,17 @@
 			this.m_lblMaster.TabIndex = 4;
 			this.m_lblMaster.Text = "C";
 			// 
-			// m_tbxMaster
+			// m_numMaster
 			// 
-			this.m_tbxMaster.DecimalPlaces = 3;
-			this.m_tbxMaster.Location = new System.Drawing.Point(100, 66);
-			this.m_tbxMaster.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_tbxMaster.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_tbxMaster.Name = "m_tbxMaster";
-			this.m_tbxMaster.RestrictInvalidCharacters = false;
-			this.m_tbxMaster.Size = new System.Drawing.Size(120, 23);
-			this.m_tbxMaster.TabIndex = 5;
-			this.m_tbxMaster.DebouncedValueChanged += new System.EventHandler(this.m_tbxMaster_DebouncedValueChanged);
+			this.m_numMaster.DecimalPlaces = 3;
+			this.m_numMaster.Location = new System.Drawing.Point(100, 66);
+			this.m_numMaster.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numMaster.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numMaster.Name = "m_numMaster";
+			this.m_numMaster.RestrictInvalidCharacters = false;
+			this.m_numMaster.Size = new System.Drawing.Size(120, 23);
+			this.m_numMaster.TabIndex = 5;
+			this.m_numMaster.DebouncedValueChanged += new System.EventHandler(this.m_numMaster_DebouncedValueChanged);
 			// 
 			// m_lblSlave
 			// 
@@ -204,17 +204,17 @@
 			this.m_lblSlave.TabIndex = 6;
 			this.m_lblSlave.Text = "A";
 			// 
-			// m_tbxSlave
+			// m_numSlave
 			// 
-			this.m_tbxSlave.DecimalPlaces = 3;
-			this.m_tbxSlave.Location = new System.Drawing.Point(322, 66);
-			this.m_tbxSlave.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_tbxSlave.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_tbxSlave.Name = "m_tbxSlave";
-			this.m_tbxSlave.RestrictInvalidCharacters = false;
-			this.m_tbxSlave.Size = new System.Drawing.Size(120, 23);
-			this.m_tbxSlave.TabIndex = 7;
-			this.m_tbxSlave.DebouncedValueChanged += new System.EventHandler(this.m_tbxSlave_DebouncedValueChanged);
+			this.m_numSlave.DecimalPlaces = 3;
+			this.m_numSlave.Location = new System.Drawing.Point(322, 66);
+			this.m_numSlave.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numSlave.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numSlave.Name = "m_numSlave";
+			this.m_numSlave.RestrictInvalidCharacters = false;
+			this.m_numSlave.Size = new System.Drawing.Size(120, 23);
+			this.m_numSlave.TabIndex = 7;
+			this.m_numSlave.DebouncedValueChanged += new System.EventHandler(this.m_numSlave_DebouncedValueChanged);
 			// 
 			// m_btnRotaryPos
 			// 
@@ -243,27 +243,27 @@
 			this.m_lblInterpolateType.TabIndex = 10;
 			this.m_lblInterpolateType.Text = "插補方案";
 			// 
-			// m_cbxInterpolateType
+			// m_cmbInterpolateType
 			// 
-			this.m_cbxInterpolateType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.m_cbxInterpolateType.FormattingEnabled = true;
-			this.m_cbxInterpolateType.Location = new System.Drawing.Point(100, 126);
-			this.m_cbxInterpolateType.Name = "m_cbxInterpolateType";
-			this.m_cbxInterpolateType.Size = new System.Drawing.Size(120, 24);
-			this.m_cbxInterpolateType.TabIndex = 11;
-			this.m_cbxInterpolateType.Items.AddRange(new object[] { "維持默認", "旋轉軸平滑", "傾角切坡口", "從軸平滑", "主軸平滑"});
-			this.m_cbxInterpolateType.SelectedIndexChanged += new System.EventHandler(this.m_cbxInterpolateType_SelectedIndexChanged);
+			this.m_cmbInterpolateType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.m_cmbInterpolateType.FormattingEnabled = true;
+			this.m_cmbInterpolateType.Location = new System.Drawing.Point(100, 126);
+			this.m_cmbInterpolateType.Name = "m_cmbInterpolateType";
+			this.m_cmbInterpolateType.Size = new System.Drawing.Size(120, 24);
+			this.m_cmbInterpolateType.TabIndex = 11;
+			this.m_cmbInterpolateType.Items.AddRange(new object[] { "維持默認", "旋轉軸平滑", "傾角切坡口", "從軸平滑", "主軸平滑"});
+			this.m_cmbInterpolateType.SelectedIndexChanged += new System.EventHandler(this.m_cmbInterpolateType_SelectedIndexChanged);
 			// 
-			// m_secQuickSet
+			// m_pnlQuickSet
 			// 
-			this.m_secQuickSet.Controls.Add(this.m_btnZDir);
-			this.m_secQuickSet.Controls.Add(this.m_btnKeep);
-			this.m_secQuickSet.Controls.Add(this.m_btnRevert);
-			this.m_secQuickSet.Location = new System.Drawing.Point(0, 227);
-			this.m_secQuickSet.Name = "m_secQuickSet";
-			this.m_secQuickSet.Size = new System.Drawing.Size(452, 69);
-			this.m_secQuickSet.TabIndex = 1;
-			this.m_secQuickSet.Text = "姿態方向快捷鍵";
+			this.m_pnlQuickSet.Controls.Add(this.m_btnZDir);
+			this.m_pnlQuickSet.Controls.Add(this.m_btnKeep);
+			this.m_pnlQuickSet.Controls.Add(this.m_btnRevert);
+			this.m_pnlQuickSet.Location = new System.Drawing.Point(0, 227);
+			this.m_pnlQuickSet.Name = "m_pnlQuickSet";
+			this.m_pnlQuickSet.Size = new System.Drawing.Size(452, 69);
+			this.m_pnlQuickSet.TabIndex = 1;
+			this.m_pnlQuickSet.Text = "姿態方向快捷鍵";
 			// 
 			// m_btnZDir
 			// 
@@ -292,16 +292,16 @@
 			this.m_btnRevert.Text = "原始";
 			this.m_btnRevert.Click += new System.EventHandler(this.m_btnRevert_Click);
 			//
-			// m_secSetting
+			// m_pnlSetting
 			//
-			this.m_secSetting.Controls.Add(this.m_btnAdd);
-			this.m_secSetting.Controls.Add(this.m_btnRemove);
-			this.m_secSetting.Controls.Add(this.m_btnClear);
-			this.m_secSetting.Location = new System.Drawing.Point(0, 304);
-			this.m_secSetting.Name = "m_secSetting";
-			this.m_secSetting.Size = new System.Drawing.Size(452, 69);
-			this.m_secSetting.TabIndex = 2;
-			this.m_secSetting.Text = "姿態設置";
+			this.m_pnlSetting.Controls.Add(this.m_btnAdd);
+			this.m_pnlSetting.Controls.Add(this.m_btnRemove);
+			this.m_pnlSetting.Controls.Add(this.m_btnClear);
+			this.m_pnlSetting.Location = new System.Drawing.Point(0, 304);
+			this.m_pnlSetting.Name = "m_pnlSetting";
+			this.m_pnlSetting.Size = new System.Drawing.Size(452, 69);
+			this.m_pnlSetting.TabIndex = 2;
+			this.m_pnlSetting.Text = "姿態設置";
 			// 
 			// m_btnAdd
 			// 
@@ -332,23 +332,23 @@
 			this.m_btnClear.Text = "清除所有控制點";
 			this.m_btnClear.Click += new System.EventHandler(this.m_btnClear_Click);
 			//
-			// m_secMovePnt
+			// m_pnlMovePnt
 			//
-			this.m_secMovePnt.Controls.Add(this.m_lblStartPnt);
-			this.m_secMovePnt.Controls.Add(this.m_btnToStart);
-			this.m_secMovePnt.Controls.Add(this.m_btnToEnd);
-			this.m_secMovePnt.Controls.Add(this.m_pnlStartEndSwitch);
-			this.m_secMovePnt.Controls.Add(this.m_lblPnt);
-			this.m_secMovePnt.Controls.Add(this.m_btnPrev);
-			this.m_secMovePnt.Controls.Add(this.m_btnNext);
-			this.m_secMovePnt.Controls.Add(this.m_lblCtrlPnt);
-			this.m_secMovePnt.Controls.Add(this.m_btnPreCtrlPnt);
-			this.m_secMovePnt.Controls.Add(this.m_btnNextCtrlPnt);
-			this.m_secMovePnt.Location = new System.Drawing.Point(12, 393);
-			this.m_secMovePnt.Name = "m_secMovePnt";
-			this.m_secMovePnt.Size = new System.Drawing.Size(452, 159);
-			this.m_secMovePnt.TabIndex = 1;
-			this.m_secMovePnt.Text = "控制點移動";
+			this.m_pnlMovePnt.Controls.Add(this.m_lblStartPnt);
+			this.m_pnlMovePnt.Controls.Add(this.m_btnToStart);
+			this.m_pnlMovePnt.Controls.Add(this.m_btnToEnd);
+			this.m_pnlMovePnt.Controls.Add(this.m_pnlStartEndSwitch);
+			this.m_pnlMovePnt.Controls.Add(this.m_lblPnt);
+			this.m_pnlMovePnt.Controls.Add(this.m_btnPrev);
+			this.m_pnlMovePnt.Controls.Add(this.m_btnNext);
+			this.m_pnlMovePnt.Controls.Add(this.m_lblCtrlPnt);
+			this.m_pnlMovePnt.Controls.Add(this.m_btnPreCtrlPnt);
+			this.m_pnlMovePnt.Controls.Add(this.m_btnNextCtrlPnt);
+			this.m_pnlMovePnt.Location = new System.Drawing.Point(12, 393);
+			this.m_pnlMovePnt.Name = "m_pnlMovePnt";
+			this.m_pnlMovePnt.Size = new System.Drawing.Size(452, 159);
+			this.m_pnlMovePnt.TabIndex = 1;
+			this.m_pnlMovePnt.Text = "控制點移動";
 			//
 			// m_lblStartPnt
 			//
@@ -558,17 +558,17 @@
 			// ToolVectorDlg
 			//
 			this.ClientSize = new System.Drawing.Size(476, 564);
-			this.Controls.Add(this.m_gbxIndexParam);
-			this.Controls.Add(this.m_secMovePnt);
+			this.Controls.Add(this.m_pnlIndexParam);
+			this.Controls.Add(this.m_pnlMovePnt);
 			this.Name = "ToolVectorDlg";
 			this.Text = "飛邊姿態";
-			this.m_gbxIndexParam.ResumeLayout(false);
-			this.m_secToolVecInfo.ResumeLayout(false);
-			this.m_secToolVecInfo.PerformLayout();
-			this.m_secQuickSet.ResumeLayout(false);
-			this.m_secSetting.ResumeLayout(false);
-			this.m_secMovePnt.ResumeLayout(false);
-			this.m_secMovePnt.PerformLayout();
+			this.m_pnlIndexParam.ResumeLayout(false);
+			this.m_pnlToolVecInfo.ResumeLayout(false);
+			this.m_pnlToolVecInfo.PerformLayout();
+			this.m_pnlQuickSet.ResumeLayout(false);
+			this.m_pnlSetting.ResumeLayout(false);
+			this.m_pnlMovePnt.ResumeLayout(false);
+			this.m_pnlMovePnt.PerformLayout();
 			this.m_pnlStartEndSwitch.ResumeLayout(false);
 			this.m_pnlStartEndSwitch.PerformLayout();
 			this.m_pnlColorNormal.ResumeLayout(false);
@@ -576,39 +576,39 @@
 			this.m_pnlColorBevel.ResumeLayout(false);
 			this.m_pnlColorMaster.ResumeLayout(false);
 			this.m_pnlColorSlave.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxAngleA)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxAngleB)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxMaster)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxSlave)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numAngleA)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numAngleB)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numMaster)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numSlave)).EndInit();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private System.Windows.Forms.Panel m_gbxIndexParam;
-		private CommonUI.Controls.SectionPanel m_secToolVecInfo;
+		private System.Windows.Forms.Panel m_pnlIndexParam;
+		private CommonUI.Controls.SectionPanel m_pnlToolVecInfo;
 		private System.Windows.Forms.Label m_lblADeg;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxAngleA;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numAngleA;
 		private System.Windows.Forms.Label m_lblBDeg;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxAngleB;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numAngleB;
 		private CommonUI.Controls.ThemedLabel m_lblMaster;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxMaster;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numMaster;
 		private CommonUI.Controls.ThemedLabel m_lblSlave;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxSlave;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numSlave;
 		private CommonUI.Controls.ThemedButton m_btnRotaryPos;
 		private CommonUI.Controls.ThemedButton m_btnRotaryNeg;
 		private System.Windows.Forms.Label m_lblInterpolateType;
-		private System.Windows.Forms.ComboBox m_cbxInterpolateType;
-		private CommonUI.Controls.SectionPanel m_secQuickSet;
+		private System.Windows.Forms.ComboBox m_cmbInterpolateType;
+		private CommonUI.Controls.SectionPanel m_pnlQuickSet;
 		private CommonUI.Controls.ThemedButton m_btnZDir;
 		private CommonUI.Controls.ThemedButton m_btnKeep;
 		private CommonUI.Controls.ThemedButton m_btnRevert;
-		private CommonUI.Controls.SectionPanel m_secSetting;
+		private CommonUI.Controls.SectionPanel m_pnlSetting;
 		private CommonUI.Controls.ThemedButton m_btnAdd;
 		private CommonUI.Controls.ThemedButton m_btnRemove;
 		private CommonUI.Controls.ThemedButton m_btnClear;
-		private CommonUI.Controls.SectionPanel m_secMovePnt;
+		private CommonUI.Controls.SectionPanel m_pnlMovePnt;
 		private System.Windows.Forms.Label m_lblStartPnt;
 		private CommonUI.Controls.ThemedButton m_btnToStart;
 		private CommonUI.Controls.ThemedButton m_btnToEnd;

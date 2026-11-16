@@ -16,61 +16,61 @@
 
 		private void InitializeComponent()
 		{
-			this.m_gbxOrderMode = new CommonUI.Controls.SectionPanel();
-			this.m_rbSequentialOrder = new System.Windows.Forms.RadioButton();
-			this.m_rbPathSwap = new System.Windows.Forms.RadioButton();
-			this.m_gbxContent = new CommonUI.Controls.SectionPanel();
+			this.m_pnlOrderMode = new CommonUI.Controls.SectionPanel();
+			this.m_rdoSequentialOrder = new System.Windows.Forms.RadioButton();
+			this.m_rdoPathSwap = new System.Windows.Forms.RadioButton();
+			this.m_pnlContent = new CommonUI.Controls.SectionPanel();
 			this.m_lblSequentialDesc = new System.Windows.Forms.Label();
 			this.m_btnMoveUp = new CommonUI.Controls.ThemedButton();
 			this.m_btnMoveDown = new CommonUI.Controls.ThemedButton();
 			this.m_btnMoveToTop = new CommonUI.Controls.ThemedButton();
 			this.m_btnApply = new CommonUI.Controls.ThemedButton();
-			this.m_gbxOrderMode.SuspendLayout();
-			this.m_gbxContent.SuspendLayout();
+			this.m_pnlOrderMode.SuspendLayout();
+			this.m_pnlContent.SuspendLayout();
 			this.SuspendLayout();
 			//
-			// m_gbxOrderMode
+			// m_pnlOrderMode
 			//
-			this.m_gbxOrderMode.Controls.Add(this.m_rbSequentialOrder);
-			this.m_gbxOrderMode.Controls.Add(this.m_rbPathSwap);
-			this.m_gbxOrderMode.Location = new System.Drawing.Point(12, 12);
-			this.m_gbxOrderMode.Name = "m_gbxOrderMode";
-			this.m_gbxOrderMode.Size = new System.Drawing.Size(296, 99);
-			this.m_gbxOrderMode.TabIndex = 0;
-			this.m_gbxOrderMode.Text = "排序模式";
+			this.m_pnlOrderMode.Controls.Add(this.m_rdoSequentialOrder);
+			this.m_pnlOrderMode.Controls.Add(this.m_rdoPathSwap);
+			this.m_pnlOrderMode.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlOrderMode.Name = "m_pnlOrderMode";
+			this.m_pnlOrderMode.Size = new System.Drawing.Size(296, 99);
+			this.m_pnlOrderMode.TabIndex = 0;
+			this.m_pnlOrderMode.Text = "排序模式";
 			//
-			// m_rbSequentialOrder
+			// m_rdoSequentialOrder
 			//
-			this.m_rbSequentialOrder.AutoSize = true;
-			this.m_rbSequentialOrder.Location = new System.Drawing.Point(10, 38);
-			this.m_rbSequentialOrder.Name = "m_rbSequentialOrder";
-			this.m_rbSequentialOrder.Size = new System.Drawing.Size(73, 20);
-			this.m_rbSequentialOrder.TabIndex = 0;
-			this.m_rbSequentialOrder.TabStop = true;
-			this.m_rbSequentialOrder.Text = "依次排序";
-			this.m_rbSequentialOrder.CheckedChanged += new System.EventHandler(this.m_rbSequentialOrder_CheckedChanged);
+			this.m_rdoSequentialOrder.AutoSize = true;
+			this.m_rdoSequentialOrder.Location = new System.Drawing.Point(10, 38);
+			this.m_rdoSequentialOrder.Name = "m_rdoSequentialOrder";
+			this.m_rdoSequentialOrder.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoSequentialOrder.TabIndex = 0;
+			this.m_rdoSequentialOrder.TabStop = true;
+			this.m_rdoSequentialOrder.Text = "依次排序";
+			this.m_rdoSequentialOrder.CheckedChanged += new System.EventHandler(this.m_rdoSequentialOrder_CheckedChanged);
 			//
-			// m_rbPathSwap
+			// m_rdoPathSwap
 			//
-			this.m_rbPathSwap.AutoSize = true;
-			this.m_rbPathSwap.Location = new System.Drawing.Point(10, 68);
-			this.m_rbPathSwap.Name = "m_rbPathSwap";
-			this.m_rbPathSwap.Size = new System.Drawing.Size(73, 20);
-			this.m_rbPathSwap.TabIndex = 1;
-			this.m_rbPathSwap.TabStop = true;
-			this.m_rbPathSwap.Text = "路徑置換";
-			this.m_rbPathSwap.CheckedChanged += new System.EventHandler(this.m_rbPathSwap_CheckedChanged);
+			this.m_rdoPathSwap.AutoSize = true;
+			this.m_rdoPathSwap.Location = new System.Drawing.Point(10, 68);
+			this.m_rdoPathSwap.Name = "m_rdoPathSwap";
+			this.m_rdoPathSwap.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoPathSwap.TabIndex = 1;
+			this.m_rdoPathSwap.TabStop = true;
+			this.m_rdoPathSwap.Text = "路徑置換";
+			this.m_rdoPathSwap.CheckedChanged += new System.EventHandler(this.m_rdoPathSwap_CheckedChanged);
 			//
-			// m_gbxContent
+			// m_pnlContent
 			//
-			this.m_gbxContent.Controls.Add(this.m_lblSequentialDesc);
-			this.m_gbxContent.Controls.Add(this.m_btnMoveUp);
-			this.m_gbxContent.Controls.Add(this.m_btnMoveDown);
-			this.m_gbxContent.Location = new System.Drawing.Point(12, 119);
-			this.m_gbxContent.Name = "m_gbxContent";
-			this.m_gbxContent.Size = new System.Drawing.Size(296, 99);
-			this.m_gbxContent.TabIndex = 1;
-			this.m_gbxContent.Text = "設定";
+			this.m_pnlContent.Controls.Add(this.m_lblSequentialDesc);
+			this.m_pnlContent.Controls.Add(this.m_btnMoveUp);
+			this.m_pnlContent.Controls.Add(this.m_btnMoveDown);
+			this.m_pnlContent.Location = new System.Drawing.Point(12, 119);
+			this.m_pnlContent.Name = "m_pnlContent";
+			this.m_pnlContent.Size = new System.Drawing.Size(296, 99);
+			this.m_pnlContent.TabIndex = 1;
+			this.m_pnlContent.Text = "設定";
 			//
 			// m_lblSequentialDesc
 			//
@@ -123,25 +123,25 @@
 			// OrderDialog
 			//
 			this.ClientSize = new System.Drawing.Size(320, 274);
-			this.Controls.Add(this.m_gbxOrderMode);
-			this.Controls.Add(this.m_gbxContent);
+			this.Controls.Add(this.m_pnlOrderMode);
+			this.Controls.Add(this.m_pnlContent);
 			this.Controls.Add(this.m_btnMoveToTop);
 			this.Controls.Add(this.m_btnApply);
 			this.Name = "OrderDialog";
 			this.Text = "路徑排序";
-			this.m_gbxOrderMode.ResumeLayout(false);
-			this.m_gbxOrderMode.PerformLayout();
-			this.m_gbxContent.ResumeLayout(false);
+			this.m_pnlOrderMode.ResumeLayout(false);
+			this.m_pnlOrderMode.PerformLayout();
+			this.m_pnlContent.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_gbxOrderMode;
-		private System.Windows.Forms.RadioButton m_rbSequentialOrder;
-		private System.Windows.Forms.RadioButton m_rbPathSwap;
-		private CommonUI.Controls.SectionPanel m_gbxContent;
+		private CommonUI.Controls.SectionPanel m_pnlOrderMode;
+		private System.Windows.Forms.RadioButton m_rdoSequentialOrder;
+		private System.Windows.Forms.RadioButton m_rdoPathSwap;
+		private CommonUI.Controls.SectionPanel m_pnlContent;
 		private System.Windows.Forms.Label m_lblSequentialDesc;
 		private CommonUI.Controls.ThemedButton m_btnMoveUp;
 		private CommonUI.Controls.ThemedButton m_btnMoveDown;

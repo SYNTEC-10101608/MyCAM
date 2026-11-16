@@ -23,18 +23,18 @@ namespace MyCAM.Editor.Dialog
 		internal void UpdateDisplacementFromManipulator( double dx, double dy, double dz )
 		{
 			m_isIgnoreValueChange = true;
-			UpdateNumericValue( m_nudX, dx );
-			UpdateNumericValue( m_nudY, dy );
-			UpdateNumericValue( m_nudZ, dz );
+			UpdateNumericValue( m_numX, dx );
+			UpdateNumericValue( m_numY, dy );
+			UpdateNumericValue( m_numZ, dz );
 			m_isIgnoreValueChange = false;
 		}
 
 		internal void UpdateRotationFromManipulator( double drx, double dry, double drz )
 		{
 			m_isIgnoreValueChange = true;
-			UpdateRotationValueFromManipulator( m_nudRx, drx );
-			UpdateRotationValueFromManipulator( m_nudRy, dry );
-			UpdateRotationValueFromManipulator( m_nudRz, drz );
+			UpdateRotationValueFromManipulator( m_numRx, drx );
+			UpdateRotationValueFromManipulator( m_numRy, dry );
+			UpdateRotationValueFromManipulator( m_numRz, drz );
 			m_isIgnoreValueChange = false;
 		}
 
@@ -77,8 +77,8 @@ namespace MyCAM.Editor.Dialog
 
 		void InitialControlValue()
 		{
-			m_txbStepDistance.Text = m_DisplacementIncrement.ToString();
-			m_txbStepAngle.Text = m_RotationIncrement.ToString();
+			m_numStepDistance.Text = m_DisplacementIncrement.ToString();
+			m_numStepAngle.Text = m_RotationIncrement.ToString();
 
 			foreach( var nud in GetDisplacementControls() ) {
 				nud.Increment = m_DisplacementIncrement;
@@ -94,74 +94,74 @@ namespace MyCAM.Editor.Dialog
 		void RegisterValueChangedEvents()
 		{
 			// ValueChanged events (manually registered, not in Designer)
-			m_nudX.ValueChanged += m_nudX_ValueChanged;
-			m_nudY.ValueChanged += m_nudY_ValueChanged;
-			m_nudZ.ValueChanged += m_nudZ_ValueChanged;
-			m_nudRx.ValueChanged += m_nudRx_ValueChanged;
-			m_nudRy.ValueChanged += m_nudRy_ValueChanged;
-			m_nudRz.ValueChanged += m_nudRz_ValueChanged;
+			m_numX.ValueChanged += m_numX_ValueChanged;
+			m_numY.ValueChanged += m_numY_ValueChanged;
+			m_numZ.ValueChanged += m_numZ_ValueChanged;
+			m_numRx.ValueChanged += m_numRx_ValueChanged;
+			m_numRy.ValueChanged += m_numRy_ValueChanged;
+			m_numRz.ValueChanged += m_numRz_ValueChanged;
 		}
 
 		// ValueChanged event handlers (unified implementation)
-		void m_nudX_ValueChanged( object sender, EventArgs e )
+		void m_numX_ValueChanged( object sender, EventArgs e )
 		{
-			HandleValueChanged( m_nudX, EAxisTransformDirection.XAxis, Displace );
+			HandleValueChanged( m_numX, EAxisTransformDirection.XAxis, Displace );
 		}
 
-		void m_nudY_ValueChanged( object sender, EventArgs e )
+		void m_numY_ValueChanged( object sender, EventArgs e )
 		{
-			HandleValueChanged( m_nudY, EAxisTransformDirection.YAxis, Displace );
+			HandleValueChanged( m_numY, EAxisTransformDirection.YAxis, Displace );
 		}
 
-		void m_nudZ_ValueChanged( object sender, EventArgs e )
+		void m_numZ_ValueChanged( object sender, EventArgs e )
 		{
-			HandleValueChanged( m_nudZ, EAxisTransformDirection.ZAxis, Displace );
+			HandleValueChanged( m_numZ, EAxisTransformDirection.ZAxis, Displace );
 		}
 
-		void m_nudRx_ValueChanged( object sender, EventArgs e )
+		void m_numRx_ValueChanged( object sender, EventArgs e )
 		{
-			HandleValueChanged( m_nudRx, EAxisTransformDirection.XAxis, Rotate );
+			HandleValueChanged( m_numRx, EAxisTransformDirection.XAxis, Rotate );
 		}
 
-		void m_nudRy_ValueChanged( object sender, EventArgs e )
+		void m_numRy_ValueChanged( object sender, EventArgs e )
 		{
-			HandleValueChanged( m_nudRy, EAxisTransformDirection.YAxis, Rotate );
+			HandleValueChanged( m_numRy, EAxisTransformDirection.YAxis, Rotate );
 		}
 
-		void m_nudRz_ValueChanged( object sender, EventArgs e )
+		void m_numRz_ValueChanged( object sender, EventArgs e )
 		{
-			HandleValueChanged( m_nudRz, EAxisTransformDirection.ZAxis, Rotate );
+			HandleValueChanged( m_numRz, EAxisTransformDirection.ZAxis, Rotate );
 		}
 
 		// MouseWheel event handlers (called by Designer)
-		void m_nudX_MouseWheel( object sender, MouseEventArgs e )
+		void m_numX_MouseWheel( object sender, MouseEventArgs e )
 		{
-			HandleMouseWheel( m_nudX, e, m_DisplacementIncrement );
+			HandleMouseWheel( m_numX, e, m_DisplacementIncrement );
 		}
 
-		void m_nudY_MouseWheel( object sender, MouseEventArgs e )
+		void m_numY_MouseWheel( object sender, MouseEventArgs e )
 		{
-			HandleMouseWheel( m_nudY, e, m_DisplacementIncrement );
+			HandleMouseWheel( m_numY, e, m_DisplacementIncrement );
 		}
 
-		void m_nudZ_MouseWheel( object sender, MouseEventArgs e )
+		void m_numZ_MouseWheel( object sender, MouseEventArgs e )
 		{
-			HandleMouseWheel( m_nudZ, e, m_DisplacementIncrement );
+			HandleMouseWheel( m_numZ, e, m_DisplacementIncrement );
 		}
 
-		void m_nudRx_MouseWheel( object sender, MouseEventArgs e )
+		void m_numRx_MouseWheel( object sender, MouseEventArgs e )
 		{
-			HandleMouseWheel( m_nudRx, e, m_RotationIncrement );
+			HandleMouseWheel( m_numRx, e, m_RotationIncrement );
 		}
 
-		void m_nudRy_MouseWheel( object sender, MouseEventArgs e )
+		void m_numRy_MouseWheel( object sender, MouseEventArgs e )
 		{
-			HandleMouseWheel( m_nudRy, e, m_RotationIncrement );
+			HandleMouseWheel( m_numRy, e, m_RotationIncrement );
 		}
 
-		void m_nudRz_MouseWheel( object sender, MouseEventArgs e )
+		void m_numRz_MouseWheel( object sender, MouseEventArgs e )
 		{
-			HandleMouseWheel( m_nudRz, e, m_RotationIncrement );
+			HandleMouseWheel( m_numRz, e, m_RotationIncrement );
 		}
 
 		// Unified value change handler
@@ -248,22 +248,22 @@ namespace MyCAM.Editor.Dialog
 			FormCancel?.Invoke();
 		}
 
-		void m_txbStepDistance_Leave( object sender, EventArgs e )
+		void m_numStepDistance_Leave( object sender, EventArgs e )
 		{
-			if( decimal.TryParse( m_txbStepDistance.Text, out decimal stepDistance ) && stepDistance > 0 && stepDistance < decimal.MaxValue ) {
+			if( decimal.TryParse( m_numStepDistance.Text, out decimal stepDistance ) && stepDistance > 0 && stepDistance < decimal.MaxValue ) {
 				m_DisplacementIncrement = stepDistance;
 				foreach( var nud in GetDisplacementControls() ) {
 					nud.Increment = stepDistance;
 				}
 			}
 			else {
-				m_txbStepDistance.Text = m_DisplacementIncrement.ToString();
+				m_numStepDistance.Text = m_DisplacementIncrement.ToString();
 			}
 		}
 
-		void m_txbStepAngle_Leave( object sender, EventArgs e )
+		void m_numStepAngle_Leave( object sender, EventArgs e )
 		{
-			if( decimal.TryParse( m_txbStepAngle.Text, out decimal stepAngle ) && stepAngle > 0 ) {
+			if( decimal.TryParse( m_numStepAngle.Text, out decimal stepAngle ) && stepAngle > 0 ) {
 				// Limit to specified decimal places
 				stepAngle = Math.Round( stepAngle, ROTATION_DECIMAL_PLACES );
 				m_RotationIncrement = stepAngle;
@@ -271,40 +271,40 @@ namespace MyCAM.Editor.Dialog
 					nud.Increment = stepAngle;
 				}
 				// Display with up to ROTATION_DECIMAL_PLACES digits (trailing zeros omitted)
-				m_txbStepAngle.Text = stepAngle.ToString( $"F{ROTATION_DECIMAL_PLACES}" );
+				m_numStepAngle.Text = stepAngle.ToString( $"F{ROTATION_DECIMAL_PLACES}" );
 			}
 			else {
-				m_txbStepAngle.Text = m_RotationIncrement.ToString( $"F{ROTATION_DECIMAL_PLACES}" );
+				m_numStepAngle.Text = m_RotationIncrement.ToString( $"F{ROTATION_DECIMAL_PLACES}" );
 			}
 		}
 
-		void m_txbStepAngle_KeyDown( object sender, KeyEventArgs e )
+		void m_numStepAngle_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Enter ) {
-				m_txbStepAngle_Leave( null, null );
+				m_numStepAngle_Leave( null, null );
 			}
 		}
 
-		void m_txbStepDistance_KeyDown( object sender, KeyEventArgs e )
+		void m_numStepDistance_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Enter ) {
-				m_txbStepDistance_Leave( null, null );
+				m_numStepDistance_Leave( null, null );
 			}
 		}
 
 		// Helper methods to group controls
 		IEnumerable<NumericUpDown> GetDisplacementControls()
 		{
-			yield return m_nudX;
-			yield return m_nudY;
-			yield return m_nudZ;
+			yield return m_numX;
+			yield return m_numY;
+			yield return m_numZ;
 		}
 
 		IEnumerable<NumericUpDown> GetRotationControls()
 		{
-			yield return m_nudRx;
-			yield return m_nudRy;
-			yield return m_nudRz;
+			yield return m_numRx;
+			yield return m_numRy;
+			yield return m_numRz;
 		}
 
 		IEnumerable<NumericUpDown> GetAllNumericControls()

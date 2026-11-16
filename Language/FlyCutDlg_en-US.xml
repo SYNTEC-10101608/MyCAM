@@ -3,19 +3,19 @@
 	<Message ID="FlyCutDlg" Content="FlyCut" />
 
 	<Message ID="m_lblFlyCut" Content="Type" />
-	<Message ID="m_rbtnCircularFlyCut" Content="Circular FlyCut" />
+	<Message ID="m_rdoCircularFlyCut" Content="Circular FlyCut" />
 
-	<Message ID="m_gbxSetting" Content="FlyCut Parameters" />
+	<Message ID="m_pnlSetting" Content="FlyCut Parameters" />
 
 	<Message ID="m_lblStartPosition" Content="Start Position" />
-	<Message ID="m_rbtnLeftTop" Content="Top Left" />
-	<Message ID="m_rbtnLeftBottom" Content="Bottom Left" />
-	<Message ID="m_rbtnRightTop" Content="Top Right" />
-	<Message ID="m_rbtnRightBottom" Content="Bottom Right" />
+	<Message ID="m_rdoLeftTop" Content="Top Left" />
+	<Message ID="m_rdoLeftBottom" Content="Bottom Left" />
+	<Message ID="m_rdoRightTop" Content="Top Right" />
+	<Message ID="m_rdoRightBottom" Content="Bottom Right" />
 
 	<Message ID="m_lblDirection" Content="Direction" />
-	<Message ID="m_rbtnVertical" Content="Vertical" />
-	<Message ID="m_rbtnHorizontal" Content="Horizontal" />
+	<Message ID="m_rdoVertical" Content="Vertical" />
+	<Message ID="m_rdoHorizontal" Content="Horizontal" />
 	<Message ID="GroupWidth" Content="Spacing" />
 	<Message ID="GroupAngle" Content="Angle" />
 

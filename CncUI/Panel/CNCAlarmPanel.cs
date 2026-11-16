@@ -20,7 +20,7 @@ namespace CncUI
 
 		public void ApplyResources()
 		{
-			m_secAlarm.Text = m_IsCurrent
+			m_pnlAlarm.Text = m_IsCurrent
 				? string.Format( Language.TryGetString( "Title_Current", CURRENT_TITLE ), m_AlarmCount )
 				: Language.TryGetString( "Title_Stale", STALE_TITLE );
 			m_colCode.HeaderText = Language.TryGetString( "m_colCode", CODE );
@@ -40,7 +40,7 @@ namespace CncUI
 					break;
 			}
 			m_lblStatus.Visible = !string.IsNullOrEmpty( m_lblStatus.Text );
-			m_ToolTip.SetToolTip( m_lblStatus, m_lblStatus.Text );
+			m_ttpAlarm.SetToolTip( m_lblStatus, m_lblStatus.Text );
 			RefreshAlarmText();
 			UpdateListBounds();
 		}
@@ -52,19 +52,19 @@ namespace CncUI
 			m_Status = status;
 			m_Error = error;
 			ApplyResources();
-			m_gridAlarms.SuspendLayout();
+			m_dgvAlarms.SuspendLayout();
 			try {
-				m_gridAlarms.Rows.Clear();
+				m_dgvAlarms.Rows.Clear();
 				foreach( CncAlarm alarm in alarms ) {
 					string code = string.Format( CultureInfo.InvariantCulture, "{0}-{1}-{2}",
 						alarm.Category.Replace( "ALARM", string.Empty ), alarm.ObjectID, alarm.AlarmID );
-					int index = m_gridAlarms.Rows.Add( code, GetAlarmText( alarm ) );
-					m_gridAlarms.Rows[ index ].Tag = alarm;
+					int index = m_dgvAlarms.Rows.Add( code, GetAlarmText( alarm ) );
+					m_dgvAlarms.Rows[ index ].Tag = alarm;
 				}
-				m_gridAlarms.CellRole = isCurrent ? TextRole.Error : TextRole.Secondary;
+				m_dgvAlarms.CellRole = isCurrent ? TextRole.Error : TextRole.Secondary;
 			}
 			finally {
-				m_gridAlarms.ResumeLayout();
+				m_dgvAlarms.ResumeLayout();
 			}
 			UpdateListBounds();
 		}
@@ -77,7 +77,7 @@ namespace CncUI
 
 		void RefreshAlarmText()
 		{
-			foreach( DataGridViewRow row in m_gridAlarms.Rows ) {
+			foreach( DataGridViewRow row in m_dgvAlarms.Rows ) {
 				if( row.Tag is CncAlarm alarm ) {
 					row.Cells[ m_colText.Index ].Value = GetAlarmText( alarm );
 				}
@@ -150,13 +150,13 @@ namespace CncUI
 
 		void UpdateListBounds()
 		{
-			if( m_gridAlarms == null ) {
+			if( m_dgvAlarms == null ) {
 				return;
 			}
-			int top = string.IsNullOrEmpty( m_lblStatus.Text ) ? m_lblStatus.Top : m_lblStatus.Bottom + 4;
-			m_gridAlarms.SetBounds( ThemeMetrics.SECTION_PADDING, top,
-				Math.Max( 0, ClientSize.Width - 2 * ThemeMetrics.SECTION_PADDING ),
-				Math.Max( 0, ClientSize.Height - top - ThemeMetrics.SECTION_PADDING ) );
+			int top = string.IsNullOrEmpty( m_lblStatus.Text ) ? m_lblStatus.Top : m_lblStatus.Bottom + ThemeMetrics.CONTROL_GAP;
+			m_dgvAlarms.SetBounds( ThemeMetrics.SECTION_PADDING, top,
+				Math.Max( 0, m_pnlAlarm.ClientSize.Width - 2 * ThemeMetrics.SECTION_PADDING ),
+				Math.Max( 0, m_pnlAlarm.ClientSize.Height - top - ThemeMetrics.SECTION_PADDING ) );
 		}
 
 		IReadOnlyList<CncAxis> m_Axes = Array.AsReadOnly( new CncAxis[ 0 ] );

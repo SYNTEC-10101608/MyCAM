@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ResMap>
 	<Message ID="AxisTransformDlg" Content="Преобразование оси" />
-	<Message ID="m_grpDisplacement" Content="Смещение" />
-	<Message ID="m_grpRotation" Content="Вращение" />
+	<Message ID="m_pnlDisplacement" Content="Смещение" />
+	<Message ID="m_pnlRotation" Content="Вращение" />
 	<Message ID="m_lblX" Content="X" />
 	<Message ID="m_lblY" Content="Y" />
 	<Message ID="m_lblZ" Content="Z" />

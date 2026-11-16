@@ -100,3 +100,30 @@ function Get-Bounds( $screen, [string]$name ) {
 	$size = ConvertTo-Size $props["Size"]
 	return [pscustomobject]@{ Name = $name; Left = $location.Width; Top = $location.Height; Width = $size.Width; Height = $size.Height }
 }
+
+# Children of a container in tab order: rows from top to bottom, left to right within a row. Controls whose tops are
+# at most ROW_TOLERANCE apart share a row (labels sit 4 lower, check boxes 2 lower than the inputs of their row).
+function Get-LayoutOrder( $screen, [string]$szContainer ) {
+	$ROW_TOLERANCE = 6
+	$items = @( $screen.Children[$szContainer] | Where-Object { $_ } | ForEach-Object { Get-Bounds $screen $_ } |
+		Where-Object { $_ } | Sort-Object Top, Left )
+	$rows = New-Object System.Collections.Generic.List[object]
+	foreach ($item in $items) {
+		$isSameRow = $rows.Count -gt 0 -and ($item.Top - $rows[$rows.Count - 1][0].Top) -le $ROW_TOLERANCE
+		if ($isSameRow) {
+			$rows[$rows.Count - 1].Add($item)
+		}
+		else {
+			$row = New-Object System.Collections.Generic.List[object]
+			$row.Add($item)
+			$rows.Add($row)
+		}
+	}
+	$order = New-Object System.Collections.Generic.List[string]
+	foreach ($row in $rows) {
+		foreach ($item in ($row | Sort-Object Left)) {
+			$order.Add($item.Name)
+		}
+	}
+	return $order
+}

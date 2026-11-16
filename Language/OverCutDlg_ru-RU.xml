@@ -2,7 +2,7 @@
 <ResMap>
 	<Message ID="OverCutDlg" Content="Избыточный рез" />
 	<Message ID="m_lblOverCutLength" Content="Длина избыточного среза:" />
-	<Message ID="m_OverCutUnit" Content="мм" />
+	<Message ID="m_lblOverCutUnit" Content="мм" />
 	<Message ID="Error_NegativeLength" Content="Длина должна быть больше 0" />
 	<Message ID="Error_ExceedGeometry" Content="Длина избыточного среза выходит за геометрические пределы" />
 </ResMap>

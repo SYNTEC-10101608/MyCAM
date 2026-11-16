@@ -22,9 +22,9 @@ namespace MyCAM.Editor.Dialog
 		{
 			InitializeComponent();
 			m_DrawingFields = new Control[ , ] {
-				{ m_txtDrawing1X, m_txtDrawing1Y, m_txtDrawing1Z },
-				{ m_txtDrawing2X, m_txtDrawing2Y, m_txtDrawing2Z },
-				{ m_txtDrawing3X, m_txtDrawing3Y, m_txtDrawing3Z }
+				{ m_lblDrawing1XValue, m_lblDrawing1YValue, m_lblDrawing1ZValue },
+				{ m_lblDrawing2XValue, m_lblDrawing2YValue, m_lblDrawing2ZValue },
+				{ m_lblDrawing3XValue, m_lblDrawing3YValue, m_lblDrawing3ZValue }
 			};
 			m_WorkpieceFields = new[ , ] {
 				{ m_txtWorkpiece1X, m_txtWorkpiece1Y, m_txtWorkpiece1Z },
@@ -55,7 +55,7 @@ namespace MyCAM.Editor.Dialog
 			m_btnCalculate.Click += ( sender, e ) => CalculateRequested?.Invoke();
 			m_btnPickDrawing.Click += ( sender, e ) => DrawingPickRequested?.Invoke();
 			m_btnPickCancel.Click += ( sender, e ) => DrawingPickCancelRequested?.Invoke();
-			m_chbDrawingOnly.CheckedChanged += ( sender, e ) =>
+			m_chkDrawingOnly.CheckedChanged += ( sender, e ) =>
 			{
 				if( !m_Loading ) {
 					DrawingOnlyChanged?.Invoke();
@@ -77,7 +77,7 @@ namespace MyCAM.Editor.Dialog
 
 		internal string[,] DrawingInput => ReadFields( m_DrawingFields );
 		internal string[,] WorkpieceInput => ReadFields( m_WorkpieceFields );
-		internal bool DrawingOnlyChecked => m_chbDrawingOnly.Checked;
+		internal bool DrawingOnlyChecked => m_chkDrawingOnly.Checked;
 		internal string ToleranceText { get => m_txtTolerance.Text; set => m_txtTolerance.Text = value; }
 
 		internal void SetInputs( string[,] drawing, string[,] workpiece, string tolerance )
@@ -176,9 +176,9 @@ namespace MyCAM.Editor.Dialog
 			bool workpieceComplete, bool picking, int pickCount, int pickIndex, bool busy, bool capturing )
 		{
 			m_Loading = true;
-			try { m_chbDrawingOnly.Checked = drawingOnly; }
+			try { m_chkDrawingOnly.Checked = drawingOnly; }
 			finally { m_Loading = false; }
-			m_chbDrawingOnly.Text = connected ? Language.TryGetString( "DrawingOnly", DRAWING_ONLY )
+			m_chkDrawingOnly.Text = connected ? Language.TryGetString( "DrawingOnly", DRAWING_ONLY )
 				: Language.TryGetString( "DrawingOnly_Offline", DRAWING_ONLY_OFFLINE );
 			bool enabled = !busy && !picking;
 			m_pnlDrawing.Enabled = !busy;
@@ -190,14 +190,14 @@ namespace MyCAM.Editor.Dialog
 			m_btnReset1.Enabled = m_btnReset2.Enabled = m_btnReset3.Enabled = enabled && !capturing;
 			m_btnPickCancel.Visible = picking;
 			m_btnPickCancel.Enabled = picking;
-			m_chbDrawingOnly.Enabled = enabled && !capturing && connected;
+			m_chkDrawingOnly.Enabled = enabled && !capturing && connected;
 			bool calibrationEnabled = connected && !drawingOnly;
 			m_pnlWorkpiece.Enabled = calibrationEnabled && enabled && drawingComplete && !capturing;
 			m_txtTolerance.Enabled = calibrationEnabled && enabled;
 			m_btnCalculate.Enabled = calibrationEnabled && enabled && drawingComplete && !capturing;
 			SetStepAppearance( m_pnlDrawing, Language.TryGetString( "Step_Drawing", DRAWING_STEP ), ThreePointStep.Drawing, step );
 			SetStepAppearance( m_pnlWorkpiece, Language.TryGetString( "Step_Workpiece", WORKPIECE_STEP ), ThreePointStep.Workpiece, step );
-			SetStepAppearance( m_secCalculation, Language.TryGetString( "Step_Calculation", CALCULATION_STEP ), ThreePointStep.Calculation, step );
+			SetStepAppearance( m_pnlCalculation, Language.TryGetString( "Step_Calculation", CALCULATION_STEP ), ThreePointStep.Calculation, step );
 			m_lblDrawingDescription.Text = picking
 				? pickIndex >= 0 ? string.Format( Language.TryGetString( "Drawing_Repicking", DRAWING_REPICKING ), pickIndex + 1 )
 				: string.Format( Language.TryGetString( "Drawing_Picking", DRAWING_PICKING ), pickCount + 1, pickCount )
@@ -215,14 +215,14 @@ namespace MyCAM.Editor.Dialog
 			}
 
 			m_CalibrationVisible = visible;
-			m_pnlWorkpiece.Visible = m_secCalculation.Visible = visible;
+			m_pnlWorkpiece.Visible = m_pnlCalculation.Visible = visible;
 			m_lblTolerance.Visible = m_txtTolerance.Visible = m_lblToleranceUnit.Visible = visible;
 			m_lblError.Visible = m_lblErrorValue.Visible = m_btnCalculate.Visible = visible;
 
 			// the dialog ends below the last shown section
 			int nContentBottom = visible
-				? SectionStack.Arrange( m_pnlDrawing, m_secOption, m_pnlWorkpiece, m_secCalculation )
-				: SectionStack.Arrange( m_pnlDrawing, m_secOption );
+				? SectionStack.Arrange( m_pnlDrawing, m_pnlOption, m_pnlWorkpiece, m_pnlCalculation )
+				: SectionStack.Arrange( m_pnlDrawing, m_pnlOption );
 			SectionStack.PlaceButtonBar( this, nContentBottom );
 		}
 

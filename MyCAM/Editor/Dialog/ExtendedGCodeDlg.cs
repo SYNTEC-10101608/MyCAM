@@ -17,11 +17,11 @@ namespace MyCAM.Editor
 		{
 			InitializeComponent();
 
-			m_rbtnTraverseStart.Tag = ExtendedGCodeType.TraverseHead;
-			m_rbtnTraverseEnd.Tag = ExtendedGCodeType.TraverseTail;
-			m_rbtnPathStart.Tag = ExtendedGCodeType.PathHead;
-			m_rbtnPathEnd.Tag = ExtendedGCodeType.PathTail;
-			m_rbtnControlPoint.Tag = ExtendedGCodeType.ControlPoint;
+			m_rdoTraverseStart.Tag = ExtendedGCodeType.TraverseHead;
+			m_rdoTraverseEnd.Tag = ExtendedGCodeType.TraverseTail;
+			m_rdoPathStart.Tag = ExtendedGCodeType.PathHead;
+			m_rdoPathEnd.Tag = ExtendedGCodeType.PathTail;
+			m_rdoControlPoint.Tag = ExtendedGCodeType.ControlPoint;
 		}
 
 		public void ResetParam( ExtendedGCodeParam param )
@@ -33,13 +33,13 @@ namespace MyCAM.Editor
 
 			// non selected
 			if( m_Param == null ) {
-				m_flpnlRadioButton.Enabled = false;
-				foreach( RadioButton rbtn in m_flpnlRadioButton.Controls.OfType<RadioButton>() ) {
+				m_pnlRadioButton.Enabled = false;
+				foreach( RadioButton rbtn in m_pnlRadioButton.Controls.OfType<RadioButton>() ) {
 					rbtn.Checked = false;
 				}
 
 				m_lblIsStartOrEnd.Text = string.Empty;
-				m_flpnlToStartOrEnd.Enabled = false;
+				m_pnlToStartOrEnd.Enabled = false;
 
 				m_lblIsMixData.Text = string.Empty;
 				m_txtGCode.Text = string.Empty;
@@ -54,13 +54,13 @@ namespace MyCAM.Editor
 
 			SetInputEnabled( m_Param.IsModified );
 
-			m_flpnlRadioButton.Enabled = true;
-			m_rbtnControlPoint.Enabled = m_Param.IsSingleSelectMode;
-			foreach( RadioButton rbtn in m_flpnlRadioButton.Controls.OfType<RadioButton>() ) {
+			m_pnlRadioButton.Enabled = true;
+			m_rdoControlPoint.Enabled = m_Param.IsSingleSelectMode;
+			foreach( RadioButton rbtn in m_pnlRadioButton.Controls.OfType<RadioButton>() ) {
 				rbtn.Checked = rbtn.Tag is ExtendedGCodeType gCodeType && gCodeType == m_Param.GCodeType;
 			}
 
-			m_flpnlToStartOrEnd.Enabled = true;
+			m_pnlToStartOrEnd.Enabled = true;
 			m_btnToStartOrEnd.Enabled = ( m_Param.IsPathStartPoint != null );
 			m_lblIsStartOrEnd.Text = ( m_Param.GCodeType != ExtendedGCodeType.ControlPoint || m_Param.IsPathStartPoint == null ) ?
 				string.Empty

@@ -27,86 +27,86 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_secLeadIn = new CommonUI.Controls.SectionPanel();
-			this.label1 = new System.Windows.Forms.Label();
-			this.m_tbxLeadInStraightLength = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.label2 = new CommonUI.Controls.ThemedLabel();
+			this.m_pnlLeadIn = new CommonUI.Controls.SectionPanel();
+			this.m_lblLeadInLineLength = new System.Windows.Forms.Label();
+			this.m_numLeadInStraightLength = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblLeadInLineLengthUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_lblLeadInLength = new System.Windows.Forms.Label();
-			this.m_tbxLeadInArcLength = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_LeadInLegnthUnit = new CommonUI.Controls.ThemedLabel();
+			this.m_numLeadInArcLength = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblLeadInLengthUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_lblLeadInAngle = new System.Windows.Forms.Label();
-			this.m_tbxLeadInAngle = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_LeadInAngleUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_secLeadOut = new CommonUI.Controls.SectionPanel();
-			this.label4 = new System.Windows.Forms.Label();
-			this.m_tbxLeadOutStraightLength = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.label5 = new CommonUI.Controls.ThemedLabel();
+			this.m_numLeadInAngle = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblLeadInAngleUnit = new CommonUI.Controls.ThemedLabel();
+			this.m_pnlLeadOut = new CommonUI.Controls.SectionPanel();
+			this.m_lblLeadOutLineLength = new System.Windows.Forms.Label();
+			this.m_numLeadOutStraightLength = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblLeadOutLineLengthUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_lblLeadOutLength = new System.Windows.Forms.Label();
-			this.m_tbxLeadOutArcLength = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_LeadOutLegnthUnit = new CommonUI.Controls.ThemedLabel();
+			this.m_numLeadOutArcLength = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblLeadOutLengthUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_lblLeadOutAngle = new System.Windows.Forms.Label();
-			this.m_tbxLeadOutAngle = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_LeadOutAngleUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_secOption = new CommonUI.Controls.SectionPanel();
+			this.m_numLeadOutAngle = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblLeadOutAngleUnit = new CommonUI.Controls.ThemedLabel();
+			this.m_pnlOption = new CommonUI.Controls.SectionPanel();
 			this.m_chkFlip = new System.Windows.Forms.CheckBox();
 			this.m_btnOK = new CommonUI.Controls.ThemedButton();
-			this.m_secLeadIn.SuspendLayout();
-			this.m_secLeadOut.SuspendLayout();
-			this.m_secOption.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInStraightLength)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInArcLength)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInAngle)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutStraightLength)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutArcLength)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutAngle)).BeginInit();
+			this.m_pnlLeadIn.SuspendLayout();
+			this.m_pnlLeadOut.SuspendLayout();
+			this.m_pnlOption.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadInStraightLength)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadInArcLength)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadInAngle)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadOutStraightLength)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadOutArcLength)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadOutAngle)).BeginInit();
 			this.SuspendLayout();
 			// 
-			// m_secLeadIn
+			// m_pnlLeadIn
 			// 
-			this.m_secLeadIn.Controls.Add(this.label1);
-			this.m_secLeadIn.Controls.Add(this.m_tbxLeadInStraightLength);
-			this.m_secLeadIn.Controls.Add(this.label2);
-			this.m_secLeadIn.Controls.Add(this.m_lblLeadInLength);
-			this.m_secLeadIn.Controls.Add(this.m_tbxLeadInArcLength);
-			this.m_secLeadIn.Controls.Add(this.m_LeadInLegnthUnit);
-			this.m_secLeadIn.Controls.Add(this.m_lblLeadInAngle);
-			this.m_secLeadIn.Controls.Add(this.m_tbxLeadInAngle);
-			this.m_secLeadIn.Controls.Add(this.m_LeadInAngleUnit);
-			this.m_secLeadIn.Location = new System.Drawing.Point(12, 12);
-			this.m_secLeadIn.Name = "m_secLeadIn";
-			this.m_secLeadIn.Size = new System.Drawing.Size(296, 129);
-			this.m_secLeadIn.TabIndex = 0;
-			this.m_secLeadIn.Text = "進入引線";
+			this.m_pnlLeadIn.Controls.Add(this.m_lblLeadInLineLength);
+			this.m_pnlLeadIn.Controls.Add(this.m_numLeadInStraightLength);
+			this.m_pnlLeadIn.Controls.Add(this.m_lblLeadInLineLengthUnit);
+			this.m_pnlLeadIn.Controls.Add(this.m_lblLeadInLength);
+			this.m_pnlLeadIn.Controls.Add(this.m_numLeadInArcLength);
+			this.m_pnlLeadIn.Controls.Add(this.m_lblLeadInLengthUnit);
+			this.m_pnlLeadIn.Controls.Add(this.m_lblLeadInAngle);
+			this.m_pnlLeadIn.Controls.Add(this.m_numLeadInAngle);
+			this.m_pnlLeadIn.Controls.Add(this.m_lblLeadInAngleUnit);
+			this.m_pnlLeadIn.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlLeadIn.Name = "m_pnlLeadIn";
+			this.m_pnlLeadIn.Size = new System.Drawing.Size(296, 129);
+			this.m_pnlLeadIn.TabIndex = 0;
+			this.m_pnlLeadIn.Text = "進入引線";
 			// 
-			// label1
+			// m_lblLeadInLineLength
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(10, 40);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(55, 16);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "直線長度";
+			this.m_lblLeadInLineLength.AutoSize = true;
+			this.m_lblLeadInLineLength.Location = new System.Drawing.Point(10, 40);
+			this.m_lblLeadInLineLength.Name = "m_lblLeadInLineLength";
+			this.m_lblLeadInLineLength.Size = new System.Drawing.Size(55, 16);
+			this.m_lblLeadInLineLength.TabIndex = 0;
+			this.m_lblLeadInLineLength.Text = "直線長度";
 			// 
-			// m_tbxLeadInStraightLength
+			// m_numLeadInStraightLength
 			// 
-			this.m_tbxLeadInStraightLength.DecimalPlaces = 3;
-			this.m_tbxLeadInStraightLength.Increment = new decimal(new int[] { 5, 0, 0, 65536});
-			this.m_tbxLeadInStraightLength.Location = new System.Drawing.Point(100, 36);
-			this.m_tbxLeadInStraightLength.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_tbxLeadInStraightLength.Name = "m_tbxLeadInStraightLength";
-			this.m_tbxLeadInStraightLength.Size = new System.Drawing.Size(150, 23);
-			this.m_tbxLeadInStraightLength.TabIndex = 1;
-			this.m_tbxLeadInStraightLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadIn_DebouncedValueChanged);
+			this.m_numLeadInStraightLength.DecimalPlaces = 3;
+			this.m_numLeadInStraightLength.Increment = new decimal(new int[] { 5, 0, 0, 65536});
+			this.m_numLeadInStraightLength.Location = new System.Drawing.Point(100, 36);
+			this.m_numLeadInStraightLength.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numLeadInStraightLength.Name = "m_numLeadInStraightLength";
+			this.m_numLeadInStraightLength.Size = new System.Drawing.Size(150, 23);
+			this.m_numLeadInStraightLength.TabIndex = 1;
+			this.m_numLeadInStraightLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadIn_DebouncedValueChanged);
 			// 
-			// label2
+			// m_lblLeadInLineLengthUnit
 			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(256, 40);
-			this.label2.Name = "label2";
-			this.label2.Role = CommonUI.Theme.TextRole.Secondary;
-			this.label2.Size = new System.Drawing.Size(26, 16);
-			this.label2.TabIndex = 2;
-			this.label2.Text = "mm";
+			this.m_lblLeadInLineLengthUnit.AutoSize = true;
+			this.m_lblLeadInLineLengthUnit.Location = new System.Drawing.Point(256, 40);
+			this.m_lblLeadInLineLengthUnit.Name = "m_lblLeadInLineLengthUnit";
+			this.m_lblLeadInLineLengthUnit.Role = CommonUI.Theme.TextRole.Secondary;
+			this.m_lblLeadInLineLengthUnit.Size = new System.Drawing.Size(26, 16);
+			this.m_lblLeadInLineLengthUnit.TabIndex = 2;
+			this.m_lblLeadInLineLengthUnit.Text = "mm";
 			// 
 			// m_lblLeadInLength
 			// 
@@ -117,26 +117,26 @@
 			this.m_lblLeadInLength.TabIndex = 3;
 			this.m_lblLeadInLength.Text = "半徑";
 			// 
-			// m_tbxLeadInArcLength
+			// m_numLeadInArcLength
 			// 
-			this.m_tbxLeadInArcLength.DecimalPlaces = 3;
-			this.m_tbxLeadInArcLength.Increment = new decimal(new int[] { 5, 0, 0, 65536});
-			this.m_tbxLeadInArcLength.Location = new System.Drawing.Point(100, 66);
-			this.m_tbxLeadInArcLength.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_tbxLeadInArcLength.Name = "m_tbxLeadInArcLength";
-			this.m_tbxLeadInArcLength.Size = new System.Drawing.Size(150, 23);
-			this.m_tbxLeadInArcLength.TabIndex = 4;
-			this.m_tbxLeadInArcLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadIn_DebouncedValueChanged);
+			this.m_numLeadInArcLength.DecimalPlaces = 3;
+			this.m_numLeadInArcLength.Increment = new decimal(new int[] { 5, 0, 0, 65536});
+			this.m_numLeadInArcLength.Location = new System.Drawing.Point(100, 66);
+			this.m_numLeadInArcLength.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numLeadInArcLength.Name = "m_numLeadInArcLength";
+			this.m_numLeadInArcLength.Size = new System.Drawing.Size(150, 23);
+			this.m_numLeadInArcLength.TabIndex = 4;
+			this.m_numLeadInArcLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadIn_DebouncedValueChanged);
 			// 
-			// m_LeadInLegnthUnit
+			// m_lblLeadInLengthUnit
 			// 
-			this.m_LeadInLegnthUnit.AutoSize = true;
-			this.m_LeadInLegnthUnit.Location = new System.Drawing.Point(256, 70);
-			this.m_LeadInLegnthUnit.Name = "m_LeadInLegnthUnit";
-			this.m_LeadInLegnthUnit.Role = CommonUI.Theme.TextRole.Secondary;
-			this.m_LeadInLegnthUnit.Size = new System.Drawing.Size(26, 16);
-			this.m_LeadInLegnthUnit.TabIndex = 5;
-			this.m_LeadInLegnthUnit.Text = "mm";
+			this.m_lblLeadInLengthUnit.AutoSize = true;
+			this.m_lblLeadInLengthUnit.Location = new System.Drawing.Point(256, 70);
+			this.m_lblLeadInLengthUnit.Name = "m_lblLeadInLengthUnit";
+			this.m_lblLeadInLengthUnit.Role = CommonUI.Theme.TextRole.Secondary;
+			this.m_lblLeadInLengthUnit.Size = new System.Drawing.Size(26, 16);
+			this.m_lblLeadInLengthUnit.TabIndex = 5;
+			this.m_lblLeadInLengthUnit.Text = "mm";
 			// 
 			// m_lblLeadInAngle
 			// 
@@ -147,72 +147,72 @@
 			this.m_lblLeadInAngle.TabIndex = 6;
 			this.m_lblLeadInAngle.Text = "角度";
 			// 
-			// m_tbxLeadInAngle
+			// m_numLeadInAngle
 			// 
-			this.m_tbxLeadInAngle.DecimalPlaces = 3;
-			this.m_tbxLeadInAngle.Location = new System.Drawing.Point(100, 96);
-			this.m_tbxLeadInAngle.Maximum = new decimal(new int[] { 180, 0, 0, 0});
-			this.m_tbxLeadInAngle.Name = "m_tbxLeadInAngle";
-			this.m_tbxLeadInAngle.Size = new System.Drawing.Size(150, 23);
-			this.m_tbxLeadInAngle.TabIndex = 7;
-			this.m_tbxLeadInAngle.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadIn_DebouncedValueChanged);
+			this.m_numLeadInAngle.DecimalPlaces = 3;
+			this.m_numLeadInAngle.Location = new System.Drawing.Point(100, 96);
+			this.m_numLeadInAngle.Maximum = new decimal(new int[] { 180, 0, 0, 0});
+			this.m_numLeadInAngle.Name = "m_numLeadInAngle";
+			this.m_numLeadInAngle.Size = new System.Drawing.Size(150, 23);
+			this.m_numLeadInAngle.TabIndex = 7;
+			this.m_numLeadInAngle.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadIn_DebouncedValueChanged);
 			// 
-			// m_LeadInAngleUnit
+			// m_lblLeadInAngleUnit
 			// 
-			this.m_LeadInAngleUnit.AutoSize = true;
-			this.m_LeadInAngleUnit.Location = new System.Drawing.Point(256, 100);
-			this.m_LeadInAngleUnit.Name = "m_LeadInAngleUnit";
-			this.m_LeadInAngleUnit.Role = CommonUI.Theme.TextRole.Secondary;
-			this.m_LeadInAngleUnit.Size = new System.Drawing.Size(26, 16);
-			this.m_LeadInAngleUnit.TabIndex = 8;
-			this.m_LeadInAngleUnit.Text = "°";
+			this.m_lblLeadInAngleUnit.AutoSize = true;
+			this.m_lblLeadInAngleUnit.Location = new System.Drawing.Point(256, 100);
+			this.m_lblLeadInAngleUnit.Name = "m_lblLeadInAngleUnit";
+			this.m_lblLeadInAngleUnit.Role = CommonUI.Theme.TextRole.Secondary;
+			this.m_lblLeadInAngleUnit.Size = new System.Drawing.Size(26, 16);
+			this.m_lblLeadInAngleUnit.TabIndex = 8;
+			this.m_lblLeadInAngleUnit.Text = "°";
 			// 
-			// m_secLeadOut
+			// m_pnlLeadOut
 			// 
-			this.m_secLeadOut.Controls.Add(this.label4);
-			this.m_secLeadOut.Controls.Add(this.m_tbxLeadOutStraightLength);
-			this.m_secLeadOut.Controls.Add(this.label5);
-			this.m_secLeadOut.Controls.Add(this.m_lblLeadOutLength);
-			this.m_secLeadOut.Controls.Add(this.m_tbxLeadOutArcLength);
-			this.m_secLeadOut.Controls.Add(this.m_LeadOutLegnthUnit);
-			this.m_secLeadOut.Controls.Add(this.m_lblLeadOutAngle);
-			this.m_secLeadOut.Controls.Add(this.m_tbxLeadOutAngle);
-			this.m_secLeadOut.Controls.Add(this.m_LeadOutAngleUnit);
-			this.m_secLeadOut.Location = new System.Drawing.Point(12, 149);
-			this.m_secLeadOut.Name = "m_secLeadOut";
-			this.m_secLeadOut.Size = new System.Drawing.Size(296, 129);
-			this.m_secLeadOut.TabIndex = 1;
-			this.m_secLeadOut.Text = "退出引線";
+			this.m_pnlLeadOut.Controls.Add(this.m_lblLeadOutLineLength);
+			this.m_pnlLeadOut.Controls.Add(this.m_numLeadOutStraightLength);
+			this.m_pnlLeadOut.Controls.Add(this.m_lblLeadOutLineLengthUnit);
+			this.m_pnlLeadOut.Controls.Add(this.m_lblLeadOutLength);
+			this.m_pnlLeadOut.Controls.Add(this.m_numLeadOutArcLength);
+			this.m_pnlLeadOut.Controls.Add(this.m_lblLeadOutLengthUnit);
+			this.m_pnlLeadOut.Controls.Add(this.m_lblLeadOutAngle);
+			this.m_pnlLeadOut.Controls.Add(this.m_numLeadOutAngle);
+			this.m_pnlLeadOut.Controls.Add(this.m_lblLeadOutAngleUnit);
+			this.m_pnlLeadOut.Location = new System.Drawing.Point(12, 149);
+			this.m_pnlLeadOut.Name = "m_pnlLeadOut";
+			this.m_pnlLeadOut.Size = new System.Drawing.Size(296, 129);
+			this.m_pnlLeadOut.TabIndex = 1;
+			this.m_pnlLeadOut.Text = "退出引線";
 			// 
-			// label4
+			// m_lblLeadOutLineLength
 			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(10, 40);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(55, 16);
-			this.label4.TabIndex = 0;
-			this.label4.Text = "直線長度";
+			this.m_lblLeadOutLineLength.AutoSize = true;
+			this.m_lblLeadOutLineLength.Location = new System.Drawing.Point(10, 40);
+			this.m_lblLeadOutLineLength.Name = "m_lblLeadOutLineLength";
+			this.m_lblLeadOutLineLength.Size = new System.Drawing.Size(55, 16);
+			this.m_lblLeadOutLineLength.TabIndex = 0;
+			this.m_lblLeadOutLineLength.Text = "直線長度";
 			// 
-			// m_tbxLeadOutStraightLength
+			// m_numLeadOutStraightLength
 			// 
-			this.m_tbxLeadOutStraightLength.DecimalPlaces = 3;
-			this.m_tbxLeadOutStraightLength.Increment = new decimal(new int[] { 5, 0, 0, 65536});
-			this.m_tbxLeadOutStraightLength.Location = new System.Drawing.Point(100, 36);
-			this.m_tbxLeadOutStraightLength.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_tbxLeadOutStraightLength.Name = "m_tbxLeadOutStraightLength";
-			this.m_tbxLeadOutStraightLength.Size = new System.Drawing.Size(150, 23);
-			this.m_tbxLeadOutStraightLength.TabIndex = 1;
-			this.m_tbxLeadOutStraightLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadOut_DebouncedValueChanged);
+			this.m_numLeadOutStraightLength.DecimalPlaces = 3;
+			this.m_numLeadOutStraightLength.Increment = new decimal(new int[] { 5, 0, 0, 65536});
+			this.m_numLeadOutStraightLength.Location = new System.Drawing.Point(100, 36);
+			this.m_numLeadOutStraightLength.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numLeadOutStraightLength.Name = "m_numLeadOutStraightLength";
+			this.m_numLeadOutStraightLength.Size = new System.Drawing.Size(150, 23);
+			this.m_numLeadOutStraightLength.TabIndex = 1;
+			this.m_numLeadOutStraightLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadOut_DebouncedValueChanged);
 			// 
-			// label5
+			// m_lblLeadOutLineLengthUnit
 			// 
-			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(256, 40);
-			this.label5.Name = "label5";
-			this.label5.Role = CommonUI.Theme.TextRole.Secondary;
-			this.label5.Size = new System.Drawing.Size(26, 16);
-			this.label5.TabIndex = 2;
-			this.label5.Text = "mm";
+			this.m_lblLeadOutLineLengthUnit.AutoSize = true;
+			this.m_lblLeadOutLineLengthUnit.Location = new System.Drawing.Point(256, 40);
+			this.m_lblLeadOutLineLengthUnit.Name = "m_lblLeadOutLineLengthUnit";
+			this.m_lblLeadOutLineLengthUnit.Role = CommonUI.Theme.TextRole.Secondary;
+			this.m_lblLeadOutLineLengthUnit.Size = new System.Drawing.Size(26, 16);
+			this.m_lblLeadOutLineLengthUnit.TabIndex = 2;
+			this.m_lblLeadOutLineLengthUnit.Text = "mm";
 			// 
 			// m_lblLeadOutLength
 			// 
@@ -223,26 +223,26 @@
 			this.m_lblLeadOutLength.TabIndex = 3;
 			this.m_lblLeadOutLength.Text = "半徑";
 			// 
-			// m_tbxLeadOutArcLength
+			// m_numLeadOutArcLength
 			// 
-			this.m_tbxLeadOutArcLength.DecimalPlaces = 3;
-			this.m_tbxLeadOutArcLength.Increment = new decimal(new int[] { 5, 0, 0, 65536});
-			this.m_tbxLeadOutArcLength.Location = new System.Drawing.Point(100, 66);
-			this.m_tbxLeadOutArcLength.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_tbxLeadOutArcLength.Name = "m_tbxLeadOutArcLength";
-			this.m_tbxLeadOutArcLength.Size = new System.Drawing.Size(150, 23);
-			this.m_tbxLeadOutArcLength.TabIndex = 4;
-			this.m_tbxLeadOutArcLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadOut_DebouncedValueChanged);
+			this.m_numLeadOutArcLength.DecimalPlaces = 3;
+			this.m_numLeadOutArcLength.Increment = new decimal(new int[] { 5, 0, 0, 65536});
+			this.m_numLeadOutArcLength.Location = new System.Drawing.Point(100, 66);
+			this.m_numLeadOutArcLength.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numLeadOutArcLength.Name = "m_numLeadOutArcLength";
+			this.m_numLeadOutArcLength.Size = new System.Drawing.Size(150, 23);
+			this.m_numLeadOutArcLength.TabIndex = 4;
+			this.m_numLeadOutArcLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadOut_DebouncedValueChanged);
 			// 
-			// m_LeadOutLegnthUnit
+			// m_lblLeadOutLengthUnit
 			// 
-			this.m_LeadOutLegnthUnit.AutoSize = true;
-			this.m_LeadOutLegnthUnit.Location = new System.Drawing.Point(256, 70);
-			this.m_LeadOutLegnthUnit.Name = "m_LeadOutLegnthUnit";
-			this.m_LeadOutLegnthUnit.Role = CommonUI.Theme.TextRole.Secondary;
-			this.m_LeadOutLegnthUnit.Size = new System.Drawing.Size(26, 16);
-			this.m_LeadOutLegnthUnit.TabIndex = 5;
-			this.m_LeadOutLegnthUnit.Text = "mm";
+			this.m_lblLeadOutLengthUnit.AutoSize = true;
+			this.m_lblLeadOutLengthUnit.Location = new System.Drawing.Point(256, 70);
+			this.m_lblLeadOutLengthUnit.Name = "m_lblLeadOutLengthUnit";
+			this.m_lblLeadOutLengthUnit.Role = CommonUI.Theme.TextRole.Secondary;
+			this.m_lblLeadOutLengthUnit.Size = new System.Drawing.Size(26, 16);
+			this.m_lblLeadOutLengthUnit.TabIndex = 5;
+			this.m_lblLeadOutLengthUnit.Text = "mm";
 			// 
 			// m_lblLeadOutAngle
 			// 
@@ -253,33 +253,33 @@
 			this.m_lblLeadOutAngle.TabIndex = 6;
 			this.m_lblLeadOutAngle.Text = "角度";
 			// 
-			// m_tbxLeadOutAngle
+			// m_numLeadOutAngle
 			// 
-			this.m_tbxLeadOutAngle.DecimalPlaces = 3;
-			this.m_tbxLeadOutAngle.Location = new System.Drawing.Point(100, 96);
-			this.m_tbxLeadOutAngle.Maximum = new decimal(new int[] { 180, 0, 0, 0});
-			this.m_tbxLeadOutAngle.Name = "m_tbxLeadOutAngle";
-			this.m_tbxLeadOutAngle.Size = new System.Drawing.Size(150, 23);
-			this.m_tbxLeadOutAngle.TabIndex = 7;
-			this.m_tbxLeadOutAngle.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadOut_DebouncedValueChanged);
+			this.m_numLeadOutAngle.DecimalPlaces = 3;
+			this.m_numLeadOutAngle.Location = new System.Drawing.Point(100, 96);
+			this.m_numLeadOutAngle.Maximum = new decimal(new int[] { 180, 0, 0, 0});
+			this.m_numLeadOutAngle.Name = "m_numLeadOutAngle";
+			this.m_numLeadOutAngle.Size = new System.Drawing.Size(150, 23);
+			this.m_numLeadOutAngle.TabIndex = 7;
+			this.m_numLeadOutAngle.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadOut_DebouncedValueChanged);
 			// 
-			// m_LeadOutAngleUnit
+			// m_lblLeadOutAngleUnit
 			// 
-			this.m_LeadOutAngleUnit.AutoSize = true;
-			this.m_LeadOutAngleUnit.Location = new System.Drawing.Point(256, 100);
-			this.m_LeadOutAngleUnit.Name = "m_LeadOutAngleUnit";
-			this.m_LeadOutAngleUnit.Role = CommonUI.Theme.TextRole.Secondary;
-			this.m_LeadOutAngleUnit.Size = new System.Drawing.Size(26, 16);
-			this.m_LeadOutAngleUnit.TabIndex = 8;
-			this.m_LeadOutAngleUnit.Text = "°";
+			this.m_lblLeadOutAngleUnit.AutoSize = true;
+			this.m_lblLeadOutAngleUnit.Location = new System.Drawing.Point(256, 100);
+			this.m_lblLeadOutAngleUnit.Name = "m_lblLeadOutAngleUnit";
+			this.m_lblLeadOutAngleUnit.Role = CommonUI.Theme.TextRole.Secondary;
+			this.m_lblLeadOutAngleUnit.Size = new System.Drawing.Size(26, 16);
+			this.m_lblLeadOutAngleUnit.TabIndex = 8;
+			this.m_lblLeadOutAngleUnit.Text = "°";
 			// 
-			// m_secOption
+			// m_pnlOption
 			// 
-			this.m_secOption.Controls.Add(this.m_chkFlip);
-			this.m_secOption.Location = new System.Drawing.Point(12, 286);
-			this.m_secOption.Name = "m_secOption";
-			this.m_secOption.Size = new System.Drawing.Size(296, 43);
-			this.m_secOption.TabIndex = 2;
+			this.m_pnlOption.Controls.Add(this.m_chkFlip);
+			this.m_pnlOption.Location = new System.Drawing.Point(12, 286);
+			this.m_pnlOption.Name = "m_pnlOption";
+			this.m_pnlOption.Size = new System.Drawing.Size(296, 43);
+			this.m_pnlOption.TabIndex = 2;
 			// 
 			// m_chkFlip
 			// 
@@ -305,51 +305,51 @@
 			// LeadDlg
 			// 
 			this.ClientSize = new System.Drawing.Size(320, 385);
-			this.Controls.Add(this.m_secLeadIn);
-			this.Controls.Add(this.m_secLeadOut);
-			this.Controls.Add(this.m_secOption);
+			this.Controls.Add(this.m_pnlLeadIn);
+			this.Controls.Add(this.m_pnlLeadOut);
+			this.Controls.Add(this.m_pnlOption);
 			this.Controls.Add(this.m_btnOK);
 			this.Name = "LeadDlg";
 			this.Text = "引線設置";
-			this.m_secLeadIn.ResumeLayout(false);
-			this.m_secLeadIn.PerformLayout();
-			this.m_secLeadOut.ResumeLayout(false);
-			this.m_secLeadOut.PerformLayout();
-			this.m_secOption.ResumeLayout(false);
-			this.m_secOption.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInStraightLength)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInArcLength)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInAngle)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutStraightLength)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutArcLength)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutAngle)).EndInit();
+			this.m_pnlLeadIn.ResumeLayout(false);
+			this.m_pnlLeadIn.PerformLayout();
+			this.m_pnlLeadOut.ResumeLayout(false);
+			this.m_pnlLeadOut.PerformLayout();
+			this.m_pnlOption.ResumeLayout(false);
+			this.m_pnlOption.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadInStraightLength)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadInArcLength)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadInAngle)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadOutStraightLength)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadOutArcLength)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLeadOutAngle)).EndInit();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_secLeadIn;
-		private System.Windows.Forms.Label label1;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxLeadInStraightLength;
-		private CommonUI.Controls.ThemedLabel label2;
+		private CommonUI.Controls.SectionPanel m_pnlLeadIn;
+		private System.Windows.Forms.Label m_lblLeadInLineLength;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadInStraightLength;
+		private CommonUI.Controls.ThemedLabel m_lblLeadInLineLengthUnit;
 		private System.Windows.Forms.Label m_lblLeadInLength;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxLeadInArcLength;
-		private CommonUI.Controls.ThemedLabel m_LeadInLegnthUnit;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadInArcLength;
+		private CommonUI.Controls.ThemedLabel m_lblLeadInLengthUnit;
 		private System.Windows.Forms.Label m_lblLeadInAngle;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxLeadInAngle;
-		private CommonUI.Controls.ThemedLabel m_LeadInAngleUnit;
-		private CommonUI.Controls.SectionPanel m_secLeadOut;
-		private System.Windows.Forms.Label label4;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxLeadOutStraightLength;
-		private CommonUI.Controls.ThemedLabel label5;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadInAngle;
+		private CommonUI.Controls.ThemedLabel m_lblLeadInAngleUnit;
+		private CommonUI.Controls.SectionPanel m_pnlLeadOut;
+		private System.Windows.Forms.Label m_lblLeadOutLineLength;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadOutStraightLength;
+		private CommonUI.Controls.ThemedLabel m_lblLeadOutLineLengthUnit;
 		private System.Windows.Forms.Label m_lblLeadOutLength;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxLeadOutArcLength;
-		private CommonUI.Controls.ThemedLabel m_LeadOutLegnthUnit;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadOutArcLength;
+		private CommonUI.Controls.ThemedLabel m_lblLeadOutLengthUnit;
 		private System.Windows.Forms.Label m_lblLeadOutAngle;
-		private CommonUI.Controls.DebouncedNumericUpDown m_tbxLeadOutAngle;
-		private CommonUI.Controls.ThemedLabel m_LeadOutAngleUnit;
-		private CommonUI.Controls.SectionPanel m_secOption;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadOutAngle;
+		private CommonUI.Controls.ThemedLabel m_lblLeadOutAngleUnit;
+		private CommonUI.Controls.SectionPanel m_pnlOption;
 		private System.Windows.Forms.CheckBox m_chkFlip;
 		private CommonUI.Controls.ThemedButton m_btnOK;
 	}

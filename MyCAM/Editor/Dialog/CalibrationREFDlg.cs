@@ -46,24 +46,24 @@ namespace MyCAM.Editor.Dialog
 		{
 			switch( currentEditPnt ) {
 				case (int)PointIndex.Pnt1:
-					m_gbPnt1.Enabled = true;
-					m_gbPnt2.Enabled = false;
-					m_gbPnt3.Enabled = false;
+					m_pnlPnt1.Enabled = true;
+					m_pnlPnt2.Enabled = false;
+					m_pnlPnt3.Enabled = false;
 					return;
 				case (int)PointIndex.Pnt2:
-					m_gbPnt1.Enabled = false;
-					m_gbPnt2.Enabled = true;
-					m_gbPnt3.Enabled = false;
+					m_pnlPnt1.Enabled = false;
+					m_pnlPnt2.Enabled = true;
+					m_pnlPnt3.Enabled = false;
 					return;
 				case (int)PointIndex.Pnt3:
-					m_gbPnt1.Enabled = false;
-					m_gbPnt2.Enabled = false;
-					m_gbPnt3.Enabled = true;
+					m_pnlPnt1.Enabled = false;
+					m_pnlPnt2.Enabled = false;
+					m_pnlPnt3.Enabled = true;
 					return;
 				default:
-					m_gbPnt1.Enabled = true;
-					m_gbPnt2.Enabled = true;
-					m_gbPnt3.Enabled = true;
+					m_pnlPnt1.Enabled = true;
+					m_pnlPnt2.Enabled = true;
+					m_pnlPnt3.Enabled = true;
 					break;
 			}
 		}
@@ -71,27 +71,27 @@ namespace MyCAM.Editor.Dialog
 		// click on viewer to set point, then update point to dialog
 		public void SetPnt1( gp_Pnt point )
 		{
-			m_tbxPnt1X.Text = point.x.ToString( "F3" );
-			m_tbxPnt1Y.Text = point.y.ToString( "F3" );
-			m_tbxPnt1Z.Text = point.z.ToString( "F3" );
+			m_lblPnt1XValue.Text = point.x.ToString( "F3" );
+			m_lblPnt1YValue.Text = point.y.ToString( "F3" );
+			m_lblPnt1ZValue.Text = point.z.ToString( "F3" );
 			SetPnt1();
 			RaisePreview( m_CalibrationData );
 		}
 
 		public void SetPnt2( gp_Pnt point )
 		{
-			m_tbxPnt2X.Text = point.x.ToString( "F3" );
-			m_tbxPnt2Y.Text = point.y.ToString( "F3" );
-			m_tbxPnt2Z.Text = point.z.ToString( "F3" );
+			m_lblPnt2XValue.Text = point.x.ToString( "F3" );
+			m_lblPnt2YValue.Text = point.y.ToString( "F3" );
+			m_lblPnt2ZValue.Text = point.z.ToString( "F3" );
 			SetPnt2();
 			RaisePreview( m_CalibrationData );
 		}
 
 		public void SetPnt3( gp_Pnt point )
 		{
-			m_tbxPnt3X.Text = point.x.ToString( "F3" );
-			m_tbxPnt3Y.Text = point.y.ToString( "F3" );
-			m_tbxPnt3Z.Text = point.z.ToString( "F3" );
+			m_lblPnt3XValue.Text = point.x.ToString( "F3" );
+			m_lblPnt3YValue.Text = point.y.ToString( "F3" );
+			m_lblPnt3ZValue.Text = point.z.ToString( "F3" );
 			SetPnt3();
 			RaisePreview( m_CalibrationData );
 		}
@@ -131,26 +131,26 @@ namespace MyCAM.Editor.Dialog
 		void SetUI()
 		{
 			if( m_CalibrationData == null || m_CalibrationData.IsBeenSet == false ) {
-				m_tbxPnt1X.Text = "";
-				m_tbxPnt1Y.Text = "";
-				m_tbxPnt1Z.Text = "";
-				m_tbxPnt2X.Text = "";
-				m_tbxPnt2Y.Text = "";
-				m_tbxPnt2Z.Text = "";
-				m_tbxPnt3X.Text = "";
-				m_tbxPnt3Y.Text = "";
-				m_tbxPnt3Z.Text = "";
+				m_lblPnt1XValue.Text = "";
+				m_lblPnt1YValue.Text = "";
+				m_lblPnt1ZValue.Text = "";
+				m_lblPnt2XValue.Text = "";
+				m_lblPnt2YValue.Text = "";
+				m_lblPnt2ZValue.Text = "";
+				m_lblPnt3XValue.Text = "";
+				m_lblPnt3YValue.Text = "";
+				m_lblPnt3ZValue.Text = "";
 				return;
 			}
-			m_tbxPnt1X.Text = m_CalibrationData.Ref_Pnt1.x.ToString( "F3" );
-			m_tbxPnt1Y.Text = m_CalibrationData.Ref_Pnt1.y.ToString( "F3" );
-			m_tbxPnt1Z.Text = m_CalibrationData.Ref_Pnt1.z.ToString( "F3" );
-			m_tbxPnt2X.Text = m_CalibrationData.Ref_Pnt2.x.ToString( "F3" );
-			m_tbxPnt2Y.Text = m_CalibrationData.Ref_Pnt2.y.ToString( "F3" );
-			m_tbxPnt2Z.Text = m_CalibrationData.Ref_Pnt2.z.ToString( "F3" );
-			m_tbxPnt3X.Text = m_CalibrationData.Ref_Pnt3.x.ToString( "F3" );
-			m_tbxPnt3Y.Text = m_CalibrationData.Ref_Pnt3.y.ToString( "F3" );
-			m_tbxPnt3Z.Text = m_CalibrationData.Ref_Pnt3.z.ToString( "F3" );
+			m_lblPnt1XValue.Text = m_CalibrationData.Ref_Pnt1.x.ToString( "F3" );
+			m_lblPnt1YValue.Text = m_CalibrationData.Ref_Pnt1.y.ToString( "F3" );
+			m_lblPnt1ZValue.Text = m_CalibrationData.Ref_Pnt1.z.ToString( "F3" );
+			m_lblPnt2XValue.Text = m_CalibrationData.Ref_Pnt2.x.ToString( "F3" );
+			m_lblPnt2YValue.Text = m_CalibrationData.Ref_Pnt2.y.ToString( "F3" );
+			m_lblPnt2ZValue.Text = m_CalibrationData.Ref_Pnt2.z.ToString( "F3" );
+			m_lblPnt3XValue.Text = m_CalibrationData.Ref_Pnt3.x.ToString( "F3" );
+			m_lblPnt3YValue.Text = m_CalibrationData.Ref_Pnt3.y.ToString( "F3" );
+			m_lblPnt3ZValue.Text = m_CalibrationData.Ref_Pnt3.z.ToString( "F3" );
 		}
 
 		#region UI Event
@@ -192,67 +192,67 @@ namespace MyCAM.Editor.Dialog
 
 		void ClearPnt1Tbx()
 		{
-			m_tbxPnt1X.Text = "";
-			m_tbxPnt1Y.Text = "";
-			m_tbxPnt1Z.Text = "";
+			m_lblPnt1XValue.Text = "";
+			m_lblPnt1YValue.Text = "";
+			m_lblPnt1ZValue.Text = "";
 			m_CalibrationData.Ref_Pnt1 = null;
 		}
 
 		void ClearPnt2Tbx()
 		{
-			m_tbxPnt2X.Text = "";
-			m_tbxPnt2Y.Text = "";
-			m_tbxPnt2Z.Text = "";
+			m_lblPnt2XValue.Text = "";
+			m_lblPnt2YValue.Text = "";
+			m_lblPnt2ZValue.Text = "";
 			m_CalibrationData.Ref_Pnt2 = null;
 		}
 
 		void ClearPnt3Tbx()
 		{
-			m_tbxPnt3X.Text = "";
-			m_tbxPnt3Y.Text = "";
-			m_tbxPnt3Z.Text = "";
+			m_lblPnt3XValue.Text = "";
+			m_lblPnt3YValue.Text = "";
+			m_lblPnt3ZValue.Text = "";
 			m_CalibrationData.Ref_Pnt3 = null;
 		}
 
 		void SetPnt1()
 		{
-			if( string.IsNullOrEmpty( m_tbxPnt1X.Text ) || string.IsNullOrEmpty( m_tbxPnt1Y.Text ) || string.IsNullOrEmpty( m_tbxPnt1Z.Text ) ) {
+			if( string.IsNullOrEmpty( m_lblPnt1XValue.Text ) || string.IsNullOrEmpty( m_lblPnt1YValue.Text ) || string.IsNullOrEmpty( m_lblPnt1ZValue.Text ) ) {
 				m_CalibrationData.Ref_Pnt1 = null;
 				return;
 			}
 			m_CalibrationData.Ref_Pnt1 = new gp_Pnt()
 			{
-				x = double.TryParse( m_tbxPnt1X.Text, out double xValue ) ? xValue : 0,
-				y = double.TryParse( m_tbxPnt1Y.Text, out double yValue ) ? yValue : 0,
-				z = double.TryParse( m_tbxPnt1Z.Text, out double zValue ) ? zValue : 0,
+				x = double.TryParse( m_lblPnt1XValue.Text, out double xValue ) ? xValue : 0,
+				y = double.TryParse( m_lblPnt1YValue.Text, out double yValue ) ? yValue : 0,
+				z = double.TryParse( m_lblPnt1ZValue.Text, out double zValue ) ? zValue : 0,
 			};
 		}
 
 		void SetPnt2()
 		{
-			if( string.IsNullOrEmpty( m_tbxPnt2X.Text ) || string.IsNullOrEmpty( m_tbxPnt2Y.Text ) || string.IsNullOrEmpty( m_tbxPnt2Z.Text ) ) {
+			if( string.IsNullOrEmpty( m_lblPnt2XValue.Text ) || string.IsNullOrEmpty( m_lblPnt2YValue.Text ) || string.IsNullOrEmpty( m_lblPnt2ZValue.Text ) ) {
 				m_CalibrationData.Ref_Pnt2 = null;
 				return;
 			}
 			m_CalibrationData.Ref_Pnt2 = new gp_Pnt()
 			{
-				x = double.Parse( m_tbxPnt2X.Text ),
-				y = double.Parse( m_tbxPnt2Y.Text ),
-				z = double.Parse( m_tbxPnt2Z.Text )
+				x = double.Parse( m_lblPnt2XValue.Text ),
+				y = double.Parse( m_lblPnt2YValue.Text ),
+				z = double.Parse( m_lblPnt2ZValue.Text )
 			};
 		}
 
 		void SetPnt3()
 		{
-			if( string.IsNullOrEmpty( m_tbxPnt3X.Text ) || string.IsNullOrEmpty( m_tbxPnt3Y.Text ) || string.IsNullOrEmpty( m_tbxPnt3Z.Text ) ) {
+			if( string.IsNullOrEmpty( m_lblPnt3XValue.Text ) || string.IsNullOrEmpty( m_lblPnt3YValue.Text ) || string.IsNullOrEmpty( m_lblPnt3ZValue.Text ) ) {
 				m_CalibrationData.Ref_Pnt3 = null;
 				return;
 			}
 			m_CalibrationData.Ref_Pnt3 = new gp_Pnt()
 			{
-				x = double.Parse( m_tbxPnt3X.Text ),
-				y = double.Parse( m_tbxPnt3Y.Text ),
-				z = double.Parse( m_tbxPnt3Z.Text )
+				x = double.Parse( m_lblPnt3XValue.Text ),
+				y = double.Parse( m_lblPnt3YValue.Text ),
+				z = double.Parse( m_lblPnt3ZValue.Text )
 			};
 		}
 

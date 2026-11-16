@@ -27,23 +27,23 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_secConnect = new CommonUI.Controls.SectionPanel();
+			this.m_pnlConnect = new CommonUI.Controls.SectionPanel();
 			this.m_lblIP = new System.Windows.Forms.Label();
-			this.m_txbIP = new System.Windows.Forms.TextBox();
+			this.m_txtIP = new System.Windows.Forms.TextBox();
 			this.m_lblTips = new CommonUI.Controls.ThemedLabel();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
-			this.m_secConnect.SuspendLayout();
+			this.m_pnlConnect.SuspendLayout();
 			this.SuspendLayout();
 			//
-			// m_secConnect
+			// m_pnlConnect
 			//
-			this.m_secConnect.Controls.Add(this.m_lblIP);
-			this.m_secConnect.Controls.Add(this.m_txbIP);
-			this.m_secConnect.Controls.Add(this.m_lblTips);
-			this.m_secConnect.Location = new System.Drawing.Point(12, 12);
-			this.m_secConnect.Name = "m_secConnect";
-			this.m_secConnect.Size = new System.Drawing.Size(296, 73);
-			this.m_secConnect.TabIndex = 0;
+			this.m_pnlConnect.Controls.Add(this.m_lblIP);
+			this.m_pnlConnect.Controls.Add(this.m_txtIP);
+			this.m_pnlConnect.Controls.Add(this.m_lblTips);
+			this.m_pnlConnect.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlConnect.Name = "m_pnlConnect";
+			this.m_pnlConnect.Size = new System.Drawing.Size(296, 73);
+			this.m_pnlConnect.TabIndex = 0;
 			//
 			// m_lblIP
 			//
@@ -54,12 +54,12 @@
 			this.m_lblIP.TabIndex = 0;
 			this.m_lblIP.Text = "IP：";
 			//
-			// m_txbIP
+			// m_txtIP
 			//
-			this.m_txbIP.Location = new System.Drawing.Point(50, 10);
-			this.m_txbIP.Name = "m_txbIP";
-			this.m_txbIP.Size = new System.Drawing.Size(150, 23);
-			this.m_txbIP.TabIndex = 1;
+			this.m_txtIP.Location = new System.Drawing.Point(50, 10);
+			this.m_txtIP.Name = "m_txtIP";
+			this.m_txtIP.Size = new System.Drawing.Size(150, 23);
+			this.m_txtIP.TabIndex = 1;
 			//
 			// m_lblTips
 			//
@@ -84,21 +84,21 @@
 			// ConnectDlg
 			//
 			this.ClientSize = new System.Drawing.Size(320, 141);
-			this.Controls.Add(this.m_secConnect);
+			this.Controls.Add(this.m_pnlConnect);
 			this.Controls.Add(this.m_btnConfirm);
 			this.Name = "ConnectDlg";
 			this.Text = "連線設定";
-			this.m_secConnect.ResumeLayout(false);
-			this.m_secConnect.PerformLayout();
+			this.m_pnlConnect.ResumeLayout(false);
+			this.m_pnlConnect.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_secConnect;
+		private CommonUI.Controls.SectionPanel m_pnlConnect;
 		private System.Windows.Forms.Label m_lblIP;
-		private System.Windows.Forms.TextBox m_txbIP;
+		private System.Windows.Forms.TextBox m_txtIP;
 		private CommonUI.Controls.ThemedLabel m_lblTips;
 		private CommonUI.Controls.ThemedButton m_btnConfirm;
 	}

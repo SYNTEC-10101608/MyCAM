@@ -71,8 +71,8 @@
 
 		void InitializeBandwidthControls()
 		{
-			m_nudExtrusionBandwidth.Value = (decimal)SortParams.DEFAULT_EXTRUSION_BANDWIDTH_MM;
-			m_nudRotationBandwidth.Value = (decimal)SortParams.DEFAULT_ROTATION_BANDWIDTH_DEG;
+			m_numExtrusionBandwidth.Value = (decimal)SortParams.DEFAULT_EXTRUSION_BANDWIDTH_MM;
+			m_numRotationBandwidth.Value = (decimal)SortParams.DEFAULT_ROTATION_BANDWIDTH_DEG;
 		}
 
 		void LoadImages()
@@ -123,11 +123,11 @@
 
 			// bandwidth: horizontal uses mm (extrusion), vertical uses degree (rotation)
 			m_lblExtrusionBandwidth.Visible = isHorizontal;
-			m_nudExtrusionBandwidth.Visible = isHorizontal;
+			m_numExtrusionBandwidth.Visible = isHorizontal;
 			m_lblExtrusionUnit.Visible = isHorizontal;
 
 			m_lblRotationBandwidth.Visible = isVertical;
-			m_nudRotationBandwidth.Visible = isVertical;
+			m_numRotationBandwidth.Visible = isVertical;
 			m_lblRotationUnit.Visible = isVertical;
 
 			// Update preview image
@@ -213,8 +213,8 @@
 			{
 				Method = method,
 				CylinderAxis = GetSelectedCylinderAxis(),
-				ExtrusionBandwidth_mm = (double)m_nudExtrusionBandwidth.Value,
-				RotationBandwidth_deg = (double)m_nudRotationBandwidth.Value
+				ExtrusionBandwidth_mm = (double)m_numExtrusionBandwidth.Value,
+				RotationBandwidth_deg = (double)m_numRotationBandwidth.Value
 			};
 
 			// CylinderVertical: hardcode extrusion to "from top" (descending = true)

@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="ContourEditDlg" Content="輪廓編輯" />
-	<Message ID="m_gbxIndexParam" Content="控制點參數" />
+	<Message ID="m_pnlIndexParam" Content="控制點參數" />
 
 	<Message ID="m_lblRefCoordType" Content="座標系" />
-	<Message ID="m_rbtnWorldCoord" Content="世界座標系" />
-	<Message ID="m_rbtnLocalCoord" Content="區域座標系" />
+	<Message ID="m_rdoWorldCoord" Content="世界座標系" />
+	<Message ID="m_rdoLocalCoord" Content="區域座標系" />
 
 	<Message ID="m_lblToStartOrEnd" Content="起終點切換" />
-	<Message ID="m_rbtnToStart" Content="起點" />
-	<Message ID="m_rbtnToEnd" Content="終點" />
+	<Message ID="m_rdoToStart" Content="起點" />
+	<Message ID="m_rdoToEnd" Content="終點" />
 
 	<Message ID="m_lblDX" Content="X偏移" />
 	<Message ID="m_lblDY" Content="Y偏移" />

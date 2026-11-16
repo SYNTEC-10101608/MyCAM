@@ -16,13 +16,13 @@ namespace MyCAM.Editor.Dialog
 		void Initialization()
 		{
 			// initialize numeric up down controls
-			m_NumUpDownCompensate.Maximum = decimal.MaxValue;
-			m_NumUpDownCompensate.Minimum = decimal.MinValue;
-			m_NumUpDownCompensate.DecimalPlaces = 3;
-			m_NumUpDownCompensate.Increment = 0.25m;
+			m_numCompensate.Maximum = decimal.MaxValue;
+			m_numCompensate.Minimum = decimal.MinValue;
+			m_numCompensate.DecimalPlaces = 3;
+			m_numCompensate.Increment = 0.25m;
 		}
 
-		void m_NumUpDownCompensate_DebouncedValueChanged( object sender, System.EventArgs e )
+		void m_numCompensate_DebouncedValueChanged( object sender, System.EventArgs e )
 		{
 			SetCompensateValue();
 		}
@@ -40,37 +40,37 @@ namespace MyCAM.Editor.Dialog
 
 		void SetCompensateValue()
 		{
-			bool isExceedsLimit = IsGeomConstraintExceedsLimit?.Invoke( (double)m_NumUpDownCompensate.Value ) ?? false;
+			bool isExceedsLimit = IsGeomConstraintExceedsLimit?.Invoke( (double)m_numCompensate.Value ) ?? false;
 			if( isExceedsLimit ) {
-				m_NumUpDownCompensate.SilentSetValue = (decimal)m_CompensateData;
+				m_numCompensate.SilentSetValue = (decimal)m_CompensateData;
 				return;
 			}
-			m_CompensateData = (double)m_NumUpDownCompensate.Value;
+			m_CompensateData = (double)m_numCompensate.Value;
 			RaisePreview( m_CompensateData );
 		}
 
 		void m_btnReset_Click( object sender, System.EventArgs e )
 		{
 			m_CompensateData = 0;
-			m_NumUpDownCompensate.SilentSetValue = 0;
+			m_numCompensate.SilentSetValue = 0;
 			RaiseReset( m_CompensateData );
 		}
 
 		void m_btnClear_Click( object sender, System.EventArgs e )
 		{
 			m_CompensateData = 0.0;
-			m_NumUpDownCompensate.SilentSetValue = 0;
+			m_numCompensate.SilentSetValue = 0;
 			RaisePreview( m_CompensateData );
 		}
 
 		void m_btnConfirm_Click( object sender, System.EventArgs e )
 		{
-			bool isExceedsLimit = IsGeomConstraintExceedsLimit?.Invoke( (double)m_NumUpDownCompensate.Value ) ?? false;
+			bool isExceedsLimit = IsGeomConstraintExceedsLimit?.Invoke( (double)m_numCompensate.Value ) ?? false;
 			if( isExceedsLimit ) {
-				m_NumUpDownCompensate.SilentSetValue = (decimal)m_CompensateData;
+				m_numCompensate.SilentSetValue = (decimal)m_CompensateData;
 				return;
 			}
-			m_CompensateData = (double)m_NumUpDownCompensate.Value;
+			m_CompensateData = (double)m_numCompensate.Value;
 			RaiseConfirm( m_CompensateData );
 		}
 

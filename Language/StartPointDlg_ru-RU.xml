@@ -2,8 +2,8 @@
 <ResMap>
 	<Message ID="StartPointDlg" Content="отправная точка" />
 
-	<Message ID="m_rbtnManualSelect" Content="Ручной выбор" />
-	<Message ID="m_rbtnAutoSelect" Content="Автоматический пакетный выбор" />
+	<Message ID="m_rdoManualSelect" Content="Ручной выбор" />
+	<Message ID="m_rdoAutoSelect" Content="Автоматический пакетный выбор" />
 
 	<Message ID="m_lblTolerance" Content="Допуск" />
 	<Message ID="m_btnIncreasePriority" Content="Повысить приоритет" />
