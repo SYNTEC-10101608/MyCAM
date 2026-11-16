@@ -15,6 +15,7 @@ namespace MyCAM.Editor.Dialog
 		public AxisTransformDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			InitialControlBoundarySetting();
 			InitialControlValue();
 			RegisterValueChangedEvents();

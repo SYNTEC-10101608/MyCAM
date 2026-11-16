@@ -9,6 +9,7 @@ namespace MyCAM.Editor
 		public ManualTransformDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			InitMethodComboBox();
 		}
 

@@ -15,6 +15,7 @@ namespace MyCAM.Editor.Dialog
 		public StartPointDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_numTolerance.Maximum = decimal.MaxValue;
 			m_numTolerance.Minimum = 0;
 

@@ -18,6 +18,15 @@
 #   S11 dialog code sets no font, color, location or size of its controls (the designer layout is what runs)
 #   S12 no DPI scaling (DeviceDpi): the layout is designed for 96 DPI
 #   S13 language: an ID written like a control name belongs to a control of the class or is used by its code
+#   S14 language: every dialog calls ApplyLanguage() right after InitializeComponent()
+#   S15 only CommonUI defines control classes (MyCAM and CncUI use the CommonUI controls)
+#   S16 button kinds: Start / Hold / Stop only in the CNC panels; at most one Primary in a container
+#   S17 button bar order (section 4.4): auxiliary buttons from the left margin, the others from the right margin,
+#       8 apart; Primary is the rightmost, Cancel / Close right before it, Reset / Preview on the left
+#   S18 alignment in a card: the first input of each row starts at the same x; a unit label is 6 after its input
+#   S19 main window designer: white list of types, no appearance except the data color swatches
+#   S20 data colors: every "static readonly Color" constant is a registered data color (StaticExceptions.txt)
+#   S21 every public type of CommonUI is listed in the component catalog (section 9)
 #
 # Exceptions are listed in StaticExceptions.txt: "<rule> <class> <control> <reason>". Exit code 1 on a problem.
 
@@ -38,6 +47,12 @@ $ALLOWED_TYPES = @(
 	"System.Windows.Forms.PictureBox", "System.Windows.Forms.DataGridView",
 	"System.Windows.Forms.DataGridViewTextBoxColumn", "System.Windows.Forms.Panel",
 	"System.Windows.Forms.ToolTip", "System.Windows.Forms.Timer", "System.ComponentModel.IContainer" )
+
+# main window only (section 3)
+$MAIN_WINDOW_TYPES = @( "System.Windows.Forms.MenuStrip", "System.Windows.Forms.ToolStrip",
+	"System.Windows.Forms.ToolStripContainer", "System.Windows.Forms.ContextMenuStrip",
+	"System.Windows.Forms.ToolStripButton", "System.Windows.Forms.ToolStripMenuItem",
+	"System.Windows.Forms.ToolStripSeparator", "System.Windows.Forms.TableLayoutPanel" )
 
 # non-numeric text fields (section 3)
 $ALLOWED_TEXTBOX = @( "ConnectDlg.m_txtIP", "MeasureDlg.m_txtResult", "ExtendedGCodeDlg.m_txtGCode",
@@ -104,6 +119,157 @@ function Test-TabOrder( $screen ) {
 				Report "S10" $screen.ClassName $name "TabIndex $nTabIndex is not after the control before it in the layout ($szContainer)"
 			}
 			$nPrevious = $nTabIndex
+		}
+	}
+}
+
+function Test-ApplyLanguage( $screen, [string]$szCodePath ) {
+	$code = if (Test-Path $szCodePath) { Get-Content $szCodePath -Raw -Encoding UTF8 } else { "" }
+	if ($code -notmatch "InitializeComponent\(\);\s*\r?\n\s*ApplyLanguage\(\);") {
+		Report "S14" $screen.ClassName "*" "ApplyLanguage() must be called right after InitializeComponent()"
+	}
+}
+
+# CNC machining kinds (section 3) and the single main action of a container
+function Test-ButtonKinds( $screen, [bool]$isCncPanel ) {
+	$primaryMap = @{}
+	foreach ($name in $screen.Props.Keys) {
+		$szKind = $screen.Props[$name]["Kind"]
+		if ($null -eq $szKind) {
+			continue
+		}
+		$isMachiningKind = $szKind -match "ButtonKind\.(Start|Hold|Stop)$"
+		if ($isMachiningKind -and -not $isCncPanel) {
+			Report "S16" $screen.ClassName $name "$szKind is only for the CNC panels"
+		}
+		if ($szKind -match "ButtonKind\.Primary$") {
+			$szParent = Get-Parent $screen $name
+			if (-not $primaryMap.ContainsKey($szParent)) {
+				$primaryMap[$szParent] = New-Object System.Collections.Generic.List[string]
+			}
+			$primaryMap[$szParent].Add($name)
+		}
+	}
+	foreach ($szParent in $primaryMap.Keys) {
+		if ($primaryMap[$szParent].Count -gt 1) {
+			Report "S16" $screen.ClassName $szParent "more than one Primary button: $($primaryMap[$szParent] -join ', ')"
+		}
+	}
+}
+
+function Get-Parent( $screen, [string]$name ) {
+	foreach ($szContainer in $screen.Children.Keys) {
+		if ($screen.Children[$szContainer] -contains $name) {
+			return $szContainer
+		}
+	}
+	return "(form)"
+}
+
+# the button bar of the form, or of a wizard page (a plain Panel on the form)
+function Test-ButtonBarOrder( $screen ) {
+	$client = $screen.FormProps["ClientSize"]
+	if ($null -eq $client) {
+		return
+	}
+	$clientSize = ConvertTo-Size $client
+	$bars = @( [pscustomobject]@{ Container = "(form)"; Left = 12; Right = $clientSize.Width - 12 } )
+	foreach ($name in @( $screen.Children["(form)"] | Where-Object { $_ } )) {
+		if ($screen.Fields[$name] -eq "System.Windows.Forms.Panel") {
+			$bounds = Get-Bounds $screen $name
+			$bars += [pscustomobject]@{ Container = $name; Left = 0; Right = $bounds.Width }
+		}
+	}
+	foreach ($bar in $bars) {
+		$buttons = @( $screen.Children[$bar.Container] | Where-Object { $_ -and $screen.Fields[$_] -eq "CommonUI.Controls.ThemedButton" } |
+			ForEach-Object { Get-Bounds $screen $_ } | Where-Object { $_.Height -eq 28 } | Sort-Object Left )
+		if ($buttons.Count -eq 0) {
+			continue
+		}
+
+		# chains from both margins; every button belongs to one of them
+		$leftGroup = New-Object System.Collections.Generic.List[object]
+		$nEdge = $bar.Left
+		foreach ($button in $buttons) {
+			if ($button.Left -ne $nEdge) {
+				break
+			}
+			$leftGroup.Add($button)
+			$nEdge = $button.Left + $button.Width + 8
+		}
+		$rightGroup = New-Object System.Collections.Generic.List[object]
+		$nEdge = $bar.Right
+		for ($i = $buttons.Count - 1; $i -ge 0; $i--) {
+			$button = $buttons[$i]
+			if ($button.Left + $button.Width -ne $nEdge -or $leftGroup.Contains($button)) {
+				break
+			}
+			$rightGroup.Insert(0, $button)
+			$nEdge = $button.Left - 8
+		}
+		foreach ($button in $buttons) {
+			if (-not $leftGroup.Contains($button) -and -not $rightGroup.Contains($button)) {
+				Report "S17" $screen.ClassName $button.Name "not chained 8 apart from the left or right margin of the button bar"
+			}
+		}
+
+		# the main action is the rightmost, cancel / close right before it, reset / preview on the left
+		$nIndex = 0
+		foreach ($button in $buttons) {
+			$props = $screen.Props[$button.Name]
+			$isPrimary = $props["Kind"] -match "ButtonKind\.Primary$"
+			$szCommon = $props["CommonText"]
+			$isLast = $nIndex -eq $buttons.Count - 1
+			if ($isPrimary -and -not $isLast) {
+				Report "S17" $screen.ClassName $button.Name "the Primary button must be the rightmost of the button bar"
+			}
+			if ($szCommon -match "\.(Cancel|Close)$") {
+				$next = if ($isLast) { $null } else { $buttons[$nIndex + 1] }
+				$isBeforePrimary = $null -ne $next -and $screen.Props[$next.Name]["Kind"] -match "ButtonKind\.Primary$"
+				if (-not $rightGroup.Contains($button) -or (-not $isLast -and -not $isBeforePrimary)) {
+					Report "S17" $screen.ClassName $button.Name "cancel / close must be right before the Primary button (or the rightmost)"
+				}
+			}
+			if ($szCommon -match "\.(Reset|Preview)$" -and -not $leftGroup.Contains($button)) {
+				Report "S17" $screen.ClassName $button.Name "reset / preview are auxiliary actions, placed from the left margin"
+			}
+			$nIndex++
+		}
+	}
+}
+
+# S18 inside a card or a plain panel: first inputs of the rows aligned, units 6 after their input
+function Test-CardAlignment( $screen ) {
+	$containers = @( $screen.Fields.Keys | Where-Object { $screen.Fields[$_] -match "(CommonUI.Controls.SectionPanel|System.Windows.Forms.Panel)$" } )
+	foreach ($szContainer in $containers) {
+		$children = @( $screen.Children[$szContainer] | Where-Object { $_ } | ForEach-Object { Get-Bounds $screen $_ } | Where-Object { $_ } )
+		# a multi-line text box is an output area, not an input row
+		$inputs = @( $children | Where-Object { $screen.Fields[$_.Name] -match "(DebouncedNumericUpDown|ComboBox|TextBox)$" -and
+			$screen.Props[$_.Name]["Multiline"] -ne "true" } )
+		$rowLefts = @{}
+		foreach ($input in $inputs) {
+			$nRowTop = $input.Top
+			if (-not $rowLefts.ContainsKey($nRowTop) -or $input.Left -lt $rowLefts[$nRowTop].Left) {
+				$rowLefts[$nRowTop] = $input
+			}
+		}
+		$firstInputs = @( $rowLefts.Values )
+		$nCommonLeft = ($firstInputs | Group-Object Left | Sort-Object Count -Descending | Select-Object -First 1).Name
+		foreach ($input in $firstInputs) {
+			if ($null -ne $nCommonLeft -and $input.Left -ne [int]$nCommonLeft) {
+				Report "S18" $screen.ClassName $input.Name "first input of the row at x=$($input.Left), the others of $szContainer at x=$nCommonLeft"
+			}
+		}
+		foreach ($unit in @( $children | Where-Object { $_.Name -cmatch "Unit$" -and $screen.Props[$_.Name]["Role"] -match "TextRole\.Secondary$" } )) {
+			$input = $inputs | Where-Object { $unit.Top -ge $_.Top -and $unit.Top -lt $_.Top + $_.Height -and $_.Left -lt $unit.Left } |
+				Sort-Object { $_.Left + $_.Width } -Descending | Select-Object -First 1
+			if ($null -eq $input) {
+				continue
+			}
+			$nExpected = $input.Left + $input.Width + 6
+			if ($unit.Left -ne $nExpected) {
+				Report "S18" $screen.ClassName $unit.Name "unit label at x=$($unit.Left), expected 6 after $($input.Name) (x=$nExpected)"
+			}
 		}
 	}
 }
@@ -419,9 +585,17 @@ foreach ($file in $designerFiles) {
 		}
 	}
 
-	# S5 layout of dialogs
+	# S5 / S17 layout of dialogs, S14 language call
 	if ($isDialog) {
 		Test-DialogLayout $screen
+		Test-ButtonBarOrder $screen
+		Test-ApplyLanguage $screen ($file.FullName -replace "\.Designer\.cs$", ".cs")
+	}
+
+	# S16 button kinds, S18 alignment in cards (embedded panels are scaled, their grid is checked at runtime)
+	Test-ButtonKinds $screen ($file.FullName -match "\\CncUI\\Panel\\")
+	if ($isDialog) {
+		Test-CardAlignment $screen
 	}
 
 	# S6 / S7 language
@@ -438,6 +612,58 @@ $mainScreen = Read-DesignerFile (Join-Path $Root "MyCAM\StartupForm.Designer.cs"
 if (-not $Only -or $mainScreen.ClassName -like $Only) {
 	Test-FieldNames $mainScreen
 	Test-OrphanIds $mainScreen (Join-Path $Root "MyCAM\StartupForm.cs")
+
+	# S19 types and appearance of the main window (the data color swatches are exceptions)
+	foreach ($name in $mainScreen.Fields.Keys) {
+		$szType = $mainScreen.Fields[$name]
+		if ($ALLOWED_TYPES -notcontains $szType -and $MAIN_WINDOW_TYPES -notcontains $szType) {
+			Report "S19" $mainScreen.ClassName $name "type $szType is not in the white list of the main window"
+		}
+	}
+	foreach ($prop in $FORBIDDEN_FORM_PROPS) {
+		if ($mainScreen.FormProps.ContainsKey($prop)) {
+			Report "S19" $mainScreen.ClassName "(form)" "sets $prop"
+		}
+	}
+	foreach ($name in $mainScreen.Props.Keys) {
+		foreach ($prop in @( "Font", "BackColor", "ForeColor", "FlatStyle", "UseVisualStyleBackColor", "ImageTransparentColor" )) {
+			if ($mainScreen.Props[$name].ContainsKey($prop)) {
+				Report "S19" $mainScreen.ClassName $name "sets $prop"
+			}
+		}
+	}
+}
+
+# S21 the component catalog of the guideline lists every public type of CommonUI
+$guideline = Get-Content (Join-Path $Root ".github\instructions\ui-style.instructions.md") -Raw -Encoding UTF8
+$catalogIndex = $guideline.IndexOf("## 9. CommonUI")
+$catalog = if ($catalogIndex -ge 0) { $guideline.Substring($catalogIndex) } else { "" }
+foreach ($file in Get-ChildItem (Join-Path $Root "CommonUI") -Filter "*.cs" -Recurse | Where-Object { $_.FullName -notmatch "\\(bin|obj|Properties)\\" -and $_.Name -notlike "*.Designer.cs" }) {
+	$code = Get-Content $file.FullName -Raw -Encoding UTF8
+	foreach ($match in [regex]::Matches($code, "public (static |sealed |partial |abstract )*(class|enum|struct|interface) (\w+)")) {
+		$szType = $match.Groups[3].Value
+		if ($catalog -notmatch "``$szType``") {
+			Report "S21" $szType "*" "public CommonUI type is not listed in the component catalog (guideline section 9)"
+		}
+	}
+}
+
+# S15 control classes are defined in CommonUI only
+$CONTROL_BASES = "Control|UserControl|ScrollableControl|ContainerControl|Panel|Button|ButtonBase|Label|TextBox|TextBoxBase|" +
+	"NumericUpDown|UpDownBase|ComboBox|ListBox|CheckedListBox|ListView|TreeView|DataGridView|CheckBox|RadioButton|" +
+	"GroupBox|PictureBox|ProgressBar|TrackBar|TabControl|SplitContainer|ToolStrip|MenuStrip|StatusStrip|FlowLayoutPanel|" +
+	"TableLayoutPanel|ToolStripItem|ToolStripButton|ToolStripMenuItem|ToolStripControlHost|DataGridViewColumn|DataGridViewCell"
+foreach ($dir in @( "MyCAM", "CncUI", "OCCViewer" )) {
+	$path = Join-Path $Root $dir
+	if (-not (Test-Path $path)) {
+		continue
+	}
+	foreach ($file in Get-ChildItem $path -Filter "*.cs" -Recurse | Where-Object { $_.FullName -notmatch "\\(bin|obj)\\" }) {
+		$code = Get-Content $file.FullName -Raw -Encoding UTF8
+		foreach ($match in [regex]::Matches($code, "class\s+(\w+)\s*:\s*(System\.Windows\.Forms\.)?($CONTROL_BASES)\b")) {
+			Report "S15" $match.Groups[1].Value "*" "derives from $($match.Groups[3].Value); controls are defined in CommonUI"
+		}
+	}
 }
 
 # ---------------------------------------------------------------- code
@@ -477,8 +703,9 @@ foreach ($file in $codeFiles) {
 			continue
 		}
 
-		# data colors are allowed as named constants
-		if ($line -match "static readonly (System\.Drawing\.)?Color [A-Z][A-Z0-9_]+ =") {
+		# data colors are allowed as named constants registered in StaticExceptions.txt (S20)
+		if ($line -match "static readonly (System\.Drawing\.)?Color ([A-Z][A-Z0-9_]+) =") {
+			Report "S20" $szClass $Matches[2] "data color constant not registered: $($line.Trim())"
 			continue
 		}
 		Report "S4" $szClass "line$nLine" "hard-coded color or font: $($line.Trim())"

@@ -7,6 +7,7 @@ namespace MyCAM.Editor
 		public SewPartDlg( double dSewTolerance )
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_numSewTol.Value = (decimal)dSewTolerance;
 		}
 

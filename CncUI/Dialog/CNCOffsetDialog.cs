@@ -10,6 +10,7 @@ namespace CncUI.Dialog
 		public CNCOffsetDialog()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_AxisNames = new[] { m_lblX, m_lblY, m_lblZ, m_lblRotary1, m_lblRotary2 };
 			m_Coordinates = new[] { m_lblXValue, m_lblYValue, m_lblZValue, m_lblRotary1Value, m_lblRotary2Value };
 			m_ZeroButtons = new[] { m_btnXZero, m_btnYZero, m_btnZZero, m_btnRotary1Zero, m_btnRotary2Zero };

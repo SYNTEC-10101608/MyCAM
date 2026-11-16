@@ -8,7 +8,7 @@ namespace CommonUI.Controls
 {
 	/// <summary>
 	/// A row created at runtime in a list of values: index + numeric box + unit + delete button.
-	/// The caller gives the unit and the delete text; the layout follows the theme metrics.
+	/// The caller gives the value range, decimal places, unit and delete text; the layout follows the theme metrics.
 	/// </summary>
 	public class RemovableValueRow : Panel
 	{
@@ -27,10 +27,14 @@ namespace CommonUI.Controls
 		/// Create a row.
 		/// </summary>
 		/// <param name="dInitialValue">Initial value, set without raising <see cref="ValueCommitted"/>.</param>
+		/// <param name="minimum">Smallest value the field accepts.</param>
+		/// <param name="maximum">Largest value the field accepts.</param>
+		/// <param name="nDecimalPlaces">Decimal places of the field.</param>
 		/// <param name="szUnit">Unit text, e.g. "mm".</param>
 		/// <param name="szDeleteText">Text of the delete button.</param>
 		/// <param name="indexColor">Data color of the index (e.g. an axis color); null for the body color.</param>
-		public RemovableValueRow( double dInitialValue, string szUnit, string szDeleteText, Color? indexColor = null )
+		public RemovableValueRow( double dInitialValue, decimal minimum, decimal maximum, int nDecimalPlaces,
+			string szUnit, string szDeleteText, Color? indexColor = null )
 		{
 			int nValueLeft = INDEX_WIDTH + ThemeMetrics.CONTROL_GAP;
 			int nUnitLeft = nValueLeft + VALUE_WIDTH + ThemeMetrics.CONTROL_GAP;
@@ -45,17 +49,17 @@ namespace CommonUI.Controls
 			if( indexColor.HasValue ) {
 				m_lblIndex.ForeColor = indexColor.Value;
 			}
-			m_nudValue = new DebouncedNumericUpDown
+			m_numValue = new DebouncedNumericUpDown
 			{
 				Location = new Point( nValueLeft, 0 ),
 				Size = new Size( VALUE_WIDTH, ThemeMetrics.INPUT_HEIGHT ),
-				Minimum = -99999,
-				Maximum = 99999,
-				DecimalPlaces = 1,
+				Minimum = minimum,
+				Maximum = maximum,
+				DecimalPlaces = nDecimalPlaces,
 				Increment = 1,
 				RestrictInvalidCharacters = true
 			};
-			m_nudValue.SilentSetValue = (decimal)dInitialValue;
+			m_numValue.SilentSetValue = (decimal)dInitialValue;
 			m_lblUnit = new ThemedLabel
 			{
 				AutoSize = false,
@@ -72,12 +76,12 @@ namespace CommonUI.Controls
 				TabStop = false
 			};
 			Controls.Add( m_lblIndex );
-			Controls.Add( m_nudValue );
+			Controls.Add( m_numValue );
 			Controls.Add( m_lblUnit );
 			Controls.Add( m_btnDelete );
 
-			m_nudValue.DebouncedValueChanged += OnDebouncedValueChanged;
-			m_nudValue.ValueRejected += OnNudValueRejected;
+			m_numValue.DebouncedValueChanged += OnDebouncedValueChanged;
+			m_numValue.ValueRejected += OnNumValueRejected;
 			m_btnDelete.Click += OnDeleteClick;
 
 			Size = new Size( ROW_WIDTH, ROW_HEIGHT );
@@ -89,9 +93,9 @@ namespace CommonUI.Controls
 
 		public event EventHandler<ValueRejectedEventArgs> ValueRejected;
 
-		public DebouncedNumericUpDown ValueControl => m_nudValue;
+		public DebouncedNumericUpDown ValueControl => m_numValue;
 
-		public double LastValidValue => (double)m_nudValue.Value;
+		public double LastValidValue => (double)m_numValue.Value;
 
 		public bool CanDelete
 		{
@@ -129,7 +133,7 @@ namespace CommonUI.Controls
 			ValueCommitted?.Invoke( this );
 		}
 
-		void OnNudValueRejected( object sender, ValueRejectedEventArgs e )
+		void OnNumValueRejected( object sender, ValueRejectedEventArgs e )
 		{
 			ValueRejected?.Invoke( this, e );
 		}
@@ -145,7 +149,7 @@ namespace CommonUI.Controls
 		const int DELETE_WIDTH = 56;
 
 		readonly Label m_lblIndex;
-		readonly DebouncedNumericUpDown m_nudValue;
+		readonly DebouncedNumericUpDown m_numValue;
 		readonly ThemedLabel m_lblUnit;
 		readonly ThemedButton m_btnDelete;
 	}

@@ -12,6 +12,7 @@ namespace MyCAM.Editor
 		public MicroJointDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_numMicroJointLength.SilentSetValue = (decimal)DEFAULT_LENGTH;
 		}
 

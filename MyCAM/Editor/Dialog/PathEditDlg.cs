@@ -7,6 +7,7 @@ namespace MyCAM.Editor.Dialog
 		public PathEditDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_LanguageManager = new LanguageManager.LanguageManager( "PathEditDlg" );
 			InitRefCoordTypeItems();
 		}

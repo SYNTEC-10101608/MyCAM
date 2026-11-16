@@ -5,14 +5,25 @@ using System.Windows.Forms;
 using CommonUI.Controls;
 using CommonUI.Theme;
 
-namespace CncUI.Controls
+namespace CommonUI.Forms
 {
-	internal sealed class ResponsiveLayout
+	/// <summary>
+	/// Proportional layout of an embedded panel (ui-style.instructions.md, section 6): remembers the designer
+	/// bounds of the children and scales them to the size the main window gives. A titled card keeps its title bar
+	/// height and the title bar controls keep their size at the right edge. Dialogs do not use it.
+	/// </summary>
+	public sealed class ResponsiveLayout
 	{
+		/// <summary>
+		/// Remember the current bounds of the children; the current client size is the design size.
+		/// </summary>
 		public ResponsiveLayout( Control container ) : this( container, container.ClientSize )
 		{
 		}
 
+		/// <summary>
+		/// Remember the current bounds of the children against the given design size.
+		/// </summary>
 		public ResponsiveLayout( Control container, Size designSize )
 		{
 			m_DesignSize = designSize;
@@ -25,11 +36,17 @@ namespace CncUI.Controls
 			}
 		}
 
+		/// <summary>
+		/// Scale the children to the current client size of the container.
+		/// </summary>
 		public void Apply( Control container )
 		{
 			Apply( container, container.ClientSize );
 		}
 
+		/// <summary>
+		/// Scale the children to the given size.
+		/// </summary>
 		public void Apply( Control container, Size layoutSize )
 		{
 			if( m_DesignSize.Width <= 0 || m_DesignSize.Height <= 0 ||

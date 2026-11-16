@@ -19,6 +19,7 @@ namespace MyCAM.Editor
 		public LockMSAxisDlg( RotaryAxisConfig config, FiveAxisType machineType )
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_RotaryAxisConfig = config;
 			m_IsSpindle = machineType == FiveAxisType.Spindle;
 			m_lblMachiningDirHint.Visible = m_IsSpindle;

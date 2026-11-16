@@ -11,6 +11,7 @@ namespace MyCAM.Editor.Dialog
 			m_StandardPatternGeomData = standardPatternGeomData;
 			m_PathType = standardPatternGeomData == null ? PathType.Contour : standardPatternGeomData.PathType;
 			InitializeComponent();
+			ApplyLanguage();
 			m_LanguageManager = new LanguageManager.LanguageManager( "PatternSettingDlg" );
 			InitLocalizedTexts();
 			InitializeControlsValue();

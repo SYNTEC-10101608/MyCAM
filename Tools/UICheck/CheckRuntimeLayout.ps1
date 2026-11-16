@@ -17,6 +17,8 @@ if (-not (Test-Path (Join-Path $binDir "MyCAM.exe"))) {
 	Write-Host "[UICheck] MyCAM.exe not found in $binDir, build first."
 	exit 2
 }
+. (Join-Path $PSScriptRoot "SyncLanguage.ps1")
+Sync-LanguageFiles $Root $binDir
 
 # compile the runner into the output folder, so it finds language files and assemblies like MyCAM.exe
 $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
@@ -24,7 +26,7 @@ $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild 
 	Select-Object -First 1
 $csc = Join-Path (Split-Path $msbuild) "Roslyn\csc.exe"
 $runner = Join-Path $binDir "UICheckRunner.exe"
-$references = @( "System.dll", "System.Core.dll", "System.Drawing.dll", "System.Windows.Forms.dll",
+$references = @( "System.dll", "System.Core.dll", "System.Drawing.dll", "System.Windows.Forms.dll", "System.Xml.dll",
 	(Join-Path $binDir "CommonUI.dll"), (Join-Path $binDir "LanguageManager.dll") ) | ForEach-Object { "/r:$_" }
 & $csc /nologo /target:exe /platform:anycpu /out:$runner @references (Join-Path $PSScriptRoot "LayoutRunner.cs")
 if ($LASTEXITCODE -ne 0) {

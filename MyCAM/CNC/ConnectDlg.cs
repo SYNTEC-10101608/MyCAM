@@ -11,6 +11,7 @@ namespace MyCAM.Editor.Dialog
 		public ConnectDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_txtIP.Text = MyApp.AppSetting.CNCIP;
 		}
 

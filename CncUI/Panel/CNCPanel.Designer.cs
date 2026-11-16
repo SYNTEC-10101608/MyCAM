@@ -460,7 +460,7 @@
 			//
 			this.m_btnStart.Location = new System.Drawing.Point(10, 98);
 			this.m_btnStart.Name = "m_btnStart";
-			this.m_btnStart.Kind = CommonUI.Controls.ButtonKind.Primary;
+			this.m_btnStart.Kind = CommonUI.Controls.ButtonKind.Start;
 			this.m_btnStart.Size = new System.Drawing.Size(123, 38);
 			this.m_btnStart.TabIndex = 4;
 			this.m_btnStart.Text = "開始";
@@ -469,6 +469,7 @@
 			//
 			this.m_btnPause.Location = new System.Drawing.Point(139, 98);
 			this.m_btnPause.Name = "m_btnPause";
+			this.m_btnPause.Kind = CommonUI.Controls.ButtonKind.Hold;
 			this.m_btnPause.Size = new System.Drawing.Size(123, 38);
 			this.m_btnPause.TabIndex = 5;
 			this.m_btnPause.Text = "暫停";
@@ -477,6 +478,7 @@
 			//
 			this.m_btnContinue.Location = new System.Drawing.Point(10, 142);
 			this.m_btnContinue.Name = "m_btnContinue";
+			this.m_btnContinue.Kind = CommonUI.Controls.ButtonKind.Hold;
 			this.m_btnContinue.Size = new System.Drawing.Size(123, 38);
 			this.m_btnContinue.TabIndex = 6;
 			this.m_btnContinue.Text = "繼續";
@@ -485,7 +487,7 @@
 			//
 			this.m_btnStop.Location = new System.Drawing.Point(139, 142);
 			this.m_btnStop.Name = "m_btnStop";
-			this.m_btnStop.Kind = CommonUI.Controls.ButtonKind.Danger;
+			this.m_btnStop.Kind = CommonUI.Controls.ButtonKind.Stop;
 			this.m_btnStop.Size = new System.Drawing.Size(123, 38);
 			this.m_btnStop.TabIndex = 7;
 			this.m_btnStop.Text = "停止";

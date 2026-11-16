@@ -138,22 +138,25 @@ namespace CommonUI.Forms
 
 		protected override void OnLoad( EventArgs e )
 		{
-			bool isDesignTime = DesignMode || LicenseManager.UsageMode == LicenseUsageMode.Designtime;
-
-			// texts first, so Load handlers of derived dialogs can still override runtime texts
-			if( isDesignTime == false ) {
-				ApplyLanguage();
-			}
 			base.OnLoad( e );
 
 			// center after Load handlers, which may change the size
+			bool isDesignTime = DesignMode || LicenseManager.UsageMode == LicenseUsageMode.Designtime;
 			if( isDesignTime == false ) {
 				Location = DialogPlacement.GetCenterLocation( this );
 			}
 		}
 
-		void ApplyLanguage()
+		/// <summary>
+		/// Apply the language texts: the dialog title by the class name, each caption control by its name.
+		/// Every dialog calls it right after InitializeComponent(), the base constructor runs before the controls exist.
+		/// </summary>
+		protected void ApplyLanguage()
 		{
+			bool isDesignTime = DesignMode || LicenseManager.UsageMode == LicenseUsageMode.Designtime;
+			if( isDesignTime ) {
+				return;
+			}
 			LanguageManager.LanguageManager languageManager = new LanguageManager.LanguageManager( LanguageFileName );
 			if( languageManager.HasString( LanguageFileName ) ) {
 				Text = languageManager.GetString( LanguageFileName );

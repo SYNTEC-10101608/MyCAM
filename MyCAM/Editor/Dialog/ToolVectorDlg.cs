@@ -26,6 +26,7 @@ namespace MyCAM.Editor
 		{
 			// struct would not be null
 			InitializeComponent();
+			ApplyLanguage();
 			m_IsPathRevese = isPathReverse;
 			ResetToolVecParam( param );
 

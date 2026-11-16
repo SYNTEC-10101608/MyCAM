@@ -51,3 +51,12 @@ S6 CNCInfoPanel m_btnCoordinates text depends on the coordinate mode, set by Set
 S6 CNCPanel m_btnJog text depends on the jog mode, set by SetJogMode()
 S11 CNCDlg line* the remote screen dialog takes the size of the remote VNC screen and is placed on the CNC area
 S11 VNCUserControl line* the VNC view takes the resolution of the remote screen
+S19 StartupForm m_tsbLayer* layer color swatches are data colors (section 6)
+S19 StartupForm m_tsbNeedProcess machining legend swatch is a data color (section 6)
+S20 DesignSupportBracketDlg X_POSITION_COLOR data color: X support position index and preview
+S20 DesignSupportBracketDlg Y_POSITION_COLOR data color: Y support position index and preview
+S20 CNCInfoPanel X_AXIS_COLOR data color: CNC axis dot
+S20 CNCInfoPanel Y_AXIS_COLOR data color: CNC axis dot
+S20 CNCInfoPanel Z_AXIS_COLOR data color: CNC axis dot
+S20 CNCInfoPanel B_AXIS_COLOR data color: CNC axis dot
+S20 CNCInfoPanel C_AXIS_COLOR data color: CNC axis dot

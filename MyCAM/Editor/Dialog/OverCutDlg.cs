@@ -8,6 +8,7 @@ namespace MyCAM.Editor.Dialog
 		public OverCutDlg( double overCutLength )
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_OverCutLength = overCutLength;
 			m_numOverCutLength.SilentSetValue = (decimal)m_OverCutLength;
 		}

@@ -34,6 +34,7 @@ namespace MyCAM.Editor
 		public ThreePtTransformDlg( TransParam transParam )
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_LanguageManager = new LanguageManager.LanguageManager( "ThreePtTransformDlg" );
 
 			// init cad textbox

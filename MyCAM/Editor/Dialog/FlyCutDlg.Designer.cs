@@ -240,6 +240,7 @@
 			// m_btnRemove
 			//
 			this.m_btnRemove.Location = new System.Drawing.Point(200, 208);
+			this.m_btnRemove.Kind = CommonUI.Controls.ButtonKind.Danger;
 			this.m_btnRemove.Name = "m_btnRemove";
 			this.m_btnRemove.Size = new System.Drawing.Size(80, 28);
 			this.m_btnRemove.TabIndex = 2;
@@ -248,7 +249,6 @@
 			//
 			// m_btnAdd
 			//
-			this.m_btnAdd.Kind = CommonUI.Controls.ButtonKind.Primary;
 			this.m_btnAdd.Location = new System.Drawing.Point(288, 208);
 			this.m_btnAdd.Name = "m_btnAdd";
 			this.m_btnAdd.Size = new System.Drawing.Size(80, 28);

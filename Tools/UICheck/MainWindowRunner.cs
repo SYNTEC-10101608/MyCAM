@@ -16,7 +16,8 @@ namespace UICheck
 	// Landscape / portrait only depends on the main window's aspect ratio, so a portrait window larger than a
 	// landscape screen is checked by sizing the window beyond the screen (the part outside is still rendered).
 	//
-	//   P1  dialog not centered in DialogPlacement's area (whole window in landscape, CAM area in portrait)
+	//   P1  dialog not centered in DialogPlacement's area (whole window in landscape, CAM area in portrait);
+	//       "modal:<name>" opens the dialog with ShowDialog, as the program does for it
 	//   P2  portrait CAM area is not the part above the CNC host
 	//   P3  main window or a control in it does not use the font family of the UI language
 	//   P4  a visible CNC panel at the size the main window gives it fails the T1 / T2 / T4 checks of LayoutRunner
@@ -132,6 +133,9 @@ namespace UICheck
 
 		static int CheckDialog( Form mainForm, string szName, Rectangle area, Graphics graphics )
 		{
+			if( szName.StartsWith( MODAL_PREFIX, StringComparison.Ordinal ) ) {
+				return CheckModalDialog( mainForm, szName.Substring( MODAL_PREFIX.Length ), area );
+			}
 			Type type = FindType( szName );
 			if( type == null ) {
 				Console.WriteLine( "FAIL  {0}: type not found", szName );
@@ -183,6 +187,52 @@ namespace UICheck
 				}
 			}
 		}
+
+		// P1 for a dialog the program opens with ShowDialog: the location is read when it is shown, then it is closed
+		static int CheckModalDialog( Form mainForm, string szName, Rectangle area )
+		{
+			Type type = FindType( szName );
+			if( type == null ) {
+				Console.WriteLine( "FAIL  {0}: type not found", szName );
+				return 1;
+			}
+			Form dialog = null;
+			try {
+				dialog = (Form)LayoutRunner.CreateInstance( type );
+				Point shownLocation = Point.Empty;
+				Form shownDialog = dialog;
+				shownDialog.Shown += ( sender, e ) =>
+				{
+					shownLocation = shownDialog.Location;
+					shownDialog.BeginInvoke( new Action( shownDialog.Close ) );
+				};
+				dialog.ShowDialog( mainForm );
+				Point expected = new Point( area.Left + ( area.Width - dialog.Width ) / 2,
+					area.Top + ( area.Height - dialog.Height ) / 2 );
+				Rectangle workingArea = Screen.FromControl( mainForm ).WorkingArea;
+				bool isInsideScreen = workingArea.Contains( new Rectangle( expected, dialog.Size ) );
+				if( isInsideScreen && shownLocation != expected ) {
+					Console.WriteLine( "FAIL  P1 {0} (ShowDialog) at {1}, expected {2}", szName, shownLocation, expected );
+					return 1;
+				}
+				Console.WriteLine( "OK    {0} (ShowDialog) at {1}{2}", szName, shownLocation,
+					isInsideScreen ? "" : " (expected " + expected + " is outside the screen)" );
+				return 0;
+			}
+			catch( Exception ex ) {
+				Exception inner = ex is TargetInvocationException && ex.InnerException != null ? ex.InnerException : ex;
+				Console.WriteLine( "FAIL  {0} cannot be opened: {1} {2}", szName, inner.GetType().Name,
+					inner.Message.Split( '\n' )[ 0 ].Trim() );
+				return 1;
+			}
+			finally {
+				if( dialog != null && !dialog.IsDisposed ) {
+					dialog.Dispose();
+				}
+			}
+		}
+
+		const string MODAL_PREFIX = "modal:";
 
 		// P3: every control of the main window uses the family of the UI language (the value font is Consolas)
 		static int CheckFontFamily( Form mainForm )

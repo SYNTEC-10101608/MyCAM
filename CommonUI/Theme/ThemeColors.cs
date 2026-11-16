@@ -38,5 +38,13 @@ namespace CommonUI.Theme
 		public static readonly Color ERROR = ColorTranslator.FromHtml( "#C42B1C" );
 		public static readonly Color WARNING = ColorTranslator.FromHtml( "#A86200" );
 		public static readonly Color SUCCESS = ColorTranslator.FromHtml( "#107C41" );
+
+		// hover / pressed of the filled CNC machining buttons (ButtonKind.Start / Hold / Stop)
+		public static readonly Color SUCCESS_HOVER = ColorTranslator.FromHtml( "#0E6C39" );
+		public static readonly Color SUCCESS_PRESSED = ColorTranslator.FromHtml( "#0C5C30" );
+		public static readonly Color WARNING_HOVER = ColorTranslator.FromHtml( "#925500" );
+		public static readonly Color WARNING_PRESSED = ColorTranslator.FromHtml( "#7C4900" );
+		public static readonly Color ERROR_HOVER = ColorTranslator.FromHtml( "#AA2518" );
+		public static readonly Color ERROR_PRESSED = ColorTranslator.FromHtml( "#912015" );
 	}
 }

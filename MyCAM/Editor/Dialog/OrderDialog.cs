@@ -20,6 +20,7 @@ namespace MyCAM.Editor
 		public OrderDialog()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			InitializeDialog();
 		}
 

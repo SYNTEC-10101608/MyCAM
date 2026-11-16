@@ -23,6 +23,7 @@ namespace MyCAM.Editor.Dialog
 		public DesignSupportBracketDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_LanguageManager = new LanguageManager.LanguageManager( "DesignSupportBracketDlg" );
 			LoadImages();
 			RegisterDebouncedHandlers();
@@ -276,7 +277,8 @@ namespace MyCAM.Editor.Dialog
 			System.Drawing.Color? labelColor = null )
 		{
 			string deleteText = m_LanguageManager.TryGetString( "m_btnDeletePosition", DefaultDeletePosition );
-			var row = new RemovableValueRow( defaultValue, POSITION_UNIT, deleteText, labelColor );
+			var row = new RemovableValueRow( defaultValue, POSITION_MINIMUM, POSITION_MAXIMUM, POSITION_DECIMAL_PLACES,
+				POSITION_UNIT, deleteText, labelColor );
 			row.DeleteRequested += OnPositionRowDeleteRequested;
 			row.ValueCommitted += OnPositionRowValueCommitted;
 			row.ValueRejected += OnPositionRowValueRejected;
@@ -380,6 +382,9 @@ namespace MyCAM.Editor.Dialog
 		List<RemovableValueRow> m_YRows = new List<RemovableValueRow>();
 
 		const string POSITION_UNIT = "mm";
+		const decimal POSITION_MINIMUM = -99999;
+		const decimal POSITION_MAXIMUM = 99999;
+		const int POSITION_DECIMAL_PLACES = 1;
 
 		// data colors that tell the X / Y position lists apart
 		static readonly System.Drawing.Color X_POSITION_COLOR = System.Drawing.Color.DarkGreen;

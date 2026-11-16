@@ -8,6 +8,7 @@ namespace MyCAM.Editor
 		public EntryAndExitDlg( EntryAndExitData data )
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			InitializeControlAndFieldValue( data );
 		}
 
