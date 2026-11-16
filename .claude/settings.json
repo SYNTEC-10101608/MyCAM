@@ -11,8 +11,7 @@
       "Bash(git rev-parse *)",
       "Bash(git check-ignore *)",
       "Bash(git check-attr *)",
-      "Bash(cmd /c Build.bat *)",
-      "Bash(cmd //c Build.bat *)",
+      "Bash(./Build.bat)",
       "Bash(./Build.bat *)",
       "Bash(dotnet format *)",
       "PowerShell(git status *)",
@@ -25,8 +24,9 @@
       "PowerShell(git rev-parse *)",
       "PowerShell(git check-ignore *)",
       "PowerShell(git check-attr *)",
+      "PowerShell(.\\Build.bat)",
       "PowerShell(.\\Build.bat *)",
-      "PowerShell(cmd /c Build.bat *)",
+      "PowerShell(cmd /c .\\Build.bat *)",
       "PowerShell(dotnet format *)"
     ]
   }

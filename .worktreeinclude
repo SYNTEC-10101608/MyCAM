@@ -1,0 +1,16 @@
+# Claude Code 建立 worktree 時，一併從主 checkout 複製的未追蹤檔案（gitignore 語法）
+# 沒有列在這裡的未追蹤檔案，新 worktree 不會有；不存在的檔案會略過
+
+# 個人 Claude 設定（只在 worktree 根目錄讀取，必須複製）
+# CLAUDE.local.md 不列入：worktree 位於 repo 底下，會從主 checkout 往上層載入，複製反而重複
+.claude/settings.local.json
+
+# 無法便宜重建的原生 DLL
+MyCAM/bin/Debug/FCLTool.dll
+MyCAM/bin/Release/FCLTool.dll
+MyCAM/bin/Debug/PostTool.dll
+MyCAM/bin/Release/PostTool.dll
+
+# 可客製的執行期設定（機構參數、STL、後處理、AppSetting）
+MyCAM/bin/Debug/Custom/**
+MyCAM/bin/Release/Custom/**
