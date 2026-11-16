@@ -45,23 +45,24 @@
 			this.m_btnZDir = new CommonUI.Controls.ThemedButton();
 			this.m_btnKeep = new CommonUI.Controls.ThemedButton();
 			this.m_btnRevert = new CommonUI.Controls.ThemedButton();
-			this.m_lblStartEnd = new System.Windows.Forms.Label();
-			this.m_btnSwitchStartEnd = new CommonUI.Controls.ThemedButton();
-			this.m_lblStartOrEnd = new System.Windows.Forms.Label();
 			this.m_secSetting = new CommonUI.Controls.SectionPanel();
 			this.m_btnAdd = new CommonUI.Controls.ThemedButton();
 			this.m_btnRemove = new CommonUI.Controls.ThemedButton();
 			this.m_btnClear = new CommonUI.Controls.ThemedButton();
-			this.m_gpbStartPnt = new CommonUI.Controls.SectionPanel();
+			this.m_secMovePnt = new CommonUI.Controls.SectionPanel();
+			this.m_lblStartPnt = new System.Windows.Forms.Label();
 			this.m_btnToStart = new CommonUI.Controls.ThemedButton();
 			this.m_btnToEnd = new CommonUI.Controls.ThemedButton();
-			this.m_gpbPnt = new CommonUI.Controls.SectionPanel();
+			this.m_pnlStartEndSwitch = new System.Windows.Forms.Panel();
+			this.m_lblStartEnd = new System.Windows.Forms.Label();
+			this.m_btnSwitchStartEnd = new CommonUI.Controls.ThemedButton();
+			this.m_lblStartOrEnd = new System.Windows.Forms.Label();
+			this.m_lblPnt = new System.Windows.Forms.Label();
 			this.m_btnPrev = new CommonUI.Controls.ThemedButton();
 			this.m_btnNext = new CommonUI.Controls.ThemedButton();
-			this.m_gpbCtrlPnt = new CommonUI.Controls.SectionPanel();
+			this.m_lblCtrlPnt = new System.Windows.Forms.Label();
 			this.m_btnPreCtrlPnt = new CommonUI.Controls.ThemedButton();
 			this.m_btnNextCtrlPnt = new CommonUI.Controls.ThemedButton();
-			this.m_gbxColorLegend = new CommonUI.Controls.SectionPanel();
 			this.m_pnlColorNormal = new System.Windows.Forms.Panel();
 			this.m_lblLegendNormal = new System.Windows.Forms.Label();
 			this.m_pnlColorRotary = new System.Windows.Forms.Panel();
@@ -76,10 +77,8 @@
 			this.m_secToolVecInfo.SuspendLayout();
 			this.m_secQuickSet.SuspendLayout();
 			this.m_secSetting.SuspendLayout();
-			this.m_gpbStartPnt.SuspendLayout();
-			this.m_gpbPnt.SuspendLayout();
-			this.m_gpbCtrlPnt.SuspendLayout();
-			this.m_gbxColorLegend.SuspendLayout();
+			this.m_secMovePnt.SuspendLayout();
+			this.m_pnlStartEndSwitch.SuspendLayout();
 			this.m_pnlColorNormal.SuspendLayout();
 			this.m_pnlColorRotary.SuspendLayout();
 			this.m_pnlColorBevel.SuspendLayout();
@@ -98,7 +97,7 @@
 			this.m_gbxIndexParam.Controls.Add(this.m_secSetting);
 			this.m_gbxIndexParam.Location = new System.Drawing.Point(12, 12);
 			this.m_gbxIndexParam.Name = "m_gbxIndexParam";
-			this.m_gbxIndexParam.Size = new System.Drawing.Size(452, 343);
+			this.m_gbxIndexParam.Size = new System.Drawing.Size(452, 373);
 			this.m_gbxIndexParam.TabIndex = 0;
 			// 
 			// m_secToolVecInfo
@@ -115,9 +114,19 @@
 			this.m_secToolVecInfo.Controls.Add(this.m_btnRotaryNeg);
 			this.m_secToolVecInfo.Controls.Add(this.m_lblInterpolateType);
 			this.m_secToolVecInfo.Controls.Add(this.m_cbxInterpolateType);
+			this.m_secToolVecInfo.Controls.Add(this.m_pnlColorNormal);
+			this.m_secToolVecInfo.Controls.Add(this.m_lblLegendNormal);
+			this.m_secToolVecInfo.Controls.Add(this.m_pnlColorRotary);
+			this.m_secToolVecInfo.Controls.Add(this.m_lblLegendRotary);
+			this.m_secToolVecInfo.Controls.Add(this.m_pnlColorBevel);
+			this.m_secToolVecInfo.Controls.Add(this.m_lblLegendBevel);
+			this.m_secToolVecInfo.Controls.Add(this.m_pnlColorMaster);
+			this.m_secToolVecInfo.Controls.Add(this.m_lblLegendMaster);
+			this.m_secToolVecInfo.Controls.Add(this.m_pnlColorSlave);
+			this.m_secToolVecInfo.Controls.Add(this.m_lblLegendSlave);
 			this.m_secToolVecInfo.Location = new System.Drawing.Point(0, 0);
 			this.m_secToolVecInfo.Name = "m_secToolVecInfo";
-			this.m_secToolVecInfo.Size = new System.Drawing.Size(452, 159);
+			this.m_secToolVecInfo.Size = new System.Drawing.Size(452, 219);
 			this.m_secToolVecInfo.TabIndex = 0;
 			this.m_secToolVecInfo.Text = "單點姿態資訊";
 			// 
@@ -250,12 +259,9 @@
 			this.m_secQuickSet.Controls.Add(this.m_btnZDir);
 			this.m_secQuickSet.Controls.Add(this.m_btnKeep);
 			this.m_secQuickSet.Controls.Add(this.m_btnRevert);
-			this.m_secQuickSet.Controls.Add(this.m_lblStartEnd);
-			this.m_secQuickSet.Controls.Add(this.m_btnSwitchStartEnd);
-			this.m_secQuickSet.Controls.Add(this.m_lblStartOrEnd);
-			this.m_secQuickSet.Location = new System.Drawing.Point(0, 167);
+			this.m_secQuickSet.Location = new System.Drawing.Point(0, 227);
 			this.m_secQuickSet.Name = "m_secQuickSet";
-			this.m_secQuickSet.Size = new System.Drawing.Size(452, 99);
+			this.m_secQuickSet.Size = new System.Drawing.Size(452, 69);
 			this.m_secQuickSet.TabIndex = 1;
 			this.m_secQuickSet.Text = "姿態方向快捷鍵";
 			// 
@@ -285,40 +291,13 @@
 			this.m_btnRevert.TabIndex = 2;
 			this.m_btnRevert.Text = "原始";
 			this.m_btnRevert.Click += new System.EventHandler(this.m_btnRevert_Click);
-			// 
-			// m_lblStartEnd
-			// 
-			this.m_lblStartEnd.AutoSize = true;
-			this.m_lblStartEnd.Location = new System.Drawing.Point(10, 70);
-			this.m_lblStartEnd.Name = "m_lblStartEnd";
-			this.m_lblStartEnd.Size = new System.Drawing.Size(67, 16);
-			this.m_lblStartEnd.TabIndex = 3;
-			this.m_lblStartEnd.Text = "起終點切換";
-			// 
-			// m_btnSwitchStartEnd
-			// 
-			this.m_btnSwitchStartEnd.Location = new System.Drawing.Point(100, 66);
-			this.m_btnSwitchStartEnd.Name = "m_btnSwitchStartEnd";
-			this.m_btnSwitchStartEnd.Size = new System.Drawing.Size(80, 23);
-			this.m_btnSwitchStartEnd.TabIndex = 4;
-			this.m_btnSwitchStartEnd.Text = "起/終";
-			this.m_btnSwitchStartEnd.Click += new System.EventHandler(this.m_btnSwitchStartEnd_Click);
-			// 
-			// m_lblStartOrEnd
-			// 
-			this.m_lblStartOrEnd.AutoSize = true;
-			this.m_lblStartOrEnd.Location = new System.Drawing.Point(190, 70);
-			this.m_lblStartOrEnd.Name = "m_lblStartOrEnd";
-			this.m_lblStartOrEnd.Size = new System.Drawing.Size(67, 16);
-			this.m_lblStartOrEnd.TabIndex = 5;
-			this.m_lblStartOrEnd.Text = "當前位置：";
-			// 
+			//
 			// m_secSetting
-			// 
+			//
 			this.m_secSetting.Controls.Add(this.m_btnAdd);
 			this.m_secSetting.Controls.Add(this.m_btnRemove);
 			this.m_secSetting.Controls.Add(this.m_btnClear);
-			this.m_secSetting.Location = new System.Drawing.Point(0, 274);
+			this.m_secSetting.Location = new System.Drawing.Point(0, 304);
 			this.m_secSetting.Name = "m_secSetting";
 			this.m_secSetting.Size = new System.Drawing.Size(452, 69);
 			this.m_secSetting.TabIndex = 2;
@@ -352,217 +331,246 @@
 			this.m_btnClear.TabIndex = 2;
 			this.m_btnClear.Text = "清除所有控制點";
 			this.m_btnClear.Click += new System.EventHandler(this.m_btnClear_Click);
-			// 
-			// m_gpbStartPnt
-			// 
-			this.m_gpbStartPnt.Controls.Add(this.m_btnToStart);
-			this.m_gpbStartPnt.Controls.Add(this.m_btnToEnd);
-			this.m_gpbStartPnt.Location = new System.Drawing.Point(12, 363);
-			this.m_gpbStartPnt.Name = "m_gpbStartPnt";
-			this.m_gpbStartPnt.Size = new System.Drawing.Size(452, 69);
-			this.m_gpbStartPnt.TabIndex = 1;
-			this.m_gpbStartPnt.Text = "起終點轉換";
-			// 
+			//
+			// m_secMovePnt
+			//
+			this.m_secMovePnt.Controls.Add(this.m_lblStartPnt);
+			this.m_secMovePnt.Controls.Add(this.m_btnToStart);
+			this.m_secMovePnt.Controls.Add(this.m_btnToEnd);
+			this.m_secMovePnt.Controls.Add(this.m_pnlStartEndSwitch);
+			this.m_secMovePnt.Controls.Add(this.m_lblPnt);
+			this.m_secMovePnt.Controls.Add(this.m_btnPrev);
+			this.m_secMovePnt.Controls.Add(this.m_btnNext);
+			this.m_secMovePnt.Controls.Add(this.m_lblCtrlPnt);
+			this.m_secMovePnt.Controls.Add(this.m_btnPreCtrlPnt);
+			this.m_secMovePnt.Controls.Add(this.m_btnNextCtrlPnt);
+			this.m_secMovePnt.Location = new System.Drawing.Point(12, 393);
+			this.m_secMovePnt.Name = "m_secMovePnt";
+			this.m_secMovePnt.Size = new System.Drawing.Size(452, 159);
+			this.m_secMovePnt.TabIndex = 1;
+			this.m_secMovePnt.Text = "控制點移動";
+			//
+			// m_lblStartPnt
+			//
+			this.m_lblStartPnt.AutoSize = true;
+			this.m_lblStartPnt.Location = new System.Drawing.Point(10, 40);
+			this.m_lblStartPnt.Name = "m_lblStartPnt";
+			this.m_lblStartPnt.Size = new System.Drawing.Size(67, 16);
+			this.m_lblStartPnt.TabIndex = 0;
+			this.m_lblStartPnt.Text = "起終點轉換";
+			//
 			// m_btnToStart
-			// 
-			this.m_btnToStart.Location = new System.Drawing.Point(10, 36);
+			//
+			this.m_btnToStart.Location = new System.Drawing.Point(100, 36);
 			this.m_btnToStart.Name = "m_btnToStart";
 			this.m_btnToStart.Size = new System.Drawing.Size(100, 23);
-			this.m_btnToStart.TabIndex = 0;
+			this.m_btnToStart.TabIndex = 1;
 			this.m_btnToStart.Text = "至起點";
 			this.m_btnToStart.Click += new System.EventHandler(this.m_btnToStart_Click);
-			// 
+			//
 			// m_btnToEnd
-			// 
-			this.m_btnToEnd.Location = new System.Drawing.Point(118, 36);
+			//
+			this.m_btnToEnd.Location = new System.Drawing.Point(208, 36);
 			this.m_btnToEnd.Name = "m_btnToEnd";
 			this.m_btnToEnd.Size = new System.Drawing.Size(100, 23);
-			this.m_btnToEnd.TabIndex = 1;
+			this.m_btnToEnd.TabIndex = 2;
 			this.m_btnToEnd.Text = "至終點";
 			this.m_btnToEnd.Click += new System.EventHandler(this.m_btnToEnd_Click);
-			// 
-			// m_gpbPnt
-			// 
-			this.m_gpbPnt.Controls.Add(this.m_btnPrev);
-			this.m_gpbPnt.Controls.Add(this.m_btnNext);
-			this.m_gpbPnt.Location = new System.Drawing.Point(12, 440);
-			this.m_gpbPnt.Name = "m_gpbPnt";
-			this.m_gpbPnt.Size = new System.Drawing.Size(452, 69);
-			this.m_gpbPnt.TabIndex = 2;
-			this.m_gpbPnt.Text = "前後點轉換";
-			// 
+			//
+			// m_pnlStartEndSwitch
+			//
+			this.m_pnlStartEndSwitch.Controls.Add(this.m_lblStartEnd);
+			this.m_pnlStartEndSwitch.Controls.Add(this.m_btnSwitchStartEnd);
+			this.m_pnlStartEndSwitch.Controls.Add(this.m_lblStartOrEnd);
+			this.m_pnlStartEndSwitch.Location = new System.Drawing.Point(10, 66);
+			this.m_pnlStartEndSwitch.Name = "m_pnlStartEndSwitch";
+			this.m_pnlStartEndSwitch.Size = new System.Drawing.Size(432, 23);
+			this.m_pnlStartEndSwitch.TabIndex = 3;
+			//
+			// m_lblStartEnd
+			//
+			this.m_lblStartEnd.AutoSize = true;
+			this.m_lblStartEnd.Location = new System.Drawing.Point(0, 4);
+			this.m_lblStartEnd.Name = "m_lblStartEnd";
+			this.m_lblStartEnd.Size = new System.Drawing.Size(67, 16);
+			this.m_lblStartEnd.TabIndex = 0;
+			this.m_lblStartEnd.Text = "起終點切換";
+			//
+			// m_btnSwitchStartEnd
+			//
+			this.m_btnSwitchStartEnd.Location = new System.Drawing.Point(90, 0);
+			this.m_btnSwitchStartEnd.Name = "m_btnSwitchStartEnd";
+			this.m_btnSwitchStartEnd.Size = new System.Drawing.Size(100, 23);
+			this.m_btnSwitchStartEnd.TabIndex = 1;
+			this.m_btnSwitchStartEnd.Text = "起/終";
+			this.m_btnSwitchStartEnd.Click += new System.EventHandler(this.m_btnSwitchStartEnd_Click);
+			//
+			// m_lblStartOrEnd
+			//
+			this.m_lblStartOrEnd.AutoSize = true;
+			this.m_lblStartOrEnd.Location = new System.Drawing.Point(198, 4);
+			this.m_lblStartOrEnd.Name = "m_lblStartOrEnd";
+			this.m_lblStartOrEnd.Size = new System.Drawing.Size(67, 16);
+			this.m_lblStartOrEnd.TabIndex = 2;
+			this.m_lblStartOrEnd.Text = "當前位置：";
+			//
+			// m_lblPnt
+			//
+			this.m_lblPnt.AutoSize = true;
+			this.m_lblPnt.Location = new System.Drawing.Point(10, 100);
+			this.m_lblPnt.Name = "m_lblPnt";
+			this.m_lblPnt.Size = new System.Drawing.Size(67, 16);
+			this.m_lblPnt.TabIndex = 4;
+			this.m_lblPnt.Text = "前後點轉換";
+			//
 			// m_btnPrev
-			// 
-			this.m_btnPrev.Location = new System.Drawing.Point(10, 36);
+			//
+			this.m_btnPrev.Location = new System.Drawing.Point(100, 96);
 			this.m_btnPrev.Name = "m_btnPrev";
 			this.m_btnPrev.Size = new System.Drawing.Size(100, 23);
-			this.m_btnPrev.TabIndex = 0;
+			this.m_btnPrev.TabIndex = 5;
 			this.m_btnPrev.Text = "前一點";
 			this.m_btnPrev.MouseDown += new System.Windows.Forms.MouseEventHandler(this.m_btnPrev_MouseDown);
 			this.m_btnPrev.MouseUp += new System.Windows.Forms.MouseEventHandler(this.m_btnPrev_MouseUp);
 			// 
 			// m_btnNext
 			// 
-			this.m_btnNext.Location = new System.Drawing.Point(118, 36);
+			this.m_btnNext.Location = new System.Drawing.Point(208, 96);
 			this.m_btnNext.Name = "m_btnNext";
 			this.m_btnNext.Size = new System.Drawing.Size(100, 23);
-			this.m_btnNext.TabIndex = 1;
+			this.m_btnNext.TabIndex = 6;
 			this.m_btnNext.Text = "後一點";
 			this.m_btnNext.MouseDown += new System.Windows.Forms.MouseEventHandler(this.m_btnNext_MouseDown);
 			this.m_btnNext.MouseUp += new System.Windows.Forms.MouseEventHandler(this.m_btnNext_MouseUp);
-			// 
-			// m_gpbCtrlPnt
-			// 
-			this.m_gpbCtrlPnt.Controls.Add(this.m_btnPreCtrlPnt);
-			this.m_gpbCtrlPnt.Controls.Add(this.m_btnNextCtrlPnt);
-			this.m_gpbCtrlPnt.Location = new System.Drawing.Point(12, 517);
-			this.m_gpbCtrlPnt.Name = "m_gpbCtrlPnt";
-			this.m_gpbCtrlPnt.Size = new System.Drawing.Size(452, 69);
-			this.m_gpbCtrlPnt.TabIndex = 3;
-			this.m_gpbCtrlPnt.Text = "控制點轉換";
-			// 
+			//
+			// m_lblCtrlPnt
+			//
+			this.m_lblCtrlPnt.AutoSize = true;
+			this.m_lblCtrlPnt.Location = new System.Drawing.Point(10, 130);
+			this.m_lblCtrlPnt.Name = "m_lblCtrlPnt";
+			this.m_lblCtrlPnt.Size = new System.Drawing.Size(67, 16);
+			this.m_lblCtrlPnt.TabIndex = 7;
+			this.m_lblCtrlPnt.Text = "控制點轉換";
+			//
 			// m_btnPreCtrlPnt
-			// 
-			this.m_btnPreCtrlPnt.Location = new System.Drawing.Point(10, 36);
+			//
+			this.m_btnPreCtrlPnt.Location = new System.Drawing.Point(100, 126);
 			this.m_btnPreCtrlPnt.Name = "m_btnPreCtrlPnt";
 			this.m_btnPreCtrlPnt.Size = new System.Drawing.Size(100, 23);
-			this.m_btnPreCtrlPnt.TabIndex = 0;
+			this.m_btnPreCtrlPnt.TabIndex = 8;
 			this.m_btnPreCtrlPnt.Text = "前控制點";
 			this.m_btnPreCtrlPnt.Click += new System.EventHandler(this.m_btnPreCtrlPnt_Click);
 			// 
 			// m_btnNextCtrlPnt
 			// 
-			this.m_btnNextCtrlPnt.Location = new System.Drawing.Point(118, 36);
+			this.m_btnNextCtrlPnt.Location = new System.Drawing.Point(208, 126);
 			this.m_btnNextCtrlPnt.Name = "m_btnNextCtrlPnt";
 			this.m_btnNextCtrlPnt.Size = new System.Drawing.Size(100, 23);
-			this.m_btnNextCtrlPnt.TabIndex = 1;
+			this.m_btnNextCtrlPnt.TabIndex = 9;
 			this.m_btnNextCtrlPnt.Text = "後控制點";
 			this.m_btnNextCtrlPnt.Click += new System.EventHandler(this.m_btnNextCtrlPnt_Click);
-			// 
-			// m_gbxColorLegend
-			// 
-			this.m_gbxColorLegend.Controls.Add(this.m_pnlColorNormal);
-			this.m_gbxColorLegend.Controls.Add(this.m_lblLegendNormal);
-			this.m_gbxColorLegend.Controls.Add(this.m_pnlColorRotary);
-			this.m_gbxColorLegend.Controls.Add(this.m_lblLegendRotary);
-			this.m_gbxColorLegend.Controls.Add(this.m_pnlColorBevel);
-			this.m_gbxColorLegend.Controls.Add(this.m_lblLegendBevel);
-			this.m_gbxColorLegend.Controls.Add(this.m_pnlColorMaster);
-			this.m_gbxColorLegend.Controls.Add(this.m_lblLegendMaster);
-			this.m_gbxColorLegend.Controls.Add(this.m_pnlColorSlave);
-			this.m_gbxColorLegend.Controls.Add(this.m_lblLegendSlave);
-			this.m_gbxColorLegend.Location = new System.Drawing.Point(12, 594);
-			this.m_gbxColorLegend.Name = "m_gbxColorLegend";
-			this.m_gbxColorLegend.Size = new System.Drawing.Size(452, 99);
-			this.m_gbxColorLegend.TabIndex = 4;
-			this.m_gbxColorLegend.Text = "插值方案";
-			// 
+			//
 			// m_pnlColorNormal
-			// 
+			//
 			this.m_pnlColorNormal.BackColor = System.Drawing.Color.Blue;
-			this.m_pnlColorNormal.Location = new System.Drawing.Point(10, 39);
+			this.m_pnlColorNormal.Location = new System.Drawing.Point(100, 159);
 			this.m_pnlColorNormal.Name = "m_pnlColorNormal";
 			this.m_pnlColorNormal.Size = new System.Drawing.Size(16, 16);
-			this.m_pnlColorNormal.TabIndex = 0;
-			// 
+			this.m_pnlColorNormal.TabIndex = 12;
+			//
 			// m_lblLegendNormal
-			// 
+			//
 			this.m_lblLegendNormal.AutoSize = true;
-			this.m_lblLegendNormal.Location = new System.Drawing.Point(32, 40);
+			this.m_lblLegendNormal.Location = new System.Drawing.Point(122, 160);
 			this.m_lblLegendNormal.Name = "m_lblLegendNormal";
 			this.m_lblLegendNormal.Size = new System.Drawing.Size(31, 16);
-			this.m_lblLegendNormal.TabIndex = 1;
+			this.m_lblLegendNormal.TabIndex = 13;
 			this.m_lblLegendNormal.Text = "維持";
-			// 
+			//
 			// m_pnlColorRotary
-			// 
+			//
 			this.m_pnlColorRotary.BackColor = System.Drawing.Color.Orange;
-			this.m_pnlColorRotary.Location = new System.Drawing.Point(160, 39);
+			this.m_pnlColorRotary.Location = new System.Drawing.Point(214, 159);
 			this.m_pnlColorRotary.Name = "m_pnlColorRotary";
 			this.m_pnlColorRotary.Size = new System.Drawing.Size(16, 16);
-			this.m_pnlColorRotary.TabIndex = 2;
-			// 
+			this.m_pnlColorRotary.TabIndex = 14;
+			//
 			// m_lblLegendRotary
-			// 
+			//
 			this.m_lblLegendRotary.AutoSize = true;
-			this.m_lblLegendRotary.Location = new System.Drawing.Point(182, 40);
+			this.m_lblLegendRotary.Location = new System.Drawing.Point(236, 160);
 			this.m_lblLegendRotary.Name = "m_lblLegendRotary";
 			this.m_lblLegendRotary.Size = new System.Drawing.Size(79, 16);
-			this.m_lblLegendRotary.TabIndex = 3;
+			this.m_lblLegendRotary.TabIndex = 15;
 			this.m_lblLegendRotary.Text = "旋轉軸平滑";
-			// 
+			//
 			// m_pnlColorBevel
-			// 
+			//
 			this.m_pnlColorBevel.BackColor = System.Drawing.Color.Cyan;
-			this.m_pnlColorBevel.Location = new System.Drawing.Point(310, 39);
+			this.m_pnlColorBevel.Location = new System.Drawing.Point(328, 159);
 			this.m_pnlColorBevel.Name = "m_pnlColorBevel";
 			this.m_pnlColorBevel.Size = new System.Drawing.Size(16, 16);
-			this.m_pnlColorBevel.TabIndex = 4;
-			// 
+			this.m_pnlColorBevel.TabIndex = 16;
+			//
 			// m_lblLegendBevel
-			// 
+			//
 			this.m_lblLegendBevel.AutoSize = true;
-			this.m_lblLegendBevel.Location = new System.Drawing.Point(332, 40);
+			this.m_lblLegendBevel.Location = new System.Drawing.Point(350, 160);
 			this.m_lblLegendBevel.Name = "m_lblLegendBevel";
 			this.m_lblLegendBevel.Size = new System.Drawing.Size(79, 16);
-			this.m_lblLegendBevel.TabIndex = 5;
+			this.m_lblLegendBevel.TabIndex = 17;
 			this.m_lblLegendBevel.Text = "傾角切坡口";
-			// 
+			//
 			// m_pnlColorMaster
-			// 
+			//
 			this.m_pnlColorMaster.BackColor = System.Drawing.Color.Magenta;
-			this.m_pnlColorMaster.Location = new System.Drawing.Point(10, 69);
+			this.m_pnlColorMaster.Location = new System.Drawing.Point(100, 189);
 			this.m_pnlColorMaster.Name = "m_pnlColorMaster";
 			this.m_pnlColorMaster.Size = new System.Drawing.Size(16, 16);
-			this.m_pnlColorMaster.TabIndex = 6;
-			// 
+			this.m_pnlColorMaster.TabIndex = 18;
+			//
 			// m_lblLegendMaster
-			// 
+			//
 			this.m_lblLegendMaster.AutoSize = true;
-			this.m_lblLegendMaster.Location = new System.Drawing.Point(32, 70);
+			this.m_lblLegendMaster.Location = new System.Drawing.Point(122, 190);
 			this.m_lblLegendMaster.Name = "m_lblLegendMaster";
 			this.m_lblLegendMaster.Size = new System.Drawing.Size(31, 16);
-			this.m_lblLegendMaster.TabIndex = 7;
+			this.m_lblLegendMaster.TabIndex = 19;
 			this.m_lblLegendMaster.Text = "主軸";
-			// 
+			//
 			// m_pnlColorSlave
-			// 
+			//
 			this.m_pnlColorSlave.BackColor = System.Drawing.Color.Yellow;
-			this.m_pnlColorSlave.Location = new System.Drawing.Point(160, 69);
+			this.m_pnlColorSlave.Location = new System.Drawing.Point(214, 189);
 			this.m_pnlColorSlave.Name = "m_pnlColorSlave";
 			this.m_pnlColorSlave.Size = new System.Drawing.Size(16, 16);
-			this.m_pnlColorSlave.TabIndex = 8;
-			// 
+			this.m_pnlColorSlave.TabIndex = 20;
+			//
 			// m_lblLegendSlave
-			// 
+			//
 			this.m_lblLegendSlave.AutoSize = true;
-			this.m_lblLegendSlave.Location = new System.Drawing.Point(182, 70);
+			this.m_lblLegendSlave.Location = new System.Drawing.Point(236, 190);
 			this.m_lblLegendSlave.Name = "m_lblLegendSlave";
 			this.m_lblLegendSlave.Size = new System.Drawing.Size(31, 16);
-			this.m_lblLegendSlave.TabIndex = 9;
+			this.m_lblLegendSlave.TabIndex = 21;
 			this.m_lblLegendSlave.Text = "從軸";
-			// 
+			//
 			// ToolVectorDlg
-			// 
-			this.ClientSize = new System.Drawing.Size(476, 705);
+			//
+			this.ClientSize = new System.Drawing.Size(476, 564);
 			this.Controls.Add(this.m_gbxIndexParam);
-			this.Controls.Add(this.m_gpbStartPnt);
-			this.Controls.Add(this.m_gpbPnt);
-			this.Controls.Add(this.m_gpbCtrlPnt);
-			this.Controls.Add(this.m_gbxColorLegend);
+			this.Controls.Add(this.m_secMovePnt);
 			this.Name = "ToolVectorDlg";
 			this.Text = "飛邊姿態";
 			this.m_gbxIndexParam.ResumeLayout(false);
 			this.m_secToolVecInfo.ResumeLayout(false);
 			this.m_secToolVecInfo.PerformLayout();
 			this.m_secQuickSet.ResumeLayout(false);
-			this.m_secQuickSet.PerformLayout();
 			this.m_secSetting.ResumeLayout(false);
-			this.m_gpbStartPnt.ResumeLayout(false);
-			this.m_gpbPnt.ResumeLayout(false);
-			this.m_gpbCtrlPnt.ResumeLayout(false);
-			this.m_gbxColorLegend.ResumeLayout(false);
-			this.m_gbxColorLegend.PerformLayout();
+			this.m_secMovePnt.ResumeLayout(false);
+			this.m_secMovePnt.PerformLayout();
+			this.m_pnlStartEndSwitch.ResumeLayout(false);
+			this.m_pnlStartEndSwitch.PerformLayout();
 			this.m_pnlColorNormal.ResumeLayout(false);
 			this.m_pnlColorRotary.ResumeLayout(false);
 			this.m_pnlColorBevel.ResumeLayout(false);
@@ -596,23 +604,24 @@
 		private CommonUI.Controls.ThemedButton m_btnZDir;
 		private CommonUI.Controls.ThemedButton m_btnKeep;
 		private CommonUI.Controls.ThemedButton m_btnRevert;
-		private System.Windows.Forms.Label m_lblStartEnd;
-		private CommonUI.Controls.ThemedButton m_btnSwitchStartEnd;
-		private System.Windows.Forms.Label m_lblStartOrEnd;
 		private CommonUI.Controls.SectionPanel m_secSetting;
 		private CommonUI.Controls.ThemedButton m_btnAdd;
 		private CommonUI.Controls.ThemedButton m_btnRemove;
 		private CommonUI.Controls.ThemedButton m_btnClear;
-		private CommonUI.Controls.SectionPanel m_gpbStartPnt;
+		private CommonUI.Controls.SectionPanel m_secMovePnt;
+		private System.Windows.Forms.Label m_lblStartPnt;
 		private CommonUI.Controls.ThemedButton m_btnToStart;
 		private CommonUI.Controls.ThemedButton m_btnToEnd;
-		private CommonUI.Controls.SectionPanel m_gpbPnt;
+		private System.Windows.Forms.Panel m_pnlStartEndSwitch;
+		private System.Windows.Forms.Label m_lblStartEnd;
+		private CommonUI.Controls.ThemedButton m_btnSwitchStartEnd;
+		private System.Windows.Forms.Label m_lblStartOrEnd;
+		private System.Windows.Forms.Label m_lblPnt;
 		private CommonUI.Controls.ThemedButton m_btnPrev;
 		private CommonUI.Controls.ThemedButton m_btnNext;
-		private CommonUI.Controls.SectionPanel m_gpbCtrlPnt;
+		private System.Windows.Forms.Label m_lblCtrlPnt;
 		private CommonUI.Controls.ThemedButton m_btnPreCtrlPnt;
 		private CommonUI.Controls.ThemedButton m_btnNextCtrlPnt;
-		private CommonUI.Controls.SectionPanel m_gbxColorLegend;
 		private System.Windows.Forms.Panel m_pnlColorNormal;
 		private System.Windows.Forms.Label m_lblLegendNormal;
 		private System.Windows.Forms.Panel m_pnlColorRotary;

@@ -64,13 +64,16 @@ namespace MyCAM.Editor
 			m_ToolVecParam = toolVecParam;
 
 			// no selected index param, disable edit UI
+			// the start / end switch row sits in the point moving section but belongs to the index edit UI
 			if( m_ToolVecParam == null ) {
 				m_gbxIndexParam.Enabled = false;
+				m_pnlStartEndSwitch.Enabled = false;
 				return;
 			}
 
 			// update index edit UI
 			m_gbxIndexParam.Enabled = true;
+			m_pnlStartEndSwitch.Enabled = true;
 			m_tbxAngleA.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleA_deg : m_ToolVecParam.AngleA_deg );
 			m_tbxAngleB.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleB_deg : m_ToolVecParam.AngleB_deg );
 			m_tbxMaster.SilentSetValue = (decimal)m_ToolVecParam.Master_deg;

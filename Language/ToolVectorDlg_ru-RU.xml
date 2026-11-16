@@ -17,16 +17,16 @@
 	<Message ID="m_btnAdd" Content="Добавить" />
 	<Message ID="m_btnRemove" Content="Удалить" />
 	<Message ID="m_btnClear" Content="Очистить все контрольные точки" />
-	<Message ID="m_gpbStartPnt" Content="Переключение начальной/конечной точки" />
+	<Message ID="m_secMovePnt" Content="Перемещение по точкам" />
+	<Message ID="m_lblStartPnt" Content="Переключение начальной/конечной точки" />
 	<Message ID="m_btnToStart" Content="К начальной точке" />
-	<Message ID="m_gpbPnt" Content="Переключение предыдущей/следующей точки" />
+	<Message ID="m_lblPnt" Content="Переключение предыдущей/следующей точки" />
 	<Message ID="m_btnPrev" Content="Предыдущая точка" />
 	<Message ID="m_btnNext" Content="Следующая точка" />
 	<Message ID="m_btnToEnd" Content="К конечной точке" />
-	<Message ID="m_gpbCtrlPnt" Content="Переключение контрольных точек" />
+	<Message ID="m_lblCtrlPnt" Content="Переключение контрольных точек" />
 	<Message ID="m_btnPreCtrlPnt" Content="Предыдущая контрольная точка" />
 	<Message ID="m_btnNextCtrlPnt" Content="Следующая контрольная точка" />
-	<Message ID="m_gbxColorLegend" Content="Схема интерполяции" />
 	<Message ID="m_lblLegendNormal" Content="Сохранить" />
 	<Message ID="m_lblLegendRotary" Content="Плавное вращение оси" />
 	<Message ID="m_lblLegendBevel" Content="Скос наклона" />

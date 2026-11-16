@@ -18,13 +18,14 @@ if /i not "%~1"=="runtime" goto :report
 if "%~2"=="" (
 	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntimeLayout.ps1"
 ) else (
-	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntimeLayout.ps1" -ShotDir "%~2"
+	REM full path, the layout runner works in the build output folder
+	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntimeLayout.ps1" -ShotDir "%~f2"
 )
 if errorlevel 1 set "RESULT=1"
 
 REM main window screenshots go to the temp folder when no screenshot folder is given
-set "SHOTS=%~2"
-if "%SHOTS%"=="" set "SHOTS=%TEMP%\UICheck"
+set "SHOTS=%~f2"
+if "%~2"=="" set "SHOTS=%TEMP%\UICheck"
 REM each language x page (CAD start page, CAM, CNC machining) x landscape / portrait
 for %%L in (zh-TW zh-CN) do (
 	for %%M in (CAD CAM CNC) do (

@@ -117,9 +117,9 @@
             //
             // m_btnOuterEquipParameters
             //
-            this.m_btnOuterEquipParameters.Location = new System.Drawing.Point( 140, 5 );
+            this.m_btnOuterEquipParameters.Location = new System.Drawing.Point( 146, 4 );
             this.m_btnOuterEquipParameters.Name = "m_btnOuterEquipParameters";
-            this.m_btnOuterEquipParameters.Size = new System.Drawing.Size( 68, 24 );
+            this.m_btnOuterEquipParameters.Size = new System.Drawing.Size( 66, 24 );
             this.m_btnOuterEquipParameters.TabIndex = 1;
             this.m_btnOuterEquipParameters.Text = "參數設置";
             //
@@ -211,40 +211,40 @@
             //
             this.m_btnJogStep5.Location = new System.Drawing.Point( 4, 30 );
             this.m_btnJogStep5.Name = "m_btnJogStep5";
-            this.m_btnJogStep5.Size = new System.Drawing.Size( 36, 28 );
+            this.m_btnJogStep5.Size = new System.Drawing.Size( 38, 28 );
             this.m_btnJogStep5.TabIndex = 1;
             this.m_btnJogStep5.Text = "0.05";
             //
             // m_btnJogStep10
             //
-            this.m_btnJogStep10.Location = new System.Drawing.Point( 44, 30 );
+            this.m_btnJogStep10.Location = new System.Drawing.Point( 47, 30 );
             this.m_btnJogStep10.Name = "m_btnJogStep10";
-            this.m_btnJogStep10.Size = new System.Drawing.Size( 36, 28 );
+            this.m_btnJogStep10.Size = new System.Drawing.Size( 37, 28 );
             this.m_btnJogStep10.TabIndex = 2;
             this.m_btnJogStep10.Text = "0.1";
             //
             // m_btnJogStep50
             //
-            this.m_btnJogStep50.Location = new System.Drawing.Point( 84, 30 );
+            this.m_btnJogStep50.Location = new System.Drawing.Point( 89, 30 );
             this.m_btnJogStep50.Name = "m_btnJogStep50";
-            this.m_btnJogStep50.Size = new System.Drawing.Size( 36, 28 );
+            this.m_btnJogStep50.Size = new System.Drawing.Size( 38, 28 );
             this.m_btnJogStep50.TabIndex = 3;
             this.m_btnJogStep50.Text = "0.5";
             //
             // m_btnJogStep100
             //
             this.m_btnJogStep100.Active = true;
-            this.m_btnJogStep100.Location = new System.Drawing.Point( 124, 30 );
+            this.m_btnJogStep100.Location = new System.Drawing.Point( 132, 30 );
             this.m_btnJogStep100.Name = "m_btnJogStep100";
-            this.m_btnJogStep100.Size = new System.Drawing.Size( 36, 28 );
+            this.m_btnJogStep100.Size = new System.Drawing.Size( 37, 28 );
             this.m_btnJogStep100.TabIndex = 4;
             this.m_btnJogStep100.Text = "1.0";
             //
             // m_btnJogStep200
             //
-            this.m_btnJogStep200.Location = new System.Drawing.Point( 164, 30 );
+            this.m_btnJogStep200.Location = new System.Drawing.Point( 174, 30 );
             this.m_btnJogStep200.Name = "m_btnJogStep200";
-            this.m_btnJogStep200.Size = new System.Drawing.Size( 36, 28 );
+            this.m_btnJogStep200.Size = new System.Drawing.Size( 38, 28 );
             this.m_btnJogStep200.TabIndex = 5;
             this.m_btnJogStep200.Text = "2.0";
             //
@@ -415,9 +415,9 @@
             //
             // m_btnResumeCutParameters
             //
-            this.m_btnResumeCutParameters.Location = new System.Drawing.Point( 140, 5 );
+            this.m_btnResumeCutParameters.Location = new System.Drawing.Point( 146, 4 );
             this.m_btnResumeCutParameters.Name = "m_btnResumeCutParameters";
-            this.m_btnResumeCutParameters.Size = new System.Drawing.Size( 68, 24 );
+            this.m_btnResumeCutParameters.Size = new System.Drawing.Size( 66, 24 );
             this.m_btnResumeCutParameters.TabIndex = 1;
             this.m_btnResumeCutParameters.Text = "參數設置";
             //

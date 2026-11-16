@@ -47,6 +47,8 @@
 | 2026-11-16 | 直式人機的驗證方式 | 橫 / 直式只依主視窗外框長寬比判斷（`MainLayout`、`StartupForm`、`CNCDlg` 皆比較 `Height > Width`），與系統顯示方向無關。因此不旋轉螢幕，改在橫式螢幕上把主視窗開到 1080×1880 截圖並檢查對話框置中（`CaptureMainWindow.ps1`，已併入 `UICheck.bat runtime`）。 |
 | 2026-11-16 | 語系修正（隨遷移處理） | `ExtendedGCodeDlg` 的 `IS_START_POINT` / `IS_END_POINT` / `IS_MIX_DATA` 與程式使用的 ID 不一致（簡中一直顯示繁中預設字），已改為程式使用的 ID。語系檔名與類別名不一致者改名：`LockABDlg` → `LockMSAxisDlg`、`CNCThreePointDialog` → `CNCThreePointDlg`。 |
 | 2026-11-16 | 主視窗截圖補 CAM 與 CNC 頁面 | 使用者要求：橫式與直式的主視窗截圖，除了啟動後的 CAD 頁面，也要有 CAM 頁面與 CNC（加工）頁面，這兩頁的 UI 比較完整。`CaptureMainWindow.ps1` 加 `-Mode CAD\|CAM\|CNC`（以點選選單切換），`UICheck.bat runtime` 改為語系 × 頁面 × 橫直式共 12 張。CNC 頁面為未連線狀態。 |
+| 2026-11-16 | CNC 面板按鈕對齊 | 使用者看截圖後提出（橫、直式都有）：「參數設置」按鈕與下方功能按鈕沒對齊；軸向移動的倍率按鈕沒對齊。改為「參數設置」對齊第三欄按鈕（`CNCPanel` 的功能控制、加工策略兩處），五個倍率按鈕左右撐滿到與下方按鈕同寬（間距同為 5）。 |
+| 2026-11-16 | 飛邊姿態（`ToolVectorDlg`）區塊合併 | 使用者要求：起終點轉換、前後點轉換、控制點轉換都屬於「控制點的移動調整」，合為一張卡片「控制點移動」，每一列以原本的區塊名稱當列標籤；「起終點切換」也屬於這一類，移到「至起點 / 至終點」那一列下方；「插值方案」圖例併入「單點姿態資訊」，放在插補方案下拉選單下方。對話框高度由 705 降為 564。為維持行為：起終點切換列原本隨 `m_gbxIndexParam` 在沒有選取點時停用，移出後以無外觀 `Panel`（`m_pnlStartEndSwitch`）包住，並在同一時機設定其 `Enabled`。附帶的外觀差異：圖例移入 `m_gbxIndexParam` 後，沒有選取點時圖例文字會與其他欄位一起顯示為停用色。 |
 
 ## 4. 後續處理項目
 

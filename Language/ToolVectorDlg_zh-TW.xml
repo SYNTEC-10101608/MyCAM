@@ -17,16 +17,16 @@
 	<Message ID="m_btnAdd" Content="新增" />
 	<Message ID="m_btnRemove" Content="刪除" />
 	<Message ID="m_btnClear" Content="清除所有控制點" />
-	<Message ID="m_gpbStartPnt" Content="起終點轉換" />
+	<Message ID="m_secMovePnt" Content="控制點移動" />
+	<Message ID="m_lblStartPnt" Content="起終點轉換" />
 	<Message ID="m_btnToStart" Content="至起點" />
-	<Message ID="m_gpbPnt" Content="前後點轉換" />
+	<Message ID="m_lblPnt" Content="前後點轉換" />
 	<Message ID="m_btnPrev" Content="前一點" />
 	<Message ID="m_btnNext" Content="後一點" />
 	<Message ID="m_btnToEnd" Content="至終點" />
-	<Message ID="m_gpbCtrlPnt" Content="控制點轉換" />
+	<Message ID="m_lblCtrlPnt" Content="控制點轉換" />
 	<Message ID="m_btnPreCtrlPnt" Content="前控制點" />
 	<Message ID="m_btnNextCtrlPnt" Content="後控制點" />
-	<Message ID="m_gbxColorLegend" Content="插值方案" />
 	<Message ID="m_lblLegendNormal" Content="維持" />
 	<Message ID="m_lblLegendRotary" Content="旋轉軸平滑" />
 	<Message ID="m_lblLegendBevel" Content="傾角切坡口" />
