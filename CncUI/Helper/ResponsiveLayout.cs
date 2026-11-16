@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using CommonUI.Controls;
+using CommonUI.Theme;
 
 namespace CncUI.Controls
 {
@@ -14,6 +16,10 @@ namespace CncUI.Controls
 		public ResponsiveLayout( Control container, Size designSize )
 		{
 			m_DesignSize = designSize;
+
+			// a titled card keeps its title bar height; only the content below it is scaled
+			SectionPanel card = container as SectionPanel;
+			m_TitleHeight = card != null && !string.IsNullOrEmpty( card.Text ) ? ThemeMetrics.SECTION_TITLE_HEIGHT : 0;
 			foreach( Control control in container.Controls ) {
 				m_Items.Add( new Item( control ) );
 			}
@@ -31,15 +37,22 @@ namespace CncUI.Controls
 				return;
 			}
 			double scaleX = (double)layoutSize.Width / m_DesignSize.Width;
-			double scaleY = (double)layoutSize.Height / m_DesignSize.Height;
+			double scaleY = (double)Math.Max( 1, layoutSize.Height - m_TitleHeight ) /
+				Math.Max( 1, m_DesignSize.Height - m_TitleHeight );
 			container.SuspendLayout();
 			try {
 				foreach( Item item in m_Items ) {
 					Rectangle original = item.Bounds;
 					int left = (int)Math.Round( original.Left * scaleX );
-					int top = (int)Math.Round( original.Top * scaleY );
 					int right = (int)Math.Round( original.Right * scaleX );
-					int bottom = (int)Math.Round( original.Bottom * scaleY );
+					int top = original.Top;
+					int bottom = original.Bottom;
+
+					// controls in the title bar (card actions) keep their design height and position
+					if( original.Top >= m_TitleHeight ) {
+						top = m_TitleHeight + (int)Math.Round( ( original.Top - m_TitleHeight ) * scaleY );
+						bottom = m_TitleHeight + (int)Math.Round( ( original.Bottom - m_TitleHeight ) * scaleY );
+					}
 					item.Control.SetBounds( left, top, Math.Max( 1, right - left ), Math.Max( 1, bottom - top ) );
 					item.Children?.Apply( item.Control );
 				}
@@ -67,6 +80,7 @@ namespace CncUI.Controls
 		}
 
 		readonly Size m_DesignSize;
+		readonly int m_TitleHeight;
 		readonly List<Item> m_Items = new List<Item>();
 	}
 }

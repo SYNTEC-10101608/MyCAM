@@ -44,18 +44,6 @@ namespace CommonUI.Controls
 			set => base.ForeColor = value;
 		}
 
-		protected override void OnPaint( PaintEventArgs e )
-		{
-			if( m_Role != TextRole.SectionTitle ) {
-				base.OnPaint( e );
-				return;
-			}
-
-			// same look as a SectionPanel title bar, for section titles that cannot be a card title
-			Color textColor = Enabled ? ThemeColors.TEXT : ThemeColors.TEXT_DISABLED;
-			SectionTitleDrawing.Draw( e.Graphics, Text, ClientRectangle, textColor );
-		}
-
 		void ApplyRole()
 		{
 			// body text inherits from the parent like a plain label
@@ -66,7 +54,6 @@ namespace CommonUI.Controls
 			}
 			base.Font = ThemeFonts.GetFont( m_Role );
 			base.ForeColor = ThemeText.GetColor( m_Role );
-			Invalidate();
 		}
 
 		TextRole m_Role = TextRole.Body;

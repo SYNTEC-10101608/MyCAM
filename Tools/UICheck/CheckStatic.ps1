@@ -12,6 +12,7 @@
 #   S6  language: captions written in Chinese have their ID in zh-TW and zh-CN; the four languages have the same
 #       IDs; the language file is named after the class
 #   S7  language: a control whose name is an ID is not given another text in code (auto-applied texts would win)
+#   S8  section titles (section 4.5): a card title is SectionPanel.Text; no emphasized label in a card's title bar
 #
 # Exceptions are listed in StaticExceptions.txt: "<rule> <class> <control> <reason>". Exit code 1 on a problem.
 
@@ -41,6 +42,9 @@ $FORBIDDEN_FORM_PROPS = @( "AutoScaleMode", "AutoScaleDimensions", "FormBorderSt
 	"MinimizeBox", "ShowIcon", "ShowInTaskbar", "Font", "BackColor", "ForeColor" )
 $FORBIDDEN_CONTROL_PROPS = @( "Font", "BackColor", "ForeColor", "FlatStyle", "UseVisualStyleBackColor", "Dock",
 	"Anchor", "AutoScaleMode", "AutoScaleDimensions", "BorderStyle", "ImageTransparentColor" )
+
+# ThemeMetrics.SECTION_TITLE_HEIGHT
+$TITLE_BAR_HEIGHT = 32
 
 $exceptions = @{}
 $exceptionFile = Join-Path $PSScriptRoot "StaticExceptions.txt"
@@ -329,6 +333,23 @@ foreach ($file in $designerFiles) {
 			}
 			if ($screen.Props[$name].ContainsKey($prop)) {
 				Report "S2" $szClass $name "sets $prop"
+			}
+		}
+	}
+
+	# S8 an emphasized label at the top of a card stands in for the card title, which is SectionPanel.Text
+	# above the content grid: the title bar of a titled card, above the first label row (10 + 4) of an untitled one
+	foreach ($section in @( $screen.Fields.Keys | Where-Object { $screen.Fields[$_] -eq "CommonUI.Controls.SectionPanel" } )) {
+		$sectionProps = $screen.Props[$section]
+		$isTitled = $sectionProps -and $sectionProps.ContainsKey("Text") -and $sectionProps["Text"] -ne ""
+		$nTitleLimit = if ($isTitled) { $TITLE_BAR_HEIGHT } else { 14 }
+		foreach ($name in @( $screen.Children[$section] | Where-Object { $_ } )) {
+			$bounds = Get-Bounds $screen $name
+			$props = $screen.Props[$name]
+			$isLabel = $screen.Fields[$name] -match "(Label|ThemedLabel)$"
+			$isEmphasis = $props -and $props["Role"] -match "TextRole\.(Emphasis|Title)$"
+			if ($isLabel -and $isEmphasis -and $bounds -and $bounds.Top -lt $nTitleLimit) {
+				Report "S8" $szClass $name "emphasized label above the content of $section; use $section.Text as the title"
 			}
 		}
 	}
