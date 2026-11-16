@@ -15,6 +15,7 @@ namespace MyCAM.Editor.Dialog
 		public CalibrationREFDlg( CalibrationData data )
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_LanguageManager = new LanguageManager.LanguageManager( "CalibrationREFDlg" );
 			m_CalibrationData = data;
 			SetUI();

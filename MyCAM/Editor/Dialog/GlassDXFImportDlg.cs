@@ -12,6 +12,7 @@ namespace MyCAM.Editor.Dialog
 		public GlassDXFImportDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_LanguageManager = new LanguageManager.LanguageManager( "GlassDXFImportDlg" );
 		}
 

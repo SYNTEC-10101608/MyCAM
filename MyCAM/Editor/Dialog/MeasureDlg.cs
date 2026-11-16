@@ -8,6 +8,7 @@ namespace MyCAM.Editor
 		public MeasureDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			InitMethodComboBox();
 		}
 

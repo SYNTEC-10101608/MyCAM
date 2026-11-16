@@ -21,6 +21,7 @@ namespace MyCAM.Editor.Dialog
 		public CNCThreePointDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_DrawingFields = new Control[ , ] {
 				{ m_lblDrawing1XValue, m_lblDrawing1YValue, m_lblDrawing1ZValue },
 				{ m_lblDrawing2XValue, m_lblDrawing2YValue, m_lblDrawing2ZValue },

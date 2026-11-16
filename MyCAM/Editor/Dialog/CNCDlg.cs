@@ -12,6 +12,7 @@ namespace MyCAM.Editor.Dialog
 		public CNCDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			InitAspectRatio();
 		}
 

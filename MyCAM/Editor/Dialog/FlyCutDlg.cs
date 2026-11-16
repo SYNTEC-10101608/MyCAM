@@ -13,6 +13,7 @@ namespace MyCAM.Editor.Dialog
 		public FlyCutDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_numGroupWidth.Minimum = 0;
 
 		}

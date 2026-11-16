@@ -12,6 +12,7 @@ namespace MyCAM.Editor.Dialog
 		public AddPathDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_LanguageManager = new LanguageManager.LanguageManager( "AddPathDlg" );
 			InitializeComboBox();
 

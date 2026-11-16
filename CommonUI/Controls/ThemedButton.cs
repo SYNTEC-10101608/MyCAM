@@ -175,6 +175,15 @@ namespace CommonUI.Controls
 				text = ThemeColors.TEXT_ON_ACCENT;
 				return;
 			}
+
+			// CNC machining buttons are filled with the status color of their severity
+			bool isMachining = m_Kind == ButtonKind.Start || m_Kind == ButtonKind.Hold || m_Kind == ButtonKind.Stop;
+			if( isMachining ) {
+				fill = GetMachiningFill();
+				border = fill;
+				text = ThemeColors.TEXT_ON_ACCENT;
+				return;
+			}
 			fill = m_isPressed ? ThemeColors.PRESSED : m_isHovered ? ThemeColors.HOVER : ThemeColors.SURFACE;
 			if( m_Kind == ButtonKind.Danger ) {
 				border = ThemeColors.ERROR;
@@ -183,6 +192,20 @@ namespace CommonUI.Controls
 			else {
 				border = ThemeColors.BORDER_STRONG;
 				text = ThemeColors.TEXT;
+			}
+		}
+
+		Color GetMachiningFill()
+		{
+			switch( m_Kind ) {
+				case ButtonKind.Start:
+					return m_isPressed ? ThemeColors.SUCCESS_PRESSED : m_isHovered ? ThemeColors.SUCCESS_HOVER : ThemeColors.SUCCESS;
+				case ButtonKind.Hold:
+					return m_isPressed ? ThemeColors.WARNING_PRESSED : m_isHovered ? ThemeColors.WARNING_HOVER : ThemeColors.WARNING;
+				case ButtonKind.Stop:
+					return m_isPressed ? ThemeColors.ERROR_PRESSED : m_isHovered ? ThemeColors.ERROR_HOVER : ThemeColors.ERROR;
+				default:
+					throw new InvalidOperationException( "not a machining button kind: " + m_Kind );
 			}
 		}
 

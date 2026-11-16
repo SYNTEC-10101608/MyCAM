@@ -9,6 +9,7 @@ namespace MyCAM.Editor
 		public TraverseDlg( TraverseData data )
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			InitializeControlAndFieldValue( data );
 			UpdateFollowSafeDistanceRange();
 			m_numCutDownDistance.ValueChanged += m_numCutDownDistance_ValueChanged;

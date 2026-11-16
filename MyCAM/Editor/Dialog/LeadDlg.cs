@@ -12,6 +12,7 @@ namespace MyCAM.Editor.Dialog
 				leadData = new LeadData();
 			}
 			InitializeComponent();
+			ApplyLanguage();
 			m_LeadData = leadData;
 
 			// lead in setting

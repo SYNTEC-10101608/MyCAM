@@ -10,6 +10,7 @@ namespace MyCAM.Editor
 		public RCornerDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 		}
 
 		public void SetStatus( string szStatus )

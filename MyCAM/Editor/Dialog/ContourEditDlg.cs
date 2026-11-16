@@ -16,6 +16,7 @@ namespace MyCAM.Editor
 		public ContourEditDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 
 			m_rdoWorldCoord.Tag = RefCoordinateType.World;
 			m_rdoLocalCoord.Tag = RefCoordinateType.Local;

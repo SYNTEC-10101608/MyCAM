@@ -69,6 +69,7 @@
 	<Compile Include="Forms\MainWindowBase.cs">
 	  <SubType>Form</SubType>
 	</Compile>
+	<Compile Include="Forms\ResponsiveLayout.cs" />
 	<Compile Include="Forms\PanelBase.cs">
 	  <SubType>UserControl</SubType>
 	</Compile>

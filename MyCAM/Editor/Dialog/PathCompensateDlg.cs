@@ -7,6 +7,7 @@ namespace MyCAM.Editor.Dialog
 		public PathCompensateDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 			m_LanguageManager = new LanguageManager.LanguageManager( "PathCompensateDlg" );
 			Initialization();
 		}

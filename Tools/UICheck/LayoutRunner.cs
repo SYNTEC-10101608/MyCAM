@@ -21,7 +21,8 @@ namespace UICheck
 	//   T4  visible sibling controls that overlap
 	//   T5  visible control outside its container (scrolling containers are skipped)
 	//   T6  dialog layout after Load differs from the designer layout
-	//   a screen that cannot be opened is a problem, not a skip
+	//   T7  a caption whose name is a language ID does not show the text of the language file after construction
+	//   a screen that cannot be opened is a problem, not a skip; wizards are checked in each state (STATE_MAP)
 	//
 	// Usage: UICheckRunner.exe <language> <screenshot folder|-> [type name filter]
 	internal static class LayoutRunner
@@ -56,22 +57,31 @@ namespace UICheck
 				if( szFilter != null && type.Name.IndexOf( szFilter, StringComparison.OrdinalIgnoreCase ) < 0 ) {
 					continue;
 				}
-				List<string> problemList;
-				string szError = CheckScreen( type, szShotDir, out problemList );
+				// a wizard is checked in each of its states, every other screen once as it opens
+				string[] stateArray;
+				if( STATE_MAP.TryGetValue( type.Name, out stateArray ) == false ) {
+					stateArray = new string[] { null };
+				}
+				for( int i = 0; i < stateArray.Length; i++ ) {
+					string szLabel = stateArray[ i ] == null ? type.Name : type.Name + "[" + stateArray[ i ] + "]";
+					string szShotName = stateArray[ i ] == null ? type.Name : type.Name + "_" + ( i + 1 );
+					List<string> problemList;
+					string szError = CheckScreen( type, stateArray[ i ], szShotDir, szShotName, szLanguage, out problemList );
 
-				// a screen that cannot be opened is not checked, so it counts as a problem
-				if( szError != null ) {
-					Console.WriteLine( "FAIL  {0} cannot be opened: {1}", type.Name, szError );
-					nProblemCount++;
-					continue;
-				}
-				nCheckedCount++;
-				foreach( string szProblem in problemList ) {
-					Console.WriteLine( "FAIL  {0} {1}", type.Name, szProblem );
-				}
-				nProblemCount += problemList.Count;
-				if( problemList.Count == 0 ) {
-					Console.WriteLine( "OK    {0}", type.Name );
+					// a screen that cannot be opened is not checked, so it counts as a problem
+					if( szError != null ) {
+						Console.WriteLine( "FAIL  {0} cannot be opened: {1}", szLabel, szError );
+						nProblemCount++;
+						continue;
+					}
+					nCheckedCount++;
+					foreach( string szProblem in problemList ) {
+						Console.WriteLine( "FAIL  {0} {1}", szLabel, szProblem );
+					}
+					nProblemCount += problemList.Count;
+					if( problemList.Count == 0 ) {
+						Console.WriteLine( "OK    {0}", szLabel );
+					}
 				}
 			}
 			Console.WriteLine( "[{0}] {1} screens checked, {2} problems", szLanguage, nCheckedCount, nProblemCount );
@@ -104,7 +114,8 @@ namespace UICheck
 			}
 		}
 
-		static string CheckScreen( Type type, string szShotDir, out List<string> problemList )
+		static string CheckScreen( Type type, string szState, string szShotDir, string szShotName, string szLanguage,
+			out List<string> problemList )
 		{
 			problemList = new List<string>();
 			Form form = null;
@@ -115,11 +126,12 @@ namespace UICheck
 					form = HostPanel( (Control)instance );
 				}
 
-				// wizard dialogs show one step through a method of their own
-				string szPrepare;
-				if( PREPARE_METHOD_MAP.TryGetValue( type.Name, out szPrepare ) ) {
-					BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-					type.GetMethod( szPrepare, flags ).Invoke( instance, null );
+				// the language texts are applied in the constructor; checked before a state changes runtime texts
+				CheckLanguageTexts( (Control)instance, type.Name, szLanguage, problemList );
+
+				// wizard dialogs show one state through a method of their own
+				if( szState != null ) {
+					InvokeState( instance, szState );
 				}
 
 				// the designer layout, to compare with the one after Load; embedded panels are scaled to the host
@@ -127,7 +139,7 @@ namespace UICheck
 				Dictionary<Control, Rectangle> designBoundsMap = isDialog ? TakeBounds( form ) : null;
 				Size designClientSize = form.ClientSize;
 
-				// show without disturbing the desktop; the layout and the language texts are applied on Load
+				// show without disturbing the desktop; the dialog is centered on Load
 				form.Opacity = 0;
 				form.Show();
 				Application.DoEvents();
@@ -136,7 +148,7 @@ namespace UICheck
 					CheckDesignLayout( form, designClientSize, designBoundsMap, problemList );
 				}
 				if( szShotDir != null ) {
-					SaveScreenshot( form, Path.Combine( szShotDir, type.Name + ".png" ) );
+					SaveScreenshot( form, Path.Combine( szShotDir, szShotName + ".png" ) );
 				}
 				return null;
 			}
@@ -148,6 +160,82 @@ namespace UICheck
 				if( form != null && !form.IsDisposed ) {
 					form.Hide();
 					form.Dispose();
+				}
+			}
+		}
+
+		// "Method arg arg ...; Method ...": enum values by name, null, bool, numbers
+		static void InvokeState( object instance, string szState )
+		{
+			foreach( string szCall in szState.Split( ';' ) ) {
+				InvokeCall( instance, szCall.Trim() );
+			}
+		}
+
+		static void InvokeCall( object instance, string szCall )
+		{
+			string[] tokenArray = szCall.Split( ' ' );
+			BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+			MethodInfo method = instance.GetType().GetMethods( flags ).First( m => m.Name == tokenArray[ 0 ] &&
+				m.GetParameters().Length == tokenArray.Length - 1 );
+			ParameterInfo[] parameterArray = method.GetParameters();
+			object[] argArray = new object[ parameterArray.Length ];
+			for( int i = 0; i < parameterArray.Length; i++ ) {
+				string szToken = tokenArray[ i + 1 ];
+				Type parameterType = Nullable.GetUnderlyingType( parameterArray[ i ].ParameterType ) ??
+					parameterArray[ i ].ParameterType;
+				if( szToken == "null" ) {
+					argArray[ i ] = null;
+				}
+				else if( parameterType.IsEnum ) {
+					argArray[ i ] = Enum.Parse( parameterType, szToken );
+				}
+				else {
+					argArray[ i ] = Convert.ChangeType( szToken, parameterType, System.Globalization.CultureInfo.InvariantCulture );
+				}
+			}
+			method.Invoke( instance, argArray );
+		}
+
+		// T7: each caption control whose name is an ID shows the text of the language file (catches a dialog that
+		// does not call ApplyLanguage and a stale copy of the language files)
+		static void CheckLanguageTexts( Control root, string szClass, string szLanguage, List<string> problemList )
+		{
+			string szPath = Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "Resource", "Language",
+				szClass + "_" + szLanguage + ".xml" );
+			if( File.Exists( szPath ) == false ) {
+				return;
+			}
+			Dictionary<string, string> textMap = new Dictionary<string, string>();
+			System.Xml.XmlDocument document = new System.Xml.XmlDocument();
+			document.Load( szPath );
+			foreach( System.Xml.XmlElement message in document.GetElementsByTagName( "Message" ) ) {
+				textMap[ message.GetAttribute( "ID" ) ] = message.GetAttribute( "Content" );
+			}
+			string szTitle;
+			if( root is Form && textMap.TryGetValue( szClass, out szTitle ) && root.Text != szTitle ) {
+				problemList.Add( string.Format( "T7 title '{0}', language file has '{1}'", root.Text, szTitle ) );
+			}
+			Stack<Control> stack = new Stack<Control>();
+			stack.Push( root );
+			while( stack.Count > 0 ) {
+				Control control = stack.Pop();
+				foreach( Control child in control.Controls ) {
+					stack.Push( child );
+				}
+				if( control == root ) {
+					continue;
+				}
+
+				// shared button texts come from the common language file
+				ThemedButton button = control as ThemedButton;
+				bool isCommon = button != null && button.CommonText != CommonButtonText.None;
+				bool isCaption = control is Label || control is ButtonBase || control is SectionPanel;
+				string szText;
+				if( isCaption && isCommon == false && textMap.TryGetValue( control.Name, out szText ) &&
+					control.Text != szText ) {
+					problemList.Add( string.Format( "T7 {0} shows '{1}', language file has '{2}'", Describe( control ),
+						control.Text, szText ) );
 				}
 			}
 		}
@@ -382,12 +470,23 @@ namespace UICheck
 		const int BUTTON_TEXT_PADDING = 12;
 		const int CHECK_GLYPH_WIDTH = 18;
 
-		// the main window is checked by screenshots; the remote screen only hosts the VNC view
-		// method called before the check, e.g. to show the main step of a wizard
-		static readonly Dictionary<string, string> PREPARE_METHOD_MAP = new Dictionary<string, string>
+		// states of the wizards, each checked on a new instance: "Method arg arg ..." called before the check
+		static readonly Dictionary<string, string[]> STATE_MAP = new Dictionary<string, string[]>
 		{
-			{ "DesignSupportBracketDlg", "ShowInputParametersPanel" }
+			{ "AddPathDlg", new[] { "GoToStep ChooseMode", "GoToStep SelectFace", "GoToStep ChooseWireMode",
+				"GoToStep SelectWire" } },
+			{ "DesignSupportBracketDlg", new[] { "ShowSelectFacePanel", "ShowInputParametersPanel",
+				@"ShowSaveDxfPanel C:\Temp" } },
+			{ "CNCThreePointDlg", new[] {
+				"DisplayState Drawing false true false false false 0 0 false false null false false",
+				"DisplayState Drawing true false false false true 3 0 false false null false false",
+				"DisplayState Workpiece true false true false false 3 1 false true null false false",
+				"DisplayState Calculation true false true true false 3 0 false false 0.05 true true" } },
+			// null: as it opens (offline); then the machining buttons enabled, as when connected
+			{ "CNCPanel", new[] { null, "SetCommandsEnabled true; SetJogEnabled true" } }
 		};
+
+		// the main window is checked by screenshots; the remote screen only hosts the VNC view
 
 		// FormBase is the behavior base of the dialogs, not a screen
 		static readonly HashSet<string> SKIP_TYPE_LIST = new HashSet<string> { "StartupForm", "CNCDlg", "FormBase" };

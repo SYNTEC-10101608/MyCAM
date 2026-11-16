@@ -16,6 +16,7 @@ namespace MyCAM.Editor
 		public ExtendedGCodeDlg()
 		{
 			InitializeComponent();
+			ApplyLanguage();
 
 			m_rdoTraverseStart.Tag = ExtendedGCodeType.TraverseHead;
 			m_rdoTraverseEnd.Tag = ExtendedGCodeType.TraverseTail;

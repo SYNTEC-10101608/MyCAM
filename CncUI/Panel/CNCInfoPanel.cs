@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using CncManager.Definition;
-using CncUI.Controls;
 using CommonUI.Controls;
 using CommonUI.Forms;
 using CommonUI.Theme;
