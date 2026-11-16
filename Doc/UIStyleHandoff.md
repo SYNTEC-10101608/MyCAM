@@ -69,6 +69,7 @@
 | `CompareBehavior.ps1` | 與 `master` 比對事件訂閱、控制項屬性等行為面差異 B1～B7 |
 | `CheckRuntimeLayout.ps1` + `LayoutRunner.cs` | 實際開啟所有對話框與 CNC 面板，檢查文字超出、重疊、超出容器 T1～T5，可輸出截圖 |
 | `CaptureMainWindow.ps1` + `MainWindowRunner.cs` | 主視窗截圖與對話框置中檢查 P1、P2。`-Mode CAD\|CAM\|CNC` 切換頁面；直式在橫式螢幕上以 1080×1880 開窗即可，不必旋轉螢幕 |
+| `HiddenDesktopRun.cs` | 2026-11-16 新增：讓上面兩個 runner 在隱藏桌面執行，不佔用螢幕、不搶焦點；`-Visible` 改回一般桌面 |
 | `StaticExceptions.txt` / `BehaviorExceptions.txt` | 經確認的例外，每行附理由；行為例外必須對應已決議的項目 |
 
 Runner 由腳本以 Roslyn `csc` 編譯到 `MyCAM\bin\Debug`（`UICheckRunner.exe`、`UICheckMainWindow.exe`），不進方案。

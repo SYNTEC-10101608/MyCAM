@@ -6,13 +6,16 @@
 	[int]$Height = 1040,
 	[string]$Language = "zh-TW",
 	[ValidateSet( "CAD", "CAM", "CNC" )][string]$Mode = "CAD",
-	[string[]]$Dialogs = @( "AddPathDlg", "OverCutDlg", "StartPointDlg" )
+	[string[]]$Dialogs = @( "AddPathDlg", "OverCutDlg", "StartPointDlg" ),
+	[switch]$Visible
 )
 # Screenshot of the main window at a given size (e.g. 1920 x 1040 landscape, 1080 x 1880 portrait) and check
 # that dialogs are centered in the dialog area (see MainWindowRunner.cs). Landscape / portrait only depends on
 # the window's aspect ratio, so a portrait window is checked on a landscape screen by sizing it beyond the screen.
 # -Mode clicks the CAM or CNC (machining) page before the capture; CAD is the start page.
 # The language is set in memory only; the setting file is not changed.
+# The runner works on a hidden desktop (HiddenDesktopRun.cs) so it does not take the screen; -Visible shows it.
+# On the hidden desktop the OpenGL 3D view stays empty.
 
 $ErrorActionPreference = "Stop"
 if (-not $Root) {
@@ -38,6 +41,12 @@ if ($LASTEXITCODE -ne 0) {
 	Write-Host "[UICheck] failed to compile MainWindowRunner.cs"
 	exit 2
 }
+$hidden = Join-Path $binDir "UICheckHidden.exe"
+& $csc /nologo /target:exe /platform:anycpu /out:$hidden (Join-Path $PSScriptRoot "HiddenDesktopRun.cs")
+if ($LASTEXITCODE -ne 0) {
+	Write-Host "[UICheck] failed to compile HiddenDesktopRun.cs"
+	exit 2
+}
 
 $outPath = $OutFile
 if (-not [System.IO.Path]::IsPathRooted($outPath)) {
@@ -46,7 +55,12 @@ if (-not [System.IO.Path]::IsPathRooted($outPath)) {
 New-Item -ItemType Directory -Force (Split-Path $outPath) | Out-Null
 Push-Location $binDir
 try {
-	& $runner $Language $Mode $Width $Height $outPath @Dialogs
+	if ($Visible) {
+		& $runner $Language $Mode $Width $Height $outPath @Dialogs
+	}
+	else {
+		& $hidden $runner $Language $Mode $Width $Height $outPath @Dialogs
+	}
 	$result = $LASTEXITCODE
 }
 finally {

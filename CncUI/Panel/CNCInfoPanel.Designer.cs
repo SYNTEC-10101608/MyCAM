@@ -277,7 +277,7 @@
 			this.m_grpHeight.TabIndex = 1;
 			this.m_lblHeightGroupTitle.Location = new System.Drawing.Point( 10, 8 );
 			this.m_lblHeightGroupTitle.Name = "m_lblHeightGroupTitle";
-			this.m_lblHeightGroupTitle.Role = CommonUI.Theme.TextRole.Emphasis;
+			this.m_lblHeightGroupTitle.Role = CommonUI.Theme.TextRole.SectionTitle;
 			this.m_lblHeightGroupTitle.Size = new System.Drawing.Size( 200, 24 );
 			this.m_lblHeightGroupTitle.Text = "調高軸資訊";
 			this.m_lblHeightGroupTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -377,7 +377,7 @@
 			this.m_grpMachining.TabIndex = 2;
 			this.m_lblMachiningTitle.Location = new System.Drawing.Point( 10, 8 );
 			this.m_lblMachiningTitle.Name = "m_lblMachiningTitle";
-			this.m_lblMachiningTitle.Role = CommonUI.Theme.TextRole.Emphasis;
+			this.m_lblMachiningTitle.Role = CommonUI.Theme.TextRole.SectionTitle;
 			this.m_lblMachiningTitle.Size = new System.Drawing.Size( 80, 24 );
 			this.m_lblMachiningTitle.Text = "加工狀態";
 			this.m_lblMachiningTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;

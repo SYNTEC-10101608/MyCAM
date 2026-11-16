@@ -3,11 +3,13 @@
 	[string]$Configuration = "Debug",
 	[string[]]$Languages = @( "zh-TW", "zh-CN" ),
 	[string]$ShotDir = "",
-	[string]$Only = ""
+	[string]$Only = "",
+	[switch]$Visible
 )
 # Runtime layout check (ui-style.instructions.md, section 8).
 # Opens every dialog and CNC panel of the built MyCAM in each language and reports T1-T5 (see LayoutRunner.cs).
 # Build first (Build.bat Debug). Exit code 1 when a problem is found.
+# The runner works on a hidden desktop (HiddenDesktopRun.cs) so it does not take the screen; -Visible shows it.
 
 $ErrorActionPreference = "Stop"
 $binDir = Join-Path $Root "MyCAM\bin\$Configuration"
@@ -29,9 +31,19 @@ if ($LASTEXITCODE -ne 0) {
 	Write-Host "[UICheck] failed to compile LayoutRunner.cs"
 	exit 2
 }
+$hidden = Join-Path $binDir "UICheckHidden.exe"
+& $csc /nologo /target:exe /platform:anycpu /out:$hidden (Join-Path $PSScriptRoot "HiddenDesktopRun.cs")
+if ($LASTEXITCODE -ne 0) {
+	Write-Host "[UICheck] failed to compile HiddenDesktopRun.cs"
+	exit 2
+}
 
+# the runner works in the output folder, so a relative screenshot folder is resolved here first
 if (-not $ShotDir) {
 	$ShotDir = "-"
+}
+elseif (-not [System.IO.Path]::IsPathRooted($ShotDir)) {
+	$ShotDir = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $ShotDir))
 }
 $result = 0
 foreach ($szLanguage in $Languages) {
@@ -42,7 +54,12 @@ foreach ($szLanguage in $Languages) {
 	}
 	Push-Location $binDir
 	try {
-		& $runner @arguments
+		if ($Visible) {
+			& $runner @arguments
+		}
+		else {
+			& $hidden $runner @arguments
+		}
 		if ($LASTEXITCODE -ne 0) {
 			$result = 1
 		}

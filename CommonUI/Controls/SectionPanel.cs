@@ -88,18 +88,11 @@ namespace CommonUI.Controls
 					graphics.FillRectangle( brush, 1, 1, Width - 2, ThemeMetrics.SECTION_TITLE_HEIGHT - 1 );
 				}
 			}
-			int nAccentTop = ( ThemeMetrics.SECTION_TITLE_HEIGHT - ACCENT_HEIGHT ) / 2;
-			using( SolidBrush brush = new SolidBrush( ThemeColors.ACCENT ) ) {
-				graphics.FillRectangle( brush, ThemeMetrics.SECTION_PADDING, nAccentTop, ACCENT_WIDTH, ACCENT_HEIGHT );
-			}
-			int nTextLeft = ThemeMetrics.SECTION_PADDING + ACCENT_WIDTH + ThemeMetrics.CONTROL_GAP;
-			Rectangle textBounds = new Rectangle( nTextLeft, 0,
-				Width - nTextLeft - ThemeMetrics.SECTION_PADDING, ThemeMetrics.SECTION_TITLE_HEIGHT );
+			Rectangle titleBounds = new Rectangle( ThemeMetrics.SECTION_PADDING, 0,
+				Width - 2 * ThemeMetrics.SECTION_PADDING, ThemeMetrics.SECTION_TITLE_HEIGHT );
 			Color titleColor = Enabled == false ? ThemeColors.TEXT_DISABLED :
 				m_isHighlighted ? ThemeColors.ACCENT : ThemeColors.TEXT;
-			TextRenderer.DrawText( graphics, Text, ThemeFonts.Emphasis, textBounds, titleColor,
-				TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine |
-				TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix );
+			SectionTitleDrawing.Draw( graphics, Text, titleBounds, titleColor );
 		}
 
 		protected override void OnEnabledChanged( System.EventArgs e )
@@ -113,9 +106,6 @@ namespace CommonUI.Controls
 			base.OnTextChanged( e );
 			Invalidate();
 		}
-
-		const int ACCENT_WIDTH = 3;
-		const int ACCENT_HEIGHT = 14;
 
 		bool m_isHighlighted;
 	}

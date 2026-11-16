@@ -58,6 +58,7 @@ applyTo: "**/*.cs"
 | `Value` | Consolas 10pt | `TEXT` | 持續變動的機台數值 |
 | `Secondary` | 9pt | `TEXT_SECONDARY` | 單位、提示 |
 | `Error` / `Warning` / `Success` | 9pt | 對應狀態色 | 狀態文字 |
+| `SectionTitle` | 9pt 粗體 + 左側強調短線 | `TEXT` | 無法使用卡片標題的區塊標題（只限 `ThemedLabel`，見 4.5） |
 
 - 靜態的文字角色：使用 `ThemedLabel`，在 Designer 設定 `Role`。
 - 依狀態改變的文字角色：執行時改 `ThemedLabel.Role`；非標籤控制項呼叫 `ThemeText.SetRole( role, control )`。
@@ -165,6 +166,8 @@ Form
 ### 4.5 區塊標題
 
 - 語意上是「畫面區塊標題」的文字，一律是 `SectionPanel.Text`，不另放標題 `Label`、不用粗體或放大的 `Label`。
+- 例外：版面依設計座標等比縮放的嵌入式面板（`CNCPanel`、`CNCInfoPanel`，`ResponsiveLayout`），標題是卡片內的
+  標籤，改用 `ThemedLabel.Role = SectionTitle`，外觀與卡片標題相同（強調短線 + 粗體）。
 - 只是需要強調的文字（軸名、欄位）用 `ThemedLabel` 的 `Emphasis`；持續變動的機台數值用 `Value`。
 
 ### 4.6 執行時才決定的外觀
@@ -221,5 +224,8 @@ Form
 | `Tools\UICheck\UICheck.bat` | 靜態檢查（`CheckStatic.ps1`）+ 行為不變比對（`CompareBehavior.ps1`，與 `master` 比較） |
 | `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | 另外以 Debug 建置結果開啟所有對話框與 CNC 面板，zh-TW / zh-CN 各跑一次（`CheckRuntimeLayout.ps1`）；並以 CAD / CAM / CNC 頁面 × 橫 / 直式截取主視窗、檢查對話框置中（`CaptureMainWindow.ps1`） |
 
+- 執行時檢查與主視窗截圖在**隱藏桌面**執行（`HiddenDesktopRun.cs`），視窗不會出現在螢幕上、不搶焦點，
+  執行期間可照常操作電腦；隱藏桌面上 3D 檢視區（OpenGL）是空白的。要看到視窗時，對 `CheckRuntimeLayout.ps1` /
+  `CaptureMainWindow.ps1` 加 `-Visible`。
 - 經確認的例外列在 `StaticExceptions.txt` / `BehaviorExceptions.txt`，每行寫明理由；行為例外必須是已決議的項目。
 - 修改畫面後必須跑 `UICheck.bat`，全部通過才可提交；新增畫面時一併確認執行時版面檢查。
