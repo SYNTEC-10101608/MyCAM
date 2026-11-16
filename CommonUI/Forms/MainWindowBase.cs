@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using CommonUI.Theme;
@@ -27,6 +28,28 @@ namespace CommonUI.Forms
 		public void ApplyThemeFont()
 		{
 			base.Font = ThemeFonts.Body;
+			ApplyToolStripFont( this );
+		}
+
+		protected override void OnLoad( EventArgs e )
+		{
+			ApplyToolStripFont( this );
+			base.OnLoad( e );
+		}
+
+		// a tool strip does not inherit its parent's font but uses the system menu font, which ignores the UI language;
+		// drop-down menus take the font of their owner item, so only the top-level strips are set
+		static void ApplyToolStripFont( Control parent )
+		{
+			foreach( Control child in parent.Controls ) {
+				if( child is ToolStrip ) {
+					child.Font = ThemeFonts.Body;
+				}
+				if( child.ContextMenuStrip != null ) {
+					child.ContextMenuStrip.Font = ThemeFonts.Body;
+				}
+				ApplyToolStripFont( child );
+			}
 		}
 
 		[Browsable( false )]

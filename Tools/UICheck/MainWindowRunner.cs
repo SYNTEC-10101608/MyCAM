@@ -18,6 +18,8 @@ namespace UICheck
 	//
 	//   P1  dialog not centered in DialogPlacement's area (whole window in landscape, CAM area in portrait)
 	//   P2  portrait CAM area is not the part above the CNC host
+	//   P3  main window or a control in it does not use the font family of the UI language
+	//   a dialog that cannot be opened is a problem, not a skip
 	//
 	// Usage: UICheckMainWindow.exe <language> <mode> <width> <height> <png> [dialog type name ...]
 	// <mode> is the page clicked before the capture: CAD (start page, nothing clicked), CAM, or CNC (machining).
@@ -44,14 +46,18 @@ namespace UICheck
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault( false );
 
-			// the language is taken from the app setting by StartupForm; set it in memory only, the file is untouched
+			// same start-up as Program.Main; the language is set in the setting in memory only, the file is untouched,
+			// then MyApp.Initialize runs again to apply it
 			string szBinDir = AppDomain.CurrentDomain.BaseDirectory;
 			m_App = Assembly.LoadFrom( Path.Combine( szBinDir, "MyCAM.exe" ) );
 			m_Cnc = Assembly.LoadFrom( Path.Combine( szBinDir, "CncUI.dll" ) );
 			Type myApp = m_App.GetType( "MyCAM.App.MyApp" );
-			myApp.GetMethod( "InitAppSetting" ).Invoke( null, null );
+			MethodInfo initialize = myApp.GetMethod( "Initialize" );
+			initialize.Invoke( null, null );
 			object setting = myApp.GetProperty( "AppSetting" ).GetValue( null );
 			setting.GetType().GetProperty( "UILanguage" ).SetValue( setting, szLanguage );
+			initialize.Invoke( null, null );
+			m_szExpectedFamily = GetExpectedFamily( szLanguage );
 
 			Form mainForm = (Form)Activator.CreateInstance( m_App.GetType( "MyCAM.StartupForm" ) );
 			mainForm.Shown += ( sender, e ) => mainForm.BeginInvoke( new Action( () =>
@@ -86,6 +92,7 @@ namespace UICheck
 			Console.WriteLine( "main window {0}x{1} ({2}), dialog area {3}", mainForm.Width, mainForm.Height,
 				isVertical ? "portrait" : "landscape", area );
 			int nProblemCount = CheckArea( mainForm, isVertical, area );
+			nProblemCount += CheckFontFamily( mainForm );
 
 			using( Bitmap bitmap = Capture( mainForm.Handle, mainForm.Size ) ) {
 				using( Graphics graphics = Graphics.FromImage( bitmap ) ) {
@@ -125,8 +132,8 @@ namespace UICheck
 		{
 			Type type = FindType( szName );
 			if( type == null ) {
-				Console.WriteLine( "SKIP  {0}: type not found", szName );
-				return 0;
+				Console.WriteLine( "FAIL  {0}: type not found", szName );
+				return 1;
 			}
 			Form dialog = null;
 			try {
@@ -162,14 +169,61 @@ namespace UICheck
 			}
 			catch( Exception ex ) {
 				Exception inner = ex is TargetInvocationException && ex.InnerException != null ? ex.InnerException : ex;
-				Console.WriteLine( "SKIP  {0}: {1} {2}", szName, inner.GetType().Name, inner.Message.Split( '\n' )[ 0 ].Trim() );
-				return 0;
+				// a dialog that cannot be opened is not checked, so it counts as a problem
+				Console.WriteLine( "FAIL  {0} cannot be opened: {1} {2}", szName, inner.GetType().Name,
+					inner.Message.Split( '\n' )[ 0 ].Trim() );
+				return 1;
 			}
 			finally {
 				if( dialog != null && !dialog.IsDisposed ) {
 					dialog.Close();
 					dialog.Dispose();
 				}
+			}
+		}
+
+		// P3: every control of the main window uses the family of the UI language (the value font is Consolas)
+		static int CheckFontFamily( Form mainForm )
+		{
+			int nProblemCount = 0;
+			if( mainForm.Font.Name != m_szExpectedFamily ) {
+				Console.WriteLine( "FAIL  P3 main window font {0}, expected {1}", mainForm.Font.Name, m_szExpectedFamily );
+				nProblemCount++;
+			}
+			nProblemCount += CheckChildFontFamily( mainForm );
+			return nProblemCount;
+		}
+
+		static int CheckChildFontFamily( Control parent )
+		{
+			int nProblemCount = 0;
+			foreach( Control child in parent.Controls ) {
+				string szFamily = child.Font.Name;
+				bool isExpected = szFamily == m_szExpectedFamily || szFamily == VALUE_FAMILY;
+				if( isExpected == false ) {
+					Console.WriteLine( "FAIL  P3 {0} ({1}) font {2}, expected {3}", child.Name, child.GetType().Name,
+						szFamily, m_szExpectedFamily );
+					nProblemCount++;
+
+					// the children inherit the same font, report the topmost one only
+					continue;
+				}
+				nProblemCount += CheckChildFontFamily( child );
+			}
+			return nProblemCount;
+		}
+
+		// independent of ThemeFonts on purpose, so a wrong initialization order is caught
+		static string GetExpectedFamily( string szLanguage )
+		{
+			if( string.Equals( szLanguage, "zh-TW", StringComparison.OrdinalIgnoreCase ) ) {
+				return "Microsoft JhengHei UI";
+			}
+			else if( string.Equals( szLanguage, "zh-CN", StringComparison.OrdinalIgnoreCase ) ) {
+				return "Microsoft YaHei UI";
+			}
+			else {
+				return "Segoe UI";
 			}
 		}
 
@@ -254,6 +308,9 @@ namespace UICheck
 			{ "CNC", "m_tsmiCNC" },
 		};
 
+		const string VALUE_FAMILY = "Consolas";
+
+		static string m_szExpectedFamily;
 		static Assembly m_App;
 		static Assembly m_Cnc;
 		static int m_nResult = 2;

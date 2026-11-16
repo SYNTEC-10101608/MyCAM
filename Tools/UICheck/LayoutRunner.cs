@@ -20,6 +20,8 @@ namespace UICheck
 	//   T3  section title wider than its card
 	//   T4  visible sibling controls that overlap
 	//   T5  visible control outside its container (scrolling containers are skipped)
+	//   T6  dialog layout after Load differs from the designer layout
+	//   a screen that cannot be opened is a problem, not a skip
 	//
 	// Usage: UICheckRunner.exe <language> <screenshot folder|-> [type name filter]
 	internal static class LayoutRunner
@@ -40,11 +42,11 @@ namespace UICheck
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault( false );
 
-			// same start-up order as StartupForm
+			// same start-up as Program.Main, then the language under test replaces the saved one in memory
 			string szBinDir = AppDomain.CurrentDomain.BaseDirectory;
 			Assembly app = Assembly.LoadFrom( Path.Combine( szBinDir, "MyCAM.exe" ) );
 			Assembly cnc = Assembly.LoadFrom( Path.Combine( szBinDir, "CncUI.dll" ) );
-			app.GetType( "MyCAM.App.MyApp" ).GetMethod( "InitAppSetting" ).Invoke( null, null );
+			app.GetType( "MyCAM.App.MyApp" ).GetMethod( "Initialize" ).Invoke( null, null );
 			LanguageManager.LanguageManager.CurrentUILanguage = szLanguage;
 			ThemeFonts.Initialize( szLanguage );
 
@@ -56,8 +58,11 @@ namespace UICheck
 				}
 				List<string> problemList;
 				string szError = CheckScreen( type, szShotDir, out problemList );
+
+				// a screen that cannot be opened is not checked, so it counts as a problem
 				if( szError != null ) {
-					Console.WriteLine( "SKIP  {0}: {1}", type.Name, szError );
+					Console.WriteLine( "FAIL  {0} cannot be opened: {1}", type.Name, szError );
+					nProblemCount++;
 					continue;
 				}
 				nCheckedCount++;
@@ -117,11 +122,19 @@ namespace UICheck
 					type.GetMethod( szPrepare, flags ).Invoke( instance, null );
 				}
 
+				// the designer layout, to compare with the one after Load; embedded panels are scaled to the host
+				bool isDialog = instance is Form;
+				Dictionary<Control, Rectangle> designBoundsMap = isDialog ? TakeBounds( form ) : null;
+				Size designClientSize = form.ClientSize;
+
 				// show without disturbing the desktop; the layout and the language texts are applied on Load
 				form.Opacity = 0;
 				form.Show();
 				Application.DoEvents();
 				CheckChildren( form, problemList );
+				if( isDialog ) {
+					CheckDesignLayout( form, designClientSize, designBoundsMap, problemList );
+				}
 				if( szShotDir != null ) {
 					SaveScreenshot( form, Path.Combine( szShotDir, type.Name + ".png" ) );
 				}
@@ -307,6 +320,48 @@ namespace UICheck
 			}
 		}
 
+		static Dictionary<Control, Rectangle> TakeBounds( Control root )
+		{
+			Dictionary<Control, Rectangle> boundsMap = new Dictionary<Control, Rectangle>();
+			Stack<Control> stack = new Stack<Control>();
+			stack.Push( root );
+			while( stack.Count > 0 ) {
+				Control control = stack.Pop();
+				foreach( Control child in control.Controls ) {
+					boundsMap[ child ] = child.Bounds;
+					stack.Push( child );
+				}
+			}
+			return boundsMap;
+		}
+
+		// T6: the layout after Load is the designer layout ("what the designer shows is what runs");
+		// auto-sized controls may change size because the language text is applied on Load
+		static void CheckDesignLayout( Form form, Size designClientSize, Dictionary<Control, Rectangle> designBoundsMap,
+			List<string> problemList )
+		{
+			if( form.ClientSize != designClientSize ) {
+				problemList.Add( string.Format( "T6 client size {0} after Load, designer {1}", form.ClientSize,
+					designClientSize ) );
+			}
+			foreach( KeyValuePair<Control, Rectangle> pair in designBoundsMap ) {
+				Control control = pair.Key;
+				Rectangle design = pair.Value;
+				if( control.IsDisposed || control.Parent == null ) {
+					continue;
+				}
+				// a combo box takes its height from the font and a list box rounds it to whole items when the
+				// handle is created, the designer shows the same
+				bool isSizeByHandle = control is ComboBox || control is ListBox;
+				bool isMoved = control.Location != design.Location;
+				bool isResized = control.AutoSize == false && isSizeByHandle == false && control.Size != design.Size;
+				if( isMoved || isResized ) {
+					problemList.Add( string.Format( "T6 {0} {1} after Load, designer {2}", Describe( control ),
+						control.Bounds, design ) );
+				}
+			}
+		}
+
 		static string Describe( Control control )
 		{
 			return string.IsNullOrEmpty( control.Name ) ? control.GetType().Name : control.Name;
@@ -334,7 +389,8 @@ namespace UICheck
 			{ "DesignSupportBracketDlg", "ShowInputParametersPanel" }
 		};
 
-		static readonly HashSet<string> SKIP_TYPE_LIST = new HashSet<string> { "StartupForm", "CNCDlg" };
+		// FormBase is the behavior base of the dialogs, not a screen
+		static readonly HashSet<string> SKIP_TYPE_LIST = new HashSet<string> { "StartupForm", "CNCDlg", "FormBase" };
 
 		// embedded panels are hosted at a typical size of their area in the main window
 		static readonly Dictionary<string, Size> PANEL_SIZE_MAP = new Dictionary<string, Size>
