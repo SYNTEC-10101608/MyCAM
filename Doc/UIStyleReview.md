@@ -163,3 +163,32 @@ C# 規範要求 `m_` + 控制項縮寫，但沒有縮寫對照表；本議題又
 | 主視窗字族 | 初始化放在 `MyApp.Initialize()`，`Program.Main` 先呼叫 | 另修正 `ToolStrip` 字型；P3 檢查字族 |
 
 驗證：`UICheck.bat runtime` 靜態 0、行為 0、zh-TW / zh-CN 各 33 畫面 0、主視窗 12 張截圖 0（含 P4）。
+
+## 6. 第二輪待決問題（草案，2026-11-16）
+
+第一輪沒有涵蓋的審查項目。不需決議、已直接處理的：D10（`UIStyleCheckReport.md` 第 4 節同步 Notes 的確認結果）。
+
+### 6.1 規則與元件
+
+| # | 問題 | 現況 | 建議 | 另一個選項 |
+| --- | --- | --- | --- | --- |
+| R2-1 | `Danger` 按鈕何時使用（2.3） | `Danger`：`CNCOffsetDialog`「全部清除」、`CalibrationREFDlg` 刪除點 / 全部刪除、`ContourEditDlg`「移除控制點」、`ExtendedGCodeDlg` / `RCornerDlg` / `MicroJointDlg` 刪除、`ToolVectorDlg` 移除 / 清除、`CNCPanel` 停止。`Normal`：`FlyCutDlg`「移除」；`PathEditDlg` / `PathCompensateDlg`「清除」、`ContourEditDlg`「清除資料」（三者都只是把輸入值歸零後預覽） | 規則：**刪除或移除已存在的資料**（點、微連、G-code、補償資料）用 `Danger`，CNC 停止用 `Danger`；只把輸入欄位歸零的「清除」是重設，用 `Normal`。照此只需改 `FlyCutDlg`「移除」（刪除飛切）→ `Danger`；`ToolVectorDlg`「清除所有控制點」是刪資料，維持 `Danger` | 「刪除 / 清除 / 移除」字樣一律 `Danger`（三個歸零的「清除」也改紅） |
+| R2-2 | `Primary` 給誰（2.3） | 多數給確定；另有 `AddPathDlg`「生成路徑」、`CNCThreePointDlg`「計算」、`DesignSupportBracketDlg`「下一步 / 生成 / 存 DXF」、`MicroJointDlg` 關閉鈕、`FlyCutDlg`「新增」 | 規則：`Primary` 只給**按下後完成這個對話框（或這一步）的動作**，每個畫面（精靈每一頁）最多一個；沒有這種動作就不設。照此只需改 `FlyCutDlg`「新增」→ `Normal`（`FlyCutDlg` 沒有確定鍵，關閉由 X） | 維持各對話框自行決定 |
+| R2-3 | 對話框寬度是否訂級距（第一輪 Q3） | 寬度 320（15 個）、380（5）、440（2）、500（1）以外，還有 360 `PathEditDlg`、400 `ThreePtTransformDlg`、434 `CalibrationREFDlg`、476 `ToolVectorDlg`、484 `CNCThreePointDlg`、584 `DesignSupportBracketDlg` | 訂 320 / 380 / 440 / 500 四級，新畫面必須選用；現有 5 個不在級距的對話框（不含 584 的精靈）調到最接近且放得下的一級，卡片與欄寬跟著調，靜態檢查加一條。只動寬度，不改內容 | 不訂級距，依內容決定（現況） |
+| R2-4 | 卡片內的小標是否允許（2.3） | `DesignSupportBracketDlg` 的「X 方向位置 / Y 方向位置」用 `Emphasis` 標籤當卡片內小標；S8 只檢查標題列，抓不到 | 不允許：語意是區塊就拆成卡片（4.5「區塊標題一律是 `SectionPanel.Text`」）。這兩個小標改為兩張卡片「X 方向位置」「Y 方向位置」；`Emphasis` 只用於軸名、欄位（例：`AxisTransformDlg`、`CNCOffsetDialog` 的軸名） | 允許卡片內小標，規範訂 `Emphasis`、`x = 10`、佔一列 |
+| R2-5 | `RemovableValueRow` 範圍寫死（D6） | ±99999、1 位小數寫在元件內；目前只有 `DesignSupportBracketDlg` 使用 | 本議題改為建構參數（`Minimum` / `Maximum` / `DecimalPlaces`），呼叫端傳入現值，行為不變 | 等第二個使用者出現再改 |
+
+### 6.2 檢查腳本其餘缺口
+
+| # | 缺口 | 建議 |
+| --- | --- | --- |
+| C2-1 | 執行時讀到 `bin` 裡過期的語系檔，ID 找不到時保留 Designer 文字，檢查照樣通過（本輪實際發生） | **本議題補**：`UICheck.bat runtime` 開始前比對 `Language/` 與 `bin/Debug/Resource/Language`，不同就先同步（等同 `CopyRef.bat` 的語系部分）並印出 |
+| C2-2 | R-c 多狀態畫面只檢查一個狀態（`AddPathDlg` 步驟、`DesignSupportBracketDlg` 三頁、`CNCThreePointDlg` 步驟） | **本議題補**：`LayoutRunner` 的 prepare 清單支援同一畫面多個狀態，各狀態跑 T1–T6 並各存一張截圖 |
+| C2-3 | S-c 按鈕列順序與卡片內對齊沒檢查 | **本議題補**：S5 加「確定最右、取消在其左、輔助從 x = 12」與「同卡片輸入欄左緣對齊、單位距輸入欄 6」 |
+| C2-4 | S-d `StartupForm.Designer.cs` 不在 S1 / S2 | **本議題補**：S1 以主視窗白名單（第 3 節主視窗列）檢查；S2 只排除圖層列色塊與圖例 |
+| C2-5 | S-e 具名顏色常數可繞過 | **本議題補**：資料色常數名稱列在 `StaticExceptions.txt`，未列入的 `static readonly Color` 報錯 |
+| C2-6 | R-g 置中只驗 3 個對話框、同一種開啟方式 | 列後續：`ShowDialog` 會阻塞 runner，需另寫非同步關閉，成本高於收益；目前置中只有 `DialogBase.OnLoad` 一處，`Show` / `ShowDialog` 共用 |
+| C2-7 | V4 語系改在 `OnLoad` 套用，`Show` 之前讀 `Text` 會拿到 zh-TW | **本議題人工盤點一次**（靜態難以判斷呼叫時機，不做成腳本）：搜尋各對話框建構子與 `Show` 前呼叫的方法中讀取標題類控制項 `.Text` 的地方，有的話改為讀語系字串；尚未盤點 |
+| C2-8 | V5 刪除的容器原本的 `Enabled` / `Visible` 由誰承接 | 列後續：B8 已比對 `.cs` 的賦值行，被賦值的控制項不存在時 B5 會報；剩下的情境需人工 |
+| C2-9 | S-b 面板卡片規格無靜態檢查 | 列後續：面板由 T1–T4、P4 在實際大小下檢查；座標規則因 `INFO_ROW_PITCH` 與縮放不同，靜態規則效益低 |
+| C2-10 | R-e 執行時才填入的文字（約 40 個控制項）在 zh-CN 下是否截斷 | 列後續：需要假資料或連線，與「CNC 連線測試」一起處理 |
