@@ -6,9 +6,8 @@
   <Message ID="m_pnlBase" Content="Размер основания" />
   <Message ID="m_lblXExtension" Content="Расстояние удлинения по X" />
   <Message ID="m_lblYExtension" Content="Расстояние удлинения по Y" />
-  <Message ID="m_pnlBracket" Content="Положение кронштейна" />
-  <Message ID="m_lblXPositionsTitle" Content="Положение кронштейна по X" />
-  <Message ID="m_lblYPositionsTitle" Content="Положение кронштейна по Y" />
+  <Message ID="m_pnlXBracket" Content="Положение кронштейна по X" />
+  <Message ID="m_pnlYBracket" Content="Положение кронштейна по Y" />
   <Message ID="m_btnAddXPosition" Content="+ Добавить положение по X" />
   <Message ID="m_btnAddYPosition" Content="+ Добавить положение по Y" />
   <Message ID="m_pnlBracketHeight" Content="Высота кронштейна" />

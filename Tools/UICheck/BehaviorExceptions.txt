@@ -42,3 +42,5 @@ B8 AddPathDlg m_pnlStepHint the step hint labels moved into the m_pnlStepHint ca
 B8 CNCThreePointDlg m_lblWorkpieceStep step labels became section titles; m_pnlCalculation is shown / hidden instead of m_lblCalculationStep, the hand-sized ClientSize is replaced by SectionStack
 B8 CNCThreePointDlg m_pnlWorkpiece same statement as above, written without the removed step labels
 B8 ToolVectorDlg m_pnlStartEndSwitch the start / end switch row left m_pnlIndexParam; its panel is enabled at the same time (decision 2026-11-16 ToolVectorDlg)
+B6 DesignSupportBracketDlg m_lblXPositionsTitle title moved to the card m_pnlXBracket (2026-11-16: no sub-titles inside a card)
+B6 DesignSupportBracketDlg m_lblYPositionsTitle title moved to the card m_pnlYBracket (2026-11-16: no sub-titles inside a card)

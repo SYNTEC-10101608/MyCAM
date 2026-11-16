@@ -39,9 +39,8 @@
 			this.m_lblYExtension = new System.Windows.Forms.Label();
 			this.m_numYExtension = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblYExtensionUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_pnlBracket = new CommonUI.Controls.SectionPanel();
-			this.m_lblXPositionsTitle = new CommonUI.Controls.ThemedLabel();
-			this.m_lblYPositionsTitle = new CommonUI.Controls.ThemedLabel();
+			this.m_pnlXBracket = new CommonUI.Controls.SectionPanel();
+			this.m_pnlYBracket = new CommonUI.Controls.SectionPanel();
 			this.m_btnResetPositions = new CommonUI.Controls.ThemedButton();
 			this.m_pnlXPositions = new System.Windows.Forms.Panel();
 			this.m_pnlYPositions = new System.Windows.Forms.Panel();
@@ -91,7 +90,8 @@
 			this.m_pnlSelectFace.SuspendLayout();
 			this.m_pnlInputParametersPage.SuspendLayout();
 			this.m_pnlBase.SuspendLayout();
-			this.m_pnlBracket.SuspendLayout();
+			this.m_pnlXBracket.SuspendLayout();
+			this.m_pnlYBracket.SuspendLayout();
 			this.m_pnlXPositions.SuspendLayout();
 			this.m_pnlYPositions.SuspendLayout();
 			this.m_pnlBracketHeight.SuspendLayout();
@@ -154,12 +154,14 @@
 			// m_pnlInputParametersPage
 			// 
 			this.m_pnlInputParametersPage.Controls.Add(this.m_pnlBase);
-			this.m_pnlInputParametersPage.Controls.Add(this.m_pnlBracket);
+			this.m_pnlInputParametersPage.Controls.Add(this.m_pnlXBracket);
+			this.m_pnlInputParametersPage.Controls.Add(this.m_pnlYBracket);
 			this.m_pnlInputParametersPage.Controls.Add(this.m_pnlBracketHeight);
 			this.m_pnlInputParametersPage.Controls.Add(this.m_pnlCrossFit);
 			this.m_pnlInputParametersPage.Controls.Add(this.m_pnlBracketCount);
 			this.m_pnlInputParametersPage.Controls.Add(this.m_pnlBottomPinSize);
 			this.m_pnlInputParametersPage.Controls.Add(this.m_btnBack);
+			this.m_pnlInputParametersPage.Controls.Add(this.m_btnResetPositions);
 			this.m_pnlInputParametersPage.Controls.Add(this.m_btnGenerate);
 			this.m_pnlInputParametersPage.Location = new System.Drawing.Point(12, 12);
 			this.m_pnlInputParametersPage.Name = "m_pnlInputParametersPage";
@@ -238,81 +240,66 @@
 			this.m_lblYExtensionUnit.TabIndex = 5;
 			this.m_lblYExtensionUnit.Text = "mm";
 			// 
-			// m_pnlBracket
-			// 
-			this.m_pnlBracket.Controls.Add(this.m_lblXPositionsTitle);
-			this.m_pnlBracket.Controls.Add(this.m_lblYPositionsTitle);
-			this.m_pnlBracket.Controls.Add(this.m_btnResetPositions);
-			this.m_pnlBracket.Controls.Add(this.m_pnlXPositions);
-			this.m_pnlBracket.Controls.Add(this.m_pnlYPositions);
-			this.m_pnlBracket.Controls.Add(this.m_btnAddXPosition);
-			this.m_pnlBracket.Controls.Add(this.m_btnAddYPosition);
-			this.m_pnlBracket.Location = new System.Drawing.Point(0, 107);
-			this.m_pnlBracket.Name = "m_pnlBracket";
-			this.m_pnlBracket.Size = new System.Drawing.Size(560, 249);
-			this.m_pnlBracket.TabIndex = 1;
-			this.m_pnlBracket.Text = "支架位置";
-			// 
-			// m_lblXPositionsTitle
-			// 
-			this.m_lblXPositionsTitle.AutoSize = true;
-			this.m_lblXPositionsTitle.Location = new System.Drawing.Point(10, 40);
-			this.m_lblXPositionsTitle.Name = "m_lblXPositionsTitle";
-			this.m_lblXPositionsTitle.Role = CommonUI.Theme.TextRole.Emphasis;
-			this.m_lblXPositionsTitle.Size = new System.Drawing.Size(92, 16);
-			this.m_lblXPositionsTitle.TabIndex = 0;
-			this.m_lblXPositionsTitle.Text = "X 方向支架位置";
-			// 
-			// m_lblYPositionsTitle
-			// 
-			this.m_lblYPositionsTitle.AutoSize = true;
-			this.m_lblYPositionsTitle.Location = new System.Drawing.Point(290, 40);
-			this.m_lblYPositionsTitle.Name = "m_lblYPositionsTitle";
-			this.m_lblYPositionsTitle.Role = CommonUI.Theme.TextRole.Emphasis;
-			this.m_lblYPositionsTitle.Size = new System.Drawing.Size(92, 16);
-			this.m_lblYPositionsTitle.TabIndex = 1;
-			this.m_lblYPositionsTitle.Text = "Y 方向支架位置";
-			// 
+			// m_pnlXBracket
+			//
+			this.m_pnlXBracket.Controls.Add(this.m_pnlXPositions);
+			this.m_pnlXBracket.Controls.Add(this.m_btnAddXPosition);
+			this.m_pnlXBracket.Location = new System.Drawing.Point(0, 107);
+			this.m_pnlXBracket.Name = "m_pnlXBracket";
+			this.m_pnlXBracket.Size = new System.Drawing.Size(276, 249);
+			this.m_pnlXBracket.TabIndex = 1;
+			this.m_pnlXBracket.Text = "X 方向支架位置";
+			//
+			// m_pnlYBracket
+			//
+			this.m_pnlYBracket.Controls.Add(this.m_pnlYPositions);
+			this.m_pnlYBracket.Controls.Add(this.m_btnAddYPosition);
+			this.m_pnlYBracket.Location = new System.Drawing.Point(284, 107);
+			this.m_pnlYBracket.Name = "m_pnlYBracket";
+			this.m_pnlYBracket.Size = new System.Drawing.Size(276, 249);
+			this.m_pnlYBracket.TabIndex = 2;
+			this.m_pnlYBracket.Text = "Y 方向支架位置";
+			//
 			// m_btnResetPositions
-			// 
-			this.m_btnResetPositions.Location = new System.Drawing.Point(470, 36);
+			//
+			this.m_btnResetPositions.Location = new System.Drawing.Point(88, 915);
 			this.m_btnResetPositions.Name = "m_btnResetPositions";
-			this.m_btnResetPositions.Size = new System.Drawing.Size(80, 23);
-			this.m_btnResetPositions.TabIndex = 2;
+			this.m_btnResetPositions.Size = new System.Drawing.Size(80, 28);
+			this.m_btnResetPositions.TabIndex = 8;
 			this.m_btnResetPositions.Text = "重設位置";
 			this.m_btnResetPositions.Click += new System.EventHandler(this.m_btnResetPositions_Click);
-			// 
+			//
 			// m_pnlXPositions
-			// 
+			//
 			this.m_pnlXPositions.AutoScroll = true;
-			this.m_pnlXPositions.Location = new System.Drawing.Point(10, 66);
+			this.m_pnlXPositions.Location = new System.Drawing.Point(10, 36);
 			this.m_pnlXPositions.Name = "m_pnlXPositions";
-			this.m_pnlXPositions.Size = new System.Drawing.Size(260, 150);
-			this.m_pnlXPositions.TabIndex = 3;
-			// 
+			this.m_pnlXPositions.Size = new System.Drawing.Size(256, 174);
+			this.m_pnlXPositions.TabIndex = 0;
+			//
 			// m_pnlYPositions
-			// 
+			//
 			this.m_pnlYPositions.AutoScroll = true;
-			this.m_pnlYPositions.Location = new System.Drawing.Point(290, 66);
+			this.m_pnlYPositions.Location = new System.Drawing.Point(10, 36);
 			this.m_pnlYPositions.Name = "m_pnlYPositions";
-			this.m_pnlYPositions.Size = new System.Drawing.Size(260, 150);
-			this.m_pnlYPositions.TabIndex = 4;
-			// 
+			this.m_pnlYPositions.Size = new System.Drawing.Size(256, 174);
+			this.m_pnlYPositions.TabIndex = 0;
+			//
 			// m_btnAddXPosition
-			// 
+			//
 			this.m_btnAddXPosition.Location = new System.Drawing.Point(10, 216);
 			this.m_btnAddXPosition.Name = "m_btnAddXPosition";
-			this.m_btnAddXPosition.Size = new System.Drawing.Size(260, 23);
-			this.m_btnAddXPosition.TabIndex = 5;
+			this.m_btnAddXPosition.Size = new System.Drawing.Size(256, 23);
+			this.m_btnAddXPosition.TabIndex = 1;
 			this.m_btnAddXPosition.Text = "+ 新增 X 支架位置";
 			this.m_btnAddXPosition.Click += new System.EventHandler(this.m_btnAddXPosition_Click);
-			// 
+			//
 			// m_btnAddYPosition
-			// 
-			this.m_btnAddYPosition.Location = new System.Drawing.Point(290, 216);
+			//
+			this.m_btnAddYPosition.Location = new System.Drawing.Point(10, 216);
 			this.m_btnAddYPosition.Name = "m_btnAddYPosition";
-			this.m_btnAddYPosition.Size = new System.Drawing.Size(260, 23);
-			this.m_btnAddYPosition.TabIndex = 6;
+			this.m_btnAddYPosition.Size = new System.Drawing.Size(256, 23);
+			this.m_btnAddYPosition.TabIndex = 1;
 			this.m_btnAddYPosition.Text = "+ 新增 Y 支架位置";
 			this.m_btnAddYPosition.Click += new System.EventHandler(this.m_btnAddYPosition_Click);
 			// 
@@ -327,7 +314,7 @@
 			this.m_pnlBracketHeight.Location = new System.Drawing.Point(0, 364);
 			this.m_pnlBracketHeight.Name = "m_pnlBracketHeight";
 			this.m_pnlBracketHeight.Size = new System.Drawing.Size(560, 99);
-			this.m_pnlBracketHeight.TabIndex = 2;
+			this.m_pnlBracketHeight.TabIndex = 3;
 			this.m_pnlBracketHeight.Text = "支架高度";
 			// 
 			// m_lblZExtension
@@ -397,7 +384,7 @@
 			this.m_pnlCrossFit.Location = new System.Drawing.Point(0, 471);
 			this.m_pnlCrossFit.Name = "m_pnlCrossFit";
 			this.m_pnlCrossFit.Size = new System.Drawing.Size(560, 154);
-			this.m_pnlCrossFit.TabIndex = 3;
+			this.m_pnlCrossFit.TabIndex = 4;
 			this.m_pnlCrossFit.Text = "咬合設計";
 			// 
 			// m_lblEngagementDepth
@@ -447,7 +434,7 @@
 			this.m_pnlBracketCount.Location = new System.Drawing.Point(0, 633);
 			this.m_pnlBracketCount.Name = "m_pnlBracketCount";
 			this.m_pnlBracketCount.Size = new System.Drawing.Size(560, 99);
-			this.m_pnlBracketCount.TabIndex = 4;
+			this.m_pnlBracketCount.TabIndex = 5;
 			this.m_pnlBracketCount.Text = "底部拼接數量";
 			// 
 			// m_lblXPinCount
@@ -506,7 +493,7 @@
 			this.m_pnlBottomPinSize.Location = new System.Drawing.Point(0, 740);
 			this.m_pnlBottomPinSize.Name = "m_pnlBottomPinSize";
 			this.m_pnlBottomPinSize.Size = new System.Drawing.Size(560, 159);
-			this.m_pnlBottomPinSize.TabIndex = 5;
+			this.m_pnlBottomPinSize.TabIndex = 6;
 			this.m_pnlBottomPinSize.Text = "拼接尺寸";
 			// 
 			// m_lblPinLength
@@ -639,7 +626,7 @@
 			this.m_btnBack.Location = new System.Drawing.Point(0, 915);
 			this.m_btnBack.Name = "m_btnBack";
 			this.m_btnBack.Size = new System.Drawing.Size(80, 28);
-			this.m_btnBack.TabIndex = 6;
+			this.m_btnBack.TabIndex = 7;
 			this.m_btnBack.Text = "上一步";
 			this.m_btnBack.Click += new System.EventHandler(this.m_btnBack_Click);
 			// 
@@ -649,7 +636,7 @@
 			this.m_btnGenerate.Location = new System.Drawing.Point(480, 915);
 			this.m_btnGenerate.Name = "m_btnGenerate";
 			this.m_btnGenerate.Size = new System.Drawing.Size(80, 28);
-			this.m_btnGenerate.TabIndex = 7;
+			this.m_btnGenerate.TabIndex = 9;
 			this.m_btnGenerate.Text = "生成";
 			this.m_btnGenerate.Click += new System.EventHandler(this.m_btnGenerate_Click);
 			// 
@@ -731,8 +718,8 @@
 			this.m_pnlInputParametersPage.ResumeLayout(false);
 			this.m_pnlBase.ResumeLayout(false);
 			this.m_pnlBase.PerformLayout();
-			this.m_pnlBracket.ResumeLayout(false);
-			this.m_pnlBracket.PerformLayout();
+			this.m_pnlXBracket.ResumeLayout(false);
+			this.m_pnlYBracket.ResumeLayout(false);
 			this.m_pnlXPositions.ResumeLayout(false);
 			this.m_pnlYPositions.ResumeLayout(false);
 			this.m_pnlBracketHeight.ResumeLayout(false);
@@ -777,9 +764,8 @@
 		private System.Windows.Forms.Label m_lblYExtension;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numYExtension;
 		private CommonUI.Controls.ThemedLabel m_lblYExtensionUnit;
-		private CommonUI.Controls.SectionPanel m_pnlBracket;
-		private CommonUI.Controls.ThemedLabel m_lblXPositionsTitle;
-		private CommonUI.Controls.ThemedLabel m_lblYPositionsTitle;
+		private CommonUI.Controls.SectionPanel m_pnlXBracket;
+		private CommonUI.Controls.SectionPanel m_pnlYBracket;
 		private CommonUI.Controls.ThemedButton m_btnResetPositions;
 		private System.Windows.Forms.Panel m_pnlXPositions;
 		private System.Windows.Forms.Panel m_pnlYPositions;
