@@ -51,6 +51,7 @@
 	  <SubType>Component</SubType>
 	</Compile>
 	<Compile Include="Controls\SectionStack.cs" />
+	<Compile Include="Controls\SectionTitleDrawing.cs" />
 	<Compile Include="Controls\ThemedButton.cs">
 	  <SubType>Component</SubType>
 	</Compile>

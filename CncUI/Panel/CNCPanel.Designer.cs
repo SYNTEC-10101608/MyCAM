@@ -109,7 +109,7 @@
             //
             this.m_lblAuxiliaryTitle.Location = new System.Drawing.Point( 11, 4 );
             this.m_lblAuxiliaryTitle.Name = "m_lblAuxiliaryTitle";
-            this.m_lblAuxiliaryTitle.Role = CommonUI.Theme.TextRole.Emphasis;
+            this.m_lblAuxiliaryTitle.Role = CommonUI.Theme.TextRole.SectionTitle;
             this.m_lblAuxiliaryTitle.Size = new System.Drawing.Size( 120, 24 );
             this.m_lblAuxiliaryTitle.TabIndex = 0;
             this.m_lblAuxiliaryTitle.Text = "功能控制";
@@ -201,7 +201,7 @@
             //
             this.m_lblJogTitle.Location = new System.Drawing.Point( 11, 4 );
             this.m_lblJogTitle.Name = "m_lblJogTitle";
-            this.m_lblJogTitle.Role = CommonUI.Theme.TextRole.Emphasis;
+            this.m_lblJogTitle.Role = CommonUI.Theme.TextRole.SectionTitle;
             this.m_lblJogTitle.Size = new System.Drawing.Size( 193, 22 );
             this.m_lblJogTitle.TabIndex = 0;
             this.m_lblJogTitle.Text = "軸向移動";
@@ -360,7 +360,7 @@
             //
             this.m_lblHomeTitle.Location = new System.Drawing.Point( 11, 4 );
             this.m_lblHomeTitle.Name = "m_lblHomeTitle";
-            this.m_lblHomeTitle.Role = CommonUI.Theme.TextRole.Emphasis;
+            this.m_lblHomeTitle.Role = CommonUI.Theme.TextRole.SectionTitle;
             this.m_lblHomeTitle.Size = new System.Drawing.Size( 193, 22 );
             this.m_lblHomeTitle.TabIndex = 0;
             this.m_lblHomeTitle.Text = "回零";
@@ -407,7 +407,7 @@
             //
             this.m_lblStrategyTitle.Location = new System.Drawing.Point( 11, 4 );
             this.m_lblStrategyTitle.Name = "m_lblStrategyTitle";
-            this.m_lblStrategyTitle.Role = CommonUI.Theme.TextRole.Emphasis;
+            this.m_lblStrategyTitle.Role = CommonUI.Theme.TextRole.SectionTitle;
             this.m_lblStrategyTitle.Size = new System.Drawing.Size( 120, 24 );
             this.m_lblStrategyTitle.TabIndex = 0;
             this.m_lblStrategyTitle.Text = "加工策略";
@@ -466,7 +466,7 @@
             //
             this.m_lblMachiningTitle.Location = new System.Drawing.Point( 11, 4 );
             this.m_lblMachiningTitle.Name = "m_lblMachiningTitle";
-            this.m_lblMachiningTitle.Role = CommonUI.Theme.TextRole.Emphasis;
+            this.m_lblMachiningTitle.Role = CommonUI.Theme.TextRole.SectionTitle;
             this.m_lblMachiningTitle.Size = new System.Drawing.Size( 97, 22 );
             this.m_lblMachiningTitle.TabIndex = 0;
             this.m_lblMachiningTitle.Text = "加工控制";

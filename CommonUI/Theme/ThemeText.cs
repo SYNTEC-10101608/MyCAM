@@ -21,6 +21,7 @@ namespace CommonUI.Theme
 				case TextRole.Emphasis:
 				case TextRole.Title:
 				case TextRole.Value:
+				case TextRole.SectionTitle:
 					return ThemeColors.TEXT;
 				case TextRole.Secondary:
 					return ThemeColors.TEXT_SECONDARY;

@@ -12,6 +12,9 @@
 		Secondary,
 		Error,
 		Warning,
-		Success
+		Success,
+
+		// section title outside a SectionPanel title bar (accent bar + emphasis), only for ThemedLabel
+		SectionTitle
 	}
 }
