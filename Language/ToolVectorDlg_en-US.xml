@@ -17,16 +17,16 @@
 	<Message ID="m_btnAdd" Content="Add" />
 	<Message ID="m_btnRemove" Content="Delete" />
 	<Message ID="m_btnClear" Content="Clear All Control Points" />
-	<Message ID="m_gpbStartPnt" Content="Start/End Point Navigation" />
+	<Message ID="m_secMovePnt" Content="Point Navigation" />
+	<Message ID="m_lblStartPnt" Content="Start/End Point Navigation" />
 	<Message ID="m_btnToStart" Content="To Start Point" />
-	<Message ID="m_gpbPnt" Content="Point Navigation" />
+	<Message ID="m_lblPnt" Content="Previous/Next Point" />
 	<Message ID="m_btnPrev" Content="Previous Point" />
 	<Message ID="m_btnNext" Content="Next Point" />
 	<Message ID="m_btnToEnd" Content="To End Point" />
-	<Message ID="m_gpbCtrlPnt" Content="Control Point Navigation" />
+	<Message ID="m_lblCtrlPnt" Content="Control Point Navigation" />
 	<Message ID="m_btnPreCtrlPnt" Content="Previous Control Point" />
 	<Message ID="m_btnNextCtrlPnt" Content="Next Control Point" />
-	<Message ID="m_gbxColorLegend" Content="Interpolation Scheme" />
 	<Message ID="m_lblLegendNormal" Content="Maintain" />
 	<Message ID="m_lblLegendRotary" Content="Rotary Axis Smoothing" />
 	<Message ID="m_lblLegendBevel" Content="Tilt-Angle Bevel Cutting" />
