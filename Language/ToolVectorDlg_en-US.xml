@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="ToolVectorDlg" Content="Edge Tool Orientation" />
-	<Message ID="m_secToolVecInfo" Content="Single-Point Tool Orientation" />
+	<Message ID="m_pnlToolVecInfo" Content="Single-Point Tool Orientation" />
 	<Message ID="m_lblADeg" Content="Forward Tilt Angle" />
 	<Message ID="m_lblBDeg" Content="Lateral Tilt Angle" />
 	<Message ID="m_lblInterpolateType" Content="Interpolation Method" />
-	<Message ID="m_secQuickSet" Content="Quick Tool Orientation Settings" />
+	<Message ID="m_pnlQuickSet" Content="Quick Tool Orientation Settings" />
 	<Message ID="m_btnZDir" Content="Z-Axis Facing" />
 	<Message ID="m_btnKeep" Content="Keep Previous Orientation" />
 	<Message ID="m_btnRevert" Content="Original" />
@@ -13,11 +13,11 @@
 	<Message ID="m_btnSwitchStartEnd" Content="Start/End" />
 	<Message ID="m_lblStartOrEnd_Start" Content="Current Position: Start Point" />
 	<Message ID="m_lblStartOrEnd_End" Content="Current Position: End Point" />
-	<Message ID="m_secSetting" Content="Tool Orientation Settings" />
+	<Message ID="m_pnlSetting" Content="Tool Orientation Settings" />
 	<Message ID="m_btnAdd" Content="Add" />
 	<Message ID="m_btnRemove" Content="Delete" />
 	<Message ID="m_btnClear" Content="Clear All Control Points" />
-	<Message ID="m_secMovePnt" Content="Point Navigation" />
+	<Message ID="m_pnlMovePnt" Content="Point Navigation" />
 	<Message ID="m_lblStartPnt" Content="Start/End Point Navigation" />
 	<Message ID="m_btnToStart" Content="To Start Point" />
 	<Message ID="m_lblPnt" Content="Previous/Next Point" />

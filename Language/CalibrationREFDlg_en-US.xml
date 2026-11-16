@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="CalibrationREFDlg" Content="Three-Point Calibration" />
-	<Message ID="m_gbPnt1" Content="Reference Point 1" />
-	<Message ID="m_gbPnt2" Content="Reference Point 2" />
-	<Message ID="m_gbPnt3" Content="Reference Point 3" />
+	<Message ID="m_pnlPnt1" Content="Reference Point 1" />
+	<Message ID="m_pnlPnt2" Content="Reference Point 2" />
+	<Message ID="m_pnlPnt3" Content="Reference Point 3" />
 	<Message ID="m_btnDelete" Content="Delete" />
 	<Message ID="m_btnDeletAll" Content="Delete All" />
 	<Message ID="NeedThreeRefPoints" Content="Three reference points required" />

@@ -20,24 +20,24 @@ namespace MyCAM.Editor.Dialog
 		void InitLocalizedTexts()
 		{
 			// circle panel labels
-			label6.Text = m_LanguageManager.TryGetString( "m_lblDiameter", label6.Text );
-			label7.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", label7.Text );
+			m_lblCircleDiameter.Text = m_LanguageManager.TryGetString( "m_lblDiameter", m_lblCircleDiameter.Text );
+			m_lblCircleRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", m_lblCircleRotateAngle.Text );
 
 			// rectangle panel labels
-			label2.Text = m_LanguageManager.TryGetString( "m_lblLength", label2.Text );
-			label3.Text = m_LanguageManager.TryGetString( "m_lblWidth", label3.Text );
-			label4.Text = m_LanguageManager.TryGetString( "m_lblCornerRadius", label4.Text );
-			label5.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", label5.Text );
+			m_lblRectLength.Text = m_LanguageManager.TryGetString( "m_lblLength", m_lblRectLength.Text );
+			m_lblRectWidth.Text = m_LanguageManager.TryGetString( "m_lblWidth", m_lblRectWidth.Text );
+			m_lblRectFilletRadius.Text = m_LanguageManager.TryGetString( "m_lblCornerRadius", m_lblRectFilletRadius.Text );
+			m_lblRectRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", m_lblRectRotateAngle.Text );
 
 			// runway panel labels
-			label15.Text = m_LanguageManager.TryGetString( "m_lblLength", label15.Text );
-			label14.Text = m_LanguageManager.TryGetString( "m_lblWidth", label14.Text );
-			label12.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", label12.Text );
+			m_lblRunwayLength.Text = m_LanguageManager.TryGetString( "m_lblLength", m_lblRunwayLength.Text );
+			m_lblRunwayWidth.Text = m_LanguageManager.TryGetString( "m_lblWidth", m_lblRunwayWidth.Text );
+			m_lblRunwayRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", m_lblRunwayRotateAngle.Text );
 
 			// polygon panel labels
-			label13.Text = m_LanguageManager.TryGetString( "m_lblSideLength", label13.Text );
-			label8.Text = m_LanguageManager.TryGetString( "m_lblCornerRadius", label8.Text );
-			label11.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", label11.Text );
+			m_lblPolygonSideLength.Text = m_LanguageManager.TryGetString( "m_lblSideLength", m_lblPolygonSideLength.Text );
+			m_lblPolygonFilletRadius.Text = m_LanguageManager.TryGetString( "m_lblCornerRadius", m_lblPolygonFilletRadius.Text );
+			m_lblPolygonRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", m_lblPolygonRotateAngle.Text );
 
 			// Update combo box items with localized strings
 			UpdatePathTypeComboBoxItems();
@@ -73,25 +73,25 @@ namespace MyCAM.Editor.Dialog
 					if( !( m_StandardPatternGeomData is CircleGeomData circleGeomData ) ) {
 						return;
 					}
-					m_txbCircleDiameter.Text = circleGeomData.Diameter.ToString();
-					m_txbCircleRotatedAngle.Text = circleGeomData.RotatedAngle_deg.ToString();
+					m_numCircleDiameter.Text = circleGeomData.Diameter.ToString();
+					m_numCircleRotatedAngle.Text = circleGeomData.RotatedAngle_deg.ToString();
 					break;
 				case PathType.Rectangle:
 					if( !( m_StandardPatternGeomData is RectangleGeomData rectangleGeomData ) ) {
 						return;
 					}
-					m_txbRecLength.Text = rectangleGeomData.Length.ToString();
-					m_txbRecWidth.Text = rectangleGeomData.Width.ToString();
-					m_txbRecCornerRadius.Text = rectangleGeomData.CornerRadius.ToString();
-					m_txbRecRotatedAngle.Text = rectangleGeomData.RotatedAngle_deg.ToString();
+					m_numRecLength.Text = rectangleGeomData.Length.ToString();
+					m_numRecWidth.Text = rectangleGeomData.Width.ToString();
+					m_numRecCornerRadius.Text = rectangleGeomData.CornerRadius.ToString();
+					m_numRecRotatedAngle.Text = rectangleGeomData.RotatedAngle_deg.ToString();
 					break;
 				case PathType.Runway:
 					if( !( m_StandardPatternGeomData is RunwayGeomData runwayGeomData ) ) {
 						return;
 					}
-					m_txbRunwayLength.Text = runwayGeomData.Length.ToString();
-					m_txbRunwayWidth.Text = runwayGeomData.Width.ToString();
-					m_txbRunwayRotatedAngle.Text = runwayGeomData.RotatedAngle_deg.ToString();
+					m_numRunwayLength.Text = runwayGeomData.Length.ToString();
+					m_numRunwayWidth.Text = runwayGeomData.Width.ToString();
+					m_numRunwayRotatedAngle.Text = runwayGeomData.RotatedAngle_deg.ToString();
 					break;
 				case PathType.Triangle:
 				case PathType.Square:
@@ -100,9 +100,9 @@ namespace MyCAM.Editor.Dialog
 					if( !( m_StandardPatternGeomData is PolygonGeomData polygonGeomData ) ) {
 						return;
 					}
-					m_txbPolygonSideLength.Text = polygonGeomData.SideLength.ToString();
-					m_txbPolygonCornerRadius.Text = polygonGeomData.CornerRadius.ToString();
-					m_txbPolygonRotatedAngle.Text = polygonGeomData.RotatedAngle_deg.ToString();
+					m_numPolygonSideLength.Text = polygonGeomData.SideLength.ToString();
+					m_numPolygonCornerRadius.Text = polygonGeomData.CornerRadius.ToString();
+					m_numPolygonRotatedAngle.Text = polygonGeomData.RotatedAngle_deg.ToString();
 					break;
 				default:
 					break;
@@ -231,10 +231,10 @@ namespace MyCAM.Editor.Dialog
 
 		void HideAllPanels()
 		{
-			m_panelRectangle.Visible = false;
-			m_panelCircle.Visible = false;
-			m_panelRunway.Visible = false;
-			m_panelPolygon.Visible = false;
+			m_pnlRectangle.Visible = false;
+			m_pnlCircle.Visible = false;
+			m_pnlRunway.Visible = false;
+			m_pnlPolygon.Visible = false;
 			m_chkCoordReverse.Visible = false;
 		}
 
@@ -243,22 +243,22 @@ namespace MyCAM.Editor.Dialog
 			HideAllPanels();
 			switch( (PathType)nIndex ) {
 				case PathType.Circle:
-					m_panelCircle.Visible = true;
+					m_pnlCircle.Visible = true;
 					m_chkCoordReverse.Visible = true;
 					break;
 				case PathType.Rectangle:
-					m_panelRectangle.Visible = true;
+					m_pnlRectangle.Visible = true;
 					m_chkCoordReverse.Visible = true;
 					break;
 				case PathType.Runway:
-					m_panelRunway.Visible = true;
+					m_pnlRunway.Visible = true;
 					m_chkCoordReverse.Visible = true;
 					break;
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
-					m_panelPolygon.Visible = true;
+					m_pnlPolygon.Visible = true;
 					m_chkCoordReverse.Visible = true;
 					break;
 				default:
@@ -268,18 +268,18 @@ namespace MyCAM.Editor.Dialog
 
 		void SetCircleParam( double diameter, double rotatedAngle_deg )
 		{
-			m_txbCircleDiameter.Text = diameter.ToString( "F3" );
-			m_txbCircleRotatedAngle.Text = rotatedAngle_deg.ToString( "F3" );
+			m_numCircleDiameter.Text = diameter.ToString( "F3" );
+			m_numCircleRotatedAngle.Text = rotatedAngle_deg.ToString( "F3" );
 			m_CircleDiameter = diameter;
 			m_CirRotatedAngle_deg = rotatedAngle_deg;
 		}
 
 		void SetRectangleParam( double length, double width, double cornerRadius, double rotatedAngle_deg )
 		{
-			m_txbRecLength.Text = length.ToString( "F3" );
-			m_txbRecWidth.Text = width.ToString( "F3" );
-			m_txbRecCornerRadius.Text = cornerRadius.ToString( "F3" );
-			m_txbRecRotatedAngle.Text = rotatedAngle_deg.ToString( "F3" );
+			m_numRecLength.Text = length.ToString( "F3" );
+			m_numRecWidth.Text = width.ToString( "F3" );
+			m_numRecCornerRadius.Text = cornerRadius.ToString( "F3" );
+			m_numRecRotatedAngle.Text = rotatedAngle_deg.ToString( "F3" );
 			m_RectLength = length;
 			m_RectWidth = width;
 			m_RectCornerRadius = cornerRadius;
@@ -288,9 +288,9 @@ namespace MyCAM.Editor.Dialog
 
 		void SetRunwayParam( double length, double width, double rotatedAngle_deg )
 		{
-			m_txbRunwayLength.Text = length.ToString( "F3" );
-			m_txbRunwayWidth.Text = width.ToString( "F3" );
-			m_txbRunwayRotatedAngle.Text = rotatedAngle_deg.ToString( "F3" );
+			m_numRunwayLength.Text = length.ToString( "F3" );
+			m_numRunwayWidth.Text = width.ToString( "F3" );
+			m_numRunwayRotatedAngle.Text = rotatedAngle_deg.ToString( "F3" );
 			m_RunwayLength = length;
 			m_RunwayWidth = width;
 			m_RunwayRotatedAngle_deg = rotatedAngle_deg;
@@ -298,9 +298,9 @@ namespace MyCAM.Editor.Dialog
 
 		void SetPolygonParam( double sideLength, double cornerRadius, double rotatedAngle_deg )
 		{
-			m_txbPolygonSideLength.Text = sideLength.ToString( "F3" );
-			m_txbPolygonCornerRadius.Text = cornerRadius.ToString( "F3" );
-			m_txbPolygonRotatedAngle.Text = rotatedAngle_deg.ToString( "F3" );
+			m_numPolygonSideLength.Text = sideLength.ToString( "F3" );
+			m_numPolygonCornerRadius.Text = cornerRadius.ToString( "F3" );
+			m_numPolygonRotatedAngle.Text = rotatedAngle_deg.ToString( "F3" );
 			m_PolygonSideLength = sideLength;
 			m_PolygonCornerRadius = cornerRadius;
 			m_PolygonRotatedAngle_deg = rotatedAngle_deg;
@@ -352,7 +352,7 @@ namespace MyCAM.Editor.Dialog
 		}
 
 		// circle
-		void m_txbCircleDiameter_KeyDown( object sender, KeyEventArgs e )
+		void m_numCircleDiameter_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -360,14 +360,14 @@ namespace MyCAM.Editor.Dialog
 			SetCircleDiameter();
 		}
 
-		void m_txbCircleDiameter_Leave( object sender, System.EventArgs e )
+		void m_numCircleDiameter_Leave( object sender, System.EventArgs e )
 		{
 			SetCircleDiameter();
 		}
 
 		void SetCircleDiameter()
 		{
-			if( double.TryParse( m_txbCircleDiameter.Text, out double diameter ) && diameter > 0 ) {
+			if( double.TryParse( m_numCircleDiameter.Text, out double diameter ) && diameter > 0 ) {
 				if( !( m_NewStandardPatternGeomData is CircleGeomData circleGeomData ) ) {
 					return;
 				}
@@ -376,11 +376,11 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbCircleDiameter.Text = m_CircleDiameter.ToString( "F3" );
+				m_numCircleDiameter.Text = m_CircleDiameter.ToString( "F3" );
 			}
 		}
 
-		void m_txbCircleRotatedAngle_KeyDown( object sender, KeyEventArgs e )
+		void m_numCircleRotatedAngle_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -388,14 +388,14 @@ namespace MyCAM.Editor.Dialog
 			SetCircleRotatedAngle();
 		}
 
-		void m_txbCircleRotatedAngle_Leave( object sender, EventArgs e )
+		void m_numCircleRotatedAngle_Leave( object sender, EventArgs e )
 		{
 			SetCircleRotatedAngle();
 		}
 
 		void SetCircleRotatedAngle()
 		{
-			if( double.TryParse( m_txbCircleRotatedAngle.Text, out double angle ) ) {
+			if( double.TryParse( m_numCircleRotatedAngle.Text, out double angle ) ) {
 				if( !( m_NewStandardPatternGeomData is CircleGeomData circleGeomData ) ) {
 					return;
 				}
@@ -404,12 +404,12 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbCircleRotatedAngle.Text = m_CirRotatedAngle_deg.ToString( "F3" );
+				m_numCircleRotatedAngle.Text = m_CirRotatedAngle_deg.ToString( "F3" );
 			}
 		}
 
 		// rectangle
-		void m_txbRecLength_KeyDown( object sender, KeyEventArgs e )
+		void m_numRecLength_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -417,14 +417,14 @@ namespace MyCAM.Editor.Dialog
 			SetRectangleLength();
 		}
 
-		void m_txbRecLength_Leave( object sender, System.EventArgs e )
+		void m_numRecLength_Leave( object sender, System.EventArgs e )
 		{
 			SetRectangleLength();
 		}
 
 		void SetRectangleLength()
 		{
-			if( double.TryParse( m_txbRecLength.Text, out double length ) && length > 0 && length > 2 * m_RectCornerRadius ) {
+			if( double.TryParse( m_numRecLength.Text, out double length ) && length > 0 && length > 2 * m_RectCornerRadius ) {
 				if( !( m_NewStandardPatternGeomData is RectangleGeomData rectangleGeomData ) ) {
 					return;
 				}
@@ -433,11 +433,11 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbRecLength.Text = m_RectLength.ToString( "F3" );
+				m_numRecLength.Text = m_RectLength.ToString( "F3" );
 			}
 		}
 
-		void m_txbRecWidth_KeyDown( object sender, KeyEventArgs e )
+		void m_numRecWidth_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -445,14 +445,14 @@ namespace MyCAM.Editor.Dialog
 			SetRectangleWidth();
 		}
 
-		void m_txbRecWidth_Leave( object sender, System.EventArgs e )
+		void m_numRecWidth_Leave( object sender, System.EventArgs e )
 		{
 			SetRectangleWidth();
 		}
 
 		void SetRectangleWidth()
 		{
-			if( double.TryParse( m_txbRecWidth.Text, out double width ) && width > 0 && width > 2 * m_RectCornerRadius ) {
+			if( double.TryParse( m_numRecWidth.Text, out double width ) && width > 0 && width > 2 * m_RectCornerRadius ) {
 				if( !( m_NewStandardPatternGeomData is RectangleGeomData rectangleGeomData ) ) {
 					return;
 				}
@@ -461,11 +461,11 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbRecWidth.Text = m_RectWidth.ToString( "F3" );
+				m_numRecWidth.Text = m_RectWidth.ToString( "F3" );
 			}
 		}
 
-		void m_txbRecCornerRadius_KeyDown( object sender, KeyEventArgs e )
+		void m_numRecCornerRadius_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -473,14 +473,14 @@ namespace MyCAM.Editor.Dialog
 			SetRectangleCornerRadius();
 		}
 
-		void m_txbRecCornerRadius_Leave( object sender, System.EventArgs e )
+		void m_numRecCornerRadius_Leave( object sender, System.EventArgs e )
 		{
 			SetRectangleCornerRadius();
 		}
 
 		void SetRectangleCornerRadius()
 		{
-			if( double.TryParse( m_txbRecCornerRadius.Text, out double cornerRadius ) && cornerRadius >= 0 && 2 * cornerRadius < m_RectLength && 2 * cornerRadius < m_RectWidth ) {
+			if( double.TryParse( m_numRecCornerRadius.Text, out double cornerRadius ) && cornerRadius >= 0 && 2 * cornerRadius < m_RectLength && 2 * cornerRadius < m_RectWidth ) {
 				if( !( m_NewStandardPatternGeomData is RectangleGeomData rectangleGeomData ) ) {
 					return;
 				}
@@ -489,11 +489,11 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbRecCornerRadius.Text = m_RectCornerRadius.ToString( "F3" );
+				m_numRecCornerRadius.Text = m_RectCornerRadius.ToString( "F3" );
 			}
 		}
 
-		void m_txbRecRotatedAngle_KeyDown( object sender, KeyEventArgs e )
+		void m_numRecRotatedAngle_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -501,14 +501,14 @@ namespace MyCAM.Editor.Dialog
 			SetRectangleRotatedAngle();
 		}
 
-		void m_txbRecRotatedAngle_Leave( object sender, System.EventArgs e )
+		void m_numRecRotatedAngle_Leave( object sender, System.EventArgs e )
 		{
 			SetRectangleRotatedAngle();
 		}
 
 		void SetRectangleRotatedAngle()
 		{
-			if( double.TryParse( m_txbRecRotatedAngle.Text, out double rotatedAngle_deg ) ) {
+			if( double.TryParse( m_numRecRotatedAngle.Text, out double rotatedAngle_deg ) ) {
 				if( !( m_NewStandardPatternGeomData is RectangleGeomData rectangleGeomData ) ) {
 					return;
 				}
@@ -517,12 +517,12 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbRecRotatedAngle.Text = m_RectRotatedAngle_deg.ToString( "F3" );
+				m_numRecRotatedAngle.Text = m_RectRotatedAngle_deg.ToString( "F3" );
 			}
 		}
 
 		// runway
-		void m_txbRunwayLength_KeyDown( object sender, KeyEventArgs e )
+		void m_numRunwayLength_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -530,14 +530,14 @@ namespace MyCAM.Editor.Dialog
 			SetRunwayLength();
 		}
 
-		void m_txbRunwayLength_Leave( object sender, System.EventArgs e )
+		void m_numRunwayLength_Leave( object sender, System.EventArgs e )
 		{
 			SetRunwayLength();
 		}
 
 		void SetRunwayLength()
 		{
-			if( double.TryParse( m_txbRunwayLength.Text, out double length ) && length > m_RunwayWidth && length > 0 ) {
+			if( double.TryParse( m_numRunwayLength.Text, out double length ) && length > m_RunwayWidth && length > 0 ) {
 				if( !( m_NewStandardPatternGeomData is RunwayGeomData runwayGeomData ) ) {
 					return;
 				}
@@ -546,11 +546,11 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbRunwayLength.Text = m_RunwayLength.ToString( "F3" );
+				m_numRunwayLength.Text = m_RunwayLength.ToString( "F3" );
 			}
 		}
 
-		void m_txbRunwayWidth_KeyDown( object sender, KeyEventArgs e )
+		void m_numRunwayWidth_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -558,14 +558,14 @@ namespace MyCAM.Editor.Dialog
 			SetRunwayWidth();
 		}
 
-		void m_txbRunwayWidth_Leave( object sender, System.EventArgs e )
+		void m_numRunwayWidth_Leave( object sender, System.EventArgs e )
 		{
 			SetRunwayWidth();
 		}
 
 		void SetRunwayWidth()
 		{
-			if( double.TryParse( m_txbRunwayWidth.Text, out double width ) && width > 0 && width < m_RunwayLength ) {
+			if( double.TryParse( m_numRunwayWidth.Text, out double width ) && width > 0 && width < m_RunwayLength ) {
 				if( !( m_NewStandardPatternGeomData is RunwayGeomData runwayGeomData ) ) {
 					return;
 				}
@@ -574,11 +574,11 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbRunwayWidth.Text = m_RunwayWidth.ToString( "F3" );
+				m_numRunwayWidth.Text = m_RunwayWidth.ToString( "F3" );
 			}
 		}
 
-		void m_txbRunwayRotatedAngle_KeyDown( object sender, KeyEventArgs e )
+		void m_numRunwayRotatedAngle_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -586,14 +586,14 @@ namespace MyCAM.Editor.Dialog
 			SetRunwayRotatedAngle();
 		}
 
-		void m_txbRunwayRotatedAngle_Leave( object sender, System.EventArgs e )
+		void m_numRunwayRotatedAngle_Leave( object sender, System.EventArgs e )
 		{
 			SetRunwayRotatedAngle();
 		}
 
 		void SetRunwayRotatedAngle()
 		{
-			if( double.TryParse( m_txbRunwayRotatedAngle.Text, out double rotatedAngle_deg ) ) {
+			if( double.TryParse( m_numRunwayRotatedAngle.Text, out double rotatedAngle_deg ) ) {
 				if( !( m_NewStandardPatternGeomData is RunwayGeomData runwayGeomData ) ) {
 					return;
 				}
@@ -602,12 +602,12 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbRunwayRotatedAngle.Text = m_RunwayRotatedAngle_deg.ToString( "F3" );
+				m_numRunwayRotatedAngle.Text = m_RunwayRotatedAngle_deg.ToString( "F3" );
 			}
 		}
 
 		// polygon
-		void m_txbPolygonSideLength_KeyDown( object sender, KeyEventArgs e )
+		void m_numPolygonSideLength_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -615,21 +615,21 @@ namespace MyCAM.Editor.Dialog
 			SetPolygonSideLength();
 		}
 
-		void m_txbPolygonSideLength_Leave( object sender, System.EventArgs e )
+		void m_numPolygonSideLength_Leave( object sender, System.EventArgs e )
 		{
 			SetPolygonSideLength();
 		}
 
 		void SetPolygonSideLength()
 		{
-			if( double.TryParse( m_txbPolygonSideLength.Text, out double sideLength ) && sideLength > 0 && sideLength > 2 * m_PolygonCornerRadius ) {
+			if( double.TryParse( m_numPolygonSideLength.Text, out double sideLength ) && sideLength > 0 && sideLength > 2 * m_PolygonCornerRadius ) {
 				if( !( m_NewStandardPatternGeomData is PolygonGeomData polygonGeomData ) ) {
 					return;
 				}
 
 				// validate that the edge length is sufficient for the corner radius
 				if( m_PolygonCornerRadius > 0 && !IsPolygonGeometryValid( polygonGeomData.Sides, sideLength, m_PolygonCornerRadius ) ) {
-					m_txbPolygonSideLength.Text = m_PolygonSideLength.ToString( "F3" );
+					m_numPolygonSideLength.Text = m_PolygonSideLength.ToString( "F3" );
 					return;
 				}
 
@@ -638,11 +638,11 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbPolygonSideLength.Text = m_PolygonSideLength.ToString( "F3" );
+				m_numPolygonSideLength.Text = m_PolygonSideLength.ToString( "F3" );
 			}
 		}
 
-		void m_txbPolygonRotatedAngle_KeyDown( object sender, KeyEventArgs e )
+		void m_numPolygonRotatedAngle_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -650,14 +650,14 @@ namespace MyCAM.Editor.Dialog
 			SetPolygonRotatedAngle();
 		}
 
-		void m_txbPolygonRotatedAngle_Leave( object sender, System.EventArgs e )
+		void m_numPolygonRotatedAngle_Leave( object sender, System.EventArgs e )
 		{
 			SetPolygonRotatedAngle();
 		}
 
 		void SetPolygonRotatedAngle()
 		{
-			if( double.TryParse( m_txbPolygonRotatedAngle.Text, out double rotatedAngle_deg ) ) {
+			if( double.TryParse( m_numPolygonRotatedAngle.Text, out double rotatedAngle_deg ) ) {
 				if( !( m_NewStandardPatternGeomData is PolygonGeomData polygonGeomData ) ) {
 					return;
 				}
@@ -666,11 +666,11 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbPolygonRotatedAngle.Text = m_PolygonRotatedAngle_deg.ToString( "F3" );
+				m_numPolygonRotatedAngle.Text = m_PolygonRotatedAngle_deg.ToString( "F3" );
 			}
 		}
 
-		void m_txbPolygonCornerRadius_KeyDown( object sender, KeyEventArgs e )
+		void m_numPolygonCornerRadius_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
 				return;
@@ -678,21 +678,21 @@ namespace MyCAM.Editor.Dialog
 			SetPolygonCornerRadius();
 		}
 
-		void m_txbPolygonCornerRadius_Leave( object sender, System.EventArgs e )
+		void m_numPolygonCornerRadius_Leave( object sender, System.EventArgs e )
 		{
 			SetPolygonCornerRadius();
 		}
 
 		void SetPolygonCornerRadius()
 		{
-			if( double.TryParse( m_txbPolygonCornerRadius.Text, out double cornerRadius ) && cornerRadius >= 0 && 2 * cornerRadius < m_PolygonSideLength ) {
+			if( double.TryParse( m_numPolygonCornerRadius.Text, out double cornerRadius ) && cornerRadius >= 0 && 2 * cornerRadius < m_PolygonSideLength ) {
 				if( !( m_NewStandardPatternGeomData is PolygonGeomData polygonGeomData ) ) {
 					return;
 				}
 
 				// validate that the corner radius is compatible with the edge length
 				if( cornerRadius > 0 && !IsPolygonGeometryValid( polygonGeomData.Sides, m_PolygonSideLength, cornerRadius ) ) {
-					m_txbPolygonCornerRadius.Text = m_PolygonCornerRadius.ToString( "F3" );
+					m_numPolygonCornerRadius.Text = m_PolygonCornerRadius.ToString( "F3" );
 					return;
 				}
 
@@ -701,7 +701,7 @@ namespace MyCAM.Editor.Dialog
 				RaisePreview( m_NewStandardPatternGeomData );
 			}
 			else {
-				m_txbPolygonCornerRadius.Text = m_PolygonCornerRadius.ToString( "F3" );
+				m_numPolygonCornerRadius.Text = m_PolygonCornerRadius.ToString( "F3" );
 			}
 		}
 

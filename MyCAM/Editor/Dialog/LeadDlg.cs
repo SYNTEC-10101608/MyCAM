@@ -15,14 +15,14 @@ namespace MyCAM.Editor.Dialog
 			m_LeadData = leadData;
 
 			// lead in setting
-			m_tbxLeadInStraightLength.SilentSetValue = (decimal)m_LeadData.LeadIn.StraightLength;
-			m_tbxLeadInArcLength.SilentSetValue = (decimal)m_LeadData.LeadIn.ArcLength;
-			m_tbxLeadInAngle.SilentSetValue = (decimal)m_LeadData.LeadIn.Angle_deg;
+			m_numLeadInStraightLength.SilentSetValue = (decimal)m_LeadData.LeadIn.StraightLength;
+			m_numLeadInArcLength.SilentSetValue = (decimal)m_LeadData.LeadIn.ArcLength;
+			m_numLeadInAngle.SilentSetValue = (decimal)m_LeadData.LeadIn.Angle_deg;
 
 			// lead out setting
-			m_tbxLeadOutStraightLength.SilentSetValue = (decimal)m_LeadData.LeadOut.StraightLength;
-			m_tbxLeadOutArcLength.SilentSetValue = (decimal)m_LeadData.LeadOut.ArcLength;
-			m_tbxLeadOutAngle.SilentSetValue = (decimal)m_LeadData.LeadOut.Angle_deg;
+			m_numLeadOutStraightLength.SilentSetValue = (decimal)m_LeadData.LeadOut.StraightLength;
+			m_numLeadOutArcLength.SilentSetValue = (decimal)m_LeadData.LeadOut.ArcLength;
+			m_numLeadOutAngle.SilentSetValue = (decimal)m_LeadData.LeadOut.Angle_deg;
 
 			// initialize textbox
 			m_chkFlip.Checked = m_LeadData.IsChangeLeadDirection;
@@ -36,8 +36,8 @@ namespace MyCAM.Editor.Dialog
 		// the lead-in and lead-out rows share their texts
 		void InitLocalizedTexts()
 		{
-			label1.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength", label1.Text );
-			label4.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength", label4.Text );
+			m_lblLeadInLineLength.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength", m_lblLeadInLineLength.Text );
+			m_lblLeadOutLineLength.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength", m_lblLeadOutLineLength.Text );
 			m_lblLeadInAngle.Text = m_LanguageManager.TryGetString( "m_lblAngle", m_lblLeadInAngle.Text );
 			m_lblLeadOutAngle.Text = m_LanguageManager.TryGetString( "m_lblAngle", m_lblLeadOutAngle.Text );
 			m_lblLeadInLength.Text = m_LanguageManager.TryGetString( "m_lblRadius", m_lblLeadInLength.Text );
@@ -53,14 +53,14 @@ namespace MyCAM.Editor.Dialog
 				this.Invoke( new Action( () => SetLeadOutControlsEnabled( isEnabled ) ) );
 				return;
 			}
-			m_tbxLeadOutStraightLength.Enabled = isEnabled;
-			m_tbxLeadOutStraightLength.SilentSetValue = (decimal)DEFAULT_VALUE;
-			m_tbxLeadOutArcLength.Enabled = isEnabled;
-			m_tbxLeadOutArcLength.SilentSetValue = (decimal)DEFAULT_VALUE;
-			m_tbxLeadOutAngle.Enabled = isEnabled;
-			m_tbxLeadOutAngle.SilentSetValue = (decimal)DEFAULT_ANGLE_DEG;
-			m_tbxLeadInAngle.Enabled = isEnabled;
-			m_tbxLeadInAngle.SilentSetValue = (decimal)DEFAULT_ANGLE_DEG;
+			m_numLeadOutStraightLength.Enabled = isEnabled;
+			m_numLeadOutStraightLength.SilentSetValue = (decimal)DEFAULT_VALUE;
+			m_numLeadOutArcLength.Enabled = isEnabled;
+			m_numLeadOutArcLength.SilentSetValue = (decimal)DEFAULT_VALUE;
+			m_numLeadOutAngle.Enabled = isEnabled;
+			m_numLeadOutAngle.SilentSetValue = (decimal)DEFAULT_ANGLE_DEG;
+			m_numLeadInAngle.Enabled = isEnabled;
+			m_numLeadInAngle.SilentSetValue = (decimal)DEFAULT_ANGLE_DEG;
 			m_chkFlip.Enabled = isEnabled;
 		}
 
@@ -82,8 +82,8 @@ namespace MyCAM.Editor.Dialog
 
 		bool IsValidParam()
 		{
-			double dLeadInAngle = (double)m_tbxLeadInAngle.Value;
-			double dLeadOutAngle = (double)m_tbxLeadOutAngle.Value;
+			double dLeadInAngle = (double)m_numLeadInAngle.Value;
+			double dLeadOutAngle = (double)m_numLeadOutAngle.Value;
 			if( !IsValidAngle( dLeadInAngle ) ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Error_AngleRange", ERROR_ANGLE_RANGE ), MyApp.NoticeType.Warning );
 				return false;
@@ -98,12 +98,12 @@ namespace MyCAM.Editor.Dialog
 		// before set param need to check params are valid
 		void SetParam()
 		{
-			m_LeadData.LeadIn.StraightLength = (double)m_tbxLeadInStraightLength.Value;
-			m_LeadData.LeadIn.ArcLength = (double)m_tbxLeadInArcLength.Value;
-			m_LeadData.LeadIn.Angle_deg = (double)m_tbxLeadInAngle.Value;
-			m_LeadData.LeadOut.StraightLength = (double)m_tbxLeadOutStraightLength.Value;
-			m_LeadData.LeadOut.ArcLength = (double)m_tbxLeadOutArcLength.Value;
-			m_LeadData.LeadOut.Angle_deg = (double)m_tbxLeadOutAngle.Value;
+			m_LeadData.LeadIn.StraightLength = (double)m_numLeadInStraightLength.Value;
+			m_LeadData.LeadIn.ArcLength = (double)m_numLeadInArcLength.Value;
+			m_LeadData.LeadIn.Angle_deg = (double)m_numLeadInAngle.Value;
+			m_LeadData.LeadOut.StraightLength = (double)m_numLeadOutStraightLength.Value;
+			m_LeadData.LeadOut.ArcLength = (double)m_numLeadOutArcLength.Value;
+			m_LeadData.LeadOut.Angle_deg = (double)m_numLeadOutAngle.Value;
 			m_LeadData.IsChangeLeadDirection = m_chkFlip.Checked;
 		}
 

@@ -17,8 +17,8 @@ namespace MyCAM.Editor
 		{
 			InitializeComponent();
 
-			m_rbtnWorldCoord.Tag = RefCoordinateType.World;
-			m_rbtnLocalCoord.Tag = RefCoordinateType.Local;
+			m_rdoWorldCoord.Tag = RefCoordinateType.World;
+			m_rdoLocalCoord.Tag = RefCoordinateType.Local;
 		}
 
 		#region Update UI
@@ -32,27 +32,27 @@ namespace MyCAM.Editor
 
 			// should not happen, but just in case
 			if( m_Param == null ) {
-				m_gbxIndexParam.Enabled = false;
-				m_tbxDX.Value = 0;
-				m_tbxDY.Value = 0;
-				m_tbxDZ.Value = 0;
+				m_pnlIndexParam.Enabled = false;
+				m_numDX.Value = 0;
+				m_numDY.Value = 0;
+				m_numDZ.Value = 0;
 				m_bSuppressValueChanged = false;
 				return;
 			}
 
-			m_gbxIndexParam.Enabled = true;
+			m_pnlIndexParam.Enabled = true;
 
-			m_rbtnWorldCoord.Checked = ( m_Param.RefCoordinateType == RefCoordinateType.World );
-			m_rbtnLocalCoord.Checked = ( m_Param.RefCoordinateType == RefCoordinateType.Local );
+			m_rdoWorldCoord.Checked = ( m_Param.RefCoordinateType == RefCoordinateType.World );
+			m_rdoLocalCoord.Checked = ( m_Param.RefCoordinateType == RefCoordinateType.Local );
 
-			m_tbxDX.Value = 0;
-			m_tbxDY.Value = 0;
-			m_tbxDZ.Value = 0;
+			m_numDX.Value = 0;
+			m_numDY.Value = 0;
+			m_numDZ.Value = 0;
 
 			SetInputEnabled( m_Param.IsModified );
 
-			m_rbtnToStart.Checked = m_Param.IsPathStartPoint == true;
-			m_rbtnToEnd.Checked = m_Param.IsPathStartPoint == false;
+			m_rdoToStart.Checked = m_Param.IsPathStartPoint == true;
+			m_rdoToEnd.Checked = m_Param.IsPathStartPoint == false;
 
 			UpdateTotalDisplacement();
 			m_bSuppressValueChanged = false;
@@ -67,9 +67,9 @@ namespace MyCAM.Editor
 
 		void SetInputEnabled( bool enabled )
 		{
-			m_tbxDX.Enabled = enabled;
-			m_tbxDY.Enabled = enabled;
-			m_tbxDZ.Enabled = enabled;
+			m_numDX.Enabled = enabled;
+			m_numDY.Enabled = enabled;
+			m_numDZ.Enabled = enabled;
 
 			m_btnReset.Enabled = enabled;
 			m_btnClear.Enabled = enabled;
@@ -83,17 +83,17 @@ namespace MyCAM.Editor
 
 		#region UI Events
 
-		void m_tbxDX_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numDX_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleDisplacementChanged();
 		}
 
-		void m_tbxDY_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numDY_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleDisplacementChanged();
 		}
 
-		void m_tbxDZ_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numDZ_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleDisplacementChanged();
 		}
@@ -131,23 +131,23 @@ namespace MyCAM.Editor
 			}
 
 			if( sender is RadioButton rbtn && rbtn.Checked ) {
-				ToStartOrEnd?.Invoke( rbtn == m_rbtnToStart );
+				ToStartOrEnd?.Invoke( rbtn == m_rdoToStart );
 			}
 		}
 
 		void m_btnReset_Click( object sender, EventArgs e )
 		{
-			m_tbxDX.Value = 0;
-			m_tbxDY.Value = 0;
-			m_tbxDZ.Value = 0;
+			m_numDX.Value = 0;
+			m_numDY.Value = 0;
+			m_numDZ.Value = 0;
 			ResetDisplacement?.Invoke();
 		}
 
 		void m_btnClear_Click( object sender, EventArgs e )
 		{
-			m_tbxDX.Value = 0;
-			m_tbxDY.Value = 0;
-			m_tbxDZ.Value = 0;
+			m_numDX.Value = 0;
+			m_numDY.Value = 0;
+			m_numDZ.Value = 0;
 			DisplacementChanged?.Invoke( 0, 0, 0, m_Param.RefCoordinateType );
 		}
 
@@ -168,9 +168,9 @@ namespace MyCAM.Editor
 
 		bool GetDisplacementFromDialog( out double dx, out double dy, out double dz )
 		{
-			dx = (double)m_tbxDX.Value;
-			dy = (double)m_tbxDY.Value;
-			dz = (double)m_tbxDZ.Value;
+			dx = (double)m_numDX.Value;
+			dy = (double)m_numDY.Value;
+			dz = (double)m_numDZ.Value;
 			return true;
 		}
 

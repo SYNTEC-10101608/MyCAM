@@ -10,5 +10,5 @@
 	<Message ID="m_btnClear" Content="Clear" />
 	<Message ID="m_lblTotalDiff" Content="Total Offset" />
 	<Message ID="IsMixData" Content="Inconsistent Offset" />
-	<Message ID="m_gpbMove" Content="Offset" />
+	<Message ID="m_pnlMove" Content="Offset" />
 </ResMap>

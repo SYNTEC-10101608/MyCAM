@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="LeadDlg" Content="Lead Line Setup" />
-	<Message ID="m_secLeadIn" Content="Lead-in" />
-	<Message ID="m_secLeadOut" Content="Lead-out" />
+	<Message ID="m_pnlLeadIn" Content="Lead-in" />
+	<Message ID="m_pnlLeadOut" Content="Lead-out" />
 	<Message ID="m_lblLeadLineLength" Content="Line Length" />
 	<Message ID="m_lblAngle" Content="Angle" />
 	<Message ID="m_lblRadius" Content="Radius" />

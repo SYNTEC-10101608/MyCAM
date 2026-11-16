@@ -19,6 +19,7 @@ namespace UICheck
 	//   P1  dialog not centered in DialogPlacement's area (whole window in landscape, CAM area in portrait)
 	//   P2  portrait CAM area is not the part above the CNC host
 	//   P3  main window or a control in it does not use the font family of the UI language
+	//   P4  a visible CNC panel at the size the main window gives it fails the T1 / T2 / T4 checks of LayoutRunner
 	//   a dialog that cannot be opened is a problem, not a skip
 	//
 	// Usage: UICheckMainWindow.exe <language> <mode> <width> <height> <png> [dialog type name ...]
@@ -93,6 +94,7 @@ namespace UICheck
 				isVertical ? "portrait" : "landscape", area );
 			int nProblemCount = CheckArea( mainForm, isVertical, area );
 			nProblemCount += CheckFontFamily( mainForm );
+			nProblemCount += CheckPanels( mainForm );
 
 			using( Bitmap bitmap = Capture( mainForm.Handle, mainForm.Size ) ) {
 				using( Graphics graphics = Graphics.FromImage( bitmap ) ) {
@@ -118,7 +120,7 @@ namespace UICheck
 				}
 				return 0;
 			}
-			Control verticalHost = FindControl( mainForm, "m_panCNCVertical" );
+			Control verticalHost = FindControl( mainForm, "m_pnlCNCVertical" );
 			int nHostTop = verticalHost.Parent.PointToScreen( verticalHost.Location ).Y;
 			bool isCAMArea = area.Top == mainForm.Top && area.Bottom == nHostTop && area.Width == mainForm.Width;
 			if( isCAMArea == false ) {
@@ -212,6 +214,46 @@ namespace UICheck
 			}
 			return nProblemCount;
 		}
+
+		// P4: the embedded panels at the size the main window gives them, not the design size LayoutRunner uses
+		static int CheckPanels( Form mainForm )
+		{
+			List<Control> panelList = new List<Control>();
+			FindPanels( mainForm, panelList );
+			int nProblemCount = 0;
+			foreach( Control panel in panelList ) {
+				List<string> problemList = new List<string>();
+				LayoutRunner.CheckChildren( panel, problemList );
+				Console.WriteLine( "panel {0} {1}x{2}, {3} problems", panel.GetType().Name, panel.Width, panel.Height,
+					problemList.Count );
+				foreach( string szProblem in problemList ) {
+					Console.WriteLine( "FAIL  P4 {0}: {1}", panel.GetType().Name, szProblem );
+				}
+				nProblemCount += problemList.Count;
+			}
+			return nProblemCount;
+		}
+
+		static void FindPanels( Control parent, List<Control> panelList )
+		{
+			foreach( Control child in parent.Controls ) {
+				if( child.Visible == false ) {
+					continue;
+				}
+				if( PANEL_TYPE_LIST.Contains( child.GetType().Name ) ) {
+					panelList.Add( child );
+					continue;
+				}
+				FindPanels( child, panelList );
+			}
+		}
+
+		static readonly HashSet<string> PANEL_TYPE_LIST = new HashSet<string>
+		{
+			"CNCPanel",
+			"CNCInfoPanel",
+			"CNCAlarmPanel",
+		};
 
 		// independent of ThemeFonts on purpose, so a wrong initialization order is caught
 		static string GetExpectedFamily( string szLanguage )

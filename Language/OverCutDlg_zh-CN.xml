@@ -2,7 +2,7 @@
 <ResMap>
 	<Message ID="OverCutDlg" Content="过切" />
 	<Message ID="m_lblOverCutLength" Content="过切长度:" />
-	<Message ID="m_OverCutUnit" Content="mm" />
+	<Message ID="m_lblOverCutUnit" Content="mm" />
 	<Message ID="Error_NegativeLength" Content="长度需要大于0" />
 	<Message ID="Error_ExceedGeometry" Content="过切长度超出几何限制" />
 </ResMap>

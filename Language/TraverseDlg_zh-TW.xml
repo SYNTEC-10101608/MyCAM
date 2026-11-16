@@ -6,12 +6,12 @@
     <Message ID="m_lblCutDownDistance" Content="下刀距離" />
     <Message ID="m_lblFollowSaveDistance" Content="隨動安全距離" />
     
-    <Message ID="m_rbtnFrogLeap" Content="蛙跳" />
-    <Message ID="m_rbtnSafePlane" Content="安全平面" />
-    <Message ID="m_rbtnSafeCylinder" Content="安全圓柱" />
-    <Message ID="m_rbtnSafeSphere" Content="安全圓球" />
+    <Message ID="m_rdoFrogLeap" Content="蛙跳" />
+    <Message ID="m_rdoSafePlane" Content="安全平面" />
+    <Message ID="m_rdoSafeCylinder" Content="安全圓柱" />
+    <Message ID="m_rdoSafeSphere" Content="安全圓球" />
 
-    <Message ID="m_gbxTraverse" Content="空移參數" />
+    <Message ID="m_pnlTraverse" Content="空移參數" />
 
     <Message ID="m_lblFrogLeapDistance" Content="蛙跳距離" />
     <Message ID="m_lblSafePlaneDistance" Content="Z平面位置" />

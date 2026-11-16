@@ -6,12 +6,12 @@
 	<Message ID="m_lblCutDownDistance" Content="Расстояние опускания инструмента" />
 	<Message ID="m_lblFollowSaveDistance" Content="Следящее безопасное расстояние" />
 
-	<Message ID="m_rbtnFrogLeap" Content="Прыжок лягушки" />
-	<Message ID="m_rbtnSafePlane" Content="Безопасная плоскость" />
-	<Message ID="m_rbtnSafeCylinder" Content="Безопасный цилиндр" />
-	<Message ID="m_rbtnSafeSphere" Content="Безопасная сфера" />
+	<Message ID="m_rdoFrogLeap" Content="Прыжок лягушки" />
+	<Message ID="m_rdoSafePlane" Content="Безопасная плоскость" />
+	<Message ID="m_rdoSafeCylinder" Content="Безопасный цилиндр" />
+	<Message ID="m_rdoSafeSphere" Content="Безопасная сфера" />
 
-    <Message ID="m_gbxTraverse" Content="араметры холостого хода" />
+    <Message ID="m_pnlTraverse" Content="араметры холостого хода" />
 
 	<Message ID="m_lblFrogLeapDistance" Content="Расстояние прыжка" />
 	<Message ID="m_lblSafePlaneDistance" Content="Положение плоскости Z" />

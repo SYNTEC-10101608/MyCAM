@@ -13,7 +13,7 @@ namespace MyCAM.Editor.Dialog
 		public FlyCutDlg()
 		{
 			InitializeComponent();
-			m_nudGroupWidth.Minimum = 0;
+			m_numGroupWidth.Minimum = 0;
 
 		}
 
@@ -26,15 +26,15 @@ namespace MyCAM.Editor.Dialog
 			m_bSuppressValueChanged = true;
 			m_Param = param;
 
-			m_rbtnLeftTop.Checked = m_Param.IsLeftOrRight && m_Param.IsTopOrBottom;
-			m_rbtnLeftBottom.Checked = m_Param.IsLeftOrRight && !m_Param.IsTopOrBottom;
-			m_rbtnRightTop.Checked = !m_Param.IsLeftOrRight && m_Param.IsTopOrBottom;
-			m_rbtnRightBottom.Checked = !m_Param.IsLeftOrRight && !m_Param.IsTopOrBottom;
+			m_rdoLeftTop.Checked = m_Param.IsLeftOrRight && m_Param.IsTopOrBottom;
+			m_rdoLeftBottom.Checked = m_Param.IsLeftOrRight && !m_Param.IsTopOrBottom;
+			m_rdoRightTop.Checked = !m_Param.IsLeftOrRight && m_Param.IsTopOrBottom;
+			m_rdoRightBottom.Checked = !m_Param.IsLeftOrRight && !m_Param.IsTopOrBottom;
 
-			m_rbtnVertical.Checked = m_Param.IsVerticalOrHorizontal;
-			m_rbtnHorizontal.Checked = !m_Param.IsVerticalOrHorizontal;
+			m_rdoVertical.Checked = m_Param.IsVerticalOrHorizontal;
+			m_rdoHorizontal.Checked = !m_Param.IsVerticalOrHorizontal;
 
-			m_nudGroupWidth.SilentSetValue = (decimal)m_Param.GroupWidth;
+			m_numGroupWidth.SilentSetValue = (decimal)m_Param.GroupWidth;
 			m_lblGroupWidth.Text = m_Param.IsGroupWidthAngle
 				? m_LanguageManager.TryGetString( "GroupAngle", GROUP_ANGLE )
 				: m_LanguageManager.TryGetString( "GroupWidth", GROUP_WIDTH );
@@ -66,8 +66,8 @@ namespace MyCAM.Editor.Dialog
 				return;
 			}
 
-			bool isLeftOrRight = m_rbtnLeftTop.Checked || m_rbtnLeftBottom.Checked;
-			bool isTopOrBottom = m_rbtnLeftTop.Checked || m_rbtnRightTop.Checked;
+			bool isLeftOrRight = m_rdoLeftTop.Checked || m_rdoLeftBottom.Checked;
+			bool isTopOrBottom = m_rdoLeftTop.Checked || m_rdoRightTop.Checked;
 
 			PositionChanged?.Invoke( isLeftOrRight, isTopOrBottom );
 		}
@@ -78,18 +78,18 @@ namespace MyCAM.Editor.Dialog
 				return;
 			}
 
-			bool isVerticalOrHorizontal = m_rbtnVertical.Checked;
+			bool isVerticalOrHorizontal = m_rdoVertical.Checked;
 
 			DirectionChanged?.Invoke( isVerticalOrHorizontal );
 		}
 
-		void m_nudGroupWidth_ValueChanged( object sender, EventArgs e )
+		void m_numGroupWidth_ValueChanged( object sender, EventArgs e )
 		{
 			if( m_bSuppressValueChanged || m_Param == null ) {
 				return;
 			}
 
-			GroupWidthChanged?.Invoke( (double)m_nudGroupWidth.Value );
+			GroupWidthChanged?.Invoke( (double)m_numGroupWidth.Value );
 		}
 
 		bool m_bSuppressValueChanged = false;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
-	<Message ID="m_grpAuxiliary" Content="功能控制" />
+	<Message ID="m_pnlAuxiliary" Content="功能控制" />
 	<Message ID="m_btnOuterEquipParameters" Content="参数设置" />
 	<Message ID="m_btnShutter" Content="光闸" />
 	<Message ID="m_btnAir" Content="吹气" />
@@ -8,21 +8,21 @@
 	<Message ID="m_btnLaser" Content="激光" />
 	<Message ID="m_btnFocus" Content="调焦" />
 	<Message ID="m_btnCalibration" Content="电容标定" />
-	<Message ID="m_grpJog" Content="轴向移动" />
+	<Message ID="m_pnlJog" Content="轴向移动" />
 	<Message ID="JogMode_Continuous" Content="点动" />
 	<Message ID="JogMode_Inching" Content="寸动" />
 	<Message ID="m_btnEndpoint" Content="控端点" />
-	<Message ID="m_grpHome" Content="回零" />
+	<Message ID="m_pnlHome" Content="回零" />
 	<Message ID="m_btnHomeProgram" Content="回程序零" />
 	<Message ID="m_btnHomeMachine" Content="回机械零" />
 	<Message ID="m_btnSafePosition" Content="回安全位置" />
-	<Message ID="m_grpStrategy" Content="加工策略" />
+	<Message ID="m_pnlStrategy" Content="加工策略" />
 	<Message ID="m_btnResumeCutParameters" Content="参数设置" />
 	<Message ID="m_btnDryRun" Content="空走" />
 	<Message ID="m_btnResumeCutting" Content="断点续切" />
 	<Message ID="m_btnHandwheelSimulation" Content="手轮模拟" />
-	<Message ID="m_grpMachining" Content="加工控制" />
-	<Message ID="m_chbThreePointCalibration" Content="三点校正" />
+	<Message ID="m_pnlMachining" Content="加工控制" />
+	<Message ID="m_chkThreePointCalibration" Content="三点校正" />
 	<Message ID="m_lblFeedOverrideTitle" Content="进给倍率" />
 	<Message ID="m_btnStart" Content="开始" />
 	<Message ID="m_btnPause" Content="暂停" />

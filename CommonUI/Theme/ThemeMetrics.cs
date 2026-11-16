@@ -22,6 +22,11 @@
 		public const int LABEL_OFFSET = 4;
 		public const int CHECK_OFFSET = 2;
 
+		// embedded panel
+		public const int PANEL_MARGIN = 8;
+		public const int INFO_ROW_HEIGHT = 22;
+		public const int INFO_ROW_PITCH = 26;
+
 		// buttons
 		public const int BUTTON_HEIGHT = 28;
 		public const int BUTTON_MIN_WIDTH = 80;

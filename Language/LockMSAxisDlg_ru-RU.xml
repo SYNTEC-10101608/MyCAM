@@ -2,11 +2,11 @@
 <ResMap>
   <Message ID="LockMSAxisDlg" Content="Настройка фиксации осей" />
   <Message ID="m_lblMode" Content="Режим" />
-  <Message ID="m_rbtnDefault" Content="По умолчанию" />
-  <Message ID="m_rbtnLockAB" Content="Резка с фиксацией осей" />
-  <Message ID="m_gbxLockAB" Content="Резка с фиксацией осей" />
+  <Message ID="m_rdoDefault" Content="По умолчанию" />
+  <Message ID="m_rdoLockAB" Content="Резка с фиксацией осей" />
+  <Message ID="m_pnlLockAB" Content="Резка с фиксацией осей" />
   <Message ID="Format_RotaryDirection" Content="Регулировка направления оси {0}" />
-  <Message ID="m_gbxMachiningDir" Content="Заданное направление обработки" />
+  <Message ID="m_pnlMachiningDir" Content="Заданное направление обработки" />
   <Message ID="m_lblMachiningDir" Content="Направление" />
   <Message ID="MachiningDir_None" Content="Нет" />
   <Message ID="m_lblMachiningDirHint" Content="Тип шпинделя не поддерживает эту функцию" />
@@ -14,9 +14,9 @@
   <Message ID="Format_LockSlave" Content="Зафиксировать ось {0}" />
   <Message ID="Format_LockMaster" Content="Зафиксировать ось {0}" />
   <Message ID="Format_SlaveAngle" Content="Угол оси {0}" />
-  <Message ID="m_rbtnSlaveAuto" Content="Авторасчёт" />
-  <Message ID="m_rbtnSlaveManual" Content="Вручную" />
+  <Message ID="m_rdoSlaveAuto" Content="Авторасчёт" />
+  <Message ID="m_rdoSlaveManual" Content="Вручную" />
   <Message ID="Format_MasterAngle" Content="Угол оси {0}" />
-  <Message ID="m_rbtnMasterAuto" Content="Авторасчёт" />
-  <Message ID="m_rbtnMasterManual" Content="Вручную" />
+  <Message ID="m_rdoMasterAuto" Content="Авторасчёт" />
+  <Message ID="m_rdoMasterManual" Content="Вручную" />
 </ResMap>

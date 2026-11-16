@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="OrderDialog" Content="Toolpath Sequencing" />
-	<Message ID="m_gbxOrderMode" Content="Sequencing Mode" />
-	<Message ID="m_rbSequentialOrder" Content="Sequential Order" />
-	<Message ID="m_rbPathSwap" Content="Path Swap" />
-	<Message ID="m_gbxContent_Sequential" Content="Settings" />
-	<Message ID="m_gbxContent_Swap" Content="Swap Operations" />
+	<Message ID="m_pnlOrderMode" Content="Sequencing Mode" />
+	<Message ID="m_rdoSequentialOrder" Content="Sequential Order" />
+	<Message ID="m_rdoPathSwap" Content="Path Swap" />
+	<Message ID="m_pnlContent_Sequential" Content="Settings" />
+	<Message ID="m_pnlContent_Swap" Content="Swap Operations" />
 	<Message ID="m_lblSequentialDesc" Content="After selecting a path, press Enter&#13;&#10;&#13;&#10;The path will be placed after the current marked path." />
 	<Message ID="m_btnMoveUp" Content="Move Up (Earlier)" />
 	<Message ID="m_btnMoveDown" Content="Move Down (Later)" />

@@ -49,9 +49,9 @@ namespace MyCAM
 
 			// need to init befor myapp because myapp will use LogPanel
 			InitializeComponent();
-			m_MainLayout = new MainLayout( m_panBackGround, m_tlpBottom, m_panCNC, m_panCNCInfo,
-				m_pnlMessages, m_pnlLog, m_panCNCVertical, m_panVerticalAlarm, m_tsmiCNC, m_tsbController );
-			m_panBackGround.SizeChanged += OnMainLayoutSizeChanged;
+			m_MainLayout = new MainLayout( m_pnlBackGround, m_pnlBottom, m_pnlCNC, m_pnlCNCInfo,
+				m_pnlMessages, m_pnlLog, m_pnlCNCVertical, m_pnlVerticalAlarm, m_tsmiCNC, m_tsmiController );
+			m_pnlBackGround.SizeChanged += OnMainLayoutSizeChanged;
 			DialogPlacement.AreaProvider = () => m_MainLayout.GetDialogArea( this );
 
 			// app
@@ -61,7 +61,7 @@ namespace MyCAM
 
 			// create the viewer
 			m_Viewer = new Viewer();
-			bool bSucess = m_Viewer.InitViewer( m_panViewer );
+			bool bSucess = m_Viewer.InitViewer( m_pnlViewer );
 			if( !bSucess ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_ViewerInitFailed", LOG_VIEWER_INIT_FAILED ), MyApp.NoticeType.Error );
 				return;
@@ -74,7 +74,7 @@ namespace MyCAM
 			m_TreeView.Location = new System.Drawing.Point( 0, 0 );
 			m_TreeView.Name = "m_TreeView";
 			m_TreeView.TabIndex = 0;
-			m_panTreeView.Controls.Add( this.m_TreeView );
+			m_pnlTreeView.Controls.Add( this.m_TreeView );
 
 			// show G54
 			ShowG54Trihedron();
@@ -223,7 +223,7 @@ namespace MyCAM
 				}
 				return;
 			}
-			m_panBackGround.SuspendLayout();
+			m_pnlBackGround.SuspendLayout();
 			try {
 				if( !m_CNCUIManager.CreatePanels() ) {
 					if( activateMachining ) {
@@ -236,9 +236,9 @@ namespace MyCAM
 				m_CNCUIManager.Panel.Visible = false;
 				m_CNCUIManager.InfoPanel.Visible = false;
 				m_CNCUIManager.Panel.Dock = DockStyle.Fill;
-				m_panCNC.Controls.Add( m_CNCUIManager.Panel );
+				m_pnlCNC.Controls.Add( m_CNCUIManager.Panel );
 				m_CNCUIManager.InfoPanel.Dock = DockStyle.Fill;
-				m_panCNCInfo.Controls.Add( m_CNCUIManager.InfoPanel );
+				m_pnlCNCInfo.Controls.Add( m_CNCUIManager.InfoPanel );
 				UpdateMainLayout();
 				if( activateMachining ) {
 					RefreshToolStripLayout( EUIStatus.Machining );
@@ -247,7 +247,7 @@ namespace MyCAM
 				}
 			}
 			finally {
-				m_panBackGround.ResumeLayout( true );
+				m_pnlBackGround.ResumeLayout( true );
 			}
 			m_MainLayout.FitPanels( m_CNCUIManager.Panel, m_CNCUIManager.InfoPanel );
 			m_CNCUIManager.Panel.Visible = true;
@@ -278,7 +278,7 @@ namespace MyCAM
 				m_CNCUIManager.InfoPanel.VerticalLayout = Height > Width;
 			}
 			m_MainLayout?.Update( Size, m_CNCUIManager != null, m_CurrentUIStatus == EUIStatus.Machining,
-				CNCPanel.GetPreferredSizeForDpi( m_panCNC.DeviceDpi ),
+				CNCPanel.PREFERRED_SIZE,
 				m_CNCUIManager?.Panel, m_CNCUIManager?.InfoPanel,
 				m_CNCUIManager?.AlarmPanel, m_CNCUIManager?.HasAlarmContent == true );
 		}
@@ -1144,8 +1144,8 @@ namespace MyCAM
 			int currentIndex = 0;
 
 			// layout from bottom to top
-			if( m_panBackGround.Visible ) {
-				Controls.SetChildIndex( m_panBackGround, currentIndex++ );
+			if( m_pnlBackGround.Visible ) {
+				Controls.SetChildIndex( m_pnlBackGround, currentIndex++ );
 			}
 			if( m_tscLevel3Container.Visible ) {
 				Controls.SetChildIndex( m_tscLevel3Container, currentIndex++ );
@@ -1382,12 +1382,12 @@ namespace MyCAM
 			MyApp.CNCIP = result.IsSuccess ? ip : null;
 		}
 
-		async void m_tsbCNCConnection_Click( object sender, EventArgs e )
+		async void m_tsmiCNCConnection_Click( object sender, EventArgs e )
 		{
-			if( !m_tsbCNCConnection.Enabled ) {
+			if( !m_tsmiCNCConnection.Enabled ) {
 				return;
 			}
-			m_tsbCNCConnection.Enabled = false;
+			m_tsmiCNCConnection.Enabled = false;
 			try {
 				await SetAndDoConnectAsync();
 			}
@@ -1398,7 +1398,7 @@ namespace MyCAM
 			}
 			finally {
 				if( !IsDisposed && !Disposing ) {
-					m_tsbCNCConnection.Enabled = true;
+					m_tsmiCNCConnection.Enabled = true;
 				}
 			}
 		}
@@ -1507,69 +1507,69 @@ namespace MyCAM
 			VisibleTechLayerButtons( false );
 		}
 
-		void m_btnPlay_Click( object sender, EventArgs e )
+		void m_tsbPlay_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.PlaySimulation();
 		}
 
-		void m_btnPause_Click( object sender, EventArgs e )
+		void m_tsbPause_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.PauseSimulation();
 		}
 
-		void m_btnStop_Click( object sender, EventArgs e )
+		void m_tsbStop_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.StopSimulation();
 		}
 
 		#endregion
 
-		void m_btnPreviousPath_Click( object sender, EventArgs e )
+		void m_tsbPreviousPath_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.PlayPrePath();
 		}
 
-		void m_btnNextPath_Click( object sender, EventArgs e )
+		void m_tsbNextPath_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.PlayNextPath();
 		}
 
-		void m_btnPreCollision_Click( object sender, EventArgs e )
+		void m_tsbPreCollision_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.MoveToPreCollision();
 		}
 
-		void m_btnNextCol_Click( object sender, EventArgs e )
+		void m_tsbNextCol_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.MoveToNextCollision();
 		}
 
-		void m_btnSpeedUp_Click( object sender, EventArgs e )
+		void m_tsbSpeedUp_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.SpeedUp();
 		}
 
-		void m_btnSlowDonw_Click( object sender, EventArgs e )
+		void m_tsbSlowDown_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.SlowDown();
 		}
 
-		void m_btnCheck_Click( object sender, EventArgs e )
+		void m_tsbCheck_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.CheckExitCollision();
 		}
 
-		void m_btnPrePoint_Click( object sender, EventArgs e )
+		void m_tsbPrePoint_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.PrePoint();
 		}
 
-		void m_btnNextPoint_Click( object sender, EventArgs e )
+		void m_tsbNextPoint_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.NextPoint();
 		}
 
-		void m_tsbController_Click( object sender, EventArgs e )
+		void m_tsmiController_Click( object sender, EventArgs e )
 		{
 			ShowController();
 		}
@@ -1592,7 +1592,7 @@ namespace MyCAM
 				m_CNCDlg.Activate();
 				m_CNCDlg.BringToFront();
 
-				m_CNCDlg.PositionInArea( m_panCNCVertical.RectangleToScreen( m_panCNCVertical.ClientRectangle ) );
+				m_CNCDlg.PositionInArea( m_pnlCNCVertical.RectangleToScreen( m_pnlCNCVertical.ClientRectangle ) );
 				return;
 			}
 
@@ -1610,7 +1610,7 @@ namespace MyCAM
 
 			// position dialog in the lower panel area for portrait mode
 			m_CNCDlg.StartPosition = FormStartPosition.Manual;
-			m_CNCDlg.PositionInArea( m_panCNCVertical.RectangleToScreen( m_panCNCVertical.ClientRectangle ) );
+			m_CNCDlg.PositionInArea( m_pnlCNCVertical.RectangleToScreen( m_pnlCNCVertical.ClientRectangle ) );
 			m_CNCDlg.PutVNCOnDlg();
 
 			// subscribe to FormClosed event to clean up reference and restore main form state
@@ -1740,10 +1740,10 @@ namespace MyCAM
 			m_tsmiCAD.Text = m_LanguageManager.TryGetString( "m_tsmiCAD", m_tsmiCAD.Text );
 			m_tsmiCAM.Text = m_LanguageManager.TryGetString( "m_tsmiCAM", m_tsmiCAM.Text );
 			m_tsmiSimulation.Text = m_LanguageManager.TryGetString( "m_tsmiSimulation", m_tsmiSimulation.Text );
-			m_tsbSetting.Text = m_LanguageManager.TryGetString( "m_tsbSetting", m_tsbSetting.Text );
-			m_tsbCNCConnection.Text = m_LanguageManager.TryGetString( "m_tsbCNCConnection", m_tsbCNCConnection.Text );
+			m_tsmiSetting.Text = m_LanguageManager.TryGetString( "m_tsmiSetting", m_tsmiSetting.Text );
+			m_tsmiCNCConnection.Text = m_LanguageManager.TryGetString( "m_tsmiCNCConnection", m_tsmiCNCConnection.Text );
 			m_tsmiLanguage.Text = m_LanguageManager.TryGetString( "m_tsmiLanguage", m_tsmiLanguage.Text );
-			m_tsbController.Text = m_LanguageManager.TryGetString( "m_tsmiControllerAdvancedSettings", m_tsbController.Text );
+			m_tsmiController.Text = m_LanguageManager.TryGetString( "m_tsmiControllerAdvancedSettings", m_tsmiController.Text );
 			m_tsmiCNC.Text = m_LanguageManager.TryGetString( "m_tsmiMachining", m_tsmiCNC.Text );
 			m_CNCUIManager?.ApplyResources();
 
@@ -1881,41 +1881,41 @@ namespace MyCAM
 			m_tsbMeasureCAM.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMeasureCAM_ToolTip", m_tsbMeasureCAM.ToolTipText );
 
 			// simulation toolbar
-			m_btnPlay.Text = m_LanguageManager.TryGetString( "m_btnPlay", m_btnPlay.Text );
-			m_btnPlay.ToolTipText = m_LanguageManager.TryGetString( "m_btnPlay_ToolTip", m_btnPlay.ToolTipText );
+			m_tsbPlay.Text = m_LanguageManager.TryGetString( "m_tsbPlay", m_tsbPlay.Text );
+			m_tsbPlay.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPlay_ToolTip", m_tsbPlay.ToolTipText );
 
-			m_btnPause.Text = m_LanguageManager.TryGetString( "m_btnPause", m_btnPause.Text );
-			m_btnPause.ToolTipText = m_LanguageManager.TryGetString( "m_btnPause_ToolTip", m_btnPause.ToolTipText );
+			m_tsbPause.Text = m_LanguageManager.TryGetString( "m_tsbPause", m_tsbPause.Text );
+			m_tsbPause.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPause_ToolTip", m_tsbPause.ToolTipText );
 
-			m_btnStop.Text = m_LanguageManager.TryGetString( "m_btnStop", m_btnStop.Text );
-			m_btnStop.ToolTipText = m_LanguageManager.TryGetString( "m_btnStop_ToolTip", m_btnStop.ToolTipText );
+			m_tsbStop.Text = m_LanguageManager.TryGetString( "m_tsbStop", m_tsbStop.Text );
+			m_tsbStop.ToolTipText = m_LanguageManager.TryGetString( "m_tsbStop_ToolTip", m_tsbStop.ToolTipText );
 
-			m_btnPreviousPath.Text = m_LanguageManager.TryGetString( "m_btnPreviousPath", m_btnPreviousPath.Text );
-			m_btnPreviousPath.ToolTipText = m_LanguageManager.TryGetString( "m_btnPreviousPath_ToolTip", m_btnPreviousPath.ToolTipText );
+			m_tsbPreviousPath.Text = m_LanguageManager.TryGetString( "m_tsbPreviousPath", m_tsbPreviousPath.Text );
+			m_tsbPreviousPath.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPreviousPath_ToolTip", m_tsbPreviousPath.ToolTipText );
 
-			m_btnNextPath.Text = m_LanguageManager.TryGetString( "m_btnNextPath", m_btnNextPath.Text );
-			m_btnNextPath.ToolTipText = m_LanguageManager.TryGetString( "m_btnNextPath_ToolTip", m_btnNextPath.ToolTipText );
+			m_tsbNextPath.Text = m_LanguageManager.TryGetString( "m_tsbNextPath", m_tsbNextPath.Text );
+			m_tsbNextPath.ToolTipText = m_LanguageManager.TryGetString( "m_tsbNextPath_ToolTip", m_tsbNextPath.ToolTipText );
 
-			m_btnPreCollision.Text = m_LanguageManager.TryGetString( "m_btnPreCollision", m_btnPreCollision.Text );
-			m_btnPreCollision.ToolTipText = m_LanguageManager.TryGetString( "m_btnPreCollision_ToolTip", m_btnPreCollision.ToolTipText );
+			m_tsbPreCollision.Text = m_LanguageManager.TryGetString( "m_tsbPreCollision", m_tsbPreCollision.Text );
+			m_tsbPreCollision.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPreCollision_ToolTip", m_tsbPreCollision.ToolTipText );
 
-			m_btnNextCol.Text = m_LanguageManager.TryGetString( "m_btnNextCol", m_btnNextCol.Text );
-			m_btnNextCol.ToolTipText = m_LanguageManager.TryGetString( "m_btnNextCol_ToolTip", m_btnNextCol.ToolTipText );
+			m_tsbNextCol.Text = m_LanguageManager.TryGetString( "m_tsbNextCol", m_tsbNextCol.Text );
+			m_tsbNextCol.ToolTipText = m_LanguageManager.TryGetString( "m_tsbNextCol_ToolTip", m_tsbNextCol.ToolTipText );
 
-			m_btnPrePoint.Text = m_LanguageManager.TryGetString( "m_btnPrePoint", m_btnPrePoint.Text );
-			m_btnPrePoint.ToolTipText = m_LanguageManager.TryGetString( "m_btnPrePoint_ToolTip", m_btnPrePoint.ToolTipText );
+			m_tsbPrePoint.Text = m_LanguageManager.TryGetString( "m_tsbPrePoint", m_tsbPrePoint.Text );
+			m_tsbPrePoint.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPrePoint_ToolTip", m_tsbPrePoint.ToolTipText );
 
-			m_btnNextPoint.Text = m_LanguageManager.TryGetString( "m_btnNextPoint", m_btnNextPoint.Text );
-			m_btnNextPoint.ToolTipText = m_LanguageManager.TryGetString( "m_btnNextPoint_ToolTip", m_btnNextPoint.ToolTipText );
+			m_tsbNextPoint.Text = m_LanguageManager.TryGetString( "m_tsbNextPoint", m_tsbNextPoint.Text );
+			m_tsbNextPoint.ToolTipText = m_LanguageManager.TryGetString( "m_tsbNextPoint_ToolTip", m_tsbNextPoint.ToolTipText );
 
-			m_btnSpeedUp.Text = m_LanguageManager.TryGetString( "m_btnSpeedUp", m_btnSpeedUp.Text );
-			m_btnSpeedUp.ToolTipText = m_LanguageManager.TryGetString( "m_btnSpeedUp_ToolTip", m_btnSpeedUp.ToolTipText );
+			m_tsbSpeedUp.Text = m_LanguageManager.TryGetString( "m_tsbSpeedUp", m_tsbSpeedUp.Text );
+			m_tsbSpeedUp.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSpeedUp_ToolTip", m_tsbSpeedUp.ToolTipText );
 
-			m_btnSlowDonw.Text = m_LanguageManager.TryGetString( "m_btnSlowDonw", m_btnSlowDonw.Text );
-			m_btnSlowDonw.ToolTipText = m_LanguageManager.TryGetString( "m_btnSlowDonw_ToolTip", m_btnSlowDonw.ToolTipText );
+			m_tsbSlowDown.Text = m_LanguageManager.TryGetString( "m_tsbSlowDown", m_tsbSlowDown.Text );
+			m_tsbSlowDown.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSlowDown_ToolTip", m_tsbSlowDown.ToolTipText );
 
-			m_btnCheck.Text = m_LanguageManager.TryGetString( "m_btnCheck", m_btnCheck.Text );
-			m_btnCheck.ToolTipText = m_LanguageManager.TryGetString( "m_btnCheck_ToolTip", m_btnCheck.ToolTipText );
+			m_tsbCheck.Text = m_LanguageManager.TryGetString( "m_tsbCheck", m_tsbCheck.Text );
+			m_tsbCheck.ToolTipText = m_LanguageManager.TryGetString( "m_tsbCheck_ToolTip", m_tsbCheck.ToolTipText );
 
 			m_tsbShowVec.ToolTipText = m_LanguageManager.TryGetString( "ShowVec", m_tsbShowVec.ToolTipText );
 			m_tsbShowOrder.ToolTipText = m_LanguageManager.TryGetString( "ShowOrder", m_tsbShowOrder.ToolTipText );

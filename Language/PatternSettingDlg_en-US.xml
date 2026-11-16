@@ -12,7 +12,6 @@
 	<Message ID="PathType_Pentagon" Content="Pentagon" />
 	<Message ID="PathType_Hexagon" Content="Hexagon" />
 	<Message ID="m_chkCoordReverse" Content="Reverse Coordinates" />
-	<Message ID="m_btnCancel" Content="Cancel" />
 	<Message ID="m_lblDiameter" Content="Diameter" />
 	<Message ID="m_lblLength" Content="Length" />
 	<Message ID="m_lblWidth" Content="Width" />

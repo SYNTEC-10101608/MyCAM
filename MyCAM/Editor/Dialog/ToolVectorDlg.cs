@@ -56,7 +56,7 @@ namespace MyCAM.Editor
 
 		public void ResetType()
 		{
-			m_cbxInterpolateType.SelectedIndex = m_AvailableTypes.IndexOf( EToolVecInterpolateType.Normal );
+			m_cmbInterpolateType.SelectedIndex = m_AvailableTypes.IndexOf( EToolVecInterpolateType.Normal );
 		}
 
 		public void ResetToolVecParam( ToolVecParam toolVecParam )
@@ -66,18 +66,18 @@ namespace MyCAM.Editor
 			// no selected index param, disable edit UI
 			// the start / end switch row sits in the point moving section but belongs to the index edit UI
 			if( m_ToolVecParam == null ) {
-				m_gbxIndexParam.Enabled = false;
+				m_pnlIndexParam.Enabled = false;
 				m_pnlStartEndSwitch.Enabled = false;
 				return;
 			}
 
 			// update index edit UI
-			m_gbxIndexParam.Enabled = true;
+			m_pnlIndexParam.Enabled = true;
 			m_pnlStartEndSwitch.Enabled = true;
-			m_tbxAngleA.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleA_deg : m_ToolVecParam.AngleA_deg );
-			m_tbxAngleB.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleB_deg : m_ToolVecParam.AngleB_deg );
-			m_tbxMaster.SilentSetValue = (decimal)m_ToolVecParam.Master_deg;
-			m_tbxSlave.SilentSetValue = (decimal)m_ToolVecParam.Slave_deg;
+			m_numAngleA.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleA_deg : m_ToolVecParam.AngleA_deg );
+			m_numAngleB.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleB_deg : m_ToolVecParam.AngleB_deg );
+			m_numMaster.SilentSetValue = (decimal)m_ToolVecParam.Master_deg;
+			m_numSlave.SilentSetValue = (decimal)m_ToolVecParam.Slave_deg;
 		}
 
 		public void EnableStartEndSwitch( bool enable, bool start )
@@ -94,21 +94,21 @@ namespace MyCAM.Editor
 			if( isControlPnt ) {
 				m_btnAdd.Enabled = false;
 				m_btnRemove.Enabled = true;
-				m_cbxInterpolateType.SelectedIndex = -1;
-				m_cbxInterpolateType.Enabled = false;
+				m_cmbInterpolateType.SelectedIndex = -1;
+				m_cmbInterpolateType.Enabled = false;
 			}
 			else {
 				m_btnAdd.Enabled = true;
 				m_btnRemove.Enabled = false;
 				if( isStartEndPnt ) {
-					m_cbxInterpolateType.SelectedIndex = -1;
-					m_cbxInterpolateType.Enabled = false;
+					m_cmbInterpolateType.SelectedIndex = -1;
+					m_cmbInterpolateType.Enabled = false;
 				}
 				else {
-					m_cbxInterpolateType.Enabled = true;
+					m_cmbInterpolateType.Enabled = true;
 
 					// type not in available list ( e.g. legacy data on single axis machine ) results in -1, no selection
-					m_cbxInterpolateType.SelectedIndex = m_AvailableTypes.IndexOf( interpolateType );
+					m_cmbInterpolateType.SelectedIndex = m_AvailableTypes.IndexOf( interpolateType );
 				}
 			}
 		}
@@ -143,18 +143,18 @@ namespace MyCAM.Editor
 			// hide the locked axis, it does not physically exist
 			if( m_RotaryAxisConfig.Variant == MixTypeVariant.MasterOnly ) {
 				m_lblSlave.Enabled = false;
-				m_tbxSlave.Enabled = false;
+				m_numSlave.Enabled = false;
 			}
 			else if( m_RotaryAxisConfig.Variant == MixTypeVariant.SlaveOnly ) {
 				m_lblMaster.Enabled = false;
-				m_tbxMaster.Enabled = false;
+				m_numMaster.Enabled = false;
 			}
 
 			// A/B tilt angles need two degrees of freedom, disable them
 			m_lblADeg.Enabled = false;
 			m_lblBDeg.Enabled = false;
-			m_tbxAngleA.Enabled = false;
-			m_tbxAngleB.Enabled = false;
+			m_numAngleA.Enabled = false;
+			m_numAngleB.Enabled = false;
 
 			// single axis machine has only one IK solution, no flip
 			m_btnRotaryPos.Enabled = false;
@@ -172,32 +172,32 @@ namespace MyCAM.Editor
 		#endregion
 
 		// UI event - interpolate type changed
-		void m_cbxInterpolateType_SelectedIndexChanged( object sender, EventArgs e )
+		void m_cmbInterpolateType_SelectedIndexChanged( object sender, EventArgs e )
 		{
-			if( m_cbxInterpolateType.SelectedIndex < 0 || m_cbxInterpolateType.SelectedIndex >= m_AvailableTypes.Count ) {
+			if( m_cmbInterpolateType.SelectedIndex < 0 || m_cmbInterpolateType.SelectedIndex >= m_AvailableTypes.Count ) {
 				return;
 			}
-			EToolVecInterpolateType selectedType = m_AvailableTypes[ m_cbxInterpolateType.SelectedIndex ];
+			EToolVecInterpolateType selectedType = m_AvailableTypes[ m_cmbInterpolateType.SelectedIndex ];
 			TypeChanged?.Invoke( selectedType );
 		}
 
 		// UI event - Index param value changed (debounced)
-		void m_tbxAngleA_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numAngleA_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleABAngleChanged();
 		}
 
-		void m_tbxAngleB_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numAngleB_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleABAngleChanged();
 		}
 
-		void m_tbxMaster_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numMaster_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleMSAngleChanged();
 		}
 
-		void m_tbxSlave_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numSlave_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleMSAngleChanged();
 		}
@@ -232,8 +232,8 @@ namespace MyCAM.Editor
 
 		bool GetABAngleFromDialog( out double angleA_deg, out double angleB_deg )
 		{
-			angleA_deg = (double)m_tbxAngleA.Value;
-			angleB_deg = (double)m_tbxAngleB.Value;
+			angleA_deg = (double)m_numAngleA.Value;
+			angleB_deg = (double)m_numAngleB.Value;
 
 			// Convert to actual angles (considering path reverse)
 			angleA_deg = m_IsPathRevese ? -angleA_deg : angleA_deg;
@@ -243,8 +243,8 @@ namespace MyCAM.Editor
 
 		bool GetMSAngleFromDialog( out double master_deg, out double slave_deg )
 		{
-			master_deg = (double)m_tbxMaster.Value;
-			slave_deg = (double)m_tbxSlave.Value;
+			master_deg = (double)m_numMaster.Value;
+			slave_deg = (double)m_numSlave.Value;
 			return true;
 		}
 
@@ -399,9 +399,9 @@ namespace MyCAM.Editor
 			string szAxisSmooth = m_LanguageManager.TryGetString( "ToolVectorDlg_AxisSmooth", AXIS_SMOOTH );
 
 			// rebuild items by available types, item index maps to m_AvailableTypes
-			m_cbxInterpolateType.Items.Clear();
+			m_cmbInterpolateType.Items.Clear();
 			foreach( EToolVecInterpolateType type in m_AvailableTypes ) {
-				m_cbxInterpolateType.Items.Add( GetInterpolateTypeName( type, masterName, slaveName, szAxisSmooth ) );
+				m_cmbInterpolateType.Items.Add( GetInterpolateTypeName( type, masterName, slaveName, szAxisSmooth ) );
 			}
 
 			// update color legend labels

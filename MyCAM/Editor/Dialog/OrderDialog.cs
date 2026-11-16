@@ -32,7 +32,7 @@ namespace MyCAM.Editor
 		void InitializeDialog()
 		{
 			// initial state
-			m_rbSequentialOrder.Checked = true;
+			m_rdoSequentialOrder.Checked = true;
 			UpdateUIByMode();
 
 			// register enter event
@@ -59,10 +59,10 @@ namespace MyCAM.Editor
 
 			switch( mode ) {
 				case OrderMode.Sequential:
-					m_rbSequentialOrder.Checked = true;
+					m_rdoSequentialOrder.Checked = true;
 					break;
 				case OrderMode.Swap:
-					m_rbPathSwap.Checked = true;
+					m_rdoPathSwap.Checked = true;
 					break;
 			}
 
@@ -72,25 +72,25 @@ namespace MyCAM.Editor
 
 		// ---- UI events ----
 
-		protected void m_rbSequentialOrder_CheckedChanged( object sender, EventArgs e )
+		protected void m_rdoSequentialOrder_CheckedChanged( object sender, EventArgs e )
 		{
 			if( m_bSuppressValueChanged ) {
 				return;
 			}
 
-			if( m_rbSequentialOrder.Checked ) {
+			if( m_rdoSequentialOrder.Checked ) {
 				UpdateUIByMode();
 				OrderModeChanged?.Invoke( OrderMode.Sequential );
 			}
 		}
 
-		void m_rbPathSwap_CheckedChanged( object sender, EventArgs e )
+		void m_rdoPathSwap_CheckedChanged( object sender, EventArgs e )
 		{
 			if( m_bSuppressValueChanged ) {
 				return;
 			}
 
-			if( m_rbPathSwap.Checked ) {
+			if( m_rdoPathSwap.Checked ) {
 				UpdateUIByMode();
 				OrderModeChanged?.Invoke( OrderMode.Swap );
 			}
@@ -131,14 +131,14 @@ namespace MyCAM.Editor
 
 		void UpdateUIByMode()
 		{
-			if( m_rbSequentialOrder.Checked ) {
-				m_gbxContent.Text = m_LanguageManager.TryGetString( "m_gbxContent_Sequential", m_gbxContent.Text );
+			if( m_rdoSequentialOrder.Checked ) {
+				m_pnlContent.Text = m_LanguageManager.TryGetString( "m_pnlContent_Sequential", m_pnlContent.Text );
 				m_lblSequentialDesc.Visible = true;
 				m_btnMoveUp.Visible = false;
 				m_btnMoveDown.Visible = false;
 			}
-			else if( m_rbPathSwap.Checked ) {
-				m_gbxContent.Text = m_LanguageManager.TryGetString( "m_gbxContent_Swap", m_gbxContent.Text );
+			else if( m_rdoPathSwap.Checked ) {
+				m_pnlContent.Text = m_LanguageManager.TryGetString( "m_pnlContent_Swap", m_pnlContent.Text );
 				m_lblSequentialDesc.Visible = false;
 				m_btnMoveUp.Visible = true;
 				m_btnMoveDown.Visible = true;

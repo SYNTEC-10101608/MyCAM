@@ -27,72 +27,72 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_secDistance = new CommonUI.Controls.SectionPanel();
+			this.m_pnlDistance = new CommonUI.Controls.SectionPanel();
 			this.m_lblLiftUpDistance = new System.Windows.Forms.Label();
-			this.m_NumericUpDownLiftUpDistance = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numLiftUpDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblLiftUpDistanceUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_lblCutDownDistance = new System.Windows.Forms.Label();
-			this.m_NumericUpDownCutDownDistance = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numCutDownDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblCutDownDistanceUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_lblFollowSaveDistance = new System.Windows.Forms.Label();
-			this.m_NumericUpDownFollowSafeDistance = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numFollowSafeDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblFollowSaveDistanceUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_secTraverseMode = new CommonUI.Controls.SectionPanel();
-			this.m_pnlTraverseMode = new System.Windows.Forms.Panel();
-			this.m_rbtnFrogLeap = new System.Windows.Forms.RadioButton();
-			this.m_rbtnSafePlane = new System.Windows.Forms.RadioButton();
-			this.m_rbtnSafeCylinder = new System.Windows.Forms.RadioButton();
-			this.m_rbtnSafeSphere = new System.Windows.Forms.RadioButton();
-			this.m_gbxTraverse = new CommonUI.Controls.SectionPanel();
+			this.m_pnlTraverseMode = new CommonUI.Controls.SectionPanel();
+			this.m_pnlTraverseModeOption = new System.Windows.Forms.Panel();
+			this.m_rdoFrogLeap = new System.Windows.Forms.RadioButton();
+			this.m_rdoSafePlane = new System.Windows.Forms.RadioButton();
+			this.m_rdoSafeCylinder = new System.Windows.Forms.RadioButton();
+			this.m_rdoSafeSphere = new System.Windows.Forms.RadioButton();
+			this.m_pnlTraverse = new CommonUI.Controls.SectionPanel();
 			this.m_pnlFrogLeap = new System.Windows.Forms.Panel();
 			this.m_lblFrogLeapDistance = new System.Windows.Forms.Label();
-			this.m_NumericUpDownFrogLeapDistance = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numFrogLeapDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblFrogLeapDistanceUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlSafePlane = new System.Windows.Forms.Panel();
 			this.m_lblSafePlaneDistance = new System.Windows.Forms.Label();
-			this.m_NumericUpDownSafePlaneDistance = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numSafePlaneDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblSafePlaneDistanceUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlSafeCylinder = new System.Windows.Forms.Panel();
 			this.m_lblSafeCylinderRadius = new System.Windows.Forms.Label();
-			this.m_NumericUpDownSafeCylinderRadius = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numSafeCylinderRadius = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblSafeCylinderRadiusUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlSafeSphere = new System.Windows.Forms.Panel();
 			this.m_lblSafeSphereRadius = new System.Windows.Forms.Label();
-			this.m_NumericUpDownSafeSphereRadius = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numSafeSphereRadius = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblSafeSphereRadiusUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
-			this.m_secDistance.SuspendLayout();
-			this.m_secTraverseMode.SuspendLayout();
+			this.m_pnlDistance.SuspendLayout();
 			this.m_pnlTraverseMode.SuspendLayout();
-			this.m_gbxTraverse.SuspendLayout();
+			this.m_pnlTraverseModeOption.SuspendLayout();
+			this.m_pnlTraverse.SuspendLayout();
 			this.m_pnlFrogLeap.SuspendLayout();
 			this.m_pnlSafePlane.SuspendLayout();
 			this.m_pnlSafeCylinder.SuspendLayout();
 			this.m_pnlSafeSphere.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownLiftUpDistance)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownCutDownDistance)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownFollowSafeDistance)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownFrogLeapDistance)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownSafePlaneDistance)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownSafeCylinderRadius)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownSafeSphereRadius)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLiftUpDistance)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numCutDownDistance)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numFollowSafeDistance)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numFrogLeapDistance)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numSafePlaneDistance)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numSafeCylinderRadius)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numSafeSphereRadius)).BeginInit();
 			this.SuspendLayout();
 			// 
-			// m_secDistance
+			// m_pnlDistance
 			// 
-			this.m_secDistance.Controls.Add(this.m_lblLiftUpDistance);
-			this.m_secDistance.Controls.Add(this.m_NumericUpDownLiftUpDistance);
-			this.m_secDistance.Controls.Add(this.m_lblLiftUpDistanceUnit);
-			this.m_secDistance.Controls.Add(this.m_lblCutDownDistance);
-			this.m_secDistance.Controls.Add(this.m_NumericUpDownCutDownDistance);
-			this.m_secDistance.Controls.Add(this.m_lblCutDownDistanceUnit);
-			this.m_secDistance.Controls.Add(this.m_lblFollowSaveDistance);
-			this.m_secDistance.Controls.Add(this.m_NumericUpDownFollowSafeDistance);
-			this.m_secDistance.Controls.Add(this.m_lblFollowSaveDistanceUnit);
-			this.m_secDistance.Location = new System.Drawing.Point(12, 12);
-			this.m_secDistance.Name = "m_secDistance";
-			this.m_secDistance.Size = new System.Drawing.Size(356, 103);
-			this.m_secDistance.TabIndex = 0;
+			this.m_pnlDistance.Controls.Add(this.m_lblLiftUpDistance);
+			this.m_pnlDistance.Controls.Add(this.m_numLiftUpDistance);
+			this.m_pnlDistance.Controls.Add(this.m_lblLiftUpDistanceUnit);
+			this.m_pnlDistance.Controls.Add(this.m_lblCutDownDistance);
+			this.m_pnlDistance.Controls.Add(this.m_numCutDownDistance);
+			this.m_pnlDistance.Controls.Add(this.m_lblCutDownDistanceUnit);
+			this.m_pnlDistance.Controls.Add(this.m_lblFollowSaveDistance);
+			this.m_pnlDistance.Controls.Add(this.m_numFollowSafeDistance);
+			this.m_pnlDistance.Controls.Add(this.m_lblFollowSaveDistanceUnit);
+			this.m_pnlDistance.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlDistance.Name = "m_pnlDistance";
+			this.m_pnlDistance.Size = new System.Drawing.Size(356, 103);
+			this.m_pnlDistance.TabIndex = 0;
 			// 
 			// m_lblLiftUpDistance
 			// 
@@ -103,18 +103,18 @@
 			this.m_lblLiftUpDistance.TabIndex = 0;
 			this.m_lblLiftUpDistance.Text = "抬刀距離";
 			// 
-			// m_NumericUpDownLiftUpDistance
+			// m_numLiftUpDistance
 			// 
-			this.m_NumericUpDownLiftUpDistance.DecimalPlaces = 3;
-			this.m_NumericUpDownLiftUpDistance.Location = new System.Drawing.Point(110, 10);
-			this.m_NumericUpDownLiftUpDistance.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_NumericUpDownLiftUpDistance.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_NumericUpDownLiftUpDistance.Name = "m_NumericUpDownLiftUpDistance";
-			this.m_NumericUpDownLiftUpDistance.RestrictInvalidCharacters = false;
-			this.m_NumericUpDownLiftUpDistance.Size = new System.Drawing.Size(150, 23);
-			this.m_NumericUpDownLiftUpDistance.TabIndex = 1;
-			this.m_NumericUpDownLiftUpDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownLiftUpDistance_DebouncedValueChanged);
-			this.m_NumericUpDownLiftUpDistance.ValueChanged += new System.EventHandler(this.m_NumericUpDownCutDownDistance_ValueChanged);
+			this.m_numLiftUpDistance.DecimalPlaces = 3;
+			this.m_numLiftUpDistance.Location = new System.Drawing.Point(110, 10);
+			this.m_numLiftUpDistance.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numLiftUpDistance.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numLiftUpDistance.Name = "m_numLiftUpDistance";
+			this.m_numLiftUpDistance.RestrictInvalidCharacters = false;
+			this.m_numLiftUpDistance.Size = new System.Drawing.Size(150, 23);
+			this.m_numLiftUpDistance.TabIndex = 1;
+			this.m_numLiftUpDistance.DebouncedValueChanged += new System.EventHandler(this.m_numLiftUpDistance_DebouncedValueChanged);
+			this.m_numLiftUpDistance.ValueChanged += new System.EventHandler(this.m_numCutDownDistance_ValueChanged);
 			// 
 			// m_lblLiftUpDistanceUnit
 			// 
@@ -135,17 +135,17 @@
 			this.m_lblCutDownDistance.TabIndex = 3;
 			this.m_lblCutDownDistance.Text = "下刀距離";
 			// 
-			// m_NumericUpDownCutDownDistance
+			// m_numCutDownDistance
 			// 
-			this.m_NumericUpDownCutDownDistance.DecimalPlaces = 3;
-			this.m_NumericUpDownCutDownDistance.Location = new System.Drawing.Point(110, 40);
-			this.m_NumericUpDownCutDownDistance.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_NumericUpDownCutDownDistance.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_NumericUpDownCutDownDistance.Name = "m_NumericUpDownCutDownDistance";
-			this.m_NumericUpDownCutDownDistance.RestrictInvalidCharacters = false;
-			this.m_NumericUpDownCutDownDistance.Size = new System.Drawing.Size(150, 23);
-			this.m_NumericUpDownCutDownDistance.TabIndex = 4;
-			this.m_NumericUpDownCutDownDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownCutDownDistance_DebouncedValueChanged);
+			this.m_numCutDownDistance.DecimalPlaces = 3;
+			this.m_numCutDownDistance.Location = new System.Drawing.Point(110, 40);
+			this.m_numCutDownDistance.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numCutDownDistance.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numCutDownDistance.Name = "m_numCutDownDistance";
+			this.m_numCutDownDistance.RestrictInvalidCharacters = false;
+			this.m_numCutDownDistance.Size = new System.Drawing.Size(150, 23);
+			this.m_numCutDownDistance.TabIndex = 4;
+			this.m_numCutDownDistance.DebouncedValueChanged += new System.EventHandler(this.m_numCutDownDistance_DebouncedValueChanged);
 			// 
 			// m_lblCutDownDistanceUnit
 			// 
@@ -166,17 +166,17 @@
 			this.m_lblFollowSaveDistance.TabIndex = 6;
 			this.m_lblFollowSaveDistance.Text = "隨動安全距離";
 			// 
-			// m_NumericUpDownFollowSafeDistance
+			// m_numFollowSafeDistance
 			// 
-			this.m_NumericUpDownFollowSafeDistance.DecimalPlaces = 3;
-			this.m_NumericUpDownFollowSafeDistance.Location = new System.Drawing.Point(110, 70);
-			this.m_NumericUpDownFollowSafeDistance.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_NumericUpDownFollowSafeDistance.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_NumericUpDownFollowSafeDistance.Name = "m_NumericUpDownFollowSafeDistance";
-			this.m_NumericUpDownFollowSafeDistance.RestrictInvalidCharacters = false;
-			this.m_NumericUpDownFollowSafeDistance.Size = new System.Drawing.Size(150, 23);
-			this.m_NumericUpDownFollowSafeDistance.TabIndex = 7;
-			this.m_NumericUpDownFollowSafeDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownFollowSafeDistance_DebouncedValueChanged);
+			this.m_numFollowSafeDistance.DecimalPlaces = 3;
+			this.m_numFollowSafeDistance.Location = new System.Drawing.Point(110, 70);
+			this.m_numFollowSafeDistance.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numFollowSafeDistance.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numFollowSafeDistance.Name = "m_numFollowSafeDistance";
+			this.m_numFollowSafeDistance.RestrictInvalidCharacters = false;
+			this.m_numFollowSafeDistance.Size = new System.Drawing.Size(150, 23);
+			this.m_numFollowSafeDistance.TabIndex = 7;
+			this.m_numFollowSafeDistance.DebouncedValueChanged += new System.EventHandler(this.m_numFollowSafeDistance_DebouncedValueChanged);
 			// 
 			// m_lblFollowSaveDistanceUnit
 			// 
@@ -188,85 +188,85 @@
 			this.m_lblFollowSaveDistanceUnit.TabIndex = 8;
 			this.m_lblFollowSaveDistanceUnit.Text = "mm";
 			// 
-			// m_secTraverseMode
-			// 
-			this.m_secTraverseMode.Controls.Add(this.m_pnlTraverseMode);
-			this.m_secTraverseMode.Location = new System.Drawing.Point(12, 123);
-			this.m_secTraverseMode.Name = "m_secTraverseMode";
-			this.m_secTraverseMode.Size = new System.Drawing.Size(356, 43);
-			this.m_secTraverseMode.TabIndex = 1;
-			// 
 			// m_pnlTraverseMode
 			// 
-			this.m_pnlTraverseMode.Controls.Add(this.m_rbtnFrogLeap);
-			this.m_pnlTraverseMode.Controls.Add(this.m_rbtnSafePlane);
-			this.m_pnlTraverseMode.Controls.Add(this.m_rbtnSafeCylinder);
-			this.m_pnlTraverseMode.Controls.Add(this.m_rbtnSafeSphere);
-			this.m_pnlTraverseMode.Location = new System.Drawing.Point(10, 10);
+			this.m_pnlTraverseMode.Controls.Add(this.m_pnlTraverseModeOption);
+			this.m_pnlTraverseMode.Location = new System.Drawing.Point(12, 123);
 			this.m_pnlTraverseMode.Name = "m_pnlTraverseMode";
-			this.m_pnlTraverseMode.Size = new System.Drawing.Size(336, 23);
-			this.m_pnlTraverseMode.TabIndex = 0;
+			this.m_pnlTraverseMode.Size = new System.Drawing.Size(356, 43);
+			this.m_pnlTraverseMode.TabIndex = 1;
 			// 
-			// m_rbtnFrogLeap
+			// m_pnlTraverseModeOption
 			// 
-			this.m_rbtnFrogLeap.AutoSize = true;
-			this.m_rbtnFrogLeap.Location = new System.Drawing.Point(0, 2);
-			this.m_rbtnFrogLeap.Name = "m_rbtnFrogLeap";
-			this.m_rbtnFrogLeap.Size = new System.Drawing.Size(49, 20);
-			this.m_rbtnFrogLeap.TabIndex = 0;
-			this.m_rbtnFrogLeap.TabStop = true;
-			this.m_rbtnFrogLeap.Text = "蛙跳";
-			this.m_rbtnFrogLeap.CheckedChanged += new System.EventHandler(this.TraverseMode_CheckChanged);
+			this.m_pnlTraverseModeOption.Controls.Add(this.m_rdoFrogLeap);
+			this.m_pnlTraverseModeOption.Controls.Add(this.m_rdoSafePlane);
+			this.m_pnlTraverseModeOption.Controls.Add(this.m_rdoSafeCylinder);
+			this.m_pnlTraverseModeOption.Controls.Add(this.m_rdoSafeSphere);
+			this.m_pnlTraverseModeOption.Location = new System.Drawing.Point(10, 10);
+			this.m_pnlTraverseModeOption.Name = "m_pnlTraverseModeOption";
+			this.m_pnlTraverseModeOption.Size = new System.Drawing.Size(336, 23);
+			this.m_pnlTraverseModeOption.TabIndex = 0;
 			// 
-			// m_rbtnSafePlane
+			// m_rdoFrogLeap
 			// 
-			this.m_rbtnSafePlane.AutoSize = true;
-			this.m_rbtnSafePlane.Location = new System.Drawing.Point(70, 2);
-			this.m_rbtnSafePlane.Name = "m_rbtnSafePlane";
-			this.m_rbtnSafePlane.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnSafePlane.TabIndex = 1;
-			this.m_rbtnSafePlane.TabStop = true;
-			this.m_rbtnSafePlane.Text = "安全平面";
-			this.m_rbtnSafePlane.CheckedChanged += new System.EventHandler(this.TraverseMode_CheckChanged);
+			this.m_rdoFrogLeap.AutoSize = true;
+			this.m_rdoFrogLeap.Location = new System.Drawing.Point(0, 2);
+			this.m_rdoFrogLeap.Name = "m_rdoFrogLeap";
+			this.m_rdoFrogLeap.Size = new System.Drawing.Size(49, 20);
+			this.m_rdoFrogLeap.TabIndex = 0;
+			this.m_rdoFrogLeap.TabStop = true;
+			this.m_rdoFrogLeap.Text = "蛙跳";
+			this.m_rdoFrogLeap.CheckedChanged += new System.EventHandler(this.TraverseMode_CheckChanged);
 			// 
-			// m_rbtnSafeCylinder
+			// m_rdoSafePlane
 			// 
-			this.m_rbtnSafeCylinder.AutoSize = true;
-			this.m_rbtnSafeCylinder.Location = new System.Drawing.Point(160, 2);
-			this.m_rbtnSafeCylinder.Name = "m_rbtnSafeCylinder";
-			this.m_rbtnSafeCylinder.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnSafeCylinder.TabIndex = 2;
-			this.m_rbtnSafeCylinder.TabStop = true;
-			this.m_rbtnSafeCylinder.Text = "安全圓柱";
-			this.m_rbtnSafeCylinder.CheckedChanged += new System.EventHandler(this.TraverseMode_CheckChanged);
+			this.m_rdoSafePlane.AutoSize = true;
+			this.m_rdoSafePlane.Location = new System.Drawing.Point(70, 2);
+			this.m_rdoSafePlane.Name = "m_rdoSafePlane";
+			this.m_rdoSafePlane.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoSafePlane.TabIndex = 1;
+			this.m_rdoSafePlane.TabStop = true;
+			this.m_rdoSafePlane.Text = "安全平面";
+			this.m_rdoSafePlane.CheckedChanged += new System.EventHandler(this.TraverseMode_CheckChanged);
 			// 
-			// m_rbtnSafeSphere
+			// m_rdoSafeCylinder
 			// 
-			this.m_rbtnSafeSphere.AutoSize = true;
-			this.m_rbtnSafeSphere.Location = new System.Drawing.Point(250, 2);
-			this.m_rbtnSafeSphere.Name = "m_rbtnSafeSphere";
-			this.m_rbtnSafeSphere.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnSafeSphere.TabIndex = 3;
-			this.m_rbtnSafeSphere.TabStop = true;
-			this.m_rbtnSafeSphere.Text = "安全圓球";
-			this.m_rbtnSafeSphere.CheckedChanged += new System.EventHandler(this.TraverseMode_CheckChanged);
+			this.m_rdoSafeCylinder.AutoSize = true;
+			this.m_rdoSafeCylinder.Location = new System.Drawing.Point(160, 2);
+			this.m_rdoSafeCylinder.Name = "m_rdoSafeCylinder";
+			this.m_rdoSafeCylinder.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoSafeCylinder.TabIndex = 2;
+			this.m_rdoSafeCylinder.TabStop = true;
+			this.m_rdoSafeCylinder.Text = "安全圓柱";
+			this.m_rdoSafeCylinder.CheckedChanged += new System.EventHandler(this.TraverseMode_CheckChanged);
 			// 
-			// m_gbxTraverse
+			// m_rdoSafeSphere
 			// 
-			this.m_gbxTraverse.Controls.Add(this.m_pnlFrogLeap);
-			this.m_gbxTraverse.Controls.Add(this.m_pnlSafePlane);
-			this.m_gbxTraverse.Controls.Add(this.m_pnlSafeCylinder);
-			this.m_gbxTraverse.Controls.Add(this.m_pnlSafeSphere);
-			this.m_gbxTraverse.Location = new System.Drawing.Point(12, 174);
-			this.m_gbxTraverse.Name = "m_gbxTraverse";
-			this.m_gbxTraverse.Size = new System.Drawing.Size(356, 69);
-			this.m_gbxTraverse.TabIndex = 2;
-			this.m_gbxTraverse.Text = "空移參數";
+			this.m_rdoSafeSphere.AutoSize = true;
+			this.m_rdoSafeSphere.Location = new System.Drawing.Point(250, 2);
+			this.m_rdoSafeSphere.Name = "m_rdoSafeSphere";
+			this.m_rdoSafeSphere.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoSafeSphere.TabIndex = 3;
+			this.m_rdoSafeSphere.TabStop = true;
+			this.m_rdoSafeSphere.Text = "安全圓球";
+			this.m_rdoSafeSphere.CheckedChanged += new System.EventHandler(this.TraverseMode_CheckChanged);
+			// 
+			// m_pnlTraverse
+			// 
+			this.m_pnlTraverse.Controls.Add(this.m_pnlFrogLeap);
+			this.m_pnlTraverse.Controls.Add(this.m_pnlSafePlane);
+			this.m_pnlTraverse.Controls.Add(this.m_pnlSafeCylinder);
+			this.m_pnlTraverse.Controls.Add(this.m_pnlSafeSphere);
+			this.m_pnlTraverse.Location = new System.Drawing.Point(12, 174);
+			this.m_pnlTraverse.Name = "m_pnlTraverse";
+			this.m_pnlTraverse.Size = new System.Drawing.Size(356, 69);
+			this.m_pnlTraverse.TabIndex = 2;
+			this.m_pnlTraverse.Text = "空移參數";
 			// 
 			// m_pnlFrogLeap
 			// 
 			this.m_pnlFrogLeap.Controls.Add(this.m_lblFrogLeapDistance);
-			this.m_pnlFrogLeap.Controls.Add(this.m_NumericUpDownFrogLeapDistance);
+			this.m_pnlFrogLeap.Controls.Add(this.m_numFrogLeapDistance);
 			this.m_pnlFrogLeap.Controls.Add(this.m_lblFrogLeapDistanceUnit);
 			this.m_pnlFrogLeap.Location = new System.Drawing.Point(10, 36);
 			this.m_pnlFrogLeap.Name = "m_pnlFrogLeap";
@@ -282,17 +282,17 @@
 			this.m_lblFrogLeapDistance.TabIndex = 0;
 			this.m_lblFrogLeapDistance.Text = "蛙跳距離";
 			// 
-			// m_NumericUpDownFrogLeapDistance
+			// m_numFrogLeapDistance
 			// 
-			this.m_NumericUpDownFrogLeapDistance.DecimalPlaces = 3;
-			this.m_NumericUpDownFrogLeapDistance.Location = new System.Drawing.Point(100, 0);
-			this.m_NumericUpDownFrogLeapDistance.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_NumericUpDownFrogLeapDistance.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_NumericUpDownFrogLeapDistance.Name = "m_NumericUpDownFrogLeapDistance";
-			this.m_NumericUpDownFrogLeapDistance.RestrictInvalidCharacters = false;
-			this.m_NumericUpDownFrogLeapDistance.Size = new System.Drawing.Size(150, 23);
-			this.m_NumericUpDownFrogLeapDistance.TabIndex = 1;
-			this.m_NumericUpDownFrogLeapDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownFrogLeapDistance_DebouncedValueChanged);
+			this.m_numFrogLeapDistance.DecimalPlaces = 3;
+			this.m_numFrogLeapDistance.Location = new System.Drawing.Point(100, 0);
+			this.m_numFrogLeapDistance.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numFrogLeapDistance.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numFrogLeapDistance.Name = "m_numFrogLeapDistance";
+			this.m_numFrogLeapDistance.RestrictInvalidCharacters = false;
+			this.m_numFrogLeapDistance.Size = new System.Drawing.Size(150, 23);
+			this.m_numFrogLeapDistance.TabIndex = 1;
+			this.m_numFrogLeapDistance.DebouncedValueChanged += new System.EventHandler(this.m_numFrogLeapDistance_DebouncedValueChanged);
 			// 
 			// m_lblFrogLeapDistanceUnit
 			// 
@@ -307,7 +307,7 @@
 			// m_pnlSafePlane
 			// 
 			this.m_pnlSafePlane.Controls.Add(this.m_lblSafePlaneDistance);
-			this.m_pnlSafePlane.Controls.Add(this.m_NumericUpDownSafePlaneDistance);
+			this.m_pnlSafePlane.Controls.Add(this.m_numSafePlaneDistance);
 			this.m_pnlSafePlane.Controls.Add(this.m_lblSafePlaneDistanceUnit);
 			this.m_pnlSafePlane.Location = new System.Drawing.Point(10, 36);
 			this.m_pnlSafePlane.Name = "m_pnlSafePlane";
@@ -323,17 +323,17 @@
 			this.m_lblSafePlaneDistance.TabIndex = 0;
 			this.m_lblSafePlaneDistance.Text = "Z平面位置";
 			// 
-			// m_NumericUpDownSafePlaneDistance
+			// m_numSafePlaneDistance
 			// 
-			this.m_NumericUpDownSafePlaneDistance.DecimalPlaces = 3;
-			this.m_NumericUpDownSafePlaneDistance.Location = new System.Drawing.Point(100, 0);
-			this.m_NumericUpDownSafePlaneDistance.Maximum = new decimal(new int[] { 1410065407, 2, 0, 0});
-			this.m_NumericUpDownSafePlaneDistance.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_NumericUpDownSafePlaneDistance.Name = "m_NumericUpDownSafePlaneDistance";
-			this.m_NumericUpDownSafePlaneDistance.RestrictInvalidCharacters = false;
-			this.m_NumericUpDownSafePlaneDistance.Size = new System.Drawing.Size(150, 23);
-			this.m_NumericUpDownSafePlaneDistance.TabIndex = 1;
-			this.m_NumericUpDownSafePlaneDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownSafePlaneDistance_DebouncedValueChanged);
+			this.m_numSafePlaneDistance.DecimalPlaces = 3;
+			this.m_numSafePlaneDistance.Location = new System.Drawing.Point(100, 0);
+			this.m_numSafePlaneDistance.Maximum = new decimal(new int[] { 1410065407, 2, 0, 0});
+			this.m_numSafePlaneDistance.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numSafePlaneDistance.Name = "m_numSafePlaneDistance";
+			this.m_numSafePlaneDistance.RestrictInvalidCharacters = false;
+			this.m_numSafePlaneDistance.Size = new System.Drawing.Size(150, 23);
+			this.m_numSafePlaneDistance.TabIndex = 1;
+			this.m_numSafePlaneDistance.DebouncedValueChanged += new System.EventHandler(this.m_numSafePlaneDistance_DebouncedValueChanged);
 			// 
 			// m_lblSafePlaneDistanceUnit
 			// 
@@ -348,7 +348,7 @@
 			// m_pnlSafeCylinder
 			// 
 			this.m_pnlSafeCylinder.Controls.Add(this.m_lblSafeCylinderRadius);
-			this.m_pnlSafeCylinder.Controls.Add(this.m_NumericUpDownSafeCylinderRadius);
+			this.m_pnlSafeCylinder.Controls.Add(this.m_numSafeCylinderRadius);
 			this.m_pnlSafeCylinder.Controls.Add(this.m_lblSafeCylinderRadiusUnit);
 			this.m_pnlSafeCylinder.Location = new System.Drawing.Point(10, 36);
 			this.m_pnlSafeCylinder.Name = "m_pnlSafeCylinder";
@@ -364,17 +364,17 @@
 			this.m_lblSafeCylinderRadius.TabIndex = 0;
 			this.m_lblSafeCylinderRadius.Text = "圓柱半徑";
 			// 
-			// m_NumericUpDownSafeCylinderRadius
+			// m_numSafeCylinderRadius
 			// 
-			this.m_NumericUpDownSafeCylinderRadius.DecimalPlaces = 3;
-			this.m_NumericUpDownSafeCylinderRadius.Location = new System.Drawing.Point(100, 0);
-			this.m_NumericUpDownSafeCylinderRadius.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_NumericUpDownSafeCylinderRadius.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_NumericUpDownSafeCylinderRadius.Name = "m_NumericUpDownSafeCylinderRadius";
-			this.m_NumericUpDownSafeCylinderRadius.RestrictInvalidCharacters = false;
-			this.m_NumericUpDownSafeCylinderRadius.Size = new System.Drawing.Size(150, 23);
-			this.m_NumericUpDownSafeCylinderRadius.TabIndex = 1;
-			this.m_NumericUpDownSafeCylinderRadius.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownSafeCylinderRadius_DebouncedValueChanged);
+			this.m_numSafeCylinderRadius.DecimalPlaces = 3;
+			this.m_numSafeCylinderRadius.Location = new System.Drawing.Point(100, 0);
+			this.m_numSafeCylinderRadius.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numSafeCylinderRadius.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numSafeCylinderRadius.Name = "m_numSafeCylinderRadius";
+			this.m_numSafeCylinderRadius.RestrictInvalidCharacters = false;
+			this.m_numSafeCylinderRadius.Size = new System.Drawing.Size(150, 23);
+			this.m_numSafeCylinderRadius.TabIndex = 1;
+			this.m_numSafeCylinderRadius.DebouncedValueChanged += new System.EventHandler(this.m_numSafeCylinderRadius_DebouncedValueChanged);
 			// 
 			// m_lblSafeCylinderRadiusUnit
 			// 
@@ -389,7 +389,7 @@
 			// m_pnlSafeSphere
 			// 
 			this.m_pnlSafeSphere.Controls.Add(this.m_lblSafeSphereRadius);
-			this.m_pnlSafeSphere.Controls.Add(this.m_NumericUpDownSafeSphereRadius);
+			this.m_pnlSafeSphere.Controls.Add(this.m_numSafeSphereRadius);
 			this.m_pnlSafeSphere.Controls.Add(this.m_lblSafeSphereRadiusUnit);
 			this.m_pnlSafeSphere.Location = new System.Drawing.Point(10, 36);
 			this.m_pnlSafeSphere.Name = "m_pnlSafeSphere";
@@ -405,17 +405,17 @@
 			this.m_lblSafeSphereRadius.TabIndex = 0;
 			this.m_lblSafeSphereRadius.Text = "球半徑";
 			// 
-			// m_NumericUpDownSafeSphereRadius
+			// m_numSafeSphereRadius
 			// 
-			this.m_NumericUpDownSafeSphereRadius.DecimalPlaces = 3;
-			this.m_NumericUpDownSafeSphereRadius.Location = new System.Drawing.Point(100, 0);
-			this.m_NumericUpDownSafeSphereRadius.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_NumericUpDownSafeSphereRadius.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
-			this.m_NumericUpDownSafeSphereRadius.Name = "m_NumericUpDownSafeSphereRadius";
-			this.m_NumericUpDownSafeSphereRadius.RestrictInvalidCharacters = false;
-			this.m_NumericUpDownSafeSphereRadius.Size = new System.Drawing.Size(150, 23);
-			this.m_NumericUpDownSafeSphereRadius.TabIndex = 1;
-			this.m_NumericUpDownSafeSphereRadius.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownSafeSphereRadius_DebouncedValueChanged);
+			this.m_numSafeSphereRadius.DecimalPlaces = 3;
+			this.m_numSafeSphereRadius.Location = new System.Drawing.Point(100, 0);
+			this.m_numSafeSphereRadius.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numSafeSphereRadius.Minimum = new decimal(new int[] { 99999, 0, 0, -2147483648});
+			this.m_numSafeSphereRadius.Name = "m_numSafeSphereRadius";
+			this.m_numSafeSphereRadius.RestrictInvalidCharacters = false;
+			this.m_numSafeSphereRadius.Size = new System.Drawing.Size(150, 23);
+			this.m_numSafeSphereRadius.TabIndex = 1;
+			this.m_numSafeSphereRadius.DebouncedValueChanged += new System.EventHandler(this.m_numSafeSphereRadius_DebouncedValueChanged);
 			// 
 			// m_lblSafeSphereRadiusUnit
 			// 
@@ -441,18 +441,18 @@
 			// TraverseDlg
 			// 
 			this.ClientSize = new System.Drawing.Size(380, 299);
-			this.Controls.Add(this.m_secDistance);
-			this.Controls.Add(this.m_secTraverseMode);
-			this.Controls.Add(this.m_gbxTraverse);
+			this.Controls.Add(this.m_pnlDistance);
+			this.Controls.Add(this.m_pnlTraverseMode);
+			this.Controls.Add(this.m_pnlTraverse);
 			this.Controls.Add(this.m_btnConfirm);
 			this.Name = "TraverseDlg";
 			this.Text = "空移參數設定";
-			this.m_secDistance.ResumeLayout(false);
-			this.m_secDistance.PerformLayout();
-			this.m_secTraverseMode.ResumeLayout(false);
+			this.m_pnlDistance.ResumeLayout(false);
+			this.m_pnlDistance.PerformLayout();
 			this.m_pnlTraverseMode.ResumeLayout(false);
-			this.m_pnlTraverseMode.PerformLayout();
-			this.m_gbxTraverse.ResumeLayout(false);
+			this.m_pnlTraverseModeOption.ResumeLayout(false);
+			this.m_pnlTraverseModeOption.PerformLayout();
+			this.m_pnlTraverse.ResumeLayout(false);
 			this.m_pnlFrogLeap.ResumeLayout(false);
 			this.m_pnlFrogLeap.PerformLayout();
 			this.m_pnlSafePlane.ResumeLayout(false);
@@ -461,51 +461,51 @@
 			this.m_pnlSafeCylinder.PerformLayout();
 			this.m_pnlSafeSphere.ResumeLayout(false);
 			this.m_pnlSafeSphere.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownLiftUpDistance)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownCutDownDistance)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownFollowSafeDistance)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownFrogLeapDistance)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownSafePlaneDistance)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownSafeCylinderRadius)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownSafeSphereRadius)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numLiftUpDistance)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numCutDownDistance)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numFollowSafeDistance)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numFrogLeapDistance)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numSafePlaneDistance)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numSafeCylinderRadius)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numSafeSphereRadius)).EndInit();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_secDistance;
+		private CommonUI.Controls.SectionPanel m_pnlDistance;
 		private System.Windows.Forms.Label m_lblLiftUpDistance;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumericUpDownLiftUpDistance;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numLiftUpDistance;
 		private CommonUI.Controls.ThemedLabel m_lblLiftUpDistanceUnit;
 		private System.Windows.Forms.Label m_lblCutDownDistance;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumericUpDownCutDownDistance;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numCutDownDistance;
 		private CommonUI.Controls.ThemedLabel m_lblCutDownDistanceUnit;
 		private System.Windows.Forms.Label m_lblFollowSaveDistance;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumericUpDownFollowSafeDistance;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numFollowSafeDistance;
 		private CommonUI.Controls.ThemedLabel m_lblFollowSaveDistanceUnit;
-		private CommonUI.Controls.SectionPanel m_secTraverseMode;
-		private System.Windows.Forms.Panel m_pnlTraverseMode;
-		private System.Windows.Forms.RadioButton m_rbtnFrogLeap;
-		private System.Windows.Forms.RadioButton m_rbtnSafePlane;
-		private System.Windows.Forms.RadioButton m_rbtnSafeCylinder;
-		private System.Windows.Forms.RadioButton m_rbtnSafeSphere;
-		private CommonUI.Controls.SectionPanel m_gbxTraverse;
+		private CommonUI.Controls.SectionPanel m_pnlTraverseMode;
+		private System.Windows.Forms.Panel m_pnlTraverseModeOption;
+		private System.Windows.Forms.RadioButton m_rdoFrogLeap;
+		private System.Windows.Forms.RadioButton m_rdoSafePlane;
+		private System.Windows.Forms.RadioButton m_rdoSafeCylinder;
+		private System.Windows.Forms.RadioButton m_rdoSafeSphere;
+		private CommonUI.Controls.SectionPanel m_pnlTraverse;
 		private System.Windows.Forms.Panel m_pnlFrogLeap;
 		private System.Windows.Forms.Label m_lblFrogLeapDistance;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumericUpDownFrogLeapDistance;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numFrogLeapDistance;
 		private CommonUI.Controls.ThemedLabel m_lblFrogLeapDistanceUnit;
 		private System.Windows.Forms.Panel m_pnlSafePlane;
 		private System.Windows.Forms.Label m_lblSafePlaneDistance;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumericUpDownSafePlaneDistance;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numSafePlaneDistance;
 		private CommonUI.Controls.ThemedLabel m_lblSafePlaneDistanceUnit;
 		private System.Windows.Forms.Panel m_pnlSafeCylinder;
 		private System.Windows.Forms.Label m_lblSafeCylinderRadius;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumericUpDownSafeCylinderRadius;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numSafeCylinderRadius;
 		private CommonUI.Controls.ThemedLabel m_lblSafeCylinderRadiusUnit;
 		private System.Windows.Forms.Panel m_pnlSafeSphere;
 		private System.Windows.Forms.Label m_lblSafeSphereRadius;
-		private CommonUI.Controls.DebouncedNumericUpDown m_NumericUpDownSafeSphereRadius;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numSafeSphereRadius;
 		private CommonUI.Controls.ThemedLabel m_lblSafeSphereRadiusUnit;
 		private CommonUI.Controls.ThemedButton m_btnConfirm;
 	}

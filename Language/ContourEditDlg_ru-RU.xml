@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="ContourEditDlg" Content="Редактирование контура" />
-	<Message ID="m_gbxIndexParam" Content="Параметры контрольной точки" />
+	<Message ID="m_pnlIndexParam" Content="Параметры контрольной точки" />
 
 	<Message ID="m_lblRefCoordType" Content="Система координат" />
-	<Message ID="m_rbtnWorldCoord" Content="Мировая система координат" />
-	<Message ID="m_rbtnLocalCoord" Content="Локальная система координат" />
+	<Message ID="m_rdoWorldCoord" Content="Мировая система координат" />
+	<Message ID="m_rdoLocalCoord" Content="Локальная система координат" />
 
 	<Message ID="m_lblToStartOrEnd" Content="Переключение начальной/конечной точки" />
-	<Message ID="m_rbtnToStart" Content="Начальная точка" />
-	<Message ID="m_rbtnToEnd" Content="Конечная точка" />
+	<Message ID="m_rdoToStart" Content="Начальная точка" />
+	<Message ID="m_rdoToEnd" Content="Конечная точка" />
 
 	<Message ID="m_lblDX" Content="Смещение по X" />
 	<Message ID="m_lblDY" Content="Смещение по Y" />

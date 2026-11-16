@@ -4,11 +4,11 @@
     
     <Message ID="m_lblInsertType" Content="Insert Position" />
     
-    <Message ID="m_rbtnTraverseStart" Content="Traverse Start" />
-    <Message ID="m_rbtnTraverseEnd" Content="Traverse End" />
-    <Message ID="m_rbtnPathStart" Content="Path Start" />
-    <Message ID="m_rbtnPathEnd" Content="Path End" />
-    <Message ID="m_rbtnControlPoint" Content="Control Point" />
+    <Message ID="m_rdoTraverseStart" Content="Traverse Start" />
+    <Message ID="m_rdoTraverseEnd" Content="Traverse End" />
+    <Message ID="m_rdoPathStart" Content="Path Start" />
+    <Message ID="m_rdoPathEnd" Content="Path End" />
+    <Message ID="m_rdoControlPoint" Content="Control Point" />
     
     <Message ID="m_lblToStartOrEnd" Content="Start/End Point Switch" />
     <Message ID="m_btnToStartOrEnd" Content="Start/End Point" />

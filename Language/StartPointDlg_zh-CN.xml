@@ -2,8 +2,8 @@
 <ResMap>
 	<Message ID="StartPointDlg" Content="起点" />
 
-	<Message ID="m_rbtnManualSelect" Content="手动选取" />
-	<Message ID="m_rbtnAutoSelect" Content="自动批量选取" />
+	<Message ID="m_rdoManualSelect" Content="手动选取" />
+	<Message ID="m_rdoAutoSelect" Content="自动批量选取" />
 
 	<Message ID="m_lblTolerance" Content="相等精度" />
 	<Message ID="m_btnIncreasePriority" Content="增加优先级" />

@@ -9,10 +9,10 @@
 	<Message ID="m_tsmiCAD" Content="CAD" />
 	<Message ID="m_tsmiCAM" Content="CAM" />
 	<Message ID="m_tsmiSimulation" Content="Симуляция" />
-	<Message ID="m_tsbSetting" Content="Параметры" />
-	<Message ID="m_tsbCNCConnection" Content="Параметры подключения CNC" />
+	<Message ID="m_tsmiSetting" Content="Параметры" />
+	<Message ID="m_tsmiCNCConnection" Content="Параметры подключения CNC" />
 	<Message ID="m_tsmiLanguage" Content="Переключение языка" />
-	<Message ID="m_tsbController" Content="Контроллер" />
+	<Message ID="m_tsmiController" Content="Контроллер" />
 	<Message ID="m_tsmiControllerAdvancedSettings" Content="Расширенные настройки контроллера" />
 	<Message ID="m_tsmiMachining" Content="Обработка" />
 	<Message ID="m_tsbSetOffset" Content="Смещение" />
@@ -109,38 +109,32 @@
 	<Message ID="m_tsbMeasureCAM_ToolTip" Content="Измерение" />
 
 	<!-- 新增路徑子工具列 -->
-	<Message ID="m_tsAddPathForHat" Content="Нестандартная крышка-генерация пути" />
-	<Message ID="m_tsAddPathForTube" Content="Трубная тяга-генерация пути" />
-	<Message ID="m_tsbSelectD1ContFace" Content="D1 непрерывность" />
-	<Message ID="m_tsbSelPath_FreeBound" Content="Все границы граней" />
-	<Message ID="m_tsbSelPath_Manual" Content="Ручной выбор" />
-	<Message ID="m_tsbManualSelectPathOK" Content="Подтвердить выделение" />
 
 	<!-- 模擬工具列 -->
-	<Message ID="m_btnPlay" Content="Воспроизведение" />
-	<Message ID="m_btnPlay_ToolTip" Content="Воспроизведение" />
-	<Message ID="m_btnPause" Content="Пауза" />
-	<Message ID="m_btnPause_ToolTip" Content="Пауза" />
-	<Message ID="m_btnStop" Content="Остановить" />
-	<Message ID="m_btnStop_ToolTip" Content="Остановить" />
-	<Message ID="m_btnPreviousPath" Content="Предыдущий путь" />
-	<Message ID="m_btnPreviousPath_ToolTip" Content="Предыдущий путь" />
-	<Message ID="m_btnNextPath" Content="Следующий путь" />
-	<Message ID="m_btnNextPath_ToolTip" Content="Следующий путь" />
-	<Message ID="m_btnPreCollision" Content="Предыдущая точка столкновения" />
-	<Message ID="m_btnPreCollision_ToolTip" Content="Предыдущая точка столкновения" />
-	<Message ID="m_btnNextCol" Content="Следующая точка столкновения" />
-	<Message ID="m_btnNextCol_ToolTip" Content="Следующая точка столкновения" />
-	<Message ID="m_btnPrePoint" Content="Предыдущий шаг" />
-	<Message ID="m_btnPrePoint_ToolTip" Content="Предыдущий шаг" />
-	<Message ID="m_btnNextPoint" Content="Следующий шаг" />
-	<Message ID="m_btnNextPoint_ToolTip" Content="Следующий шаг" />
-	<Message ID="m_btnSpeedUp" Content="Ускорить" />
-	<Message ID="m_btnSpeedUp_ToolTip" Content="Ускорить" />
-	<Message ID="m_btnSlowDonw" Content="Замедлить" />
-	<Message ID="m_btnSlowDonw_ToolTip" Content="Замедлить" />
-	<Message ID="m_btnCheck" Content="Проверка столкновения" />
-	<Message ID="m_btnCheck_ToolTip" Content="Проверка столкновения" />
+	<Message ID="m_tsbPlay" Content="Воспроизведение" />
+	<Message ID="m_tsbPlay_ToolTip" Content="Воспроизведение" />
+	<Message ID="m_tsbPause" Content="Пауза" />
+	<Message ID="m_tsbPause_ToolTip" Content="Пауза" />
+	<Message ID="m_tsbStop" Content="Остановить" />
+	<Message ID="m_tsbStop_ToolTip" Content="Остановить" />
+	<Message ID="m_tsbPreviousPath" Content="Предыдущий путь" />
+	<Message ID="m_tsbPreviousPath_ToolTip" Content="Предыдущий путь" />
+	<Message ID="m_tsbNextPath" Content="Следующий путь" />
+	<Message ID="m_tsbNextPath_ToolTip" Content="Следующий путь" />
+	<Message ID="m_tsbPreCollision" Content="Предыдущая точка столкновения" />
+	<Message ID="m_tsbPreCollision_ToolTip" Content="Предыдущая точка столкновения" />
+	<Message ID="m_tsbNextCol" Content="Следующая точка столкновения" />
+	<Message ID="m_tsbNextCol_ToolTip" Content="Следующая точка столкновения" />
+	<Message ID="m_tsbPrePoint" Content="Предыдущий шаг" />
+	<Message ID="m_tsbPrePoint_ToolTip" Content="Предыдущий шаг" />
+	<Message ID="m_tsbNextPoint" Content="Следующий шаг" />
+	<Message ID="m_tsbNextPoint_ToolTip" Content="Следующий шаг" />
+	<Message ID="m_tsbSpeedUp" Content="Ускорить" />
+	<Message ID="m_tsbSpeedUp_ToolTip" Content="Ускорить" />
+	<Message ID="m_tsbSlowDown" Content="Замедлить" />
+	<Message ID="m_tsbSlowDown_ToolTip" Content="Замедлить" />
+	<Message ID="m_tsbCheck" Content="Проверка столкновения" />
+	<Message ID="m_tsbCheck_ToolTip" Content="Проверка столкновения" />
 	
 	<!-- 提示字串 -->
 	<Message ID="ShowVec" Content="Показать позу" />

@@ -27,54 +27,54 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_grpDisplacement = new CommonUI.Controls.SectionPanel();
+			this.m_pnlDisplacement = new CommonUI.Controls.SectionPanel();
 			this.m_lblStepDis = new System.Windows.Forms.Label();
-			this.m_txbStepDistance = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numStepDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblX = new CommonUI.Controls.ThemedLabel();
-			this.m_nudX = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numX = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblY = new CommonUI.Controls.ThemedLabel();
-			this.m_nudY = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numY = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblZ = new CommonUI.Controls.ThemedLabel();
-			this.m_nudZ = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_grpRotation = new CommonUI.Controls.SectionPanel();
+			this.m_numZ = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_pnlRotation = new CommonUI.Controls.SectionPanel();
 			this.m_lblStapAngle = new System.Windows.Forms.Label();
-			this.m_txbStepAngle = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numStepAngle = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblRx = new CommonUI.Controls.ThemedLabel();
-			this.m_nudRx = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numRx = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblRy = new CommonUI.Controls.ThemedLabel();
-			this.m_nudRy = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numRy = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblRz = new CommonUI.Controls.ThemedLabel();
-			this.m_nudRz = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_numRz = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_btnReset = new CommonUI.Controls.ThemedButton();
 			this.m_btnCancel = new CommonUI.Controls.ThemedButton();
 			this.m_btnOK = new CommonUI.Controls.ThemedButton();
-			this.m_grpDisplacement.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_txbStepDistance)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudX)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudY)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudZ)).BeginInit();
-			this.m_grpRotation.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_txbStepAngle)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRx)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRy)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRz)).BeginInit();
+			this.m_pnlDisplacement.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numStepDistance)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numX)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numY)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numZ)).BeginInit();
+			this.m_pnlRotation.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numStepAngle)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numRx)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numRy)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numRz)).BeginInit();
 			this.SuspendLayout();
 			//
-			// m_grpDisplacement
+			// m_pnlDisplacement
 			//
-			this.m_grpDisplacement.Controls.Add(this.m_lblStepDis);
-			this.m_grpDisplacement.Controls.Add(this.m_txbStepDistance);
-			this.m_grpDisplacement.Controls.Add(this.m_lblX);
-			this.m_grpDisplacement.Controls.Add(this.m_nudX);
-			this.m_grpDisplacement.Controls.Add(this.m_lblY);
-			this.m_grpDisplacement.Controls.Add(this.m_nudY);
-			this.m_grpDisplacement.Controls.Add(this.m_lblZ);
-			this.m_grpDisplacement.Controls.Add(this.m_nudZ);
-			this.m_grpDisplacement.Location = new System.Drawing.Point(12, 12);
-			this.m_grpDisplacement.Name = "m_grpDisplacement";
-			this.m_grpDisplacement.Size = new System.Drawing.Size(296, 159);
-			this.m_grpDisplacement.TabIndex = 0;
-			this.m_grpDisplacement.Text = "平移";
+			this.m_pnlDisplacement.Controls.Add(this.m_lblStepDis);
+			this.m_pnlDisplacement.Controls.Add(this.m_numStepDistance);
+			this.m_pnlDisplacement.Controls.Add(this.m_lblX);
+			this.m_pnlDisplacement.Controls.Add(this.m_numX);
+			this.m_pnlDisplacement.Controls.Add(this.m_lblY);
+			this.m_pnlDisplacement.Controls.Add(this.m_numY);
+			this.m_pnlDisplacement.Controls.Add(this.m_lblZ);
+			this.m_pnlDisplacement.Controls.Add(this.m_numZ);
+			this.m_pnlDisplacement.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlDisplacement.Name = "m_pnlDisplacement";
+			this.m_pnlDisplacement.Size = new System.Drawing.Size(296, 159);
+			this.m_pnlDisplacement.TabIndex = 0;
+			this.m_pnlDisplacement.Text = "平移";
 			//
 			// m_lblStepDis
 			//
@@ -85,25 +85,25 @@
 			this.m_lblStepDis.TabIndex = 0;
 			this.m_lblStepDis.Text = "步進距離";
 			//
-			// m_txbStepDistance
+			// m_numStepDistance
 			//
-			this.m_txbStepDistance.DecimalPlaces = 3;
-			this.m_txbStepDistance.Location = new System.Drawing.Point(100, 36);
-			this.m_txbStepDistance.Maximum = new decimal(new int[] {
+			this.m_numStepDistance.DecimalPlaces = 3;
+			this.m_numStepDistance.Location = new System.Drawing.Point(100, 36);
+			this.m_numStepDistance.Maximum = new decimal(new int[] {
             99999,
             0,
             0,
             0});
-			this.m_txbStepDistance.Minimum = new decimal(new int[] {
+			this.m_numStepDistance.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             196608});
-			this.m_txbStepDistance.Name = "m_txbStepDistance";
-			this.m_txbStepDistance.Size = new System.Drawing.Size(150, 23);
-			this.m_txbStepDistance.TabIndex = 1;
-			this.m_txbStepDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbStepDistance_KeyDown);
-			this.m_txbStepDistance.Leave += new System.EventHandler(this.m_txbStepDistance_Leave);
+			this.m_numStepDistance.Name = "m_numStepDistance";
+			this.m_numStepDistance.Size = new System.Drawing.Size(150, 23);
+			this.m_numStepDistance.TabIndex = 1;
+			this.m_numStepDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_numStepDistance_KeyDown);
+			this.m_numStepDistance.Leave += new System.EventHandler(this.m_numStepDistance_Leave);
 			//
 			// m_lblX
 			//
@@ -115,13 +115,13 @@
 			this.m_lblX.TabIndex = 2;
 			this.m_lblX.Text = "X";
 			//
-			// m_nudX
+			// m_numX
 			//
-			this.m_nudX.Location = new System.Drawing.Point(100, 66);
-			this.m_nudX.Name = "m_nudX";
-			this.m_nudX.Size = new System.Drawing.Size(150, 23);
-			this.m_nudX.TabIndex = 3;
-			this.m_nudX.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudX_MouseWheel);
+			this.m_numX.Location = new System.Drawing.Point(100, 66);
+			this.m_numX.Name = "m_numX";
+			this.m_numX.Size = new System.Drawing.Size(150, 23);
+			this.m_numX.TabIndex = 3;
+			this.m_numX.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_numX_MouseWheel);
 			//
 			// m_lblY
 			//
@@ -133,13 +133,13 @@
 			this.m_lblY.TabIndex = 4;
 			this.m_lblY.Text = "Y";
 			//
-			// m_nudY
+			// m_numY
 			//
-			this.m_nudY.Location = new System.Drawing.Point(100, 96);
-			this.m_nudY.Name = "m_nudY";
-			this.m_nudY.Size = new System.Drawing.Size(150, 23);
-			this.m_nudY.TabIndex = 5;
-			this.m_nudY.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudY_MouseWheel);
+			this.m_numY.Location = new System.Drawing.Point(100, 96);
+			this.m_numY.Name = "m_numY";
+			this.m_numY.Size = new System.Drawing.Size(150, 23);
+			this.m_numY.TabIndex = 5;
+			this.m_numY.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_numY_MouseWheel);
 			//
 			// m_lblZ
 			//
@@ -151,29 +151,29 @@
 			this.m_lblZ.TabIndex = 6;
 			this.m_lblZ.Text = "Z";
 			//
-			// m_nudZ
+			// m_numZ
 			//
-			this.m_nudZ.Location = new System.Drawing.Point(100, 126);
-			this.m_nudZ.Name = "m_nudZ";
-			this.m_nudZ.Size = new System.Drawing.Size(150, 23);
-			this.m_nudZ.TabIndex = 7;
-			this.m_nudZ.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudZ_MouseWheel);
+			this.m_numZ.Location = new System.Drawing.Point(100, 126);
+			this.m_numZ.Name = "m_numZ";
+			this.m_numZ.Size = new System.Drawing.Size(150, 23);
+			this.m_numZ.TabIndex = 7;
+			this.m_numZ.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_numZ_MouseWheel);
 			//
-			// m_grpRotation
+			// m_pnlRotation
 			//
-			this.m_grpRotation.Controls.Add(this.m_lblStapAngle);
-			this.m_grpRotation.Controls.Add(this.m_txbStepAngle);
-			this.m_grpRotation.Controls.Add(this.m_lblRx);
-			this.m_grpRotation.Controls.Add(this.m_nudRx);
-			this.m_grpRotation.Controls.Add(this.m_lblRy);
-			this.m_grpRotation.Controls.Add(this.m_nudRy);
-			this.m_grpRotation.Controls.Add(this.m_lblRz);
-			this.m_grpRotation.Controls.Add(this.m_nudRz);
-			this.m_grpRotation.Location = new System.Drawing.Point(12, 179);
-			this.m_grpRotation.Name = "m_grpRotation";
-			this.m_grpRotation.Size = new System.Drawing.Size(296, 159);
-			this.m_grpRotation.TabIndex = 1;
-			this.m_grpRotation.Text = "旋轉";
+			this.m_pnlRotation.Controls.Add(this.m_lblStapAngle);
+			this.m_pnlRotation.Controls.Add(this.m_numStepAngle);
+			this.m_pnlRotation.Controls.Add(this.m_lblRx);
+			this.m_pnlRotation.Controls.Add(this.m_numRx);
+			this.m_pnlRotation.Controls.Add(this.m_lblRy);
+			this.m_pnlRotation.Controls.Add(this.m_numRy);
+			this.m_pnlRotation.Controls.Add(this.m_lblRz);
+			this.m_pnlRotation.Controls.Add(this.m_numRz);
+			this.m_pnlRotation.Location = new System.Drawing.Point(12, 179);
+			this.m_pnlRotation.Name = "m_pnlRotation";
+			this.m_pnlRotation.Size = new System.Drawing.Size(296, 159);
+			this.m_pnlRotation.TabIndex = 1;
+			this.m_pnlRotation.Text = "旋轉";
 			//
 			// m_lblStapAngle
 			//
@@ -184,25 +184,25 @@
 			this.m_lblStapAngle.TabIndex = 0;
 			this.m_lblStapAngle.Text = "步進角度";
 			//
-			// m_txbStepAngle
+			// m_numStepAngle
 			//
-			this.m_txbStepAngle.DecimalPlaces = 3;
-			this.m_txbStepAngle.Location = new System.Drawing.Point(100, 36);
-			this.m_txbStepAngle.Maximum = new decimal(new int[] {
+			this.m_numStepAngle.DecimalPlaces = 3;
+			this.m_numStepAngle.Location = new System.Drawing.Point(100, 36);
+			this.m_numStepAngle.Maximum = new decimal(new int[] {
             99999,
             0,
             0,
             0});
-			this.m_txbStepAngle.Minimum = new decimal(new int[] {
+			this.m_numStepAngle.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             196608});
-			this.m_txbStepAngle.Name = "m_txbStepAngle";
-			this.m_txbStepAngle.Size = new System.Drawing.Size(150, 23);
-			this.m_txbStepAngle.TabIndex = 1;
-			this.m_txbStepAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbStepAngle_KeyDown);
-			this.m_txbStepAngle.Leave += new System.EventHandler(this.m_txbStepAngle_Leave);
+			this.m_numStepAngle.Name = "m_numStepAngle";
+			this.m_numStepAngle.Size = new System.Drawing.Size(150, 23);
+			this.m_numStepAngle.TabIndex = 1;
+			this.m_numStepAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_numStepAngle_KeyDown);
+			this.m_numStepAngle.Leave += new System.EventHandler(this.m_numStepAngle_Leave);
 			//
 			// m_lblRx
 			//
@@ -214,23 +214,23 @@
 			this.m_lblRx.TabIndex = 2;
 			this.m_lblRx.Text = "RX";
 			//
-			// m_nudRx
+			// m_numRx
 			//
-			this.m_nudRx.Location = new System.Drawing.Point(100, 66);
-			this.m_nudRx.Maximum = new decimal(new int[] {
+			this.m_numRx.Location = new System.Drawing.Point(100, 66);
+			this.m_numRx.Maximum = new decimal(new int[] {
             360,
             0,
             0,
             0});
-			this.m_nudRx.Minimum = new decimal(new int[] {
+			this.m_numRx.Minimum = new decimal(new int[] {
             360,
             0,
             0,
             -2147483648});
-			this.m_nudRx.Name = "m_nudRx";
-			this.m_nudRx.Size = new System.Drawing.Size(150, 23);
-			this.m_nudRx.TabIndex = 3;
-			this.m_nudRx.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudRx_MouseWheel);
+			this.m_numRx.Name = "m_numRx";
+			this.m_numRx.Size = new System.Drawing.Size(150, 23);
+			this.m_numRx.TabIndex = 3;
+			this.m_numRx.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_numRx_MouseWheel);
 			//
 			// m_lblRy
 			//
@@ -242,23 +242,23 @@
 			this.m_lblRy.TabIndex = 4;
 			this.m_lblRy.Text = "RY";
 			//
-			// m_nudRy
+			// m_numRy
 			//
-			this.m_nudRy.Location = new System.Drawing.Point(100, 96);
-			this.m_nudRy.Maximum = new decimal(new int[] {
+			this.m_numRy.Location = new System.Drawing.Point(100, 96);
+			this.m_numRy.Maximum = new decimal(new int[] {
             360,
             0,
             0,
             0});
-			this.m_nudRy.Minimum = new decimal(new int[] {
+			this.m_numRy.Minimum = new decimal(new int[] {
             360,
             0,
             0,
             -2147483648});
-			this.m_nudRy.Name = "m_nudRy";
-			this.m_nudRy.Size = new System.Drawing.Size(150, 23);
-			this.m_nudRy.TabIndex = 5;
-			this.m_nudRy.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudRy_MouseWheel);
+			this.m_numRy.Name = "m_numRy";
+			this.m_numRy.Size = new System.Drawing.Size(150, 23);
+			this.m_numRy.TabIndex = 5;
+			this.m_numRy.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_numRy_MouseWheel);
 			//
 			// m_lblRz
 			//
@@ -270,23 +270,23 @@
 			this.m_lblRz.TabIndex = 6;
 			this.m_lblRz.Text = "RZ";
 			//
-			// m_nudRz
+			// m_numRz
 			//
-			this.m_nudRz.Location = new System.Drawing.Point(100, 126);
-			this.m_nudRz.Maximum = new decimal(new int[] {
+			this.m_numRz.Location = new System.Drawing.Point(100, 126);
+			this.m_numRz.Maximum = new decimal(new int[] {
             360,
             0,
             0,
             0});
-			this.m_nudRz.Minimum = new decimal(new int[] {
+			this.m_numRz.Minimum = new decimal(new int[] {
             360,
             0,
             0,
             -2147483648});
-			this.m_nudRz.Name = "m_nudRz";
-			this.m_nudRz.Size = new System.Drawing.Size(150, 23);
-			this.m_nudRz.TabIndex = 7;
-			this.m_nudRz.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudRz_MouseWheel);
+			this.m_numRz.Name = "m_numRz";
+			this.m_numRz.Size = new System.Drawing.Size(150, 23);
+			this.m_numRz.TabIndex = 7;
+			this.m_numRz.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_numRz_MouseWheel);
 			//
 			// m_btnReset
 			//
@@ -322,50 +322,50 @@
 			// AxisTransformDlg
 			//
 			this.ClientSize = new System.Drawing.Size(320, 394);
-			this.Controls.Add(this.m_grpDisplacement);
-			this.Controls.Add(this.m_grpRotation);
+			this.Controls.Add(this.m_pnlDisplacement);
+			this.Controls.Add(this.m_pnlRotation);
 			this.Controls.Add(this.m_btnReset);
 			this.Controls.Add(this.m_btnCancel);
 			this.Controls.Add(this.m_btnOK);
 			this.Name = "AxisTransformDlg";
 			this.Text = "軸向轉換";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AxisTransformDlg_FormClosing);
-			this.m_grpDisplacement.ResumeLayout(false);
-			this.m_grpDisplacement.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_txbStepDistance)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudX)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudY)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudZ)).EndInit();
-			this.m_grpRotation.ResumeLayout(false);
-			this.m_grpRotation.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_txbStepAngle)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRx)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRy)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRz)).EndInit();
+			this.m_pnlDisplacement.ResumeLayout(false);
+			this.m_pnlDisplacement.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numStepDistance)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numX)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numY)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numZ)).EndInit();
+			this.m_pnlRotation.ResumeLayout(false);
+			this.m_pnlRotation.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numStepAngle)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numRx)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numRy)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numRz)).EndInit();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_grpDisplacement;
+		private CommonUI.Controls.SectionPanel m_pnlDisplacement;
 		private System.Windows.Forms.Label m_lblStepDis;
-		private CommonUI.Controls.DebouncedNumericUpDown m_txbStepDistance;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numStepDistance;
 		private CommonUI.Controls.ThemedLabel m_lblX;
-		private CommonUI.Controls.DebouncedNumericUpDown m_nudX;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numX;
 		private CommonUI.Controls.ThemedLabel m_lblY;
-		private CommonUI.Controls.DebouncedNumericUpDown m_nudY;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numY;
 		private CommonUI.Controls.ThemedLabel m_lblZ;
-		private CommonUI.Controls.DebouncedNumericUpDown m_nudZ;
-		private CommonUI.Controls.SectionPanel m_grpRotation;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numZ;
+		private CommonUI.Controls.SectionPanel m_pnlRotation;
 		private System.Windows.Forms.Label m_lblStapAngle;
-		private CommonUI.Controls.DebouncedNumericUpDown m_txbStepAngle;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numStepAngle;
 		private CommonUI.Controls.ThemedLabel m_lblRx;
-		private CommonUI.Controls.DebouncedNumericUpDown m_nudRx;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numRx;
 		private CommonUI.Controls.ThemedLabel m_lblRy;
-		private CommonUI.Controls.DebouncedNumericUpDown m_nudRy;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numRy;
 		private CommonUI.Controls.ThemedLabel m_lblRz;
-		private CommonUI.Controls.DebouncedNumericUpDown m_nudRz;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numRz;
 		private CommonUI.Controls.ThemedButton m_btnReset;
 		private CommonUI.Controls.ThemedButton m_btnCancel;
 		private CommonUI.Controls.ThemedButton m_btnOK;

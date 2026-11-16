@@ -33,10 +33,10 @@ namespace MyCAM.Editor
 			m_IsUpdatingModeUI = true;
 			try {
 				if( isNormal ) {
-					m_rbtnDefault.Checked = true;
+					m_rdoDefault.Checked = true;
 				}
 				else {
-					m_rbtnLockAB.Checked = true;
+					m_rdoLockAB.Checked = true;
 				}
 			}
 			finally {
@@ -62,36 +62,36 @@ namespace MyCAM.Editor
 		public void EnableLockMArea( bool enableMaster )
 		{
 			enableMaster = enableMaster && m_RotaryAxisConfig.Variant != MixTypeVariant.SlaveOnly;
-			m_gbxMasterSettings.Enabled = enableMaster;
+			m_pnlMasterSettings.Enabled = enableMaster;
 			m_lblMasterAngle.Enabled = enableMaster;
-			m_dbtnMaster.Enabled = enableMaster;
+			m_numMaster.Enabled = enableMaster;
 		}
 
 		public void EnableLockSArea( bool enableSlave, bool isSingleSelect = false )
 		{
 			enableSlave = enableSlave && m_RotaryAxisConfig.Variant != MixTypeVariant.MasterOnly;
-			m_gbxSlaveSettings.Enabled = enableSlave;
+			m_pnlSlaveSettings.Enabled = enableSlave;
 			m_lblSlaveAngle.Enabled = enableSlave;
-			m_dbtnSlave.Enabled = enableSlave;
-			m_gbxRotaryDirection.Enabled = enableSlave;
-			m_gbxMachiningDir.Enabled = enableSlave && !m_IsSpindle;
+			m_numSlave.Enabled = enableSlave;
+			m_pnlRotaryDirection.Enabled = enableSlave;
+			m_pnlMachiningDir.Enabled = enableSlave && !m_IsSpindle;
 
 			if( isSingleSelect == false ) {
-				m_gbxRotaryDirection.Enabled = false;
+				m_pnlRotaryDirection.Enabled = false;
 			}
 		}
 
 		public void ResetMachiningDir( EMachiningDir dir )
 		{
-			if( m_cbxMachiningDir.Items.Count == 0 ) {
+			if( m_cmbMachiningDir.Items.Count == 0 ) {
 				return;
 			}
 			int nIndex = m_MachiningDirList.IndexOf( dir );
-			if( nIndex < 0 || nIndex >= m_cbxMachiningDir.Items.Count ) {
+			if( nIndex < 0 || nIndex >= m_cmbMachiningDir.Items.Count ) {
 				return;
 			}
 			m_IsUpdatingMachiningDirUI = true;
-			m_cbxMachiningDir.SelectedIndex = nIndex;
+			m_cmbMachiningDir.SelectedIndex = nIndex;
 			m_IsUpdatingMachiningDirUI = false;
 		}
 
@@ -99,8 +99,8 @@ namespace MyCAM.Editor
 		{
 			m_IsUpdatingMSAngleUI = true;
 			try {
-				m_dbtnMaster.SilentSetValue = (decimal)master_deg;
-				m_dbtnSlave.SilentSetValue = (decimal)slave_deg;
+				m_numMaster.SilentSetValue = (decimal)master_deg;
+				m_numSlave.SilentSetValue = (decimal)slave_deg;
 				ShowMAngleAsAssignMode( isMasterAssigned );
 				ShowSAngleAsAssignMode( isSlaveAssigned );
 			}
@@ -111,14 +111,14 @@ namespace MyCAM.Editor
 
 		public void ShowMAngleAsAssignMode( bool isAssigned )
 		{
-			ThemeText.SetRole( isAssigned ? TextRole.Body : TextRole.Secondary, m_dbtnMaster );
+			ThemeText.SetRole( isAssigned ? TextRole.Body : TextRole.Secondary, m_numMaster );
 			m_IsUpdatingMSAngleUI = true;
 			try {
 				if( isAssigned ) {
-					m_rbtnMasterManual.Checked = true;
+					m_rdoMasterManual.Checked = true;
 				}
 				else {
-					m_rbtnMasterAuto.Checked = true;
+					m_rdoMasterAuto.Checked = true;
 				}
 			}
 			finally {
@@ -128,14 +128,14 @@ namespace MyCAM.Editor
 
 		public void ShowSAngleAsAssignMode( bool isAssigned )
 		{
-			ThemeText.SetRole( isAssigned ? TextRole.Body : TextRole.Secondary, m_dbtnSlave );
+			ThemeText.SetRole( isAssigned ? TextRole.Body : TextRole.Secondary, m_numSlave );
 			m_IsUpdatingMSAngleUI = true;
 			try {
 				if( isAssigned ) {
-					m_rbtnSlaveManual.Checked = true;
+					m_rdoSlaveManual.Checked = true;
 				}
 				else {
-					m_rbtnSlaveAuto.Checked = true;
+					m_rdoSlaveAuto.Checked = true;
 				}
 			}
 			finally {
@@ -145,55 +145,55 @@ namespace MyCAM.Editor
 
 		public void GetMSAngle( out double master_deg, out double slave_deg )
 		{
-			master_deg = (double)m_dbtnMaster.Value;
-			slave_deg = (double)m_dbtnSlave.Value;
+			master_deg = (double)m_numMaster.Value;
+			slave_deg = (double)m_numSlave.Value;
 		}
 
 		#endregion
 
 		#region UI Event
 
-		void m_rbtnSlaveAuto_CheckedChanged( object sender, EventArgs e )
+		void m_rdoSlaveAuto_CheckedChanged( object sender, EventArgs e )
 		{
-			if( m_rbtnSlaveAuto.Checked && !m_IsUpdatingMSAngleUI ) {
+			if( m_rdoSlaveAuto.Checked && !m_IsUpdatingMSAngleUI ) {
 				NoticeSNeedBeSetAsAUTO();
 			}
 		}
 
-		void m_rbtnSlaveManual_CheckedChanged( object sender, EventArgs e )
+		void m_rdoSlaveManual_CheckedChanged( object sender, EventArgs e )
 		{
-			if( m_rbtnSlaveManual.Checked ) {
-				m_dbtnSlave_ValueChanged( sender, e );
+			if( m_rdoSlaveManual.Checked ) {
+				m_numSlave_ValueChanged( sender, e );
 			}
 		}
 
-		void m_dbtnSlave_ValueChanged( object sender, EventArgs e )
+		void m_numSlave_ValueChanged( object sender, EventArgs e )
 		{
 			if( m_IsUpdatingMSAngleUI ) {
 				return;
 			}
 			if( m_chkLockSlave.Checked ) {
-				SlaveChanged?.Invoke( (double)m_dbtnSlave.Value );
+				SlaveChanged?.Invoke( (double)m_numSlave.Value );
 				return;
 			}
 		}
 
-		void m_rbtnMasterAuto_CheckedChanged( object sender, EventArgs e )
+		void m_rdoMasterAuto_CheckedChanged( object sender, EventArgs e )
 		{
-			if( !m_rbtnMasterAuto.Checked ) {
+			if( !m_rdoMasterAuto.Checked ) {
 				return;
 			}
 			NoticeMNeedBeSetAsAUTO();
 		}
 
-		void m_rbtnMasterManual_CheckedChanged( object sender, EventArgs e )
+		void m_rdoMasterManual_CheckedChanged( object sender, EventArgs e )
 		{
-			if( m_rbtnMasterManual.Checked ) {
-				m_dbtnMaster_ValueChanged( sender, e );
+			if( m_rdoMasterManual.Checked ) {
+				m_numMaster_ValueChanged( sender, e );
 			}
 		}
 
-		void m_dbtnMaster_ValueChanged( object sender, EventArgs e )
+		void m_numMaster_ValueChanged( object sender, EventArgs e )
 		{
 			if( m_IsUpdatingMSAngleUI ) {
 				return;
@@ -201,7 +201,7 @@ namespace MyCAM.Editor
 
 			// set assignMS
 			if( m_chkLockMaster.Checked ) {
-				MasterChanged?.Invoke( (double)m_dbtnMaster.Value );
+				MasterChanged?.Invoke( (double)m_numMaster.Value );
 				return;
 			}
 		}
@@ -216,13 +216,13 @@ namespace MyCAM.Editor
 			NoticeMNeedBeSetAsAUTO();
 		}
 
-		void m_rbtnDefault_CheckedChanged( object sender, EventArgs e )
+		void m_rdoDefault_CheckedChanged( object sender, EventArgs e )
 		{
 			if( m_IsUpdatingModeUI ) {
 				return;
 			}
-			UpdateModeUI( m_rbtnDefault.Checked );
-			if( m_rbtnDefault.Checked ) {
+			UpdateModeUI( m_rdoDefault.Checked );
+			if( m_rdoDefault.Checked ) {
 				OnNormalMode?.Invoke( true );
 				return;
 			}
@@ -239,12 +239,12 @@ namespace MyCAM.Editor
 			FlipRotaryAxis?.Invoke( false );
 		}
 
-		void m_cbxMachiningDir_SelectedIndexChanged( object sender, EventArgs e )
+		void m_cmbMachiningDir_SelectedIndexChanged( object sender, EventArgs e )
 		{
 			if( m_IsUpdatingMachiningDirUI ) {
 				return;
 			}
-			int nIndex = m_cbxMachiningDir.SelectedIndex;
+			int nIndex = m_cmbMachiningDir.SelectedIndex;
 			if( nIndex < 0 || nIndex >= m_MachiningDirList.Count ) {
 				return;
 			}
@@ -268,7 +268,7 @@ namespace MyCAM.Editor
 		// texts that contain the axis names of the machine
 		void InitLocalizedTexts()
 		{
-			m_gbxRotaryDirection.Text = string.Format( m_LanguageManager.TryGetString( "Format_RotaryDirection", "{0}軸方向調整" ), m_RotaryAxisConfig.RotaryAxisName );
+			m_pnlRotaryDirection.Text = string.Format( m_LanguageManager.TryGetString( "Format_RotaryDirection", "{0}軸方向調整" ), m_RotaryAxisConfig.RotaryAxisName );
 			m_chkLockSlave.Text = string.Format( m_LanguageManager.TryGetString( "Format_LockSlave", "鎖{0}軸" ), m_RotaryAxisConfig.SlaveName );
 			m_lblSlaveAngle.Text = string.Format( m_LanguageManager.TryGetString( "Format_SlaveAngle", "{0}軸角度" ), m_RotaryAxisConfig.SlaveName );
 			m_chkLockMaster.Text = string.Format( m_LanguageManager.TryGetString( "Format_LockMaster", "鎖{0}軸" ), m_RotaryAxisConfig.MasterName );
@@ -280,20 +280,20 @@ namespace MyCAM.Editor
 		void BuildMachiningDirItems()
 		{
 			m_IsUpdatingMachiningDirUI = true;
-			m_cbxMachiningDir.Items.Clear();
+			m_cmbMachiningDir.Items.Clear();
 			foreach( EMachiningDir dir in m_MachiningDirList ) {
 				string szName = ( dir == EMachiningDir.None )
 					? m_LanguageManager.TryGetString( "MachiningDir_None", "無" )
 					: RotaryAxisHelper.ConvertMachiningDirName( dir, m_RotaryAxisConfig.RotaryAxisType );
-				m_cbxMachiningDir.Items.Add( szName );
+				m_cmbMachiningDir.Items.Add( szName );
 			}
-			m_cbxMachiningDir.SelectedIndex = 0;
+			m_cmbMachiningDir.SelectedIndex = 0;
 			m_IsUpdatingMachiningDirUI = false;
 		}
 
 		void UpdateModeUI( bool isNormal )
 		{
-			m_gbxLockAB.Enabled = !isNormal;
+			m_pnlLockAB.Enabled = !isNormal;
 			m_chkLockMaster.Enabled = m_RotaryAxisConfig.Variant != MixTypeVariant.SlaveOnly;
 			m_chkLockSlave.Enabled = m_RotaryAxisConfig.Variant != MixTypeVariant.MasterOnly;
 		}

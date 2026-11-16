@@ -10,5 +10,5 @@
 	<Message ID="m_btnClear" Content="清除" />
 	<Message ID="m_lblTotalDiff" Content="总偏移" />
 	<Message ID="IsMixData" Content="偏移不一致" />
-	<Message ID="m_gpbMove" Content="平移" />
+	<Message ID="m_pnlMove" Content="平移" />
 </ResMap>

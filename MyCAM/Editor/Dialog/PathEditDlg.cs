@@ -28,18 +28,18 @@ namespace MyCAM.Editor.Dialog
 			m_cmbRefCoordType.SelectedIndex = 0;
 
 			// initialize numeric up down controls
-			m_NumUpDownX.Maximum = decimal.MaxValue;
-			m_NumUpDownX.Minimum = decimal.MinValue;
-			m_NumUpDownX.DecimalPlaces = 3;
-			m_NumUpDownX.Increment = 0.25m;
-			m_NumUpDownY.Maximum = decimal.MaxValue;
-			m_NumUpDownY.Minimum = decimal.MinValue;
-			m_NumUpDownY.DecimalPlaces = 3;
-			m_NumUpDownY.Increment = 0.25m;
-			m_NumUpDownZ.Maximum = decimal.MaxValue;
-			m_NumUpDownZ.Minimum = decimal.MinValue;
-			m_NumUpDownZ.DecimalPlaces = 3;
-			m_NumUpDownZ.Increment = 0.25m;
+			m_numX.Maximum = decimal.MaxValue;
+			m_numX.Minimum = decimal.MinValue;
+			m_numX.DecimalPlaces = 3;
+			m_numX.Increment = 0.25m;
+			m_numY.Maximum = decimal.MaxValue;
+			m_numY.Minimum = decimal.MinValue;
+			m_numY.DecimalPlaces = 3;
+			m_numY.Increment = 0.25m;
+			m_numZ.Maximum = decimal.MaxValue;
+			m_numZ.Minimum = decimal.MinValue;
+			m_numZ.DecimalPlaces = 3;
+			m_numZ.Increment = 0.25m;
 
 			// Trigger initial preview to display coordinate system
 			GetValuesOfControls();
@@ -74,9 +74,9 @@ namespace MyCAM.Editor.Dialog
 			RaisePreview( m_PathEditData );
 		}
 
-		void m_NumUpDownX_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numX_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			if( m_XOffset == (double)m_NumUpDownX.Value ) {
+			if( m_XOffset == (double)m_numX.Value ) {
 				return;
 			}
 			GetValuesOfControls();
@@ -84,9 +84,9 @@ namespace MyCAM.Editor.Dialog
 			RaisePreview( m_PathEditData );
 		}
 
-		void m_NumUpDownY_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numY_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			if( m_YOffset == (double)m_NumUpDownY.Value ) {
+			if( m_YOffset == (double)m_numY.Value ) {
 				return;
 			}
 			GetValuesOfControls();
@@ -94,9 +94,9 @@ namespace MyCAM.Editor.Dialog
 			RaisePreview( m_PathEditData );
 		}
 
-		void m_NumUpDownZ_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numZ_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			if( m_ZOffset == (double)m_NumUpDownZ.Value ) {
+			if( m_ZOffset == (double)m_numZ.Value ) {
 				return;
 			}
 			GetValuesOfControls();
@@ -127,9 +127,9 @@ namespace MyCAM.Editor.Dialog
 
 		void GetValuesOfControls()
 		{
-			m_XOffset = (double)m_NumUpDownX.Value;
-			m_YOffset = (double)m_NumUpDownY.Value;
-			m_ZOffset = (double)m_NumUpDownZ.Value;
+			m_XOffset = (double)m_numX.Value;
+			m_YOffset = (double)m_numY.Value;
+			m_ZOffset = (double)m_numZ.Value;
 		}
 
 		void ClearValues()
@@ -137,9 +137,9 @@ namespace MyCAM.Editor.Dialog
 			m_XOffset = 0;
 			m_YOffset = 0;
 			m_ZOffset = 0;
-			m_NumUpDownX.Value = 0;
-			m_NumUpDownY.Value = 0;
-			m_NumUpDownZ.Value = 0;
+			m_numX.Value = 0;
+			m_numY.Value = 0;
+			m_numZ.Value = 0;
 		}
 
 		RefCoordinateType m_RefCoordinateType;

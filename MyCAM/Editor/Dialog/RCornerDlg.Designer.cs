@@ -27,21 +27,21 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_secStatus = new CommonUI.Controls.SectionPanel();
+			this.m_pnlStatus = new CommonUI.Controls.SectionPanel();
 			this.m_lblStatus = new System.Windows.Forms.Label();
 			this.m_btnDelete = new CommonUI.Controls.ThemedButton();
 			this.m_btnSwitchStartOrEnd = new CommonUI.Controls.ThemedButton();
 			this.m_btnDone = new CommonUI.Controls.ThemedButton();
-			this.m_secStatus.SuspendLayout();
+			this.m_pnlStatus.SuspendLayout();
 			this.SuspendLayout();
 			//
-			// m_secStatus
+			// m_pnlStatus
 			//
-			this.m_secStatus.Controls.Add(this.m_lblStatus);
-			this.m_secStatus.Location = new System.Drawing.Point(12, 12);
-			this.m_secStatus.Name = "m_secStatus";
-			this.m_secStatus.Size = new System.Drawing.Size(296, 43);
-			this.m_secStatus.TabIndex = 0;
+			this.m_pnlStatus.Controls.Add(this.m_lblStatus);
+			this.m_pnlStatus.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlStatus.Name = "m_pnlStatus";
+			this.m_pnlStatus.Size = new System.Drawing.Size(296, 43);
+			this.m_pnlStatus.TabIndex = 0;
 			//
 			// m_lblStatus
 			//
@@ -84,20 +84,20 @@
 			//
 			this.CancelButton = this.m_btnDone;
 			this.ClientSize = new System.Drawing.Size(320, 111);
-			this.Controls.Add(this.m_secStatus);
+			this.Controls.Add(this.m_pnlStatus);
 			this.Controls.Add(this.m_btnDelete);
 			this.Controls.Add(this.m_btnSwitchStartOrEnd);
 			this.Controls.Add(this.m_btnDone);
 			this.Name = "RCornerDlg";
 			this.Text = "R角";
-			this.m_secStatus.ResumeLayout(false);
+			this.m_pnlStatus.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_secStatus;
+		private CommonUI.Controls.SectionPanel m_pnlStatus;
 		private System.Windows.Forms.Label m_lblStatus;
 		private CommonUI.Controls.ThemedButton m_btnDelete;
 		private CommonUI.Controls.ThemedButton m_btnSwitchStartOrEnd;

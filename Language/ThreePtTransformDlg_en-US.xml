@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="ThreePtTransformDlg" Content="Three-Point Transform" />
-	<Message ID="m_gbCADCoord" Content="CAD Coordinates" />
-	<Message ID="m_gbMachineCoord" Content="Machine Coordinates" />
-	<Message ID="label1" Content="First Point" />
-	<Message ID="label2" Content="Second Point" />
-	<Message ID="label3" Content="Third Point" />
+	<Message ID="m_pnlCADCoord" Content="CAD Coordinates" />
+	<Message ID="m_pnlMachineCoord" Content="Machine Coordinates" />
+	<Message ID="m_lblCADPoint1" Content="First Point" />
+	<Message ID="m_lblCADPoint2" Content="Second Point" />
+	<Message ID="m_lblCADPoint3" Content="Third Point" />
 	<Message ID="InvalidMachineCoord" Content="Invalid machine point coordinates" />
 	<Message ID="MachinePointsCoincident" Content="Machine points cannot coincide" />
 	<Message ID="MachinePointsCollinear" Content="Machine points cannot be collinear" />

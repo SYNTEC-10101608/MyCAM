@@ -2,8 +2,8 @@
 <ResMap>
 	<Message ID="StartPointDlg" Content="Start Point" />
 
-	<Message ID="m_rbtnManualSelect" Content="Manual Select" />
-	<Message ID="m_rbtnAutoSelect" Content="Auto Batch Select" />
+	<Message ID="m_rdoManualSelect" Content="Manual Select" />
+	<Message ID="m_rdoAutoSelect" Content="Auto Batch Select" />
 
 	<Message ID="m_lblTolerance" Content="Tolerance" />
 	<Message ID="m_btnIncreasePriority" Content="Increase Priority" />

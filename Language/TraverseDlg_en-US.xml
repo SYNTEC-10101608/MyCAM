@@ -6,12 +6,12 @@
 	<Message ID="m_lblCutDownDistance" Content="Cut-down Distance" />
 	<Message ID="m_lblFollowSaveDistance" Content="Follow Safe Distance" />
 
-	<Message ID="m_rbtnFrogLeap" Content="Frog Leap" />
-	<Message ID="m_rbtnSafePlane" Content="Safe Plane" />
-	<Message ID="m_rbtnSafeCylinder" Content="Safe Cylinder" />
-	<Message ID="m_rbtnSafeSphere" Content="Safe Sphere" />
+	<Message ID="m_rdoFrogLeap" Content="Frog Leap" />
+	<Message ID="m_rdoSafePlane" Content="Safe Plane" />
+	<Message ID="m_rdoSafeCylinder" Content="Safe Cylinder" />
+	<Message ID="m_rdoSafeSphere" Content="Safe Sphere" />
 
-    <Message ID="m_gbxTraverse" Content="Traverse Parameters" />
+    <Message ID="m_pnlTraverse" Content="Traverse Parameters" />
 
 	<Message ID="m_lblFrogLeapDistance" Content="Hop Distance" />
 	<Message ID="m_lblSafePlaneDistance" Content="Z Plane Height" />

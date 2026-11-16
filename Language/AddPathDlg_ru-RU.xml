@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="AddPathDlg" Content="Добавить путь" />
-	<Message ID="m_grpStep1" Content="Способ создания пути" />
+	<Message ID="m_pnlStep1" Content="Способ создания пути" />
 	<Message ID="m_rdoAutoHat" Content="Автоматически — нестандартная крышка" />
 	<Message ID="m_rdoAutoTube" Content="Автоматически — тянутая труба" />
 	<Message ID="m_rdoManual" Content="Ручное создание" />
-	<Message ID="m_grpStep3" Content="Способ создания пути" />
+	<Message ID="m_pnlStep3" Content="Способ создания пути" />
 	<Message ID="m_rdoAutoFromFace" Content="Автоматическое создание" />
 	<Message ID="m_rdoManualWire" Content="Ручной выбор" />
 	<Message ID="m_chkShowAdvanced" Content="Расширенные параметры" />
-	<Message ID="m_grpAdvanced" Content="Расширенные параметры" />
+	<Message ID="m_pnlAdvanced" Content="Расширенные параметры" />
 	<Message ID="m_lblD1Threshold" Content="Порог непрерывности D1:" />
 	<Message ID="m_lblDiscreteMode" Content="Метод дискретизации:" />
 	<Message ID="m_lblMaxChordError" Content="Хордальная погрешность:" />

@@ -9,10 +9,10 @@
 	<Message ID="m_tsmiCAD" Content="CAD" />
 	<Message ID="m_tsmiCAM" Content="CAM" />
 	<Message ID="m_tsmiSimulation" Content="模擬" />
-	<Message ID="m_tsbSetting" Content="設定" />
-	<Message ID="m_tsbCNCConnection" Content="CNC連線設定" />
+	<Message ID="m_tsmiSetting" Content="設定" />
+	<Message ID="m_tsmiCNCConnection" Content="CNC連線設定" />
 	<Message ID="m_tsmiLanguage" Content="語系切換" />
-	<Message ID="m_tsbController" Content="控制器" />
+	<Message ID="m_tsmiController" Content="控制器" />
 	<Message ID="m_tsmiControllerAdvancedSettings" Content="控制器進階設定" />
 	<Message ID="m_tsmiMachining" Content="加工" />
 	<Message ID="m_tsbSetOffset" Content="設定偏置" />
@@ -109,38 +109,32 @@
 	<Message ID="m_tsbMeasureCAM_ToolTip" Content="量測距離或角度" />
 
 	<!-- 新增路徑子工具列 -->
-	<Message ID="m_tsAddPathForHat" Content="異形蓋件-生成路徑" />
-	<Message ID="m_tsAddPathForTube" Content="管拉件-生成路徑" />
-	<Message ID="m_tsbSelectD1ContFace" Content="沿D1邊新增路徑" />
-	<Message ID="m_tsbSelPath_FreeBound" Content="自由邊界" />
-	<Message ID="m_tsbSelPath_Manual" Content="手動選取邊界" />
-	<Message ID="m_tsbManualSelectPathOK" Content="確定選取" />
 
 	<!-- 模擬工具列 -->
-	<Message ID="m_btnPlay" Content="播放" />
-	<Message ID="m_btnPlay_ToolTip" Content="播放模擬" />
-	<Message ID="m_btnPause" Content="暫停" />
-	<Message ID="m_btnPause_ToolTip" Content="暫停模擬" />
-	<Message ID="m_btnStop" Content="停止" />
-	<Message ID="m_btnStop_ToolTip" Content="停止模擬並回到模擬起點" />
-	<Message ID="m_btnPreviousPath" Content="前路徑" />
-	<Message ID="m_btnPreviousPath_ToolTip" Content="跳往前一路徑" />
-	<Message ID="m_btnNextPath" Content="後路徑" />
-	<Message ID="m_btnNextPath_ToolTip" Content="跳往後一路徑" />
-	<Message ID="m_btnPreCollision" Content="前碰撞點" />
-	<Message ID="m_btnPreCollision_ToolTip" Content="跳往前一碰撞點" />
-	<Message ID="m_btnNextCol" Content="後碰撞點" />
-	<Message ID="m_btnNextCol_ToolTip" Content="跳往後一碰撞點" />
-	<Message ID="m_btnPrePoint" Content="上一步" />
-	<Message ID="m_btnPrePoint_ToolTip" Content="步進到前一步" />
-	<Message ID="m_btnNextPoint" Content="下一步" />
-	<Message ID="m_btnNextPoint_ToolTip" Content="步進到後一步" />
-	<Message ID="m_btnSpeedUp" Content="加速" />
-	<Message ID="m_btnSpeedUp_ToolTip" Content="加快模擬速度" />
-	<Message ID="m_btnSlowDonw" Content="減速" />
-	<Message ID="m_btnSlowDonw_ToolTip" Content="減慢模擬速度" />
-	<Message ID="m_btnCheck" Content="碰撞檢查" />
-	<Message ID="m_btnCheck_ToolTip" Content="檢查是否有碰撞" />
+	<Message ID="m_tsbPlay" Content="播放" />
+	<Message ID="m_tsbPlay_ToolTip" Content="播放模擬" />
+	<Message ID="m_tsbPause" Content="暫停" />
+	<Message ID="m_tsbPause_ToolTip" Content="暫停模擬" />
+	<Message ID="m_tsbStop" Content="停止" />
+	<Message ID="m_tsbStop_ToolTip" Content="停止模擬並回到模擬起點" />
+	<Message ID="m_tsbPreviousPath" Content="前路徑" />
+	<Message ID="m_tsbPreviousPath_ToolTip" Content="跳往前一路徑" />
+	<Message ID="m_tsbNextPath" Content="後路徑" />
+	<Message ID="m_tsbNextPath_ToolTip" Content="跳往後一路徑" />
+	<Message ID="m_tsbPreCollision" Content="前碰撞點" />
+	<Message ID="m_tsbPreCollision_ToolTip" Content="跳往前一碰撞點" />
+	<Message ID="m_tsbNextCol" Content="後碰撞點" />
+	<Message ID="m_tsbNextCol_ToolTip" Content="跳往後一碰撞點" />
+	<Message ID="m_tsbPrePoint" Content="上一步" />
+	<Message ID="m_tsbPrePoint_ToolTip" Content="步進到前一步" />
+	<Message ID="m_tsbNextPoint" Content="下一步" />
+	<Message ID="m_tsbNextPoint_ToolTip" Content="步進到後一步" />
+	<Message ID="m_tsbSpeedUp" Content="加速" />
+	<Message ID="m_tsbSpeedUp_ToolTip" Content="加快模擬速度" />
+	<Message ID="m_tsbSlowDown" Content="減速" />
+	<Message ID="m_tsbSlowDown_ToolTip" Content="減慢模擬速度" />
+	<Message ID="m_tsbCheck" Content="碰撞檢查" />
+	<Message ID="m_tsbCheck_ToolTip" Content="檢查是否有碰撞" />
 
 	<!-- 提示字串 -->
 	<Message ID="ShowVec" Content="顯示姿態" />

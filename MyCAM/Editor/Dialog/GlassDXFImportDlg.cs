@@ -17,7 +17,7 @@ namespace MyCAM.Editor.Dialog
 
 		void BtnOK_Click( object sender, EventArgs e )
 		{
-			double radius = (double)m_tbxRadius.Value;
+			double radius = (double)m_numRadius.Value;
 			if( radius < 0 || radius > MAX_RADIUS ) {
 
 				string message = string.Format( m_LanguageManager.TryGetString( "RadiusRangeError", RADIUS_RANGE_ERROR ), MAX_RADIUS );
@@ -34,7 +34,7 @@ namespace MyCAM.Editor.Dialog
 				return;
 			}
 
-			double height = (double)m_tbxHeight.Value;
+			double height = (double)m_numHeight.Value;
 			if( height <= 0 || height >= radius ) {
 
 				string message = string.Format( m_LanguageManager.TryGetString( "HeightRangeError", HEIGHT_RANGE_ERROR ), radius );

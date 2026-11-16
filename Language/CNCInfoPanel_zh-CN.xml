@@ -2,13 +2,13 @@
 <ResMap>
 	<Message ID="m_lblAxisHeader" Content="轴" />
 	<Message ID="m_lblCoordinateHeader" Content="坐标" />
-	<Message ID="m_grpCoordinates" Content="轴坐标" />
-	<Message ID="m_grpHeight" Content="调高轴信息" />
+	<Message ID="m_pnlCoordinates" Content="轴坐标" />
+	<Message ID="m_pnlHeight" Content="调高轴信息" />
 	<Message ID="m_lblCapacitanceTitle" Content="电容" />
 	<Message ID="m_lblHeightTitle" Content="调高轴坐标" />
 	<Message ID="m_lblFollowHeightTitle" Content="跟随高度" />
 	<Message ID="m_lblActualHeightTitle" Content="实际高度" />
-	<Message ID="m_grpMachining" Content="加工状态" />
+	<Message ID="m_pnlMachining" Content="加工状态" />
 	<Message ID="m_lblMainProgramTitle" Content="加工文件名" />
 	<Message ID="m_lblSpeedTitle" Content="进给速度" />
 	<Message ID="m_lblPowerTitle" Content="功率" />

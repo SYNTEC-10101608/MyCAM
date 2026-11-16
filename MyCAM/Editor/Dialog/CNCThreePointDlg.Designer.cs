@@ -31,32 +31,32 @@
 			this.m_lblDrawingDescription = new CommonUI.Controls.ThemedLabel();
 			this.m_lblDrawing1 = new System.Windows.Forms.Label();
 			this.m_lblDrawing1X = new System.Windows.Forms.Label();
-			this.m_txtDrawing1X = new System.Windows.Forms.Label();
+			this.m_lblDrawing1XValue = new System.Windows.Forms.Label();
 			this.m_lblDrawing1Y = new System.Windows.Forms.Label();
-			this.m_txtDrawing1Y = new System.Windows.Forms.Label();
+			this.m_lblDrawing1YValue = new System.Windows.Forms.Label();
 			this.m_lblDrawing1Z = new System.Windows.Forms.Label();
-			this.m_txtDrawing1Z = new System.Windows.Forms.Label();
+			this.m_lblDrawing1ZValue = new System.Windows.Forms.Label();
 			this.m_btnReset1 = new CommonUI.Controls.ThemedButton();
 			this.m_lblDrawing2 = new System.Windows.Forms.Label();
 			this.m_lblDrawing2X = new System.Windows.Forms.Label();
-			this.m_txtDrawing2X = new System.Windows.Forms.Label();
+			this.m_lblDrawing2XValue = new System.Windows.Forms.Label();
 			this.m_lblDrawing2Y = new System.Windows.Forms.Label();
-			this.m_txtDrawing2Y = new System.Windows.Forms.Label();
+			this.m_lblDrawing2YValue = new System.Windows.Forms.Label();
 			this.m_lblDrawing2Z = new System.Windows.Forms.Label();
-			this.m_txtDrawing2Z = new System.Windows.Forms.Label();
+			this.m_lblDrawing2ZValue = new System.Windows.Forms.Label();
 			this.m_btnReset2 = new CommonUI.Controls.ThemedButton();
 			this.m_lblDrawing3 = new System.Windows.Forms.Label();
 			this.m_lblDrawing3X = new System.Windows.Forms.Label();
-			this.m_txtDrawing3X = new System.Windows.Forms.Label();
+			this.m_lblDrawing3XValue = new System.Windows.Forms.Label();
 			this.m_lblDrawing3Y = new System.Windows.Forms.Label();
-			this.m_txtDrawing3Y = new System.Windows.Forms.Label();
+			this.m_lblDrawing3YValue = new System.Windows.Forms.Label();
 			this.m_lblDrawing3Z = new System.Windows.Forms.Label();
-			this.m_txtDrawing3Z = new System.Windows.Forms.Label();
+			this.m_lblDrawing3ZValue = new System.Windows.Forms.Label();
 			this.m_btnReset3 = new CommonUI.Controls.ThemedButton();
 			this.m_btnPickDrawing = new CommonUI.Controls.ThemedButton();
 			this.m_btnPickCancel = new CommonUI.Controls.ThemedButton();
-			this.m_secOption = new CommonUI.Controls.SectionPanel();
-			this.m_chbDrawingOnly = new System.Windows.Forms.CheckBox();
+			this.m_pnlOption = new CommonUI.Controls.SectionPanel();
+			this.m_chkDrawingOnly = new System.Windows.Forms.CheckBox();
 			this.m_pnlWorkpiece = new CommonUI.Controls.SectionPanel();
 			this.m_lblWorkpieceDescription = new CommonUI.Controls.ThemedLabel();
 			this.m_lblWorkpiece1 = new System.Windows.Forms.Label();
@@ -83,7 +83,7 @@
 			this.m_lblWorkpiece3Z = new System.Windows.Forms.Label();
 			this.m_txtWorkpiece3Z = new System.Windows.Forms.TextBox();
 			this.m_btnCapture3 = new CommonUI.Controls.ThemedButton();
-			this.m_secCalculation = new CommonUI.Controls.SectionPanel();
+			this.m_pnlCalculation = new CommonUI.Controls.SectionPanel();
 			this.m_lblTolerance = new System.Windows.Forms.Label();
 			this.m_txtTolerance = new System.Windows.Forms.TextBox();
 			this.m_lblToleranceUnit = new CommonUI.Controls.ThemedLabel();
@@ -91,9 +91,9 @@
 			this.m_lblErrorValue = new CommonUI.Controls.ThemedLabel();
 			this.m_btnCalculate = new CommonUI.Controls.ThemedButton();
 			this.m_pnlDrawing.SuspendLayout();
-			this.m_secOption.SuspendLayout();
+			this.m_pnlOption.SuspendLayout();
 			this.m_pnlWorkpiece.SuspendLayout();
-			this.m_secCalculation.SuspendLayout();
+			this.m_pnlCalculation.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// m_pnlDrawing
@@ -101,27 +101,27 @@
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawingDescription);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing1);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing1X);
-			this.m_pnlDrawing.Controls.Add(this.m_txtDrawing1X);
+			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing1XValue);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing1Y);
-			this.m_pnlDrawing.Controls.Add(this.m_txtDrawing1Y);
+			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing1YValue);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing1Z);
-			this.m_pnlDrawing.Controls.Add(this.m_txtDrawing1Z);
+			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing1ZValue);
 			this.m_pnlDrawing.Controls.Add(this.m_btnReset1);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing2);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing2X);
-			this.m_pnlDrawing.Controls.Add(this.m_txtDrawing2X);
+			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing2XValue);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing2Y);
-			this.m_pnlDrawing.Controls.Add(this.m_txtDrawing2Y);
+			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing2YValue);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing2Z);
-			this.m_pnlDrawing.Controls.Add(this.m_txtDrawing2Z);
+			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing2ZValue);
 			this.m_pnlDrawing.Controls.Add(this.m_btnReset2);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing3);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing3X);
-			this.m_pnlDrawing.Controls.Add(this.m_txtDrawing3X);
+			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing3XValue);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing3Y);
-			this.m_pnlDrawing.Controls.Add(this.m_txtDrawing3Y);
+			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing3YValue);
 			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing3Z);
-			this.m_pnlDrawing.Controls.Add(this.m_txtDrawing3Z);
+			this.m_pnlDrawing.Controls.Add(this.m_lblDrawing3ZValue);
 			this.m_pnlDrawing.Controls.Add(this.m_btnReset3);
 			this.m_pnlDrawing.Controls.Add(this.m_btnPickDrawing);
 			this.m_pnlDrawing.Controls.Add(this.m_btnPickCancel);
@@ -157,13 +157,13 @@
 			this.m_lblDrawing1X.TabIndex = 2;
 			this.m_lblDrawing1X.Text = "X";
 			// 
-			// m_txtDrawing1X
+			// m_lblDrawing1XValue
 			// 
-			this.m_txtDrawing1X.Location = new System.Drawing.Point(76, 66);
-			this.m_txtDrawing1X.Name = "m_txtDrawing1X";
-			this.m_txtDrawing1X.Size = new System.Drawing.Size(76, 23);
-			this.m_txtDrawing1X.TabIndex = 3;
-			this.m_txtDrawing1X.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblDrawing1XValue.Location = new System.Drawing.Point(76, 66);
+			this.m_lblDrawing1XValue.Name = "m_lblDrawing1XValue";
+			this.m_lblDrawing1XValue.Size = new System.Drawing.Size(76, 23);
+			this.m_lblDrawing1XValue.TabIndex = 3;
+			this.m_lblDrawing1XValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// m_lblDrawing1Y
 			// 
@@ -174,13 +174,13 @@
 			this.m_lblDrawing1Y.TabIndex = 4;
 			this.m_lblDrawing1Y.Text = "Y";
 			// 
-			// m_txtDrawing1Y
+			// m_lblDrawing1YValue
 			// 
-			this.m_txtDrawing1Y.Location = new System.Drawing.Point(176, 66);
-			this.m_txtDrawing1Y.Name = "m_txtDrawing1Y";
-			this.m_txtDrawing1Y.Size = new System.Drawing.Size(76, 23);
-			this.m_txtDrawing1Y.TabIndex = 5;
-			this.m_txtDrawing1Y.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblDrawing1YValue.Location = new System.Drawing.Point(176, 66);
+			this.m_lblDrawing1YValue.Name = "m_lblDrawing1YValue";
+			this.m_lblDrawing1YValue.Size = new System.Drawing.Size(76, 23);
+			this.m_lblDrawing1YValue.TabIndex = 5;
+			this.m_lblDrawing1YValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// m_lblDrawing1Z
 			// 
@@ -191,13 +191,13 @@
 			this.m_lblDrawing1Z.TabIndex = 6;
 			this.m_lblDrawing1Z.Text = "Z";
 			// 
-			// m_txtDrawing1Z
+			// m_lblDrawing1ZValue
 			// 
-			this.m_txtDrawing1Z.Location = new System.Drawing.Point(276, 66);
-			this.m_txtDrawing1Z.Name = "m_txtDrawing1Z";
-			this.m_txtDrawing1Z.Size = new System.Drawing.Size(76, 23);
-			this.m_txtDrawing1Z.TabIndex = 7;
-			this.m_txtDrawing1Z.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblDrawing1ZValue.Location = new System.Drawing.Point(276, 66);
+			this.m_lblDrawing1ZValue.Name = "m_lblDrawing1ZValue";
+			this.m_lblDrawing1ZValue.Size = new System.Drawing.Size(76, 23);
+			this.m_lblDrawing1ZValue.TabIndex = 7;
+			this.m_lblDrawing1ZValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// m_btnReset1
 			// 
@@ -225,13 +225,13 @@
 			this.m_lblDrawing2X.TabIndex = 10;
 			this.m_lblDrawing2X.Text = "X";
 			// 
-			// m_txtDrawing2X
+			// m_lblDrawing2XValue
 			// 
-			this.m_txtDrawing2X.Location = new System.Drawing.Point(76, 96);
-			this.m_txtDrawing2X.Name = "m_txtDrawing2X";
-			this.m_txtDrawing2X.Size = new System.Drawing.Size(76, 23);
-			this.m_txtDrawing2X.TabIndex = 11;
-			this.m_txtDrawing2X.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblDrawing2XValue.Location = new System.Drawing.Point(76, 96);
+			this.m_lblDrawing2XValue.Name = "m_lblDrawing2XValue";
+			this.m_lblDrawing2XValue.Size = new System.Drawing.Size(76, 23);
+			this.m_lblDrawing2XValue.TabIndex = 11;
+			this.m_lblDrawing2XValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// m_lblDrawing2Y
 			// 
@@ -242,13 +242,13 @@
 			this.m_lblDrawing2Y.TabIndex = 12;
 			this.m_lblDrawing2Y.Text = "Y";
 			// 
-			// m_txtDrawing2Y
+			// m_lblDrawing2YValue
 			// 
-			this.m_txtDrawing2Y.Location = new System.Drawing.Point(176, 96);
-			this.m_txtDrawing2Y.Name = "m_txtDrawing2Y";
-			this.m_txtDrawing2Y.Size = new System.Drawing.Size(76, 23);
-			this.m_txtDrawing2Y.TabIndex = 13;
-			this.m_txtDrawing2Y.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblDrawing2YValue.Location = new System.Drawing.Point(176, 96);
+			this.m_lblDrawing2YValue.Name = "m_lblDrawing2YValue";
+			this.m_lblDrawing2YValue.Size = new System.Drawing.Size(76, 23);
+			this.m_lblDrawing2YValue.TabIndex = 13;
+			this.m_lblDrawing2YValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// m_lblDrawing2Z
 			// 
@@ -259,13 +259,13 @@
 			this.m_lblDrawing2Z.TabIndex = 14;
 			this.m_lblDrawing2Z.Text = "Z";
 			// 
-			// m_txtDrawing2Z
+			// m_lblDrawing2ZValue
 			// 
-			this.m_txtDrawing2Z.Location = new System.Drawing.Point(276, 96);
-			this.m_txtDrawing2Z.Name = "m_txtDrawing2Z";
-			this.m_txtDrawing2Z.Size = new System.Drawing.Size(76, 23);
-			this.m_txtDrawing2Z.TabIndex = 15;
-			this.m_txtDrawing2Z.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblDrawing2ZValue.Location = new System.Drawing.Point(276, 96);
+			this.m_lblDrawing2ZValue.Name = "m_lblDrawing2ZValue";
+			this.m_lblDrawing2ZValue.Size = new System.Drawing.Size(76, 23);
+			this.m_lblDrawing2ZValue.TabIndex = 15;
+			this.m_lblDrawing2ZValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// m_btnReset2
 			// 
@@ -293,13 +293,13 @@
 			this.m_lblDrawing3X.TabIndex = 18;
 			this.m_lblDrawing3X.Text = "X";
 			// 
-			// m_txtDrawing3X
+			// m_lblDrawing3XValue
 			// 
-			this.m_txtDrawing3X.Location = new System.Drawing.Point(76, 126);
-			this.m_txtDrawing3X.Name = "m_txtDrawing3X";
-			this.m_txtDrawing3X.Size = new System.Drawing.Size(76, 23);
-			this.m_txtDrawing3X.TabIndex = 19;
-			this.m_txtDrawing3X.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblDrawing3XValue.Location = new System.Drawing.Point(76, 126);
+			this.m_lblDrawing3XValue.Name = "m_lblDrawing3XValue";
+			this.m_lblDrawing3XValue.Size = new System.Drawing.Size(76, 23);
+			this.m_lblDrawing3XValue.TabIndex = 19;
+			this.m_lblDrawing3XValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// m_lblDrawing3Y
 			// 
@@ -310,13 +310,13 @@
 			this.m_lblDrawing3Y.TabIndex = 20;
 			this.m_lblDrawing3Y.Text = "Y";
 			// 
-			// m_txtDrawing3Y
+			// m_lblDrawing3YValue
 			// 
-			this.m_txtDrawing3Y.Location = new System.Drawing.Point(176, 126);
-			this.m_txtDrawing3Y.Name = "m_txtDrawing3Y";
-			this.m_txtDrawing3Y.Size = new System.Drawing.Size(76, 23);
-			this.m_txtDrawing3Y.TabIndex = 21;
-			this.m_txtDrawing3Y.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblDrawing3YValue.Location = new System.Drawing.Point(176, 126);
+			this.m_lblDrawing3YValue.Name = "m_lblDrawing3YValue";
+			this.m_lblDrawing3YValue.Size = new System.Drawing.Size(76, 23);
+			this.m_lblDrawing3YValue.TabIndex = 21;
+			this.m_lblDrawing3YValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// m_lblDrawing3Z
 			// 
@@ -327,13 +327,13 @@
 			this.m_lblDrawing3Z.TabIndex = 22;
 			this.m_lblDrawing3Z.Text = "Z";
 			// 
-			// m_txtDrawing3Z
+			// m_lblDrawing3ZValue
 			// 
-			this.m_txtDrawing3Z.Location = new System.Drawing.Point(276, 126);
-			this.m_txtDrawing3Z.Name = "m_txtDrawing3Z";
-			this.m_txtDrawing3Z.Size = new System.Drawing.Size(76, 23);
-			this.m_txtDrawing3Z.TabIndex = 23;
-			this.m_txtDrawing3Z.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblDrawing3ZValue.Location = new System.Drawing.Point(276, 126);
+			this.m_lblDrawing3ZValue.Name = "m_lblDrawing3ZValue";
+			this.m_lblDrawing3ZValue.Size = new System.Drawing.Size(76, 23);
+			this.m_lblDrawing3ZValue.TabIndex = 23;
+			this.m_lblDrawing3ZValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// m_btnReset3
 			// 
@@ -360,23 +360,23 @@
 			this.m_btnPickCancel.Text = "取消";
 			this.m_btnPickCancel.Visible = false;
 			// 
-			// m_secOption
+			// m_pnlOption
 			// 
-			this.m_secOption.Controls.Add(this.m_chbDrawingOnly);
-			this.m_secOption.Location = new System.Drawing.Point(12, 209);
-			this.m_secOption.Name = "m_secOption";
-			this.m_secOption.Size = new System.Drawing.Size(460, 43);
-			this.m_secOption.TabIndex = 1;
+			this.m_pnlOption.Controls.Add(this.m_chkDrawingOnly);
+			this.m_pnlOption.Location = new System.Drawing.Point(12, 209);
+			this.m_pnlOption.Name = "m_pnlOption";
+			this.m_pnlOption.Size = new System.Drawing.Size(460, 43);
+			this.m_pnlOption.TabIndex = 1;
 			// 
-			// m_chbDrawingOnly
+			// m_chkDrawingOnly
 			// 
-			this.m_chbDrawingOnly.AutoSize = true;
-			this.m_chbDrawingOnly.Checked = true;
-			this.m_chbDrawingOnly.Location = new System.Drawing.Point(10, 12);
-			this.m_chbDrawingOnly.Name = "m_chbDrawingOnly";
-			this.m_chbDrawingOnly.Size = new System.Drawing.Size(97, 20);
-			this.m_chbDrawingOnly.TabIndex = 0;
-			this.m_chbDrawingOnly.Text = "僅輸出圖紙點";
+			this.m_chkDrawingOnly.AutoSize = true;
+			this.m_chkDrawingOnly.Checked = true;
+			this.m_chkDrawingOnly.Location = new System.Drawing.Point(10, 12);
+			this.m_chkDrawingOnly.Name = "m_chkDrawingOnly";
+			this.m_chkDrawingOnly.Size = new System.Drawing.Size(97, 20);
+			this.m_chkDrawingOnly.TabIndex = 0;
+			this.m_chkDrawingOnly.Text = "僅輸出圖紙點";
 			// 
 			// m_pnlWorkpiece
 			// 
@@ -623,19 +623,19 @@
 			this.m_btnCapture3.TabIndex = 24;
 			this.m_btnCapture3.Text = "帶入";
 			// 
-			// m_secCalculation
+			// m_pnlCalculation
 			// 
-			this.m_secCalculation.Controls.Add(this.m_lblTolerance);
-			this.m_secCalculation.Controls.Add(this.m_txtTolerance);
-			this.m_secCalculation.Controls.Add(this.m_lblToleranceUnit);
-			this.m_secCalculation.Controls.Add(this.m_lblError);
-			this.m_secCalculation.Controls.Add(this.m_lblErrorValue);
-			this.m_secCalculation.Controls.Add(this.m_btnCalculate);
-			this.m_secCalculation.Location = new System.Drawing.Point(12, 427);
-			this.m_secCalculation.Name = "m_secCalculation";
-			this.m_secCalculation.Size = new System.Drawing.Size(460, 69);
-			this.m_secCalculation.TabIndex = 3;
-			this.m_secCalculation.Text = "步驟三：設定誤差與計算";
+			this.m_pnlCalculation.Controls.Add(this.m_lblTolerance);
+			this.m_pnlCalculation.Controls.Add(this.m_txtTolerance);
+			this.m_pnlCalculation.Controls.Add(this.m_lblToleranceUnit);
+			this.m_pnlCalculation.Controls.Add(this.m_lblError);
+			this.m_pnlCalculation.Controls.Add(this.m_lblErrorValue);
+			this.m_pnlCalculation.Controls.Add(this.m_btnCalculate);
+			this.m_pnlCalculation.Location = new System.Drawing.Point(12, 427);
+			this.m_pnlCalculation.Name = "m_pnlCalculation";
+			this.m_pnlCalculation.Size = new System.Drawing.Size(460, 69);
+			this.m_pnlCalculation.TabIndex = 3;
+			this.m_pnlCalculation.Text = "步驟三：設定誤差與計算";
 			// 
 			// m_lblTolerance
 			// 
@@ -695,19 +695,19 @@
 			// 
 			this.ClientSize = new System.Drawing.Size(484, 508);
 			this.Controls.Add(this.m_pnlDrawing);
-			this.Controls.Add(this.m_secOption);
+			this.Controls.Add(this.m_pnlOption);
 			this.Controls.Add(this.m_pnlWorkpiece);
-			this.Controls.Add(this.m_secCalculation);
+			this.Controls.Add(this.m_pnlCalculation);
 			this.Name = "CNCThreePointDlg";
 			this.Text = "三點校正";
 			this.m_pnlDrawing.ResumeLayout(false);
 			this.m_pnlDrawing.PerformLayout();
-			this.m_secOption.ResumeLayout(false);
-			this.m_secOption.PerformLayout();
+			this.m_pnlOption.ResumeLayout(false);
+			this.m_pnlOption.PerformLayout();
 			this.m_pnlWorkpiece.ResumeLayout(false);
 			this.m_pnlWorkpiece.PerformLayout();
-			this.m_secCalculation.ResumeLayout(false);
-			this.m_secCalculation.PerformLayout();
+			this.m_pnlCalculation.ResumeLayout(false);
+			this.m_pnlCalculation.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -718,32 +718,32 @@
 		private CommonUI.Controls.ThemedLabel m_lblDrawingDescription;
 		private System.Windows.Forms.Label m_lblDrawing1;
 		private System.Windows.Forms.Label m_lblDrawing1X;
-		private System.Windows.Forms.Label m_txtDrawing1X;
+		private System.Windows.Forms.Label m_lblDrawing1XValue;
 		private System.Windows.Forms.Label m_lblDrawing1Y;
-		private System.Windows.Forms.Label m_txtDrawing1Y;
+		private System.Windows.Forms.Label m_lblDrawing1YValue;
 		private System.Windows.Forms.Label m_lblDrawing1Z;
-		private System.Windows.Forms.Label m_txtDrawing1Z;
+		private System.Windows.Forms.Label m_lblDrawing1ZValue;
 		private CommonUI.Controls.ThemedButton m_btnReset1;
 		private System.Windows.Forms.Label m_lblDrawing2;
 		private System.Windows.Forms.Label m_lblDrawing2X;
-		private System.Windows.Forms.Label m_txtDrawing2X;
+		private System.Windows.Forms.Label m_lblDrawing2XValue;
 		private System.Windows.Forms.Label m_lblDrawing2Y;
-		private System.Windows.Forms.Label m_txtDrawing2Y;
+		private System.Windows.Forms.Label m_lblDrawing2YValue;
 		private System.Windows.Forms.Label m_lblDrawing2Z;
-		private System.Windows.Forms.Label m_txtDrawing2Z;
+		private System.Windows.Forms.Label m_lblDrawing2ZValue;
 		private CommonUI.Controls.ThemedButton m_btnReset2;
 		private System.Windows.Forms.Label m_lblDrawing3;
 		private System.Windows.Forms.Label m_lblDrawing3X;
-		private System.Windows.Forms.Label m_txtDrawing3X;
+		private System.Windows.Forms.Label m_lblDrawing3XValue;
 		private System.Windows.Forms.Label m_lblDrawing3Y;
-		private System.Windows.Forms.Label m_txtDrawing3Y;
+		private System.Windows.Forms.Label m_lblDrawing3YValue;
 		private System.Windows.Forms.Label m_lblDrawing3Z;
-		private System.Windows.Forms.Label m_txtDrawing3Z;
+		private System.Windows.Forms.Label m_lblDrawing3ZValue;
 		private CommonUI.Controls.ThemedButton m_btnReset3;
 		private CommonUI.Controls.ThemedButton m_btnPickDrawing;
 		private CommonUI.Controls.ThemedButton m_btnPickCancel;
-		private CommonUI.Controls.SectionPanel m_secOption;
-		private System.Windows.Forms.CheckBox m_chbDrawingOnly;
+		private CommonUI.Controls.SectionPanel m_pnlOption;
+		private System.Windows.Forms.CheckBox m_chkDrawingOnly;
 		private CommonUI.Controls.SectionPanel m_pnlWorkpiece;
 		private CommonUI.Controls.ThemedLabel m_lblWorkpieceDescription;
 		private System.Windows.Forms.Label m_lblWorkpiece1;
@@ -770,7 +770,7 @@
 		private System.Windows.Forms.Label m_lblWorkpiece3Z;
 		private System.Windows.Forms.TextBox m_txtWorkpiece3Z;
 		private CommonUI.Controls.ThemedButton m_btnCapture3;
-		private CommonUI.Controls.SectionPanel m_secCalculation;
+		private CommonUI.Controls.SectionPanel m_pnlCalculation;
 		private System.Windows.Forms.Label m_lblTolerance;
 		private System.Windows.Forms.TextBox m_txtTolerance;
 		private CommonUI.Controls.ThemedLabel m_lblToleranceUnit;

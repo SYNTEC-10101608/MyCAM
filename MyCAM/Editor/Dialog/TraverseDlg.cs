@@ -11,48 +11,48 @@ namespace MyCAM.Editor
 			InitializeComponent();
 			InitializeControlAndFieldValue( data );
 			UpdateFollowSafeDistanceRange();
-			m_NumericUpDownCutDownDistance.ValueChanged += m_NumericUpDownCutDownDistance_ValueChanged;
+			m_numCutDownDistance.ValueChanged += m_numCutDownDistance_ValueChanged;
 		}
 
 		void InitializeControlAndFieldValue( TraverseData Data )
 		{
-			m_rbtnFrogLeap.Tag = TraverseData.TraverseType.FrogLeap;
-			m_rbtnSafePlane.Tag = TraverseData.TraverseType.SafePlane;
-			m_rbtnSafeCylinder.Tag = TraverseData.TraverseType.SafeCylinder;
-			m_rbtnSafeSphere.Tag = TraverseData.TraverseType.SafeSphere;
+			m_rdoFrogLeap.Tag = TraverseData.TraverseType.FrogLeap;
+			m_rdoSafePlane.Tag = TraverseData.TraverseType.SafePlane;
+			m_rdoSafeCylinder.Tag = TraverseData.TraverseType.SafeCylinder;
+			m_rdoSafeSphere.Tag = TraverseData.TraverseType.SafeSphere;
 
 			SetNumericUpDownRange();
 			if( Data == null ) {
-				m_NumericUpDownCutDownDistance.Value = (decimal)m_CutDownDistance;
-				m_NumericUpDownFollowSafeDistance.Value = (decimal)m_FollowSafeDistance;
-				m_NumericUpDownLiftUpDistance.Value = (decimal)m_LifUpDistance;
+				m_numCutDownDistance.Value = (decimal)m_CutDownDistance;
+				m_numFollowSafeDistance.Value = (decimal)m_FollowSafeDistance;
+				m_numLiftUpDistance.Value = (decimal)m_LifUpDistance;
 
-				m_rbtnFrogLeap.Checked = (TraverseData.TraverseType)m_rbtnFrogLeap.Tag == m_TraverseMode;
-				m_rbtnSafePlane.Checked = (TraverseData.TraverseType)m_rbtnSafePlane.Tag == m_TraverseMode;
-				m_rbtnSafeCylinder.Checked = (TraverseData.TraverseType)m_rbtnSafeCylinder.Tag == m_TraverseMode;
-				m_rbtnSafeSphere.Checked = (TraverseData.TraverseType)m_rbtnSafeSphere.Tag == m_TraverseMode;
+				m_rdoFrogLeap.Checked = (TraverseData.TraverseType)m_rdoFrogLeap.Tag == m_TraverseMode;
+				m_rdoSafePlane.Checked = (TraverseData.TraverseType)m_rdoSafePlane.Tag == m_TraverseMode;
+				m_rdoSafeCylinder.Checked = (TraverseData.TraverseType)m_rdoSafeCylinder.Tag == m_TraverseMode;
+				m_rdoSafeSphere.Checked = (TraverseData.TraverseType)m_rdoSafeSphere.Tag == m_TraverseMode;
 
-				m_NumericUpDownFrogLeapDistance.Value = (decimal)m_FrogLeapDistance;
-				m_NumericUpDownSafePlaneDistance.Value = (decimal)m_SafePlaneDistance;
-				m_NumericUpDownSafeCylinderRadius.Value = (decimal)m_SafeCylinderRadius;
-				m_NumericUpDownSafeSphereRadius.Value = (decimal)m_SafeSphereRadius;
+				m_numFrogLeapDistance.Value = (decimal)m_FrogLeapDistance;
+				m_numSafePlaneDistance.Value = (decimal)m_SafePlaneDistance;
+				m_numSafeCylinderRadius.Value = (decimal)m_SafeCylinderRadius;
+				m_numSafeSphereRadius.Value = (decimal)m_SafeSphereRadius;
 				return;
 			}
 
 			// set control value
-			m_NumericUpDownCutDownDistance.Value = (decimal)Data.CutDownDistance;
-			m_NumericUpDownFollowSafeDistance.Value = (decimal)Data.FollowSafeDistance;
-			m_NumericUpDownLiftUpDistance.Value = (decimal)Data.LiftUpDistance;
+			m_numCutDownDistance.Value = (decimal)Data.CutDownDistance;
+			m_numFollowSafeDistance.Value = (decimal)Data.FollowSafeDistance;
+			m_numLiftUpDistance.Value = (decimal)Data.LiftUpDistance;
 
-			m_rbtnFrogLeap.Checked = (TraverseData.TraverseType)m_rbtnFrogLeap.Tag == Data.TraverseMode;
-			m_rbtnSafePlane.Checked = (TraverseData.TraverseType)m_rbtnSafePlane.Tag == Data.TraverseMode;
-			m_rbtnSafeCylinder.Checked = (TraverseData.TraverseType)m_rbtnSafeCylinder.Tag == Data.TraverseMode;
-			m_rbtnSafeSphere.Checked = (TraverseData.TraverseType)m_rbtnSafeSphere.Tag == Data.TraverseMode;
+			m_rdoFrogLeap.Checked = (TraverseData.TraverseType)m_rdoFrogLeap.Tag == Data.TraverseMode;
+			m_rdoSafePlane.Checked = (TraverseData.TraverseType)m_rdoSafePlane.Tag == Data.TraverseMode;
+			m_rdoSafeCylinder.Checked = (TraverseData.TraverseType)m_rdoSafeCylinder.Tag == Data.TraverseMode;
+			m_rdoSafeSphere.Checked = (TraverseData.TraverseType)m_rdoSafeSphere.Tag == Data.TraverseMode;
 
-			m_NumericUpDownFrogLeapDistance.Value = (decimal)Data.FrogLeapDistance;
-			m_NumericUpDownSafePlaneDistance.Value = (decimal)Data.SafePlaneDistance;
-			m_NumericUpDownSafeCylinderRadius.Value = (decimal)Data.SafeCylinderRadius;
-			m_NumericUpDownSafeSphereRadius.Value = (decimal)Data.SafeSphereRadius;
+			m_numFrogLeapDistance.Value = (decimal)Data.FrogLeapDistance;
+			m_numSafePlaneDistance.Value = (decimal)Data.SafePlaneDistance;
+			m_numSafeCylinderRadius.Value = (decimal)Data.SafeCylinderRadius;
+			m_numSafeSphereRadius.Value = (decimal)Data.SafeSphereRadius;
 
 			// set field value
 			m_CutDownDistance = Data.CutDownDistance;
@@ -67,20 +67,20 @@ namespace MyCAM.Editor
 
 		void SetNumericUpDownRange()
 		{
-			m_NumericUpDownCutDownDistance.Maximum = decimal.MaxValue;
-			m_NumericUpDownCutDownDistance.Minimum = 0;
-			m_NumericUpDownFollowSafeDistance.Maximum = decimal.MaxValue;
-			m_NumericUpDownFollowSafeDistance.Minimum = 0;
-			m_NumericUpDownLiftUpDistance.Maximum = decimal.MaxValue;
-			m_NumericUpDownLiftUpDistance.Minimum = 0;
-			m_NumericUpDownFrogLeapDistance.Maximum = decimal.MaxValue;
-			m_NumericUpDownFrogLeapDistance.Minimum = 0;
-			m_NumericUpDownSafePlaneDistance.Maximum = decimal.MaxValue;
-			m_NumericUpDownSafePlaneDistance.Minimum = decimal.MinValue;
-			m_NumericUpDownSafeCylinderRadius.Maximum = decimal.MaxValue;
-			m_NumericUpDownSafeCylinderRadius.Minimum = 0;
-			m_NumericUpDownSafeSphereRadius.Maximum = decimal.MaxValue;
-			m_NumericUpDownSafeSphereRadius.Minimum = 0;
+			m_numCutDownDistance.Maximum = decimal.MaxValue;
+			m_numCutDownDistance.Minimum = 0;
+			m_numFollowSafeDistance.Maximum = decimal.MaxValue;
+			m_numFollowSafeDistance.Minimum = 0;
+			m_numLiftUpDistance.Maximum = decimal.MaxValue;
+			m_numLiftUpDistance.Minimum = 0;
+			m_numFrogLeapDistance.Maximum = decimal.MaxValue;
+			m_numFrogLeapDistance.Minimum = 0;
+			m_numSafePlaneDistance.Maximum = decimal.MaxValue;
+			m_numSafePlaneDistance.Minimum = decimal.MinValue;
+			m_numSafeCylinderRadius.Maximum = decimal.MaxValue;
+			m_numSafeCylinderRadius.Minimum = 0;
+			m_numSafeSphereRadius.Maximum = decimal.MaxValue;
+			m_numSafeSphereRadius.Minimum = 0;
 		}
 
 		protected override void OnShown( EventArgs e )
@@ -95,10 +95,10 @@ namespace MyCAM.Editor
 			RadioButton rbtn = sender as RadioButton;
 
 			if( rbtn != null && rbtn.Checked ) {
-				m_pnlFrogLeap.Visible = m_rbtnFrogLeap.Checked;
-				m_pnlSafePlane.Visible = m_rbtnSafePlane.Checked;
-				m_pnlSafeCylinder.Visible = m_rbtnSafeCylinder.Checked;
-				m_pnlSafeSphere.Visible = m_rbtnSafeSphere.Checked;
+				m_pnlFrogLeap.Visible = m_rdoFrogLeap.Checked;
+				m_pnlSafePlane.Visible = m_rdoSafePlane.Checked;
+				m_pnlSafeCylinder.Visible = m_rdoSafeCylinder.Checked;
+				m_pnlSafeSphere.Visible = m_rdoSafeSphere.Checked;
 
 				m_TraverseMode = (TraverseData.TraverseType)rbtn.Tag;
 				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance,
@@ -108,61 +108,61 @@ namespace MyCAM.Editor
 
 		void UpdateFollowSafeDistanceRange()
 		{
-			decimal maximum = m_NumericUpDownCutDownDistance.Value;
-			m_NumericUpDownFollowSafeDistance.SilentSetValue = Math.Min( m_NumericUpDownFollowSafeDistance.Value, maximum );
-			m_NumericUpDownFollowSafeDistance.Maximum = maximum;
+			decimal maximum = m_numCutDownDistance.Value;
+			m_numFollowSafeDistance.SilentSetValue = Math.Min( m_numFollowSafeDistance.Value, maximum );
+			m_numFollowSafeDistance.Maximum = maximum;
 			m_CutDownDistance = (double)maximum;
-			m_FollowSafeDistance = (double)m_NumericUpDownFollowSafeDistance.Value;
+			m_FollowSafeDistance = (double)m_numFollowSafeDistance.Value;
 		}
 
-		void m_NumericUpDownCutDownDistance_ValueChanged( object sender, EventArgs e )
+		void m_numCutDownDistance_ValueChanged( object sender, EventArgs e )
 		{
 			UpdateFollowSafeDistanceRange();
 		}
 
-		void m_NumericUpDownCutDownDistance_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numCutDownDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			m_CutDownDistance = (double)m_NumericUpDownCutDownDistance.Value;
+			m_CutDownDistance = (double)m_numCutDownDistance.Value;
 			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance,
 				m_TraverseMode, m_FrogLeapDistance, m_SafePlaneDistance, m_SafeCylinderRadius, m_SafeSphereRadius ) );
 		}
 
-		void m_NumericUpDownFollowSafeDistance_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numFollowSafeDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			m_FollowSafeDistance = (double)m_NumericUpDownFollowSafeDistance.Value;
+			m_FollowSafeDistance = (double)m_numFollowSafeDistance.Value;
 			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance,
 				m_TraverseMode, m_FrogLeapDistance, m_SafePlaneDistance, m_SafeCylinderRadius, m_SafeSphereRadius ) );
 		}
 
-		void m_NumericUpDownLiftUpDistance_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numLiftUpDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			m_LifUpDistance = (double)m_NumericUpDownLiftUpDistance.Value;
+			m_LifUpDistance = (double)m_numLiftUpDistance.Value;
 			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance,
 				m_TraverseMode, m_FrogLeapDistance, m_SafePlaneDistance, m_SafeCylinderRadius, m_SafeSphereRadius ) );
 		}
 
-		void m_NumericUpDownFrogLeapDistance_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numFrogLeapDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			m_FrogLeapDistance = (double)m_NumericUpDownFrogLeapDistance.Value;
+			m_FrogLeapDistance = (double)m_numFrogLeapDistance.Value;
 			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance,
 				m_TraverseMode, m_FrogLeapDistance, m_SafePlaneDistance, m_SafeCylinderRadius, m_SafeSphereRadius ) );
 		}
 
-		void m_NumericUpDownSafePlaneDistance_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numSafePlaneDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			m_SafePlaneDistance = (double)m_NumericUpDownSafePlaneDistance.Value;
+			m_SafePlaneDistance = (double)m_numSafePlaneDistance.Value;
 			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance,
 				m_TraverseMode, m_FrogLeapDistance, m_SafePlaneDistance, m_SafeCylinderRadius, m_SafeSphereRadius ) );
 		}
-		void m_NumericUpDownSafeCylinderRadius_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numSafeCylinderRadius_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			m_SafeCylinderRadius = (double)m_NumericUpDownSafeCylinderRadius.Value;
+			m_SafeCylinderRadius = (double)m_numSafeCylinderRadius.Value;
 			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance,
 				m_TraverseMode, m_FrogLeapDistance, m_SafePlaneDistance, m_SafeCylinderRadius, m_SafeSphereRadius ) );
 		}
-		void m_NumericUpDownSafeSphereRadius_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numSafeSphereRadius_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			m_SafeSphereRadius = (double)m_NumericUpDownSafeSphereRadius.Value;
+			m_SafeSphereRadius = (double)m_numSafeSphereRadius.Value;
 			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance,
 				m_TraverseMode, m_FrogLeapDistance, m_SafePlaneDistance, m_SafeCylinderRadius, m_SafeSphereRadius ) );
 		}
@@ -177,11 +177,11 @@ namespace MyCAM.Editor
 		void GetValuesOfControls()
 		{
 			UpdateFollowSafeDistanceRange();
-			m_LifUpDistance = (double)m_NumericUpDownLiftUpDistance.Value;
-			m_FrogLeapDistance = (double)m_NumericUpDownFrogLeapDistance.Value;
-			m_SafePlaneDistance = (double)m_NumericUpDownSafePlaneDistance.Value;
-			m_SafeCylinderRadius = (double)m_NumericUpDownSafeCylinderRadius.Value;
-			m_SafeSphereRadius = (double)m_NumericUpDownSafeSphereRadius.Value;
+			m_LifUpDistance = (double)m_numLiftUpDistance.Value;
+			m_FrogLeapDistance = (double)m_numFrogLeapDistance.Value;
+			m_SafePlaneDistance = (double)m_numSafePlaneDistance.Value;
+			m_SafeCylinderRadius = (double)m_numSafeCylinderRadius.Value;
+			m_SafeSphereRadius = (double)m_numSafeSphereRadius.Value;
 		}
 
 		double m_CutDownDistance = TraverseData.CUT_DOWN_DISTANCE;

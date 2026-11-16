@@ -3,7 +3,6 @@
 	<Message ID="GlassDXFImportDlg" Content="Glass DXF Import" />
 	<Message ID="m_lblRadius" Content="Sphere Radius (R)" />
 	<Message ID="m_lblHeight" Content="Surface Height (H)" />
-	<Message ID="m_lblNote" Content="Note: When R=0, flat plane mode is used" />
 	<Message ID="RadiusRangeError" Content="Sphere radius must be between 0 ~ {0} mm" />
 	<Message ID="HeightRangeError" Content="Surface height must be a positive number greater than 0 and less than R ({0})" />
 </ResMap>

@@ -27,55 +27,55 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_gbxMode = new CommonUI.Controls.SectionPanel();
+			this.m_pnlMode = new CommonUI.Controls.SectionPanel();
 			this.m_lblMode = new System.Windows.Forms.Label();
-			this.m_rbtnDefault = new System.Windows.Forms.RadioButton();
-			this.m_rbtnLockAB = new System.Windows.Forms.RadioButton();
-			this.m_gbxLockAB = new CommonUI.Controls.SectionPanel();
+			this.m_rdoDefault = new System.Windows.Forms.RadioButton();
+			this.m_rdoLockAB = new System.Windows.Forms.RadioButton();
+			this.m_pnlLockAB = new CommonUI.Controls.SectionPanel();
 			this.m_chkLockSlave = new System.Windows.Forms.CheckBox();
-			this.m_gbxSlaveSettings = new System.Windows.Forms.Panel();
-			this.m_tlpSlaveAngle = new System.Windows.Forms.Panel();
+			this.m_pnlSlaveSettings = new System.Windows.Forms.Panel();
+			this.m_pnlSlaveAngle = new System.Windows.Forms.Panel();
 			this.m_lblSlaveAngle = new System.Windows.Forms.Label();
-			this.m_rbtnSlaveAuto = new System.Windows.Forms.RadioButton();
-			this.m_rbtnSlaveManual = new System.Windows.Forms.RadioButton();
-			this.m_dbtnSlave = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_gbxRotaryDirection = new CommonUI.Controls.SectionPanel();
+			this.m_rdoSlaveAuto = new System.Windows.Forms.RadioButton();
+			this.m_rdoSlaveManual = new System.Windows.Forms.RadioButton();
+			this.m_numSlave = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_pnlRotaryDirection = new CommonUI.Controls.SectionPanel();
 			this.m_btnRotaryPos = new CommonUI.Controls.ThemedButton();
 			this.m_btnRotaryNeg = new CommonUI.Controls.ThemedButton();
-			this.m_gbxMachiningDir = new CommonUI.Controls.SectionPanel();
+			this.m_pnlMachiningDir = new CommonUI.Controls.SectionPanel();
 			this.m_lblMachiningDir = new System.Windows.Forms.Label();
-			this.m_cbxMachiningDir = new System.Windows.Forms.ComboBox();
+			this.m_cmbMachiningDir = new System.Windows.Forms.ComboBox();
 			this.m_lblMachiningDirHint = new CommonUI.Controls.ThemedLabel();
 			this.m_chkLockMaster = new System.Windows.Forms.CheckBox();
-			this.m_gbxMasterSettings = new System.Windows.Forms.Panel();
-			this.m_tlpMasterAngle = new System.Windows.Forms.Panel();
+			this.m_pnlMasterSettings = new System.Windows.Forms.Panel();
+			this.m_pnlMasterAngle = new System.Windows.Forms.Panel();
 			this.m_lblMasterAngle = new System.Windows.Forms.Label();
-			this.m_rbtnMasterAuto = new System.Windows.Forms.RadioButton();
-			this.m_rbtnMasterManual = new System.Windows.Forms.RadioButton();
-			this.m_dbtnMaster = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_rdoMasterAuto = new System.Windows.Forms.RadioButton();
+			this.m_rdoMasterManual = new System.Windows.Forms.RadioButton();
+			this.m_numMaster = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_btnCancel = new CommonUI.Controls.ThemedButton();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
-			this.m_gbxMode.SuspendLayout();
-			this.m_gbxLockAB.SuspendLayout();
-			this.m_gbxSlaveSettings.SuspendLayout();
-			this.m_tlpSlaveAngle.SuspendLayout();
-			this.m_gbxRotaryDirection.SuspendLayout();
-			this.m_gbxMachiningDir.SuspendLayout();
-			this.m_gbxMasterSettings.SuspendLayout();
-			this.m_tlpMasterAngle.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_dbtnSlave)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_dbtnMaster)).BeginInit();
+			this.m_pnlMode.SuspendLayout();
+			this.m_pnlLockAB.SuspendLayout();
+			this.m_pnlSlaveSettings.SuspendLayout();
+			this.m_pnlSlaveAngle.SuspendLayout();
+			this.m_pnlRotaryDirection.SuspendLayout();
+			this.m_pnlMachiningDir.SuspendLayout();
+			this.m_pnlMasterSettings.SuspendLayout();
+			this.m_pnlMasterAngle.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numSlave)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numMaster)).BeginInit();
 			this.SuspendLayout();
 			// 
-			// m_gbxMode
+			// m_pnlMode
 			// 
-			this.m_gbxMode.Controls.Add(this.m_lblMode);
-			this.m_gbxMode.Controls.Add(this.m_rbtnDefault);
-			this.m_gbxMode.Controls.Add(this.m_rbtnLockAB);
-			this.m_gbxMode.Location = new System.Drawing.Point(12, 12);
-			this.m_gbxMode.Name = "m_gbxMode";
-			this.m_gbxMode.Size = new System.Drawing.Size(416, 43);
-			this.m_gbxMode.TabIndex = 0;
+			this.m_pnlMode.Controls.Add(this.m_lblMode);
+			this.m_pnlMode.Controls.Add(this.m_rdoDefault);
+			this.m_pnlMode.Controls.Add(this.m_rdoLockAB);
+			this.m_pnlMode.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlMode.Name = "m_pnlMode";
+			this.m_pnlMode.Size = new System.Drawing.Size(416, 43);
+			this.m_pnlMode.TabIndex = 0;
 			// 
 			// m_lblMode
 			// 
@@ -86,39 +86,39 @@
 			this.m_lblMode.TabIndex = 0;
 			this.m_lblMode.Text = "模式";
 			// 
-			// m_rbtnDefault
+			// m_rdoDefault
 			// 
-			this.m_rbtnDefault.AutoSize = true;
-			this.m_rbtnDefault.Checked = true;
-			this.m_rbtnDefault.Location = new System.Drawing.Point(100, 12);
-			this.m_rbtnDefault.Name = "m_rbtnDefault";
-			this.m_rbtnDefault.Size = new System.Drawing.Size(49, 20);
-			this.m_rbtnDefault.TabIndex = 1;
-			this.m_rbtnDefault.TabStop = true;
-			this.m_rbtnDefault.Text = "默認";
-			this.m_rbtnDefault.CheckedChanged += new System.EventHandler(this.m_rbtnDefault_CheckedChanged);
+			this.m_rdoDefault.AutoSize = true;
+			this.m_rdoDefault.Checked = true;
+			this.m_rdoDefault.Location = new System.Drawing.Point(100, 12);
+			this.m_rdoDefault.Name = "m_rdoDefault";
+			this.m_rdoDefault.Size = new System.Drawing.Size(49, 20);
+			this.m_rdoDefault.TabIndex = 1;
+			this.m_rdoDefault.TabStop = true;
+			this.m_rdoDefault.Text = "默認";
+			this.m_rdoDefault.CheckedChanged += new System.EventHandler(this.m_rdoDefault_CheckedChanged);
 			// 
-			// m_rbtnLockAB
+			// m_rdoLockAB
 			// 
-			this.m_rbtnLockAB.AutoSize = true;
-			this.m_rbtnLockAB.Location = new System.Drawing.Point(190, 12);
-			this.m_rbtnLockAB.Name = "m_rbtnLockAB";
-			this.m_rbtnLockAB.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnLockAB.TabIndex = 2;
-			this.m_rbtnLockAB.Text = "鎖軸切割";
+			this.m_rdoLockAB.AutoSize = true;
+			this.m_rdoLockAB.Location = new System.Drawing.Point(190, 12);
+			this.m_rdoLockAB.Name = "m_rdoLockAB";
+			this.m_rdoLockAB.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoLockAB.TabIndex = 2;
+			this.m_rdoLockAB.Text = "鎖軸切割";
 			// 
-			// m_gbxLockAB
+			// m_pnlLockAB
 			// 
-			this.m_gbxLockAB.Controls.Add(this.m_chkLockSlave);
-			this.m_gbxLockAB.Controls.Add(this.m_gbxSlaveSettings);
-			this.m_gbxLockAB.Controls.Add(this.m_chkLockMaster);
-			this.m_gbxLockAB.Controls.Add(this.m_gbxMasterSettings);
-			this.m_gbxLockAB.Enabled = false;
-			this.m_gbxLockAB.Location = new System.Drawing.Point(12, 63);
-			this.m_gbxLockAB.Name = "m_gbxLockAB";
-			this.m_gbxLockAB.Size = new System.Drawing.Size(416, 339);
-			this.m_gbxLockAB.TabIndex = 1;
-			this.m_gbxLockAB.Text = "鎖軸切割";
+			this.m_pnlLockAB.Controls.Add(this.m_chkLockSlave);
+			this.m_pnlLockAB.Controls.Add(this.m_pnlSlaveSettings);
+			this.m_pnlLockAB.Controls.Add(this.m_chkLockMaster);
+			this.m_pnlLockAB.Controls.Add(this.m_pnlMasterSettings);
+			this.m_pnlLockAB.Enabled = false;
+			this.m_pnlLockAB.Location = new System.Drawing.Point(12, 63);
+			this.m_pnlLockAB.Name = "m_pnlLockAB";
+			this.m_pnlLockAB.Size = new System.Drawing.Size(416, 339);
+			this.m_pnlLockAB.TabIndex = 1;
+			this.m_pnlLockAB.Text = "鎖軸切割";
 			// 
 			// m_chkLockSlave
 			// 
@@ -131,26 +131,26 @@
 			this.m_chkLockSlave.Text = "鎖轉檯";
 			this.m_chkLockSlave.CheckedChanged += new System.EventHandler(this.m_chkLockSlave_CheckedChanged);
 			// 
-			// m_gbxSlaveSettings
+			// m_pnlSlaveSettings
 			// 
-			this.m_gbxSlaveSettings.Controls.Add(this.m_tlpSlaveAngle);
-			this.m_gbxSlaveSettings.Controls.Add(this.m_gbxRotaryDirection);
-			this.m_gbxSlaveSettings.Controls.Add(this.m_gbxMachiningDir);
-			this.m_gbxSlaveSettings.Location = new System.Drawing.Point(10, 66);
-			this.m_gbxSlaveSettings.Name = "m_gbxSlaveSettings";
-			this.m_gbxSlaveSettings.Size = new System.Drawing.Size(396, 159);
-			this.m_gbxSlaveSettings.TabIndex = 1;
+			this.m_pnlSlaveSettings.Controls.Add(this.m_pnlSlaveAngle);
+			this.m_pnlSlaveSettings.Controls.Add(this.m_pnlRotaryDirection);
+			this.m_pnlSlaveSettings.Controls.Add(this.m_pnlMachiningDir);
+			this.m_pnlSlaveSettings.Location = new System.Drawing.Point(10, 66);
+			this.m_pnlSlaveSettings.Name = "m_pnlSlaveSettings";
+			this.m_pnlSlaveSettings.Size = new System.Drawing.Size(396, 159);
+			this.m_pnlSlaveSettings.TabIndex = 1;
 			// 
-			// m_tlpSlaveAngle
+			// m_pnlSlaveAngle
 			// 
-			this.m_tlpSlaveAngle.Controls.Add(this.m_lblSlaveAngle);
-			this.m_tlpSlaveAngle.Controls.Add(this.m_rbtnSlaveAuto);
-			this.m_tlpSlaveAngle.Controls.Add(this.m_rbtnSlaveManual);
-			this.m_tlpSlaveAngle.Controls.Add(this.m_dbtnSlave);
-			this.m_tlpSlaveAngle.Location = new System.Drawing.Point(0, 0);
-			this.m_tlpSlaveAngle.Name = "m_tlpSlaveAngle";
-			this.m_tlpSlaveAngle.Size = new System.Drawing.Size(396, 53);
-			this.m_tlpSlaveAngle.TabIndex = 0;
+			this.m_pnlSlaveAngle.Controls.Add(this.m_lblSlaveAngle);
+			this.m_pnlSlaveAngle.Controls.Add(this.m_rdoSlaveAuto);
+			this.m_pnlSlaveAngle.Controls.Add(this.m_rdoSlaveManual);
+			this.m_pnlSlaveAngle.Controls.Add(this.m_numSlave);
+			this.m_pnlSlaveAngle.Location = new System.Drawing.Point(0, 0);
+			this.m_pnlSlaveAngle.Name = "m_pnlSlaveAngle";
+			this.m_pnlSlaveAngle.Size = new System.Drawing.Size(396, 53);
+			this.m_pnlSlaveAngle.TabIndex = 0;
 			// 
 			// m_lblSlaveAngle
 			// 
@@ -162,49 +162,49 @@
 			this.m_lblSlaveAngle.TabIndex = 0;
 			this.m_lblSlaveAngle.Text = "轉檯角度";
 			// 
-			// m_rbtnSlaveAuto
+			// m_rdoSlaveAuto
 			// 
-			this.m_rbtnSlaveAuto.AutoSize = true;
-			this.m_rbtnSlaveAuto.Location = new System.Drawing.Point(90, 2);
-			this.m_rbtnSlaveAuto.Name = "m_rbtnSlaveAuto";
-			this.m_rbtnSlaveAuto.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnSlaveAuto.TabIndex = 1;
-			this.m_rbtnSlaveAuto.Text = "自動計算";
-			this.m_rbtnSlaveAuto.CheckedChanged += new System.EventHandler(this.m_rbtnSlaveAuto_CheckedChanged);
+			this.m_rdoSlaveAuto.AutoSize = true;
+			this.m_rdoSlaveAuto.Location = new System.Drawing.Point(90, 2);
+			this.m_rdoSlaveAuto.Name = "m_rdoSlaveAuto";
+			this.m_rdoSlaveAuto.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoSlaveAuto.TabIndex = 1;
+			this.m_rdoSlaveAuto.Text = "自動計算";
+			this.m_rdoSlaveAuto.CheckedChanged += new System.EventHandler(this.m_rdoSlaveAuto_CheckedChanged);
 			// 
-			// m_rbtnSlaveManual
+			// m_rdoSlaveManual
 			// 
-			this.m_rbtnSlaveManual.AutoSize = true;
-			this.m_rbtnSlaveManual.Location = new System.Drawing.Point(190, 2);
-			this.m_rbtnSlaveManual.Name = "m_rbtnSlaveManual";
-			this.m_rbtnSlaveManual.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnSlaveManual.TabIndex = 2;
-			this.m_rbtnSlaveManual.Text = "手動設定";
-			this.m_rbtnSlaveManual.CheckedChanged += new System.EventHandler(this.m_rbtnSlaveManual_CheckedChanged);
+			this.m_rdoSlaveManual.AutoSize = true;
+			this.m_rdoSlaveManual.Location = new System.Drawing.Point(190, 2);
+			this.m_rdoSlaveManual.Name = "m_rdoSlaveManual";
+			this.m_rdoSlaveManual.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoSlaveManual.TabIndex = 2;
+			this.m_rdoSlaveManual.Text = "手動設定";
+			this.m_rdoSlaveManual.CheckedChanged += new System.EventHandler(this.m_rdoSlaveManual_CheckedChanged);
 			// 
-			// m_dbtnSlave
+			// m_numSlave
 			// 
-			this.m_dbtnSlave.DecimalPlaces = 3;
-			this.m_dbtnSlave.Enabled = false;
-			this.m_dbtnSlave.Location = new System.Drawing.Point(90, 30);
-			this.m_dbtnSlave.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_dbtnSlave.Minimum = new decimal(new int[] { -99999, 0, 0, -2147483648});
-			this.m_dbtnSlave.Name = "m_dbtnSlave";
-			this.m_dbtnSlave.RestrictInvalidCharacters = false;
-			this.m_dbtnSlave.Size = new System.Drawing.Size(150, 23);
-			this.m_dbtnSlave.TabIndex = 3;
-			this.m_dbtnSlave.ValueChanged += new System.EventHandler(this.m_dbtnSlave_ValueChanged);
+			this.m_numSlave.DecimalPlaces = 3;
+			this.m_numSlave.Enabled = false;
+			this.m_numSlave.Location = new System.Drawing.Point(90, 30);
+			this.m_numSlave.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numSlave.Minimum = new decimal(new int[] { -99999, 0, 0, -2147483648});
+			this.m_numSlave.Name = "m_numSlave";
+			this.m_numSlave.RestrictInvalidCharacters = false;
+			this.m_numSlave.Size = new System.Drawing.Size(150, 23);
+			this.m_numSlave.TabIndex = 3;
+			this.m_numSlave.ValueChanged += new System.EventHandler(this.m_numSlave_ValueChanged);
 			// 
-			// m_gbxRotaryDirection
+			// m_pnlRotaryDirection
 			// 
-			this.m_gbxRotaryDirection.Controls.Add(this.m_btnRotaryPos);
-			this.m_gbxRotaryDirection.Controls.Add(this.m_btnRotaryNeg);
-			this.m_gbxRotaryDirection.Enabled = false;
-			this.m_gbxRotaryDirection.Location = new System.Drawing.Point(0, 60);
-			this.m_gbxRotaryDirection.Name = "m_gbxRotaryDirection";
-			this.m_gbxRotaryDirection.Size = new System.Drawing.Size(193, 69);
-			this.m_gbxRotaryDirection.TabIndex = 1;
-			this.m_gbxRotaryDirection.Text = "轉台方向調整";
+			this.m_pnlRotaryDirection.Controls.Add(this.m_btnRotaryPos);
+			this.m_pnlRotaryDirection.Controls.Add(this.m_btnRotaryNeg);
+			this.m_pnlRotaryDirection.Enabled = false;
+			this.m_pnlRotaryDirection.Location = new System.Drawing.Point(0, 60);
+			this.m_pnlRotaryDirection.Name = "m_pnlRotaryDirection";
+			this.m_pnlRotaryDirection.Size = new System.Drawing.Size(193, 69);
+			this.m_pnlRotaryDirection.TabIndex = 1;
+			this.m_pnlRotaryDirection.Text = "轉台方向調整";
 			// 
 			// m_btnRotaryPos
 			// 
@@ -224,17 +224,17 @@
 			this.m_btnRotaryNeg.Text = "-";
 			this.m_btnRotaryNeg.Click += new System.EventHandler(this.m_btnRotaryNeg_Click);
 			// 
-			// m_gbxMachiningDir
+			// m_pnlMachiningDir
 			// 
-			this.m_gbxMachiningDir.Controls.Add(this.m_lblMachiningDir);
-			this.m_gbxMachiningDir.Controls.Add(this.m_cbxMachiningDir);
-			this.m_gbxMachiningDir.Controls.Add(this.m_lblMachiningDirHint);
-			this.m_gbxMachiningDir.Enabled = false;
-			this.m_gbxMachiningDir.Location = new System.Drawing.Point(203, 60);
-			this.m_gbxMachiningDir.Name = "m_gbxMachiningDir";
-			this.m_gbxMachiningDir.Size = new System.Drawing.Size(193, 99);
-			this.m_gbxMachiningDir.TabIndex = 2;
-			this.m_gbxMachiningDir.Text = "指定加工方位";
+			this.m_pnlMachiningDir.Controls.Add(this.m_lblMachiningDir);
+			this.m_pnlMachiningDir.Controls.Add(this.m_cmbMachiningDir);
+			this.m_pnlMachiningDir.Controls.Add(this.m_lblMachiningDirHint);
+			this.m_pnlMachiningDir.Enabled = false;
+			this.m_pnlMachiningDir.Location = new System.Drawing.Point(203, 60);
+			this.m_pnlMachiningDir.Name = "m_pnlMachiningDir";
+			this.m_pnlMachiningDir.Size = new System.Drawing.Size(193, 99);
+			this.m_pnlMachiningDir.TabIndex = 2;
+			this.m_pnlMachiningDir.Text = "指定加工方位";
 			// 
 			// m_lblMachiningDir
 			// 
@@ -245,15 +245,15 @@
 			this.m_lblMachiningDir.TabIndex = 0;
 			this.m_lblMachiningDir.Text = "方向";
 			// 
-			// m_cbxMachiningDir
+			// m_cmbMachiningDir
 			// 
-			this.m_cbxMachiningDir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.m_cbxMachiningDir.FormattingEnabled = true;
-			this.m_cbxMachiningDir.Location = new System.Drawing.Point(60, 36);
-			this.m_cbxMachiningDir.Name = "m_cbxMachiningDir";
-			this.m_cbxMachiningDir.Size = new System.Drawing.Size(123, 24);
-			this.m_cbxMachiningDir.TabIndex = 1;
-			this.m_cbxMachiningDir.SelectedIndexChanged += new System.EventHandler(this.m_cbxMachiningDir_SelectedIndexChanged);
+			this.m_cmbMachiningDir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.m_cmbMachiningDir.FormattingEnabled = true;
+			this.m_cmbMachiningDir.Location = new System.Drawing.Point(60, 36);
+			this.m_cmbMachiningDir.Name = "m_cmbMachiningDir";
+			this.m_cmbMachiningDir.Size = new System.Drawing.Size(123, 24);
+			this.m_cmbMachiningDir.TabIndex = 1;
+			this.m_cmbMachiningDir.SelectedIndexChanged += new System.EventHandler(this.m_cmbMachiningDir_SelectedIndexChanged);
 			// 
 			// m_lblMachiningDirHint
 			// 
@@ -276,24 +276,24 @@
 			this.m_chkLockMaster.Text = "鎖擺頭";
 			this.m_chkLockMaster.CheckedChanged += new System.EventHandler(this.m_chkLockMaster_CheckedChanged);
 			// 
-			// m_gbxMasterSettings
+			// m_pnlMasterSettings
 			// 
-			this.m_gbxMasterSettings.Controls.Add(this.m_tlpMasterAngle);
-			this.m_gbxMasterSettings.Location = new System.Drawing.Point(10, 276);
-			this.m_gbxMasterSettings.Name = "m_gbxMasterSettings";
-			this.m_gbxMasterSettings.Size = new System.Drawing.Size(396, 53);
-			this.m_gbxMasterSettings.TabIndex = 3;
+			this.m_pnlMasterSettings.Controls.Add(this.m_pnlMasterAngle);
+			this.m_pnlMasterSettings.Location = new System.Drawing.Point(10, 276);
+			this.m_pnlMasterSettings.Name = "m_pnlMasterSettings";
+			this.m_pnlMasterSettings.Size = new System.Drawing.Size(396, 53);
+			this.m_pnlMasterSettings.TabIndex = 3;
 			// 
-			// m_tlpMasterAngle
+			// m_pnlMasterAngle
 			// 
-			this.m_tlpMasterAngle.Controls.Add(this.m_lblMasterAngle);
-			this.m_tlpMasterAngle.Controls.Add(this.m_rbtnMasterAuto);
-			this.m_tlpMasterAngle.Controls.Add(this.m_rbtnMasterManual);
-			this.m_tlpMasterAngle.Controls.Add(this.m_dbtnMaster);
-			this.m_tlpMasterAngle.Location = new System.Drawing.Point(0, 0);
-			this.m_tlpMasterAngle.Name = "m_tlpMasterAngle";
-			this.m_tlpMasterAngle.Size = new System.Drawing.Size(396, 53);
-			this.m_tlpMasterAngle.TabIndex = 0;
+			this.m_pnlMasterAngle.Controls.Add(this.m_lblMasterAngle);
+			this.m_pnlMasterAngle.Controls.Add(this.m_rdoMasterAuto);
+			this.m_pnlMasterAngle.Controls.Add(this.m_rdoMasterManual);
+			this.m_pnlMasterAngle.Controls.Add(this.m_numMaster);
+			this.m_pnlMasterAngle.Location = new System.Drawing.Point(0, 0);
+			this.m_pnlMasterAngle.Name = "m_pnlMasterAngle";
+			this.m_pnlMasterAngle.Size = new System.Drawing.Size(396, 53);
+			this.m_pnlMasterAngle.TabIndex = 0;
 			// 
 			// m_lblMasterAngle
 			// 
@@ -305,38 +305,38 @@
 			this.m_lblMasterAngle.TabIndex = 0;
 			this.m_lblMasterAngle.Text = "擺頭角度";
 			// 
-			// m_rbtnMasterAuto
+			// m_rdoMasterAuto
 			// 
-			this.m_rbtnMasterAuto.AutoSize = true;
-			this.m_rbtnMasterAuto.Location = new System.Drawing.Point(90, 2);
-			this.m_rbtnMasterAuto.Name = "m_rbtnMasterAuto";
-			this.m_rbtnMasterAuto.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnMasterAuto.TabIndex = 1;
-			this.m_rbtnMasterAuto.Text = "自動計算";
-			this.m_rbtnMasterAuto.CheckedChanged += new System.EventHandler(this.m_rbtnMasterAuto_CheckedChanged);
+			this.m_rdoMasterAuto.AutoSize = true;
+			this.m_rdoMasterAuto.Location = new System.Drawing.Point(90, 2);
+			this.m_rdoMasterAuto.Name = "m_rdoMasterAuto";
+			this.m_rdoMasterAuto.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoMasterAuto.TabIndex = 1;
+			this.m_rdoMasterAuto.Text = "自動計算";
+			this.m_rdoMasterAuto.CheckedChanged += new System.EventHandler(this.m_rdoMasterAuto_CheckedChanged);
 			// 
-			// m_rbtnMasterManual
+			// m_rdoMasterManual
 			// 
-			this.m_rbtnMasterManual.AutoSize = true;
-			this.m_rbtnMasterManual.Location = new System.Drawing.Point(190, 2);
-			this.m_rbtnMasterManual.Name = "m_rbtnMasterManual";
-			this.m_rbtnMasterManual.Size = new System.Drawing.Size(73, 20);
-			this.m_rbtnMasterManual.TabIndex = 2;
-			this.m_rbtnMasterManual.Text = "手動設定";
-			this.m_rbtnMasterManual.CheckedChanged += new System.EventHandler(this.m_rbtnMasterManual_CheckedChanged);
+			this.m_rdoMasterManual.AutoSize = true;
+			this.m_rdoMasterManual.Location = new System.Drawing.Point(190, 2);
+			this.m_rdoMasterManual.Name = "m_rdoMasterManual";
+			this.m_rdoMasterManual.Size = new System.Drawing.Size(73, 20);
+			this.m_rdoMasterManual.TabIndex = 2;
+			this.m_rdoMasterManual.Text = "手動設定";
+			this.m_rdoMasterManual.CheckedChanged += new System.EventHandler(this.m_rdoMasterManual_CheckedChanged);
 			// 
-			// m_dbtnMaster
+			// m_numMaster
 			// 
-			this.m_dbtnMaster.DecimalPlaces = 3;
-			this.m_dbtnMaster.Enabled = false;
-			this.m_dbtnMaster.Location = new System.Drawing.Point(90, 30);
-			this.m_dbtnMaster.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
-			this.m_dbtnMaster.Minimum = new decimal(new int[] { -99999, 0, 0, -2147483648});
-			this.m_dbtnMaster.Name = "m_dbtnMaster";
-			this.m_dbtnMaster.RestrictInvalidCharacters = false;
-			this.m_dbtnMaster.Size = new System.Drawing.Size(150, 23);
-			this.m_dbtnMaster.TabIndex = 3;
-			this.m_dbtnMaster.ValueChanged += new System.EventHandler(this.m_dbtnMaster_ValueChanged);
+			this.m_numMaster.DecimalPlaces = 3;
+			this.m_numMaster.Enabled = false;
+			this.m_numMaster.Location = new System.Drawing.Point(90, 30);
+			this.m_numMaster.Maximum = new decimal(new int[] { 99999, 0, 0, 0});
+			this.m_numMaster.Minimum = new decimal(new int[] { -99999, 0, 0, -2147483648});
+			this.m_numMaster.Name = "m_numMaster";
+			this.m_numMaster.RestrictInvalidCharacters = false;
+			this.m_numMaster.Size = new System.Drawing.Size(150, 23);
+			this.m_numMaster.TabIndex = 3;
+			this.m_numMaster.ValueChanged += new System.EventHandler(this.m_numMaster_ValueChanged);
 			// 
 			// m_btnCancel
 			// 
@@ -362,59 +362,59 @@
 			// LockMSAxisDlg
 			// 
 			this.ClientSize = new System.Drawing.Size(440, 458);
-			this.Controls.Add(this.m_gbxMode);
-			this.Controls.Add(this.m_gbxLockAB);
+			this.Controls.Add(this.m_pnlMode);
+			this.Controls.Add(this.m_pnlLockAB);
 			this.Controls.Add(this.m_btnCancel);
 			this.Controls.Add(this.m_btnConfirm);
 			this.Name = "LockMSAxisDlg";
 			this.Text = "鎖軸設定";
-			this.m_gbxMode.ResumeLayout(false);
-			this.m_gbxMode.PerformLayout();
-			this.m_gbxLockAB.ResumeLayout(false);
-			this.m_gbxLockAB.PerformLayout();
-			this.m_gbxSlaveSettings.ResumeLayout(false);
-			this.m_tlpSlaveAngle.ResumeLayout(false);
-			this.m_tlpSlaveAngle.PerformLayout();
-			this.m_gbxRotaryDirection.ResumeLayout(false);
-			this.m_gbxMachiningDir.ResumeLayout(false);
-			this.m_gbxMachiningDir.PerformLayout();
-			this.m_gbxMasterSettings.ResumeLayout(false);
-			this.m_tlpMasterAngle.ResumeLayout(false);
-			this.m_tlpMasterAngle.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.m_dbtnSlave)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_dbtnMaster)).EndInit();
+			this.m_pnlMode.ResumeLayout(false);
+			this.m_pnlMode.PerformLayout();
+			this.m_pnlLockAB.ResumeLayout(false);
+			this.m_pnlLockAB.PerformLayout();
+			this.m_pnlSlaveSettings.ResumeLayout(false);
+			this.m_pnlSlaveAngle.ResumeLayout(false);
+			this.m_pnlSlaveAngle.PerformLayout();
+			this.m_pnlRotaryDirection.ResumeLayout(false);
+			this.m_pnlMachiningDir.ResumeLayout(false);
+			this.m_pnlMachiningDir.PerformLayout();
+			this.m_pnlMasterSettings.ResumeLayout(false);
+			this.m_pnlMasterAngle.ResumeLayout(false);
+			this.m_pnlMasterAngle.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_numSlave)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_numMaster)).EndInit();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_gbxMode;
+		private CommonUI.Controls.SectionPanel m_pnlMode;
 		private System.Windows.Forms.Label m_lblMode;
-		private System.Windows.Forms.RadioButton m_rbtnDefault;
-		private System.Windows.Forms.RadioButton m_rbtnLockAB;
-		private CommonUI.Controls.SectionPanel m_gbxLockAB;
+		private System.Windows.Forms.RadioButton m_rdoDefault;
+		private System.Windows.Forms.RadioButton m_rdoLockAB;
+		private CommonUI.Controls.SectionPanel m_pnlLockAB;
 		private System.Windows.Forms.CheckBox m_chkLockSlave;
-		private System.Windows.Forms.Panel m_gbxSlaveSettings;
-		private System.Windows.Forms.Panel m_tlpSlaveAngle;
+		private System.Windows.Forms.Panel m_pnlSlaveSettings;
+		private System.Windows.Forms.Panel m_pnlSlaveAngle;
 		private System.Windows.Forms.Label m_lblSlaveAngle;
-		private System.Windows.Forms.RadioButton m_rbtnSlaveAuto;
-		private System.Windows.Forms.RadioButton m_rbtnSlaveManual;
-		private CommonUI.Controls.DebouncedNumericUpDown m_dbtnSlave;
-		private CommonUI.Controls.SectionPanel m_gbxRotaryDirection;
+		private System.Windows.Forms.RadioButton m_rdoSlaveAuto;
+		private System.Windows.Forms.RadioButton m_rdoSlaveManual;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numSlave;
+		private CommonUI.Controls.SectionPanel m_pnlRotaryDirection;
 		private CommonUI.Controls.ThemedButton m_btnRotaryPos;
 		private CommonUI.Controls.ThemedButton m_btnRotaryNeg;
-		private CommonUI.Controls.SectionPanel m_gbxMachiningDir;
+		private CommonUI.Controls.SectionPanel m_pnlMachiningDir;
 		private System.Windows.Forms.Label m_lblMachiningDir;
-		private System.Windows.Forms.ComboBox m_cbxMachiningDir;
+		private System.Windows.Forms.ComboBox m_cmbMachiningDir;
 		private CommonUI.Controls.ThemedLabel m_lblMachiningDirHint;
 		private System.Windows.Forms.CheckBox m_chkLockMaster;
-		private System.Windows.Forms.Panel m_gbxMasterSettings;
-		private System.Windows.Forms.Panel m_tlpMasterAngle;
+		private System.Windows.Forms.Panel m_pnlMasterSettings;
+		private System.Windows.Forms.Panel m_pnlMasterAngle;
 		private System.Windows.Forms.Label m_lblMasterAngle;
-		private System.Windows.Forms.RadioButton m_rbtnMasterAuto;
-		private System.Windows.Forms.RadioButton m_rbtnMasterManual;
-		private CommonUI.Controls.DebouncedNumericUpDown m_dbtnMaster;
+		private System.Windows.Forms.RadioButton m_rdoMasterAuto;
+		private System.Windows.Forms.RadioButton m_rdoMasterManual;
+		private CommonUI.Controls.DebouncedNumericUpDown m_numMaster;
 		private CommonUI.Controls.ThemedButton m_btnCancel;
 		private CommonUI.Controls.ThemedButton m_btnConfirm;
 	}

@@ -7,6 +7,7 @@ using CncManager.Definition;
 using CncUI.Controls;
 using CommonUI.Controls;
 using CommonUI.Forms;
+using CommonUI.Theme;
 
 namespace CncUI
 {
@@ -77,10 +78,10 @@ namespace CncUI
 			m_btnCalibration.Click += ( sender, e ) => CalibrationClicked?.Invoke();
 			m_btnOuterEquipParameters.Click += ( sender, e ) => OuterEquipParametersClicked?.Invoke();
 			m_btnResumeCutParameters.Click += ( sender, e ) => ResumeCutParametersClicked?.Invoke();
-			m_chbThreePointCalibration.CheckedChanged += ( sender, e ) =>
+			m_chkThreePointCalibration.CheckedChanged += ( sender, e ) =>
 			{
 				if( !m_UpdatingThreePointCalibration ) {
-					ThreePointCalibrationChanged?.Invoke( m_chbThreePointCalibration.Checked );
+					ThreePointCalibrationChanged?.Invoke( m_chkThreePointCalibration.Checked );
 				}
 			};
 			m_Layout = new ResponsiveLayout( m_pnlCommands );
@@ -97,15 +98,15 @@ namespace CncUI
 			SetJogMode( m_Inching );
 		}
 
+		/// <summary>
+		/// Size the main window gives the panel when it has the room: the designer size. Also used before the
+		/// panel is created.
+		/// </summary>
+		public static readonly Size PREFERRED_SIZE = new Size( 288, 756 );
+
 		public override Size GetPreferredSize( Size proposedSize )
 		{
-			return GetPreferredSizeForDpi( DeviceDpi );
-		}
-
-		public static Size GetPreferredSizeForDpi( int dpi )
-		{
-			float scale = dpi / 96F;
-			return new Size( (int)Math.Ceiling( 240 * scale ), (int)Math.Ceiling( 620 * scale ) );
+			return PREFERRED_SIZE;
 		}
 
 		protected override void OnSizeChanged( EventArgs e )
@@ -114,20 +115,16 @@ namespace CncUI
 			UpdateResponsiveLayout();
 		}
 
-		protected override void OnDpiChangedAfterParent( EventArgs e )
-		{
-			base.OnDpiChangedAfterParent( e );
-			UpdateResponsiveLayout();
-		}
-
 		void UpdateResponsiveLayout()
 		{
 			if( m_Layout == null || DesignMode || LicenseManager.UsageMode == LicenseUsageMode.Designtime ) {
 				return;
 			}
-			int inset = Math.Max( 1, DeviceDpi / 96 );
-			m_pnlCommands.SetBounds( inset, inset, Math.Max( 1, ClientSize.Width - 2 * inset ),
-				Math.Max( 1, ClientSize.Height - 2 * inset ) );
+
+			// the cards keep the panel margin and are scaled to the rest
+			int nMargin = ThemeMetrics.PANEL_MARGIN;
+			m_pnlCommands.SetBounds( nMargin, nMargin, Math.Max( 1, ClientSize.Width - 2 * nMargin ),
+				Math.Max( 1, ClientSize.Height - 2 * nMargin ) );
 			m_Layout.Apply( m_pnlCommands );
 		}
 
@@ -234,7 +231,7 @@ namespace CncUI
 		{
 			m_UpdatingThreePointCalibration = true;
 			try {
-				m_chbThreePointCalibration.Checked = enabled;
+				m_chkThreePointCalibration.Checked = enabled;
 			}
 			finally {
 				m_UpdatingThreePointCalibration = false;

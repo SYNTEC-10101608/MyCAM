@@ -2,7 +2,7 @@
 <ResMap>
 	<Message ID="OverCutDlg" Content="Overcut" />
 	<Message ID="m_lblOverCutLength" Content="Overcut Length:" />
-	<Message ID="m_OverCutUnit" Content="mm" />
+	<Message ID="m_lblOverCutUnit" Content="mm" />
 	<Message ID="Error_NegativeLength" Content="Length must be greater than 0" />
 	<Message ID="Error_ExceedGeometry" Content="Overcut length exceeds geometric limit" />
 </ResMap>

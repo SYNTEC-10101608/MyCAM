@@ -16,7 +16,7 @@
 
 		private void InitializeComponent()
 		{
-			this.m_secAlign = new CommonUI.Controls.SectionPanel();
+			this.m_pnlAlign = new CommonUI.Controls.SectionPanel();
 			this.m_lblMethod = new System.Windows.Forms.Label();
 			this.m_cmbMethod = new System.Windows.Forms.ComboBox();
 			this.m_lblGuide = new CommonUI.Controls.ThemedLabel();
@@ -25,22 +25,22 @@
 			this.m_lblMoveStatus = new CommonUI.Controls.ThemedLabel();
 			this.m_lblError = new CommonUI.Controls.ThemedLabel();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
-			this.m_secAlign.SuspendLayout();
+			this.m_pnlAlign.SuspendLayout();
 			this.SuspendLayout();
 			//
-			// m_secAlign
+			// m_pnlAlign
 			//
-			this.m_secAlign.Controls.Add(this.m_lblMethod);
-			this.m_secAlign.Controls.Add(this.m_cmbMethod);
-			this.m_secAlign.Controls.Add(this.m_lblGuide);
-			this.m_secAlign.Controls.Add(this.m_lblAxisPlane);
-			this.m_secAlign.Controls.Add(this.m_cmbAxisPlane);
-			this.m_secAlign.Controls.Add(this.m_lblMoveStatus);
-			this.m_secAlign.Controls.Add(this.m_lblError);
-			this.m_secAlign.Location = new System.Drawing.Point(12, 12);
-			this.m_secAlign.Name = "m_secAlign";
-			this.m_secAlign.Size = new System.Drawing.Size(296, 193);
-			this.m_secAlign.TabIndex = 0;
+			this.m_pnlAlign.Controls.Add(this.m_lblMethod);
+			this.m_pnlAlign.Controls.Add(this.m_cmbMethod);
+			this.m_pnlAlign.Controls.Add(this.m_lblGuide);
+			this.m_pnlAlign.Controls.Add(this.m_lblAxisPlane);
+			this.m_pnlAlign.Controls.Add(this.m_cmbAxisPlane);
+			this.m_pnlAlign.Controls.Add(this.m_lblMoveStatus);
+			this.m_pnlAlign.Controls.Add(this.m_lblError);
+			this.m_pnlAlign.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlAlign.Name = "m_pnlAlign";
+			this.m_pnlAlign.Size = new System.Drawing.Size(296, 193);
+			this.m_pnlAlign.TabIndex = 0;
 			//
 			// m_lblMethod
 			//
@@ -125,19 +125,19 @@
 			// ManualTransformDlg
 			//
 			this.ClientSize = new System.Drawing.Size(320, 261);
-			this.Controls.Add(this.m_secAlign);
+			this.Controls.Add(this.m_pnlAlign);
 			this.Controls.Add(this.m_btnConfirm);
 			this.Name = "ManualTransformDlg";
 			this.Text = "工件對齊";
-			this.m_secAlign.ResumeLayout(false);
-			this.m_secAlign.PerformLayout();
+			this.m_pnlAlign.ResumeLayout(false);
+			this.m_pnlAlign.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_secAlign;
+		private CommonUI.Controls.SectionPanel m_pnlAlign;
 		private System.Windows.Forms.Label m_lblMethod;
 		private System.Windows.Forms.ComboBox m_cmbMethod;
 		private CommonUI.Controls.ThemedLabel m_lblGuide;

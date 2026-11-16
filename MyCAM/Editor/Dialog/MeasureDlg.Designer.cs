@@ -16,26 +16,26 @@
 
 		private void InitializeComponent()
 		{
-			this.m_secMeasure = new CommonUI.Controls.SectionPanel();
+			this.m_pnlMeasure = new CommonUI.Controls.SectionPanel();
 			this.m_lblMethod = new System.Windows.Forms.Label();
 			this.m_cmbMethod = new System.Windows.Forms.ComboBox();
 			this.m_lblGuide = new CommonUI.Controls.ThemedLabel();
 			this.m_lblResult = new System.Windows.Forms.Label();
 			this.m_txtResult = new System.Windows.Forms.TextBox();
-			this.m_secMeasure.SuspendLayout();
+			this.m_pnlMeasure.SuspendLayout();
 			this.SuspendLayout();
 			//
-			// m_secMeasure
+			// m_pnlMeasure
 			//
-			this.m_secMeasure.Controls.Add(this.m_lblMethod);
-			this.m_secMeasure.Controls.Add(this.m_cmbMethod);
-			this.m_secMeasure.Controls.Add(this.m_lblGuide);
-			this.m_secMeasure.Controls.Add(this.m_lblResult);
-			this.m_secMeasure.Controls.Add(this.m_txtResult);
-			this.m_secMeasure.Location = new System.Drawing.Point(12, 12);
-			this.m_secMeasure.Name = "m_secMeasure";
-			this.m_secMeasure.Size = new System.Drawing.Size(296, 210);
-			this.m_secMeasure.TabIndex = 0;
+			this.m_pnlMeasure.Controls.Add(this.m_lblMethod);
+			this.m_pnlMeasure.Controls.Add(this.m_cmbMethod);
+			this.m_pnlMeasure.Controls.Add(this.m_lblGuide);
+			this.m_pnlMeasure.Controls.Add(this.m_lblResult);
+			this.m_pnlMeasure.Controls.Add(this.m_txtResult);
+			this.m_pnlMeasure.Location = new System.Drawing.Point(12, 12);
+			this.m_pnlMeasure.Name = "m_pnlMeasure";
+			this.m_pnlMeasure.Size = new System.Drawing.Size(296, 210);
+			this.m_pnlMeasure.TabIndex = 0;
 			//
 			// m_lblMethod
 			//
@@ -86,18 +86,18 @@
 			// MeasureDlg
 			//
 			this.ClientSize = new System.Drawing.Size(320, 234);
-			this.Controls.Add(this.m_secMeasure);
+			this.Controls.Add(this.m_pnlMeasure);
 			this.Name = "MeasureDlg";
 			this.Text = "量測";
-			this.m_secMeasure.ResumeLayout(false);
-			this.m_secMeasure.PerformLayout();
+			this.m_pnlMeasure.ResumeLayout(false);
+			this.m_pnlMeasure.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private CommonUI.Controls.SectionPanel m_secMeasure;
+		private CommonUI.Controls.SectionPanel m_pnlMeasure;
 		private System.Windows.Forms.Label m_lblMethod;
 		private System.Windows.Forms.ComboBox m_cmbMethod;
 		private CommonUI.Controls.ThemedLabel m_lblGuide;

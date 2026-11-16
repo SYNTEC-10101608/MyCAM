@@ -14,15 +14,15 @@ namespace MyCAM.Editor
 		void InitializeControlAndFieldValue( EntryAndExitData data )
 		{
 			if( data == null ) {
-				m_txbEntryDistance.SilentSetValue = (decimal)m_EntryDistance;
-				m_txbExitDistance.SilentSetValue = (decimal)m_ExitDistance;
+				m_numEntryDistance.SilentSetValue = (decimal)m_EntryDistance;
+				m_numExitDistance.SilentSetValue = (decimal)m_ExitDistance;
 				return;
 			}
 
 			// set control value
-			m_txbEntryDistance.SilentSetValue = (decimal)data.EntryDistance;
-			m_txbExitDistance.SilentSetValue = (decimal)data.ExitDistance;
-			m_txbFollowSafeDistance.SilentSetValue = (decimal)data.FollowSafeDistance;
+			m_numEntryDistance.SilentSetValue = (decimal)data.EntryDistance;
+			m_numExitDistance.SilentSetValue = (decimal)data.ExitDistance;
+			m_numFollowSafeDistance.SilentSetValue = (decimal)data.FollowSafeDistance;
 
 			// set field value
 			m_EntryDistance = data.EntryDistance;
@@ -30,21 +30,21 @@ namespace MyCAM.Editor
 			m_FollowSafeDistance = data.FollowSafeDistance;
 		}
 
-		void m_txbEntryDistance_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numEntryDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			m_EntryDistance = (double)m_txbEntryDistance.Value;
+			m_EntryDistance = (double)m_numEntryDistance.Value;
 			RaisePreview( new EntryAndExitData( m_EntryDistance, m_ExitDistance, m_FollowSafeDistance ) );
 		}
 
-		void m_txbExitDistance_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numExitDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			m_ExitDistance = (double)m_txbExitDistance.Value;
+			m_ExitDistance = (double)m_numExitDistance.Value;
 			RaisePreview( new EntryAndExitData( m_EntryDistance, m_ExitDistance, m_FollowSafeDistance ) );
 		}
 
-		void m_txbFollowSafeDistance_DebouncedValueChanged( object sender, EventArgs e )
+		void m_numFollowSafeDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			m_FollowSafeDistance = (double)m_txbFollowSafeDistance.Value;
+			m_FollowSafeDistance = (double)m_numFollowSafeDistance.Value;
 			RaisePreview( new EntryAndExitData( m_EntryDistance, m_ExitDistance, m_FollowSafeDistance ) );
 		}
 

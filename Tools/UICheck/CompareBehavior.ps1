@@ -13,6 +13,12 @@
 #   B5  controls used by the code still exist
 #   B6  control types: only appearance replacements (Button -> ThemedButton, GroupBox -> SectionPanel ...)
 #   B7  Show / ShowDialog call sites in the whole repository
+#   B8  event subscriptions and Enabled / Visible / ReadOnly / Checked assignments in the code files changed since
+#       the base (screens, main window, CNC panels, helpers)
+#
+# Controls renamed for the naming rule are listed in RenameMap.txt ("<class> <old name> <new name>"); the base is
+# compared after the same renames, so a rename alone is not a difference.
+# The tab order is not compared: it follows the layout and is checked by CheckStatic.ps1 (S10).
 #
 # Exceptions: "<rule> <class> <control> <reason>" in BehaviorExceptions.txt. Exit code 1 on a difference.
 
@@ -52,6 +58,37 @@ if (Test-Path $exceptionFile) {
 		}
 	}
 }
+# renames per class
+$renameMap = @{}
+$renameFile = Join-Path $PSScriptRoot "RenameMap.txt"
+if (Test-Path $renameFile) {
+	foreach ($line in Get-Content $renameFile -Encoding UTF8) {
+		if ($line -match "^\s*(\S+)\s+(\w+)\s+(\w+)\s*$") {
+			if (-not $renameMap.ContainsKey($Matches[1])) {
+				$renameMap[$Matches[1]] = New-Object System.Collections.Generic.List[object]
+			}
+			$renameMap[$Matches[1]].Add(@( $Matches[2], $Matches[3] ))
+		}
+	}
+}
+function Rename-BaseText( [string]$szText, [string]$szClass ) {
+	if ($null -eq $szText) {
+		return $null
+	}
+	if (-not $renameMap.ContainsKey($szClass)) {
+		return $szText
+	}
+
+	# one pass, so a name that is renamed and another renamed to it do not chain; event handlers named
+	# <control>_<event> are renamed with their control
+	$nameMap = @{}
+	foreach ($pair in $renameMap[$szClass]) {
+		$nameMap[$pair[0]] = $pair[1]
+	}
+	$szAlternation = ($nameMap.Keys | Sort-Object Length -Descending | ForEach-Object { [regex]::Escape($_) }) -join "|"
+	return [regex]::Replace($szText, "\b($szAlternation)(?=\b|_)", { param( $match ) $nameMap[$match.Groups[1].Value] })
+}
+
 $problems = New-Object System.Collections.Generic.List[string]
 function Report( [string]$szRule, [string]$szClass, [string]$szControl, [string]$szMessage ) {
 	# an exception may use wildcards, e.g. "B6 CalibrationREFDlg m_tbxPnt*"
@@ -92,14 +129,15 @@ function Get-ItemsProp( [string]$szText ) {
 }
 
 # ---------------------------------------------------------------- designer files
-$designerFiles = foreach ($dir in $SCREEN_DIRS) {
+$designerFiles = @( foreach ($dir in $SCREEN_DIRS) {
 	Get-ChildItem (Join-Path $Root $dir) -Filter "*.Designer.cs" -Recurse
-}
+} ) + @( Get-Item (Join-Path $Root "MyCAM\StartupForm.Designer.cs") )
 foreach ($file in $designerFiles) {
 	$szRelative = $file.FullName.Substring($Root.Length).TrimStart("\")
-	$baseText = Get-BaseText $szRelative
+	$szFileClass = $file.Name -replace "\.Designer\.cs$", ""
+	$baseText = Rename-BaseText (Get-BaseText $szRelative) $szFileClass
 	$codeRelative = $szRelative -replace "\.Designer\.cs$", ".cs"
-	$baseCode = Get-BaseText $codeRelative
+	$baseCode = Rename-BaseText (Get-BaseText $codeRelative) $szFileClass
 	if ($null -eq $baseText) {
 		continue
 	}
@@ -207,6 +245,48 @@ foreach ($key in $oldCalls.Keys) {
 foreach ($key in $newCalls.Keys) {
 	if (-not $oldCalls.ContainsKey($key)) {
 		Report "B7" "repository" "*" "call site added: $key"
+	}
+}
+
+# ---------------------------------------------------------------- B8 behavior statements in the code
+# one statement per line is the coding style, so a line is a statement; whitespace is normalized
+function Get-BehaviorStatements( [string]$szText ) {
+	$statements = @{}
+	if ($null -eq $szText) {
+		return $statements
+	}
+	foreach ($line in ($szText -split "`n")) {
+		$szLine = ($line.Trim() -replace "\s+", " ")
+		# an event is a PascalCase member and its handler a method name, a delegate or a lambda;
+		# "y += row.Height + 2" and "nTop += nHeight" are arithmetic
+		$isEvent = $szLine -cmatch "^([\w\[\]\(\)]+\.)*[A-Z]\w*\s(\+|-)= (new [\w\.]+\(|\(.*\) =>|\w+ =>|delegate|[\w\.]+;$)"
+		$isState = $szLine -match "\.(Enabled|Visible|ReadOnly|Checked) = "
+		if ($isEvent -or $isState) {
+			$statements[$szLine] = 1 + [int]$statements[$szLine]
+		}
+	}
+	return $statements
+}
+$changedFiles = & git -C $Root diff --name-only --diff-filter=M $Base -- "*.cs" |
+	Where-Object { $_ -notmatch "\.Designer\.cs$" -and $_ -notmatch "^(Tools|CommonUI)/" }
+foreach ($szGitPath in $changedFiles) {
+	$szClass = [IO.Path]::GetFileNameWithoutExtension($szGitPath)
+	if ($Only -and $szClass -notlike $Only) {
+		continue
+	}
+	$oldStatements = Get-BehaviorStatements (Rename-BaseText (Get-BaseText $szGitPath) $szClass)
+	$newStatements = Get-BehaviorStatements (Get-Content (Join-Path $Root $szGitPath) -Raw -Encoding UTF8)
+	foreach ($szLine in $oldStatements.Keys) {
+		if ($newStatements[$szLine] -ne $oldStatements[$szLine]) {
+			$szTarget = ($szLine -split "[ \.]")[0]
+			Report "B8" $szClass $szTarget "statement removed or count changed: $szLine"
+		}
+	}
+	foreach ($szLine in $newStatements.Keys) {
+		if (-not $oldStatements.ContainsKey($szLine)) {
+			$szTarget = ($szLine -split "[ \.]")[0]
+			Report "B8" $szClass $szTarget "statement added: $szLine"
+		}
 	}
 }
 

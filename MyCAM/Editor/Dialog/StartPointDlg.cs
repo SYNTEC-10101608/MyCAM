@@ -15,12 +15,12 @@ namespace MyCAM.Editor.Dialog
 		public StartPointDlg()
 		{
 			InitializeComponent();
-			m_tbxTolernece.Maximum = decimal.MaxValue;
-			m_tbxTolernece.Minimum = 0;
+			m_numTolerance.Maximum = decimal.MaxValue;
+			m_numTolerance.Minimum = 0;
 
 		}
 
-		void m_clstStrategy_Format( object sender, ListControlConvertEventArgs e )
+		void m_clbStrategy_Format( object sender, ListControlConvertEventArgs e )
 		{
 			StartPointSelectStrategy strategy = (StartPointSelectStrategy)e.ListItem;
 
@@ -64,12 +64,12 @@ namespace MyCAM.Editor.Dialog
 			}
 			m_pnlStartPoint.Enabled = true;
 
-			m_rbtnManualSelect.Enabled = m_Param.IsSingleSelectMode;
-			m_rbtnManualSelect.Checked = !m_Param.IsAutoMode;
-			m_rbtnAutoSelect.Checked = m_Param.IsAutoMode;
+			m_rdoManualSelect.Enabled = m_Param.IsSingleSelectMode;
+			m_rdoManualSelect.Checked = !m_Param.IsAutoMode;
+			m_rdoAutoSelect.Checked = m_Param.IsAutoMode;
 			m_pnlAutoSelect.Enabled = m_Param.IsAutoMode;
 
-			m_tbxTolernece.Value = (decimal)m_Param.Tolerance;
+			m_numTolerance.Value = (decimal)m_Param.Tolerance;
 
 			ResetPriorityRuleList();
 			UpdateControlState();
@@ -80,22 +80,22 @@ namespace MyCAM.Editor.Dialog
 		void ResetPriorityRuleList()
 		{
 			StartPointSelectStrategy? selectedStrategy = GetSelectedStrategy();
-			m_clstStrategy.Items.Clear();
+			m_clbStrategy.Items.Clear();
 
 
 			foreach( StartPointSelectStrategy strategy in m_Param.Strategies ) {
-				m_clstStrategy.Items.Add( strategy, true );
+				m_clbStrategy.Items.Add( strategy, true );
 			}
 
 			foreach( StartPointSelectStrategy strategy in Enum.GetValues( typeof( StartPointSelectStrategy ) ) ) {
 				if( !m_Param.Strategies.Contains( strategy ) ) {
-					m_clstStrategy.Items.Add( strategy, false );
+					m_clbStrategy.Items.Add( strategy, false );
 				}
 			}
 
-			for( int i = 0; i < m_clstStrategy.Items.Count; ++i ) {
-				if( (StartPointSelectStrategy)m_clstStrategy.Items[ i ] == selectedStrategy ) {
-					m_clstStrategy.SelectedIndex = i;
+			for( int i = 0; i < m_clbStrategy.Items.Count; ++i ) {
+				if( (StartPointSelectStrategy)m_clbStrategy.Items[ i ] == selectedStrategy ) {
+					m_clbStrategy.SelectedIndex = i;
 					break;
 				}
 			}
@@ -115,35 +115,35 @@ namespace MyCAM.Editor.Dialog
 
 		#region UI events
 
-		void m_rbtnManualSelect_CheckedChanged( object sender, EventArgs e )
+		void m_rdoManualSelect_CheckedChanged( object sender, EventArgs e )
 		{
 			if( m_bSuppressValueChanged || m_Param == null ) {
 				return;
 			}
 
-			if( m_rbtnManualSelect.Checked && m_Param.IsAutoMode ) {
+			if( m_rdoManualSelect.Checked && m_Param.IsAutoMode ) {
 				ModeChanged?.Invoke();
 			}
 		}
 
-		void m_rbtnAutoSelect_CheckedChanged( object sender, EventArgs e )
+		void m_rdoAutoSelect_CheckedChanged( object sender, EventArgs e )
 		{
 			if( m_bSuppressValueChanged || m_Param == null ) {
 				return;
 			}
 
-			if( m_rbtnAutoSelect.Checked && !m_Param.IsAutoMode ) {
+			if( m_rdoAutoSelect.Checked && !m_Param.IsAutoMode ) {
 				ModeChanged?.Invoke();
 			}
 		}
 
-		void m_clstStrategy_ItemCheck( object sender, ItemCheckEventArgs e )
+		void m_clbStrategy_ItemCheck( object sender, ItemCheckEventArgs e )
 		{
 			if( m_bSuppressValueChanged || m_Param == null ) {
 				return;
 			}
 
-			StartPointSelectStrategy strategy = (StartPointSelectStrategy)m_clstStrategy.Items[ e.Index ];
+			StartPointSelectStrategy strategy = (StartPointSelectStrategy)m_clbStrategy.Items[ e.Index ];
 
 			// invoke action after winform UI Check event, to prevent conflict of CheckBoxList
 			BeginInvoke( new Action( () =>
@@ -154,7 +154,7 @@ namespace MyCAM.Editor.Dialog
 			} ) );
 		}
 
-		void m_clstStrategy_SelectedIndexChanged( object sender, EventArgs e )
+		void m_clbStrategy_SelectedIndexChanged( object sender, EventArgs e )
 		{
 			if( m_bSuppressValueChanged || m_Param == null ) {
 				return;
@@ -189,7 +189,7 @@ namespace MyCAM.Editor.Dialog
 				return;
 			}
 
-			m_Param.Tolerance = (double)m_tbxTolernece.Value;
+			m_Param.Tolerance = (double)m_numTolerance.Value;
 		}
 
 		void m_btnApply_Click( object sender, EventArgs e )
@@ -205,11 +205,11 @@ namespace MyCAM.Editor.Dialog
 
 		StartPointSelectStrategy? GetSelectedStrategy()
 		{
-			if( m_clstStrategy.SelectedIndex < 0 ) {
+			if( m_clbStrategy.SelectedIndex < 0 ) {
 				return null;
 			}
 
-			return (StartPointSelectStrategy)m_clstStrategy.SelectedItem;
+			return (StartPointSelectStrategy)m_clbStrategy.SelectedItem;
 		}
 
 		bool m_bSuppressValueChanged;

@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="CalibrationREFDlg" Content="三点校正" />
-	<Message ID="m_gbPnt1" Content="参考点1" />
-	<Message ID="m_gbPnt2" Content="参考点2" />
-	<Message ID="m_gbPnt3" Content="参考点3" />
+	<Message ID="m_pnlPnt1" Content="参考点1" />
+	<Message ID="m_pnlPnt2" Content="参考点2" />
+	<Message ID="m_pnlPnt3" Content="参考点3" />
 	<Message ID="m_btnDelete" Content="删除" />
 	<Message ID="m_btnDeletAll" Content="全部删除" />
 	<Message ID="NeedThreeRefPoints" Content="需要三个参考点" />

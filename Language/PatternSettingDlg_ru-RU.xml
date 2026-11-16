@@ -12,7 +12,6 @@
 	<Message ID="PathType_Pentagon" Content="Пятиугольник" />
 	<Message ID="PathType_Hexagon" Content="Шестиугольник" />
 	<Message ID="m_chkCoordReverse" Content="Перевернуть координаты" />
-	<Message ID="m_btnCancel" Content="Отмена" />
 	<Message ID="m_lblDiameter" Content="Диаметр" />
 	<Message ID="m_lblLength" Content="Длина" />
 	<Message ID="m_lblWidth" Content="Ширина" />

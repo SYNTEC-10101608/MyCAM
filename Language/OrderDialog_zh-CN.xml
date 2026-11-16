@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="OrderDialog" Content="路径排序" />
-	<Message ID="m_gbxOrderMode" Content="排序模式" />
-	<Message ID="m_rbSequentialOrder" Content="依次排序" />
-	<Message ID="m_rbPathSwap" Content="路径置换" />
-	<Message ID="m_gbxContent_Sequential" Content="设定" />
-	<Message ID="m_gbxContent_Swap" Content="置换操作" />
+	<Message ID="m_pnlOrderMode" Content="排序模式" />
+	<Message ID="m_rdoSequentialOrder" Content="依次排序" />
+	<Message ID="m_rdoPathSwap" Content="路径置换" />
+	<Message ID="m_pnlContent_Sequential" Content="设定" />
+	<Message ID="m_pnlContent_Swap" Content="置换操作" />
 	<Message ID="m_lblSequentialDesc" Content="选择路径后，按下 Enter&#13;&#10;&#13;&#10;这条路径会排列在当前旗标路径之后。" />
 	<Message ID="m_btnMoveUp" Content="往前移动（顺序变小）" />
 	<Message ID="m_btnMoveDown" Content="往后移动（顺序变大）" />
