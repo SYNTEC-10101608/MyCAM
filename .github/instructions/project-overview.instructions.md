@@ -81,6 +81,7 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 - 建議做法：
   - 在 Visual Studio 中將 `FCLTool` **卸載（Unload Project）**。卸載狀態只存在個人的 `.vs/`，不影響其他人。
   - 各開發機保留一份已建置的 `FCLTool.dll` 於 `MyCAM/bin/Debug/` 與 `MyCAM/bin/Release/`；修改 `FCLTool` 時才重新載入並建置。
+  - 新的 git worktree 沒有 `.vs/`，`FCLTool` 會回到載入狀態；在新 worktree 開啟方案後需再卸載一次，或只用 `Build.bat` 建置。
 
 ### 命令列建置
 
@@ -91,6 +92,10 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 | `Build.bat` | Debug，只建置 C# 專案（預設，不含 `PostTool` / `FCLTool`） |
 | `Build.bat Release` | Release，只建置 C# 專案 |
 | `Build.bat Debug all` | Debug，建置整個方案（含 C++，`FCLTool` 很耗時） |
+
+從 PowerShell 或 Git Bash 執行時需加上目前目錄：`.\Build.bat`（PowerShell）、`./Build.bat`（Git Bash）。
+`cmd /c Build.bat` 在設有 `NoDefaultCurrentDirectoryInExePath` 的環境（如 Claude Code）會找不到檔案，需寫成 `cmd /c .\Build.bat`。
+`CopyRef.bat` 同理。
 
 ### 執行期檔案
 
@@ -112,3 +117,14 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 
 - 分支命名：`AUTO-<議題編號>_<類型>_<簡述>`，類型 `f` 為功能、`b` 為 bug（例：`AUTO-23201_b_CannotOutputFrogLeapMacro`）。
 - Commit 訊息需明確描述修改內容，中英文皆可。
+
+### 多分支並行（git worktree）
+
+- 以 Claude Code 建立的 worktree 位於 `.claude/worktrees/<名稱>/`（已列入 `.gitignore`）。
+- Claude Code 自動建立的分支名稱為 `worktree-<名稱>`，建立後以 `git branch -m` 改為上述命名規則。
+- 建立前先 `git fetch origin`；fetch 失敗（如未連上公司網路）時，新分支會以本機舊的 `origin/<預設分支>` 為基準。
+- 未追蹤的檔案不會出現在新 worktree，需要的檔案列在 repo 根目錄的 `.worktreeinclude`，建立時由主 checkout 複製：
+  `.claude/settings.local.json`、`FCLTool.dll`、`PostTool.dll`、`bin/<組態>/Custom/`。
+- `CLAUDE.local.md` 不需複製：worktree 位於 repo 底下，Claude Code 會從上層的主 checkout 載入。
+  也因此不要在 repo 的上層目錄放 `CLAUDE.md` / `CLAUDE.local.md` 的備份，否則會被重複載入。
+- 新 worktree 第一次建置前執行 `CopyRef.bat`。

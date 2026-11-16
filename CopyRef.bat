@@ -1,5 +1,5 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 :: 設定編碼為 UTF-8，避免路徑有中文時出現亂碼
 chcp 65001 > nul
 
@@ -49,4 +49,6 @@ if not exist "%REL_CUST%\Language" mkdir "%REL_CUST%\Language"
 echo all done!
 
 REM 顯示 1 秒後自動關閉視窗
-timeout /t 1 > nul
+REM 非互動環境（如 Claude Code、CI）的 timeout 會因無法讀取輸入而報錯，忽略其輸出與結束代碼
+timeout /t 1 > nul 2>&1
+exit /b 0
