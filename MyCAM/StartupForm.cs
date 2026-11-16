@@ -39,15 +39,6 @@ namespace MyCAM
 
 		public StartupForm()
 		{
-			// initialize app setting first, other modules depend on it
-			MyApp.InitAppSetting();
-
-			// apply saved UI language
-			LanguageManager.LanguageManager.CurrentUILanguage = MyApp.AppSetting.UILanguage;
-
-			// the font family follows the UI language, so set it before any screen is created
-			ThemeFonts.Initialize( LanguageManager.LanguageManager.CurrentUILanguage );
-
 			m_LanguageManager = new LanguageManager.LanguageManager( "StartupForm" );
 
 #if !DEBUG

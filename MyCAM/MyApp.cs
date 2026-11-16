@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using CommonData;
+using CommonUI.Theme;
 using FileTranslator;
 using MyCAM.LogManager;
 using MyCAM.SettingManager;
@@ -81,12 +82,21 @@ namespace MyCAM.App
 			}
 		}
 
-		// init app setting, should be called once at application startup before any setting access
-		public static void InitAppSetting()
+		/// <summary>
+		/// Start-up initialization. Call once in Program.Main before any screen is created.
+		/// </summary>
+		public static void Initialize()
 		{
+			// other modules depend on the app setting
 			if( m_AppSetting == null ) {
 				m_AppSetting = new AppSettingManager();
 			}
+
+			// apply saved UI language
+			LanguageManager.LanguageManager.CurrentUILanguage = m_AppSetting.UILanguage;
+
+			// the font family follows the UI language, and the main window base reads it in its constructor
+			ThemeFonts.Initialize( LanguageManager.LanguageManager.CurrentUILanguage );
 		}
 
 		public static VNCUserControl VNCScreen
