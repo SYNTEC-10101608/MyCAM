@@ -78,16 +78,16 @@ Runner 由腳本以 Roslyn `csc` 編譯到 `MyCAM\bin\Debug`（`UICheckRunner.ex
 
 ### 4.1 需要使用者協助確認
 
-1. **VS Designer**：開啟 `OverCutDlg`（繼承泛型 `EditDialogBase<T>`）、`StartPointDlg`、`CNCPanel`，確認能開、外觀與執行時一致。若泛型基底開不起來，要為 22 個對話框加非泛型中介類別。
+1. ~~**VS Designer**~~：2026-11-16 使用者確認顯示正常，不需非泛型中介類別。
 2. **直式實機**：`CNCDlg`（VNC）在直式是否仍定位到 CNC 區；CNC 連線時直式下方面板。
 3. **實機操作**：TextBox 改數值框的對話框（`AxisTransformDlg`、`AddPathDlg`、`PatternSettingDlg`、`ThreePtTransformDlg`、`AutoSortPathDlg`）的輸入與預覽。
 4. **CNC 連線狀態**：`CNCPanel` / `CNCInfoPanel` / `CNCAlarmPanel` 的外觀與燈號。
 
 ### 4.2 待決問題（`UIStyleNotes.md` 第 5 節）
 
-1. `CNCThreePointDlg` 工作點座標 9 欄與誤差容忍欄是否改數值框：目前以「空白」表示未輸入，改了會改變操作，暫留 TextBox。
+1. `CNCThreePointDlg` 工作點座標 9 欄與誤差容忍欄：維持 TextBox。工作點是否改唯讀（拿掉手動輸入）待使用者決定，屬於行為變更。
 2. ~~CNC 面板內的區塊標題是否改為卡片標題~~：2026-11-16 已改為 `SectionPanel.Text`，`ResponsiveLayout` 保留標題列固定高度。
-3. 泛型基底在 Designer 的表現（同 4.1 第 1 項）。
+3. ~~泛型基底在 Designer 的表現~~：2026-11-16 已確認正常。
 
 ### 4.3 收尾
 
