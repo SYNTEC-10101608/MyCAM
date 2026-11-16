@@ -12,7 +12,7 @@
 | 分支基底 | `master` = `origin/master` = `a4b3826d`（施工期間 master 未前進） |
 | 推送狀態 | **尚未推送**到任何 remote（`origin` GitLab / `github` 個人），推送前要先問使用者推到哪裡 |
 | 未進版控的資料夾 | `UICheckScreens/`（截圖，內含 `.gitignore` = `*`） |
-| 建置 | `cmd /c Build.bat Debug`（只建 C#）；不建 FCLTool；`Language/` 有變動，執行前重跑 `CopyRef.bat` |
+| 建置 | `.\Build.bat Debug`（PowerShell，只建 C#）；不建 FCLTool；`Language/` 有變動，執行前重跑 `CopyRef.bat` |
 | 舊分支 | `AUTO-TBD_f_UIStyleImprove`：只沿用色票、字型、尺寸與圖示，實作不參考 |
 
 同一個 repo 另有 worktree `unify-path-craft-edit`（`AUTO-TBD_f_UnifyPathCraftEdit`），與本議題無關。
@@ -112,6 +112,6 @@ Runner 由腳本以 Roslyn `csc` 編譯到 `MyCAM\bin\Debug`（`UICheckRunner.ex
 - 分支 AUTO-TBD_f_UIStyleUnify，worktree D:\Decrypt\MyCAM\MyCAM\.claude\worktrees\ui-style-unify，不要另開分支或 worktree。
 - 先讀 Doc/UIStyleHandoff.md（交接）、Doc/UIStyleNotes.md（需求 / 決議 / 待決問題）、.github/instructions/ui-style.instructions.md（規範）。
 - P0～P5 已完成且尚未推送。本階段要處理：<在此填入，例如 Designer 驗證結果、待決問題的決議、推送目標>。
-- 原則：只改外觀不改行為；Designer 如實呈現；改 C# 後跑 cmd /c Build.bat Debug，不建 FCLTool；改畫面後跑 Tools\UICheck\UICheck.bat（必要時加 runtime），全部通過才提交。
+- 原則：只改外觀不改行為；Designer 如實呈現；改 C# 後跑 .\Build.bat Debug，不建 FCLTool；改畫面後跑 Tools\UICheck\UICheck.bat（必要時加 runtime），全部通過才提交。
 - Commit 訊息用繁體中文；推送前先問我 remote 與分支；新的要求或決議寫進 Doc/UIStyleNotes.md 並標日期。
 ```
