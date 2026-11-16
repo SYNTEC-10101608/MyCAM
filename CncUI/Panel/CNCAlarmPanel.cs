@@ -20,11 +20,11 @@ namespace CncUI
 
 		public void ApplyResources()
 		{
+			// captions and list columns whose ID is the control name, then the texts set at runtime
+			ApplyLanguage( Language );
 			m_pnlAlarm.Text = m_IsCurrent
 				? string.Format( Language.TryGetString( "Title_Current", CURRENT_TITLE ), m_AlarmCount )
 				: Language.TryGetString( "Title_Stale", STALE_TITLE );
-			m_colCode.HeaderText = Language.TryGetString( "m_colCode", CODE );
-			m_colText.HeaderText = Language.TryGetString( "m_colText", ALARM_TEXT );
 			switch( m_Status ) {
 				case CNCAlarmStatus.Updating:
 					m_lblStatus.Text = Language.TryGetString( "Status_Updating", UPDATING );
@@ -167,8 +167,6 @@ namespace CncUI
 
 		const string CURRENT_TITLE = "當前警報（{0}）";
 		const string STALE_TITLE = "當前警報（未更新）";
-		const string CODE = "代碼";
-		const string ALARM_TEXT = "警報內容";
 		const string UPDATING = "正在更新警報，資料尚未確認";
 		const string DISCONNECTED = "連線中斷，警報資料未更新";
 		const string READ_FAILED = "警報讀取失敗，資料未更新：{0}";

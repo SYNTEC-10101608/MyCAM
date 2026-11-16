@@ -71,8 +71,8 @@ namespace CncUI
 
 		public void ApplyResources()
 		{
-			// captions whose ID is the control name
-			LanguageApplier.Apply( this, Language );
+			// captions whose ID is the control name, then the texts set at runtime
+			ApplyLanguage( Language );
 			SetCoordinateMode( m_MachineCoordinates );
 			SetRotaryAxisRoles( m_FirstAxisRole, m_SecondAxisRole );
 			SetMachiningStatus( m_MachiningStatus );

@@ -1,58 +1,8 @@
-﻿# Confirmed exceptions of CheckStatic.ps1: <rule> <class> <control|*> <reason>
-# Keep one line per exception and explain why the rule does not apply.
+﻿# Registrations and confirmed exceptions of CheckStatic.ps1: <rule> <class> <control|*> <reason>
+# One line each, with the reason. Shared / runtime captions, stacked sections and wizard pages are recognized by the
+# check itself and are not listed here.
 
-# S6: captions that are always replaced at runtime; the designer text is only a zh-TW placeholder
-S6 ManualTransformDlg m_lblAxisPlane text depends on the alignment method (m_lblAxisPlane_Point / _Axis / _Plane)
-S6 MeasureDlg m_lblGuide guide text is set by Initialize() for the selected method
-S6 ManualTransformDlg m_lblGuide guide text is set by Initialize() for the selected method
-S6 ManualTransformDlg m_lblMoveStatus status text is set by UpdateSelectionStatusAndEnableConfirm()
-S6 OrderDialog m_pnlContent section title depends on the order mode (m_pnlContent_Sequential / _Swap)
-S7 ConnectDlg m_lblTips the IP format error replaces the hint only after the user presses confirm (after Load)
-S6 AutoSortPathDlg m_lblSelectedPath status text is set by UpdateSelectedPathStatus()
-S6 AutoSortPathDlg m_lblExtrusionBandwidth shares the text m_lblBandwidth with m_lblRotationBandwidth (set in code)
-S6 AutoSortPathDlg m_lblRotationBandwidth shares the text m_lblBandwidth with m_lblExtrusionBandwidth (set in code)
-S7 ExtendedGCodeDlg m_lblIsStartOrEnd ResetParam() sets the position text only after Show(), when the auto-applied text is already set
-S6 ExtendedGCodeDlg m_lblIsMixData text is set by ResetParam() (IsMixData)
-S6 FlyCutDlg m_lblGroupWidth text depends on the group unit, set by ResetParam() (GroupWidth / GroupAngle)
-S6 CalibrationREFDlg m_btnDelPnt* the three delete buttons share the text m_btnDelete (set in code)
-S5 AddPathDlg m_pnlStep3 step sections share the first position; SectionStack shows one at a time
-S5 AddPathDlg m_pnlStepHint step sections share the first position; SectionStack shows one at a time
-S6 AddPathDlg m_lblStepDescription text depends on the step (Desc_Step2_Title / Desc_Step4_Title)
-S5 AddPathDlg m_pnlStep1 step sections share the first position; SectionStack shows one at a time
-S6 LeadDlg m_lblLeadInLineLength shared text m_lblLeadLineLength (set in code)
-S6 LeadDlg m_lblLeadOutLineLength shared text m_lblLeadLineLength (set in code)
-S6 LeadDlg m_lblLeadInAngle shared text m_lblAngle (set in code)
-S6 LeadDlg m_lblLeadOutAngle shared text m_lblAngle (set in code)
-S6 LeadDlg m_lblLeadInLength shared text m_lblRadius (set in code)
-S6 LeadDlg m_lblLeadOutLength shared text m_lblRadius (set in code)
-S6 LockMSAxisDlg m_pnlRotaryDirection contains the axis name (Format_RotaryDirection, set in code)
-S6 LockMSAxisDlg m_chkLockSlave contains the axis name (Format_LockSlave, set in code)
-S6 LockMSAxisDlg m_chkLockMaster contains the axis name (Format_LockMaster, set in code)
-S6 LockMSAxisDlg m_lblSlaveAngle contains the axis name (Format_SlaveAngle, set in code)
-S6 LockMSAxisDlg m_lblMasterAngle contains the axis name (Format_MasterAngle, set in code)
-S6 PatternSettingDlg m_lblCircle* labels of the pattern panels share their texts (set in code)
-S6 PatternSettingDlg m_lblPolygon* labels of the pattern panels share their texts (set in code)
-S6 PatternSettingDlg m_lblRect* labels of the pattern panels share their texts (set in code)
-S6 PatternSettingDlg m_lblRunway* labels of the pattern panels share their texts (set in code)
-S2 ToolVectorDlg m_pnlColor* legend swatches use the data colors of the interpolation preview
-S5 ToolVectorDlg m_pnlColor* 16 x 16 legend swatches are centered on the text row
-S6 ToolVectorDlg m_lblStartOrEnd text is set by EnableStartEndSwitch() (m_lblStartOrEnd_Start / _End)
-S6 ToolVectorDlg m_lblLegendMaster text contains the axis name, set by UpdateInterpolateTypeNames()
-S6 ToolVectorDlg m_lblLegendSlave text contains the axis name, set by UpdateInterpolateTypeNames()
-S6 CNCThreePointDlg * captions are set in code: shared with CNCThreePointAction (Title) or formatted / shared by several controls
-S1 CNCThreePointDlg m_txtWorkpiece* an empty field means the point is not entered yet and a numeric box cannot stay empty (decision 2026-11-16; a nullable numeric box is a follow-up)
-S1 CNCThreePointDlg m_txtTolerance same empty-text semantics as the workpiece fields (decision 2026-11-16)
-S5 DesignSupportBracketDlg m_pnl* the three step panels share the dialog; ShowPanel() fits the dialog to the shown one with SectionStack.FitToPage
-S6 CNCOffsetDialog * captions use IDs shared with CNCOffsetController (Title / SetZero / ClearAll), set in code
-S6 CNCAlarmPanel m_pnlAlarm title contains the alarm count, set by ApplyResources() (Title_Current / Title_Stale)
-S6 CNCInfoPanel m_lblBNote text is the role of the rotary axis, set by SetRotaryAxisRoles()
-S6 CNCInfoPanel m_lblCNote text is the role of the rotary axis, set by SetRotaryAxisRoles()
-S6 CNCInfoPanel m_btnCoordinates text depends on the coordinate mode, set by SetCoordinateMode()
-S6 CNCPanel m_btnJog text depends on the jog mode, set by SetJogMode()
-S11 CNCDlg line* the remote screen dialog takes the size of the remote VNC screen and is placed on the CNC area
-S11 VNCUserControl line* the VNC view takes the resolution of the remote screen
-S19 StartupForm m_tsbLayer* layer color swatches are data colors (section 6)
-S19 StartupForm m_tsbNeedProcess machining legend swatch is a data color (section 6)
+# ---- data colors (section 2: data colors are named constants, only for swatches, legends and 3D objects)
 S20 DesignSupportBracketDlg X_POSITION_COLOR data color: X support position index and preview
 S20 DesignSupportBracketDlg Y_POSITION_COLOR data color: Y support position index and preview
 S20 CNCInfoPanel X_AXIS_COLOR data color: CNC axis dot
@@ -60,3 +10,14 @@ S20 CNCInfoPanel Y_AXIS_COLOR data color: CNC axis dot
 S20 CNCInfoPanel Z_AXIS_COLOR data color: CNC axis dot
 S20 CNCInfoPanel B_AXIS_COLOR data color: CNC axis dot
 S20 CNCInfoPanel C_AXIS_COLOR data color: CNC axis dot
+S2 ToolVectorDlg m_pnlColor* legend swatches in the data colors of the interpolation preview
+S19 StartupForm m_tsbLayer* layer color swatches (section 6)
+S19 StartupForm m_tsbNeedProcess machining legend swatch (section 6)
+
+# ---- windows that only host one remote content (section 4.4)
+S11 CNCDlg line* the remote screen dialog takes the size of the remote VNC screen and is placed on the CNC area
+S11 VNCUserControl line* the VNC view takes the resolution of the remote screen
+
+# ---- decided exceptions (Doc/UIStyleNotes.md)
+S1 CNCThreePointDlg m_txtWorkpiece* an empty field means the point is not entered yet and a numeric box cannot stay empty (decision 2026-11-16; a nullable numeric box is a follow-up)
+S1 CNCThreePointDlg m_txtTolerance same empty-text semantics as the workpiece fields (decision 2026-11-16)
