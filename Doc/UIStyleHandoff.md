@@ -31,12 +31,12 @@
 | P4 | `91e1f205`、`0cacef2d` | CNC 面板改 `PanelBase`、外觀統一；進度條；刪除 `GroupPanel` / `PanelButton` |
 | P5 | `0691d5a9`、`46d176fb` | 驗收報告；直式主視窗截圖與對話框置中檢查 |
 
-最後一次 `Tools\UICheck\UICheck.bat runtime UICheckScreens` 的結果：
+之後依 Reviewer 盤點（`Doc/UIStyleReview.md`）進行兩輪討論與施工：控制項欄位依型別前綴改名、CNC 面板改用
+`ThemeMetrics`、字型初始化移到 `MyApp`、按鈕種類分 CAM / CNC 兩組、語系套用統一由三個基底的 `ApplyLanguage`
+處理（含主視窗選單與工具列）、`ResponsiveLayout` 移入 `CommonUI`、規範新增元件目錄，檢查擴充到 S1–S23、
+B1–B8、T1–T7、P1–P5。決議與施工結果見 `UIStyleNotes.md` 第 3 節。
 
-- 靜態檢查：34 個 Designer 檔，0 個問題。
-- 與 master 的行為比對：0 個差異。
-- 執行時版面：zh-TW、zh-CN 各 34 個畫面，0 個問題。
-- 主視窗：zh-TW / zh-CN × CAD / CAM / CNC 頁面 × 橫式 / 直式（12 張，2026-11-16 補 CAM、CNC 頁面），對話框置中 0 個問題。
+最後一次 `Tools\UICheck\UICheck.bat runtime UICheckScreens` 的結果見 `UIStyleCheckReport.md`：全部 0 個問題。
 
 ## 3. 產出的資料與用法
 
@@ -47,16 +47,15 @@
 | `.github/instructions/ui-style.instructions.md` | **團隊規範**（定稿），AI 工具也會讀 | 之後新增 / 修改畫面一律依此；規則有變時改這份 |
 | `Doc/UIStyleDraft.md` | 設計草案 v0.5：盤點結果、設計緣由、分期計畫 | 想知道「為什麼這樣定」時查；不再當規範用 |
 | `Doc/UIStyleNotes.md` | 需求、決議、後續項目、待決問題（都標日期） | 有新要求或決議時追加；第 4 節是範圍外的後續工作，第 5 節是待決問題 |
-| `Doc/UIStyleCheckReport.md` | P5 驗收報告 | 檢查結果、截圖位置、需要人工確認的項目 |
+| `Doc/UIStyleCheckReport.md` | 驗收報告 | 檢查結果、涵蓋範圍、截圖位置、需要人工確認的項目 |
+| `Doc/UIStyleReview.md` | Reviewer 盤點與兩輪待決問題 | 查 Review 提出的問題與處理結果 |
 | `Doc/UIStyleHandoff.md` | 本檔 | 接續工作時先讀 |
 
 ### 3.2 程式
 
 | 位置 | 內容 |
 | --- | --- |
-| `CommonUI/Theme/` | `ThemeColors`、`ThemeFonts`（依語系字族）、`ThemeMetrics`、`TextRole`、`ThemeText`、`ThemedToolStripRenderer` |
-| `CommonUI/Forms/` | `DialogBase`（外觀、置中、語系自動套用）、`PanelBase`、`MainWindowBase`、`DialogPlacement`、`LanguageApplier`、`CommonTexts` |
-| `CommonUI/Controls/` | `SectionPanel`、`ThemedButton`、`ThemedLabel`、`ThemedDataGridView`、`SectionStack`、`RemovableValueRow`、`DebouncedNumericUpDown`、`MultiSelectTreeView`、`LoadingBar`、`RoundedProgressBar` |
+| `CommonUI/` | 所有元件，用途與使用方式見規範第 9 節「CommonUI 元件目錄」 |
 | `Language/CommonUI_*.xml` | 共用按鈕文字（確定、取消、重設、預覽、關閉） |
 | `MyCAM/Resource/*.png`、`IconSource/` | 新圖示與產生腳本 `RenderIcons.ps1` |
 
@@ -65,23 +64,22 @@
 | 檔案 | 用途 |
 | --- | --- |
 | `UICheck.bat` | 入口。無參數：靜態檢查 + 行為比對；`runtime [截圖資料夾]`：另跑執行時版面與主視窗檢查（需先建置 Debug） |
-| `CheckStatic.ps1` + `DesignerParser.ps1` | 靜態檢查 S1～S8（控制項白名單、Designer 不寫外觀屬性、座標規則、卡片標題不可用標籤充當等） |
-| `CompareBehavior.ps1` | 與 `master` 比對事件訂閱、控制項屬性等行為面差異 B1～B7 |
-| `CheckRuntimeLayout.ps1` + `LayoutRunner.cs` | 實際開啟所有對話框與 CNC 面板，檢查文字超出、重疊、超出容器 T1～T5，可輸出截圖 |
-| `CaptureMainWindow.ps1` + `MainWindowRunner.cs` | 主視窗截圖與對話框置中檢查 P1、P2。`-Mode CAD\|CAM\|CNC` 切換頁面；直式在橫式螢幕上以 1080×1880 開窗即可，不必旋轉螢幕 |
-| `HiddenDesktopRun.cs` | 2026-11-16 新增：讓上面兩個 runner 在隱藏桌面執行，不佔用螢幕、不搶焦點；`-Visible` 改回一般桌面 |
-| `StaticExceptions.txt` / `BehaviorExceptions.txt` | 經確認的例外，每行附理由；行為例外必須對應已決議的項目 |
+| `CheckStatic.ps1` + `DesignerParser.ps1` | 靜態檢查 S1～S23（規則列表見規範第 8 節與腳本開頭） |
+| `CompareBehavior.ps1` + `RenameMap.txt` | 與 `master` 比對行為面差異 B1～B8；控制項改名以對照表換算 |
+| `CheckRuntimeLayout.ps1` + `LayoutRunner.cs` | 開啟所有對話框與 CNC 面板（精靈依 `STATE_MAP` 各狀態），檢查 T1～T7，可輸出截圖 |
+| `CaptureMainWindow.ps1` + `MainWindowRunner.cs` | 主視窗截圖與 P1～P5。`-Mode CAD\|CAM\|CNC` 切換頁面；直式在橫式螢幕上以 1080×1880 開窗 |
+| `HiddenDesktopRun.cs` | 讓 runner 在隱藏桌面執行，不佔用螢幕；`-Visible` 改回一般桌面 |
+| `SyncLanguage.ps1` | 執行時檢查前把過期的語系檔複製到建置輸出 |
+| `FixTabOrder.ps1` | 依版面重編 `TabIndex`（S10） |
+| `StaticExceptions.txt` / `BehaviorExceptions.txt` | 資料色登錄、單一遠端內容的視窗、已決議的例外與行為差異，每行附理由 |
 
-Runner 由腳本以 Roslyn `csc` 編譯到 `MyCAM\bin\Debug`（`UICheckRunner.exe`、`UICheckMainWindow.exe`），不進方案。
+Runner 由腳本以 Roslyn `csc` 編譯到 `MyCAM\bin\<組態>` 執行，結束即刪除，不進方案也不留在建置輸出。
 
 ## 4. 還沒處理的事
 
 ### 4.1 需要使用者協助確認
 
-1. ~~**VS Designer**~~：2026-11-16 使用者確認顯示正常，不需非泛型中介類別。
-2. **直式實機**：`CNCDlg`（VNC）在直式是否仍定位到 CNC 區；CNC 連線時直式下方面板。
-3. **實機操作**：TextBox 改數值框的對話框（`AxisTransformDlg`、`AddPathDlg`、`PatternSettingDlg`、`ThreePtTransformDlg`、`AutoSortPathDlg`）的輸入與預覽。
-4. **CNC 連線狀態**：`CNCPanel` / `CNCInfoPanel` / `CNCAlarmPanel` 的外觀與燈號。
+見 `UIStyleCheckReport.md` 第 4 節（Designer 開啟本輪改動的畫面、數值框實機操作、CNC 實際連線）。
 
 ### 4.2 待決問題（`UIStyleNotes.md` 第 5 節）
 
@@ -97,7 +95,8 @@ Runner 由腳本以 Roslyn `csc` 編譯到 `MyCAM\bin\Debug`（`UICheckRunner.ex
 
 ### 4.4 範圍外的後續項目（`UIStyleNotes.md` 第 4 節）
 
-編輯工具對話框補「取消」、對話框行為模式統一、`Show` / `ShowDialog` 統一、橫式警報 / 日誌面板切換、主視窗行為重構、`CalibrationREFDlg` KeyDown 重複訂閱、數值框細節差異、唯讀座標無法複製、CNC 面板語系切換後字族未更新、支援未輸入的數值框（三點校正）。這些都不在本議題施工範圍，另開議題處理。
+編輯工具對話框補「取消」、對話框行為模式統一、`Show` / `ShowDialog` 統一、橫式警報 / 日誌面板切換、主視窗行為重構、`CalibrationREFDlg` KeyDown 重複訂閱、數值框細節差異、唯讀座標無法複製、CNC 面板語系切換後字族未更新、支援未輸入的數值框（三點校正）、檢查涵蓋範圍的缺口、
+執行時檢查發現語系檔過期（已由 `SyncLanguage.ps1` 處理）。這些都不在本議題施工範圍，另開議題處理。
 
 ## 5. 截圖與檢查的已知限制
 

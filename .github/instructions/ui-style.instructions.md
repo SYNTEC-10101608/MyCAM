@@ -182,7 +182,10 @@ Form
 - 卡片內的動作按鈕（只作用於該卡片，或須隨卡片一起停用）放在列上，高 23。
 - RadioButton 群組、會切換 `Enabled` / `Visible` 的區域，用無外觀的 `Panel` 包住；`Panel` 內的列以其頂端為 0 起算。
 - 列：有標題卡片第一列 `y = 36`、無標題 `y = 10`，之後每列 `+30`；標籤 `+4`、`CheckBox` / `RadioButton` `+2`。
-- 卡片高 = 最後一列頂端 + 23 + 10。
+- 卡片高 = 最後一列頂端 + 23 + 10。同一位置輪流顯示的步驟卡片（由 `SectionStack.Arrange` 擇一顯示）取其中最高者，
+  切換步驟時下方卡片不跳動；並排的兩張卡片同高。
+- 精靈換頁（4.6 `FitToPage`）：每一頁是放在 `(12, 12)` 的無外觀 `Panel`，頁內以頁的左上角為 `(0, 0)`、
+  依本節規則排列卡片與按鈕列（按鈕列底即頁底），對話框大小在換頁時配合該頁。
 - 按鈕列：在最後一張卡片下方 16，高 28、寬至少 80、間距 8，距底邊 12。
   主要動作（確定）在最右，取消在其左；輔助動作（重設、預覽、另存…）靠左，從 `x = 12` 開始。
   按鈕的數量與功能不因統一而改變。
@@ -252,18 +255,25 @@ Form
 
 ## 7. 多語系
 
-- 控制項自己使用的文字、且一個 ID 只對應這個控制項：以**控制項名稱**當 ID。每個對話框在建構子的
-  `InitializeComponent()` 之後立即呼叫一次 `ApplyLanguage()`（`DialogBase` 提供），走訪所有子控制項套用；
+- 控制項自己使用的文字、且一個 ID 只對應這個控制項：以**名稱**當 ID，由基底的 `ApplyLanguage` 走訪套用，
   ID 不存在時保留 Designer 上的文字。不逐一手寫套用。
-- 表單標題：以**類別名稱**當 ID，由同一個呼叫套用。
+
+  | 畫面 | 呼叫 | 時機 |
+  | --- | --- | --- |
+  | 對話框 | `ApplyLanguage()`（`DialogBase`） | 建構子的 `InitializeComponent()` 之後立即呼叫一次 |
+  | 嵌入式面板 | `ApplyLanguage( languageManager )`（`PanelBase`） | 套用語系的方法中最先呼叫；該方法在建構子與切換語系時執行 |
+  | 主視窗 | `ApplyLanguage( languageManager )`（`MainWindowBase`） | 同上 |
+
+- 套用對象：標題類控制項（`Label`、按鈕、`CheckBox`、`RadioButton`、`SectionPanel`）、清單欄位標題（以欄名）、
+  選單與工具列項目（以項目名；提示文字的 ID 為 `<項目名>_ToolTip`，含右鍵選單）。輸入框的內容不受影響。
+  嵌入式面板是另一個畫面，各自套用自己的語系檔。
+- 表單標題：以**類別名稱**當 ID，對話框由同一個呼叫套用。
 - 多個控制項共用的文字、執行時才決定的文字：在程式中明確呼叫 `TryGetString`，且該 ID **不可**等於任何控制項名稱
   （避免與控制項名稱的 ID 混淆）。
 - 共用的按鈕文字（確定、取消、重設、預覽、關閉）：在 Designer 設定 `ThemedButton.CommonText`，
   執行時一律取自 `Language/CommonUI_<語系>.xml`（優先於對話框自己的 ID）。
-- 只套用「標題類」控制項（`Label`、按鈕、`CheckBox`、`RadioButton`、`SectionPanel`）；輸入框的內容不受影響。
+- 執行時才決定的文字在 `ApplyLanguage` 之後設定。
 - Designer 上的文字寫 zh-TW；四個語系的 XML 同步維護。
-- 嵌入式面板（`PanelBase`）在套用語系的方法中呼叫 `LanguageApplier.Apply( this, languageManager )`；
-  該方法在建構子與切換語系時執行。
 
 ## 8. 檢查腳本（`Tools/UICheck`）
 
@@ -284,7 +294,7 @@ Form
 | S11 | 對話框程式中設定控制項的字型、顏色、位置或大小 |
 | S12 | 使用 `DeviceDpi` |
 | S13 | 語系檔中形如控制項名稱、卻沒有對應控制項也沒被程式使用的 ID |
-| S14 | 對話框在 `InitializeComponent()` 之後立即呼叫 `ApplyLanguage()` |
+| S14 | 對話框在 `InitializeComponent()` 之後立即呼叫 `ApplyLanguage()`；有語系檔的嵌入式面板呼叫 `ApplyLanguage( languageManager )` |
 | S15 | `CommonUI` 以外定義了控制項類別 |
 | S16 | `Start` / `Hold` / `Stop` 用在 CNC 面板以外；同一容器有兩個以上 `Primary` |
 | S17 | 按鈕列順序：輔助動作從左邊距、其餘從右邊距以 8 相接；`Primary` 最右、取消 / 關閉緊鄰其左、重設 / 預覽在左 |
@@ -292,9 +302,11 @@ Form
 | S19 | 主視窗 Designer 的控制項型別與外觀屬性（圖層色塊、圖例為例外） |
 | S20 | `static readonly Color` 常數必須登錄為資料色（`StaticExceptions.txt`） |
 | S21 | `CommonUI` 的公開型別都列在第 9 節 |
+| S22 | 卡片標題列內的控制項位置（4.5）：按鈕高 23、`y = 5`，`CheckBox` `y = 5`，標籤高 24、`y = 4`，最右者對齊內容右緣 |
+| S23 | 程式中建立白名單以外的控制項（`Button`、`GroupBox`、`NumericUpDown`、`TextBox`…） |
 | B1–B8 | 與 `master` 比較事件、行為屬性、`Show` / `ShowDialog` 等；B8 比對 `.cs` 的事件訂閱與 `Enabled` / `Visible` / `ReadOnly` / `Checked` 賦值 |
 | T1–T7 | 文字截斷、超出容器、重疊等；T6 檢查 `Load` 前後版面與 Designer 相同；T7 檢查控制項顯示語系檔的文字。精靈依 `LayoutRunner.cs` 的 `STATE_MAP` 逐一檢查每個狀態 |
-| P1–P4 | 對話框置中（含 `ShowDialog` 開啟的）、CAM 區域、主視窗字族、主視窗中 CNC 面板以實際大小的文字與版面 |
+| P1–P5 | 對話框置中（含 `ShowDialog` 開啟的）、CAM 區域、主視窗字族、主視窗中 CNC 面板以實際大小的文字與版面、選單與工具列項目顯示語系檔的文字 |
 
 - 產品程式（`MyCAM`、`CncUI`、`CommonUI` 等）不放為了檢查而寫的程式：不加只給檢查用的方法、屬性、旗標或分支。
   檢查需要的狀態，在檢查程式中呼叫產品本來就有的方法觸發（例：`STATE_MAP` 以 `SetCommandsEnabled` 呈現 CNC 連線後的按鈕），
@@ -302,7 +314,9 @@ Form
 - 執行時檢查開始前，`SyncLanguage.ps1` 會把過期的語系檔複製到建置輸出（等同 `CopyRef.bat` 的語系部分）。
 - 新增精靈或多狀態的對話框時，把各狀態加到 `STATE_MAP`。
 - 控制項改名時，把「類別 舊名 新名」加到 `RenameMap.txt`，行為比對會先把 `master` 的舊名換成新名再比較。
-- 經確認的例外列在 `StaticExceptions.txt` / `BehaviorExceptions.txt`，每行寫明理由；行為例外必須是已決議的項目。
+- 共用 / 執行時的標題文字、`SectionStack` 排列的卡片、精靈的頁，由檢查自行辨識，不列例外。
+  `StaticExceptions.txt` 只登錄資料色、承載單一遠端內容的視窗與已決議的例外；`BehaviorExceptions.txt`
+  只列已決議的行為差異。每行寫明理由。
 - 修改畫面後必須跑 `UICheck.bat`，全部通過才可提交；新增畫面時一併確認執行時版面檢查。
 
 ## 9. CommonUI 元件目錄
@@ -315,8 +329,8 @@ Form
 | 元件 | 用途 | 使用方式 |
 | --- | --- | --- |
 | `DialogBase` | 所有對話框的外觀層：外框、字型、底色、置中、語系文字 | 直接或經 `FormBase` / `EditDialogBase<T>` 繼承；建構子在 `InitializeComponent()` 後呼叫 `ApplyLanguage()` |
-| `PanelBase` | 嵌入式面板的外觀層：字型、底色、關閉自動縮放 | 取代直接繼承 `UserControl` |
-| `MainWindowBase` | 主視窗的外觀層：字型、底色、工具列字型與繪製 | 只給 `StartupForm` |
+| `PanelBase` | 嵌入式面板的外觀層：字型、底色、關閉自動縮放、語系文字 | 取代直接繼承 `UserControl`；套用語系時呼叫 `ApplyLanguage( languageManager )` |
+| `MainWindowBase` | 主視窗的外觀層：字型、底色、工具列字型與繪製、語系文字（含選單與工具列項目） | 只給 `StartupForm`；套用語系時呼叫 `ApplyLanguage( languageManager )` |
 
 ### 9.2 控制項
 
@@ -339,7 +353,7 @@ Form
 | `SectionStack` | 對話框執行時的版面變化：`Arrange`（隱藏區塊後補位）、`PlaceButtonBar`、`FitToPage`（精靈換頁） | 對話框內不手算座標 |
 | `DialogPlacement` | 對話框置中（4.3）；`MoveToCenter` 重新置中，`AreaProvider` 由主視窗註冊 | 不自行計算位置 |
 | `ResponsiveLayout` | 嵌入式面板依 Designer 座標等比縮放，標題列不縮放 | 只用於嵌入式面板 |
-| `LanguageApplier` | 以控制項名稱為 ID 套用語系文字 | 對話框經 `ApplyLanguage()`，嵌入式面板直接呼叫 |
+| `LanguageApplier` | 以名稱為 ID 套用語系文字：標題類控制項、清單欄位、選單與工具列項目（`ApplyToItems`） | 由三個基底的 `ApplyLanguage` 呼叫，畫面不直接使用 |
 | `CommonTexts` / `CommonButtonText` | 共用按鈕文字（確定、取消、重設、預覽、關閉），取自 `Language/CommonUI_<語系>.xml` | 按鈕設 `ThemedButton.CommonText` |
 | `ThemeColors` / `ThemeFonts` / `ThemeMetrics` | 色票、字型、尺寸 token（第 2 節） | 畫面不寫顏色、字型、魔術數字 |
 | `TextRole` / `ThemeText` | 文字角色與其字型、顏色；`ThemeText.SetRole` 給非標籤控制項 | 見 2.2 |
