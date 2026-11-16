@@ -85,7 +85,7 @@ Runner 由腳本以 Roslyn `csc` 編譯到 `MyCAM\bin\Debug`（`UICheckRunner.ex
 
 ### 4.2 待決問題（`UIStyleNotes.md` 第 5 節）
 
-1. `CNCThreePointDlg` 工作點座標 9 欄與誤差容忍欄：維持 TextBox。工作點是否改唯讀（拿掉手動輸入）待使用者決定，屬於行為變更。
+1. ~~`CNCThreePointDlg` 工作點座標 9 欄與誤差容忍欄~~：2026-11-16 已決議維持 TextBox、不改唯讀；可為空的數值框列為後續議題。
 2. ~~CNC 面板內的區塊標題是否改為卡片標題~~：2026-11-16 已改為 `SectionPanel.Text`，`ResponsiveLayout` 保留標題列固定高度。
 3. ~~泛型基底在 Designer 的表現~~：2026-11-16 已確認正常。
 
@@ -97,7 +97,7 @@ Runner 由腳本以 Roslyn `csc` 編譯到 `MyCAM\bin\Debug`（`UICheckRunner.ex
 
 ### 4.4 範圍外的後續項目（`UIStyleNotes.md` 第 4 節）
 
-編輯工具對話框補「取消」、對話框行為模式統一、`Show` / `ShowDialog` 統一、橫式警報 / 日誌面板切換、主視窗行為重構、`CalibrationREFDlg` KeyDown 重複訂閱、數值框細節差異、唯讀座標無法複製、CNC 面板語系切換後字族未更新。這些都不在本議題施工範圍，另開議題處理。
+編輯工具對話框補「取消」、對話框行為模式統一、`Show` / `ShowDialog` 統一、橫式警報 / 日誌面板切換、主視窗行為重構、`CalibrationREFDlg` KeyDown 重複訂閱、數值框細節差異、唯讀座標無法複製、CNC 面板語系切換後字族未更新、支援未輸入的數值框（三點校正）。這些都不在本議題施工範圍，另開議題處理。
 
 ## 5. 截圖與檢查的已知限制
 
