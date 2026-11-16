@@ -5,11 +5,13 @@
 	[int]$Width = 1920,
 	[int]$Height = 1040,
 	[string]$Language = "zh-TW",
+	[ValidateSet( "CAD", "CAM", "CNC" )][string]$Mode = "CAD",
 	[string[]]$Dialogs = @( "AddPathDlg", "OverCutDlg", "StartPointDlg" )
 )
 # Screenshot of the main window at a given size (e.g. 1920 x 1040 landscape, 1080 x 1880 portrait) and check
 # that dialogs are centered in the dialog area (see MainWindowRunner.cs). Landscape / portrait only depends on
 # the window's aspect ratio, so a portrait window is checked on a landscape screen by sizing it beyond the screen.
+# -Mode clicks the CAM or CNC (machining) page before the capture; CAD is the start page.
 # The language is set in memory only; the setting file is not changed.
 
 $ErrorActionPreference = "Stop"
@@ -44,7 +46,7 @@ if (-not [System.IO.Path]::IsPathRooted($outPath)) {
 New-Item -ItemType Directory -Force (Split-Path $outPath) | Out-Null
 Push-Location $binDir
 try {
-	& $runner $Language $Width $Height $outPath @Dialogs
+	& $runner $Language $Mode $Width $Height $outPath @Dialogs
 	$result = $LASTEXITCODE
 }
 finally {

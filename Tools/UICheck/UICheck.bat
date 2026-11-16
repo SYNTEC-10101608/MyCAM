@@ -25,12 +25,15 @@ if errorlevel 1 set "RESULT=1"
 REM main window screenshots go to the temp folder when no screenshot folder is given
 set "SHOTS=%~2"
 if "%SHOTS%"=="" set "SHOTS=%TEMP%\UICheck"
+REM each language x page (CAD start page, CAM, CNC machining) x landscape / portrait
 for %%L in (zh-TW zh-CN) do (
-	echo ## main window: %%L
-	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Language %%L -Width 1920 -Height 1040 -OutFile "%SHOTS%\MainWindow_%%L_Landscape.png"
-	if errorlevel 1 set "RESULT=1"
-	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Language %%L -Width 1080 -Height 1880 -OutFile "%SHOTS%\MainWindow_%%L_Portrait.png"
-	if errorlevel 1 set "RESULT=1"
+	for %%M in (CAD CAM CNC) do (
+		echo ## main window: %%L %%M
+		powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Language %%L -Mode %%M -Width 1920 -Height 1040 -OutFile "%SHOTS%\MainWindow_%%L_%%M_Landscape.png"
+		if errorlevel 1 set "RESULT=1"
+		powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Language %%L -Mode %%M -Width 1080 -Height 1880 -OutFile "%SHOTS%\MainWindow_%%L_%%M_Portrait.png"
+		if errorlevel 1 set "RESULT=1"
+	)
 )
 
 :report

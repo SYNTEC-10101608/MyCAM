@@ -46,6 +46,7 @@
 | 2026-11-16 | 「應用」「生成路徑」等動作按鈕 | 確定鍵統一為「確定」只套用在語意為「確定 / 完成」的按鈕；「應用」（StartPointDlg）、「生成路徑」（AddPathDlg）、「儲存 / 生成」等有明確動作的按鈕保留原文字。 |
 | 2026-11-16 | 直式人機的驗證方式 | 橫 / 直式只依主視窗外框長寬比判斷（`MainLayout`、`StartupForm`、`CNCDlg` 皆比較 `Height > Width`），與系統顯示方向無關。因此不旋轉螢幕，改在橫式螢幕上把主視窗開到 1080×1880 截圖並檢查對話框置中（`CaptureMainWindow.ps1`，已併入 `UICheck.bat runtime`）。 |
 | 2026-11-16 | 語系修正（隨遷移處理） | `ExtendedGCodeDlg` 的 `IS_START_POINT` / `IS_END_POINT` / `IS_MIX_DATA` 與程式使用的 ID 不一致（簡中一直顯示繁中預設字），已改為程式使用的 ID。語系檔名與類別名不一致者改名：`LockABDlg` → `LockMSAxisDlg`、`CNCThreePointDialog` → `CNCThreePointDlg`。 |
+| 2026-11-16 | 主視窗截圖補 CAM 與 CNC 頁面 | 使用者要求：橫式與直式的主視窗截圖，除了啟動後的 CAD 頁面，也要有 CAM 頁面與 CNC（加工）頁面，這兩頁的 UI 比較完整。`CaptureMainWindow.ps1` 加 `-Mode CAD\|CAM\|CNC`（以點選選單切換），`UICheck.bat runtime` 改為語系 × 頁面 × 橫直式共 12 張。CNC 頁面為未連線狀態。 |
 
 ## 4. 後續處理項目
 

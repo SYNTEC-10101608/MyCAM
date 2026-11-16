@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -18,22 +19,28 @@ namespace UICheck
 	//   P1  dialog not centered in DialogPlacement's area (whole window in landscape, CAM area in portrait)
 	//   P2  portrait CAM area is not the part above the CNC host
 	//
-	// Usage: UICheckMainWindow.exe <language> <width> <height> <png> [dialog type name ...]
+	// Usage: UICheckMainWindow.exe <language> <mode> <width> <height> <png> [dialog type name ...]
+	// <mode> is the page clicked before the capture: CAD (start page, nothing clicked), CAM, or CNC (machining).
 	// The first dialog is drawn into the screenshot at its centered location.
 	internal static class MainWindowRunner
 	{
 		[STAThread]
 		static int Main( string[] args )
 		{
-			if( args.Length < 4 ) {
-				Console.WriteLine( "usage: UICheckMainWindow.exe <language> <width> <height> <png> [dialog ...]" );
+			if( args.Length < 5 ) {
+				Console.WriteLine( "usage: UICheckMainWindow.exe <language> <mode> <width> <height> <png> [dialog ...]" );
 				return 2;
 			}
 			string szLanguage = args[ 0 ];
-			Size windowSize = new Size( int.Parse( args[ 1 ] ), int.Parse( args[ 2 ] ) );
-			string szOutFile = Path.GetFullPath( args[ 3 ] );
-			string[] dialogNameArray = new string[ args.Length - 4 ];
-			Array.Copy( args, 4, dialogNameArray, 0, dialogNameArray.Length );
+			string szMenuName;
+			if( MODE_MENU_MAP.TryGetValue( args[ 1 ], out szMenuName ) == false ) {
+				Console.WriteLine( "unknown mode {0}, expected CAD / CAM / CNC", args[ 1 ] );
+				return 2;
+			}
+			Size windowSize = new Size( int.Parse( args[ 2 ] ), int.Parse( args[ 3 ] ) );
+			string szOutFile = Path.GetFullPath( args[ 4 ] );
+			string[] dialogNameArray = new string[ args.Length - 5 ];
+			Array.Copy( args, 5, dialogNameArray, 0, dialogNameArray.Length );
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault( false );
 
@@ -49,14 +56,14 @@ namespace UICheck
 			Form mainForm = (Form)Activator.CreateInstance( m_App.GetType( "MyCAM.StartupForm" ) );
 			mainForm.Shown += ( sender, e ) => mainForm.BeginInvoke( new Action( () =>
 			{
-				m_nResult = Run( mainForm, windowSize, szOutFile, dialogNameArray );
+				m_nResult = Run( mainForm, szMenuName, windowSize, szOutFile, dialogNameArray );
 				mainForm.Close();
 			} ) );
 			Application.Run( mainForm );
 			return m_nResult;
 		}
 
-		static int Run( Form mainForm, Size windowSize, string szOutFile, string[] dialogNameArray )
+		static int Run( Form mainForm, string szMenuName, Size windowSize, string szOutFile, string[] dialogNameArray )
 		{
 			// Form clamps its size to the screen; raising MaximumSize lets the native resize go beyond it
 			mainForm.WindowState = FormWindowState.Normal;
@@ -67,6 +74,12 @@ namespace UICheck
 			if( mainForm.Size != windowSize ) {
 				Console.WriteLine( "FAIL  main window is {0}, expected {1}", mainForm.Size, windowSize );
 				return 1;
+			}
+
+			// switch the page the way the user does, after resizing so the layout already matches the orientation
+			if( szMenuName != null ) {
+				ClickMenu( mainForm, szMenuName );
+				Wait( 2000 );
 			}
 			bool isVertical = mainForm.Height > mainForm.Width;
 			Rectangle area = DialogPlacement.AreaProvider();
@@ -196,6 +209,15 @@ namespace UICheck
 			return null;
 		}
 
+		static void ClickMenu( Form mainForm, string szMenuName )
+		{
+			FieldInfo field = mainForm.GetType().GetField( szMenuName, BindingFlags.Instance | BindingFlags.NonPublic );
+			if( field == null ) {
+				throw new InvalidOperationException( szMenuName + " not found" );
+			}
+			( (ToolStripItem)field.GetValue( mainForm ) ).PerformClick();
+		}
+
 		static Control FindControl( Control parent, string szName )
 		{
 			Control[] foundArray = parent.Controls.Find( szName, true );
@@ -222,6 +244,15 @@ namespace UICheck
 
 		const uint SWP_NOZORDER = 0x0004;
 		const uint SWP_NOACTIVATE = 0x0010;
+
+		// menu item clicked for each mode; null is the start page
+		static readonly Dictionary<string, string> MODE_MENU_MAP =
+			new Dictionary<string, string>( StringComparer.OrdinalIgnoreCase )
+		{
+			{ "CAD", null },
+			{ "CAM", "m_tsmiCAM" },
+			{ "CNC", "m_tsmiCNC" },
+		};
 
 		static Assembly m_App;
 		static Assembly m_Cnc;
