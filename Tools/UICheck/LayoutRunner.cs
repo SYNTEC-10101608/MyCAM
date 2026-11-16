@@ -276,11 +276,7 @@ namespace UICheck
 			}
 			Size textSize = TextRenderer.MeasureText( szText, control.Font, Size.Empty,
 				TextFormatFlags.SingleLine | TextFormatFlags.NoPrefix );
-			// a section title label draws the accent bar before its text
-			ThemedLabel themedLabel = control as ThemedLabel;
-			bool isSectionTitle = themedLabel != null && themedLabel.Role == TextRole.SectionTitle;
-			int nPadding = isButton ? BUTTON_TEXT_PADDING : isCheck ? CHECK_GLYPH_WIDTH :
-				isSectionTitle ? TITLE_INDENT - ThemeMetrics.SECTION_PADDING : 0;
+			int nPadding = isButton ? BUTTON_TEXT_PADDING : isCheck ? CHECK_GLYPH_WIDTH : 0;
 			if( control.AutoSize ) {
 				// an auto-sized control grows; it must stay inside its parent
 				int nRight = control.Left + textSize.Width + nPadding;

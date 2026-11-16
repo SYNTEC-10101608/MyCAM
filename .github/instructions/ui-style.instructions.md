@@ -58,8 +58,6 @@ applyTo: "**/*.cs"
 | `Value` | Consolas 10pt | `TEXT` | 持續變動的機台數值 |
 | `Secondary` | 9pt | `TEXT_SECONDARY` | 單位、提示 |
 | `Error` / `Warning` / `Success` | 9pt | 對應狀態色 | 狀態文字 |
-| `SectionTitle` | 9pt 粗體 + 左側強調短線 | `TEXT` | 無法使用卡片標題的區塊標題（只限 `ThemedLabel`，見 4.5） |
-
 - 靜態的文字角色：使用 `ThemedLabel`，在 Designer 設定 `Role`。
 - 依狀態改變的文字角色：執行時改 `ThemedLabel.Role`；非標籤控制項呼叫 `ThemeText.SetRole( role, control )`。
 
@@ -166,8 +164,12 @@ Form
 ### 4.5 區塊標題
 
 - 語意上是「畫面區塊標題」的文字，一律是 `SectionPanel.Text`，不另放標題 `Label`、不用粗體或放大的 `Label`。
-- 例外：版面依設計座標等比縮放的嵌入式面板（`CNCPanel`、`CNCInfoPanel`，`ResponsiveLayout`），標題是卡片內的
-  標籤，改用 `ThemedLabel.Role = SectionTitle`，外觀與卡片標題相同（強調短線 + 粗體）。
+- 卡片的規格與實作不因所在的畫面類別（對話框、嵌入式面板）而不同，沒有例外；靜態檢查 S8 會檢出卡片標題列內
+  充當標題的粗體標籤。
+- 標題列右側可放只作用於該卡片的動作控制項（按鈕、`CheckBox`、狀態文字）：按鈕高 23、`y = 5`，`CheckBox` `y = 5`，
+  標籤高 24、`y = 4`，皆垂直置中於 32 高的標題列；右緣對齊卡片內容的右緣。
+- 嵌入式面板以 `ResponsiveLayout` 等比縮放時，有標題的卡片保持標題列高度與標題列內的控制項不縮放，只縮放
+  標題列下方的內容；卡片內容第一列同樣從 `y = 36` 起。
 - 只是需要強調的文字（軸名、欄位）用 `ThemedLabel` 的 `Emphasis`；持續變動的機台數值用 `Value`。
 
 ### 4.6 執行時才決定的外觀

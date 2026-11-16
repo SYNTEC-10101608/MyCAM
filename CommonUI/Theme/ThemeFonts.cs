@@ -47,7 +47,6 @@ namespace CommonUI.Theme
 				case TextRole.Success:
 					return m_Body;
 				case TextRole.Emphasis:
-				case TextRole.SectionTitle:
 					return m_Emphasis;
 				case TextRole.Title:
 					return m_Title;

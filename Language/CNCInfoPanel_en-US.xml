@@ -2,12 +2,13 @@
 <ResMap>
 	<Message ID="m_lblAxisHeader" Content="Axis" />
 	<Message ID="m_lblCoordinateHeader" Content="Coord." />
-	<Message ID="m_lblHeightGroupTitle" Content="Height axis info" />
+	<Message ID="m_grpCoordinates" Content="Axis coordinates" />
+	<Message ID="m_grpHeight" Content="Height axis info" />
 	<Message ID="m_lblCapacitanceTitle" Content="Capacitance" />
 	<Message ID="m_lblHeightTitle" Content="Height pos." />
 	<Message ID="m_lblFollowHeightTitle" Content="Follow height" />
 	<Message ID="m_lblActualHeightTitle" Content="Actual height" />
-	<Message ID="m_lblMachiningTitle" Content="Status" />
+	<Message ID="m_grpMachining" Content="Status" />
 	<Message ID="m_lblMainProgramTitle" Content="Program file" />
 	<Message ID="m_lblSpeedTitle" Content="Feed rate" />
 	<Message ID="m_lblPowerTitle" Content="Power" />

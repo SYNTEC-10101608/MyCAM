@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
-	<Message ID="m_lblAuxiliaryTitle" Content="Auxiliary" />
+	<Message ID="m_grpAuxiliary" Content="Auxiliary" />
 	<Message ID="m_btnOuterEquipParameters" Content="Parameters" />
 	<Message ID="m_btnShutter" Content="Shutter" />
 	<Message ID="m_btnAir" Content="Air" />
@@ -8,20 +8,20 @@
 	<Message ID="m_btnLaser" Content="Laser" />
 	<Message ID="m_btnFocus" Content="Focus" />
 	<Message ID="m_btnCalibration" Content="Calibrate" />
-	<Message ID="m_lblJogTitle" Content="Jog axes" />
+	<Message ID="m_grpJog" Content="Jog axes" />
 	<Message ID="JogMode_Continuous" Content="Jog" />
 	<Message ID="JogMode_Inching" Content="Step" />
 	<Message ID="m_btnEndpoint" Content="ManualRTCP" />
-	<Message ID="m_lblHomeTitle" Content="Homing" />
+	<Message ID="m_grpHome" Content="Homing" />
 	<Message ID="m_btnHomeProgram" Content="Program zero" />
 	<Message ID="m_btnHomeMachine" Content="Machine zero" />
 	<Message ID="m_btnSafePosition" Content="Safe pos." />
-	<Message ID="m_lblStrategyTitle" Content="Strategy" />
+	<Message ID="m_grpStrategy" Content="Strategy" />
 	<Message ID="m_btnResumeCutParameters" Content="Parameters" />
 	<Message ID="m_btnDryRun" Content="Dry run" />
 	<Message ID="m_btnResumeCutting" Content="Resume cut" />
 	<Message ID="m_btnHandwheelSimulation" Content="Handwheel" />
-	<Message ID="m_lblMachiningTitle" Content="Machining" />
+	<Message ID="m_grpMachining" Content="Machining" />
 	<Message ID="m_chbThreePointCalibration" Content="Three-point calibration" />
 	<Message ID="m_lblFeedOverrideTitle" Content="Feed override" />
 	<Message ID="m_btnStart" Content="Start" />

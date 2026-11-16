@@ -24,8 +24,6 @@
 			this.m_btnCoordinates = new CommonUI.Controls.ThemedButton();
 			this.m_lblAxisHeader = new CommonUI.Controls.ThemedLabel();
 			this.m_lblCoordinateHeader = new CommonUI.Controls.ThemedLabel();
-			this.m_lblHeightGroupTitle = new CommonUI.Controls.ThemedLabel();
-			this.m_lblMachiningTitle = new CommonUI.Controls.ThemedLabel();
 			this.m_lblMainProgramTitle = new CommonUI.Controls.ThemedLabel();
 			this.m_lblMainProgram = new CommonUI.Controls.ThemedLabel();
 			this.m_lblMachiningStatus = new CommonUI.Controls.ThemedLabel();
@@ -107,9 +105,10 @@
 			this.m_grpCoordinates.Size = new System.Drawing.Size( 202, 228 );
 			this.m_grpCoordinates.TabIndex = 0;
 			this.m_grpCoordinates.TabStop = false;
-			this.m_btnCoordinates.Location = new System.Drawing.Point( 10, 8 );
+			this.m_grpCoordinates.Text = "軸座標";
+			this.m_btnCoordinates.Location = new System.Drawing.Point( 68, 5 );
 			this.m_btnCoordinates.Name = "m_btnCoordinates";
-			this.m_btnCoordinates.Size = new System.Drawing.Size( 124, 24 );
+			this.m_btnCoordinates.Size = new System.Drawing.Size( 124, 23 );
 			this.m_btnCoordinates.TabIndex = 0;
 			this.m_btnCoordinates.Text = "程式座標 ⇄";
 			this.m_lblAxisHeader.Location = new System.Drawing.Point( 10, 34 );
@@ -258,7 +257,6 @@
 			//
 			// m_grpHeight
 			//
-			this.m_grpHeight.Controls.Add( this.m_lblHeightGroupTitle );
 			this.m_grpHeight.Controls.Add( this.m_lblCapacitanceTitle );
 			this.m_grpHeight.Controls.Add( this.m_lblCapacitanceValue );
 			this.m_grpHeight.Controls.Add( this.m_lblCapacitanceUnit );
@@ -275,12 +273,7 @@
 			this.m_grpHeight.Name = "m_grpHeight";
 			this.m_grpHeight.Size = new System.Drawing.Size( 220, 228 );
 			this.m_grpHeight.TabIndex = 1;
-			this.m_lblHeightGroupTitle.Location = new System.Drawing.Point( 10, 8 );
-			this.m_lblHeightGroupTitle.Name = "m_lblHeightGroupTitle";
-			this.m_lblHeightGroupTitle.Role = CommonUI.Theme.TextRole.SectionTitle;
-			this.m_lblHeightGroupTitle.Size = new System.Drawing.Size( 200, 24 );
-			this.m_lblHeightGroupTitle.Text = "調高軸資訊";
-			this.m_lblHeightGroupTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.m_grpHeight.Text = "調高軸資訊";
 			this.m_lblCapacitanceTitle.Location = new System.Drawing.Point( 10, 40 );
 			this.m_lblCapacitanceTitle.Name = "m_lblCapacitanceTitle";
 			this.m_lblCapacitanceTitle.Size = new System.Drawing.Size( 90, 22 );
@@ -350,7 +343,6 @@
 			//
 			// m_grpMachining
 			//
-			this.m_grpMachining.Controls.Add( this.m_lblMachiningTitle );
 			this.m_grpMachining.Controls.Add( this.m_lblMainProgramTitle );
 			this.m_grpMachining.Controls.Add( this.m_lblMainProgram );
 			this.m_grpMachining.Controls.Add( this.m_lblMachiningStatus );
@@ -375,12 +367,7 @@
 			this.m_grpMachining.Name = "m_grpMachining";
 			this.m_grpMachining.Size = new System.Drawing.Size( 234, 228 );
 			this.m_grpMachining.TabIndex = 2;
-			this.m_lblMachiningTitle.Location = new System.Drawing.Point( 10, 8 );
-			this.m_lblMachiningTitle.Name = "m_lblMachiningTitle";
-			this.m_lblMachiningTitle.Role = CommonUI.Theme.TextRole.SectionTitle;
-			this.m_lblMachiningTitle.Size = new System.Drawing.Size( 80, 24 );
-			this.m_lblMachiningTitle.Text = "加工狀態";
-			this.m_lblMachiningTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.m_grpMachining.Text = "加工狀態";
 			this.m_lblMainProgramTitle.Location = new System.Drawing.Point( 10, 40 );
 			this.m_lblMainProgramTitle.Name = "m_lblMainProgramTitle";
 			this.m_lblMainProgramTitle.Size = new System.Drawing.Size( 60, 22 );
@@ -395,7 +382,7 @@
 			this.m_lblMainProgram.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.m_lblMainProgram.UseMnemonic = false;
 			this.m_lblMachiningStatus.AutoEllipsis = true;
-			this.m_lblMachiningStatus.Location = new System.Drawing.Point( 160, 8 );
+			this.m_lblMachiningStatus.Location = new System.Drawing.Point( 160, 4 );
 			this.m_lblMachiningStatus.Name = "m_lblMachiningStatus";
 			this.m_lblMachiningStatus.Role = CommonUI.Theme.TextRole.Secondary;
 			this.m_lblMachiningStatus.Size = new System.Drawing.Size( 64, 24 );
@@ -520,8 +507,6 @@
 		private CommonUI.Controls.ThemedButton m_btnCoordinates;
 		private CommonUI.Controls.ThemedLabel m_lblAxisHeader;
 		private CommonUI.Controls.ThemedLabel m_lblCoordinateHeader;
-		private CommonUI.Controls.ThemedLabel m_lblHeightGroupTitle;
-		private CommonUI.Controls.ThemedLabel m_lblMachiningTitle;
 		private CommonUI.Controls.ThemedLabel m_lblMainProgramTitle;
 		private CommonUI.Controls.ThemedLabel m_lblMainProgram;
 		private CommonUI.Controls.ThemedLabel m_lblMachiningStatus;

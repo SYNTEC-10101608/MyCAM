@@ -148,8 +148,14 @@ namespace CncUI
 					}
 					row.Add( control );
 				}
-				int rowTop = VERTICAL_CARD_GAP;
-				foreach( List<Control> row in rows.Values ) {
+				// a titled card starts its rows below the title bar; card actions in the title bar stay there
+				bool isTitled = !string.IsNullOrEmpty( card.Text );
+				int rowTop = isTitled ? ThemeMetrics.SECTION_TITLE_HEIGHT : VERTICAL_CARD_GAP;
+				foreach( KeyValuePair<int, List<Control>> rowEntry in rows ) {
+					if( isTitled && rowEntry.Key < ThemeMetrics.SECTION_TITLE_HEIGHT ) {
+						continue;
+					}
+					List<Control> row = rowEntry.Value;
 					int rowHeight = 0;
 					foreach( Control control in row ) {
 						int padding = control is Button ? VERTICAL_BUTTON_PADDING : VERTICAL_ROW_PADDING;

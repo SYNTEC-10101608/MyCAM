@@ -65,7 +65,7 @@
 | 檔案 | 用途 |
 | --- | --- |
 | `UICheck.bat` | 入口。無參數：靜態檢查 + 行為比對；`runtime [截圖資料夾]`：另跑執行時版面與主視窗檢查（需先建置 Debug） |
-| `CheckStatic.ps1` + `DesignerParser.ps1` | 靜態檢查 S1～S7（控制項白名單、Designer 不寫外觀屬性、座標規則等） |
+| `CheckStatic.ps1` + `DesignerParser.ps1` | 靜態檢查 S1～S8（控制項白名單、Designer 不寫外觀屬性、座標規則、卡片標題不可用標籤充當等） |
 | `CompareBehavior.ps1` | 與 `master` 比對事件訂閱、控制項屬性等行為面差異 B1～B7 |
 | `CheckRuntimeLayout.ps1` + `LayoutRunner.cs` | 實際開啟所有對話框與 CNC 面板，檢查文字超出、重疊、超出容器 T1～T5，可輸出截圖 |
 | `CaptureMainWindow.ps1` + `MainWindowRunner.cs` | 主視窗截圖與對話框置中檢查 P1、P2。`-Mode CAD\|CAM\|CNC` 切換頁面；直式在橫式螢幕上以 1080×1880 開窗即可，不必旋轉螢幕 |
@@ -86,7 +86,7 @@ Runner 由腳本以 Roslyn `csc` 編譯到 `MyCAM\bin\Debug`（`UICheckRunner.ex
 ### 4.2 待決問題（`UIStyleNotes.md` 第 5 節）
 
 1. `CNCThreePointDlg` 工作點座標 9 欄與誤差容忍欄是否改數值框：目前以「空白」表示未輸入，改了會改變操作，暫留 TextBox。
-2. CNC 面板內的區塊標題是否改為卡片標題：牽動 `ResponsiveLayout` 版面行為，本次只改成強調文字。
+2. ~~CNC 面板內的區塊標題是否改為卡片標題~~：2026-11-16 已改為 `SectionPanel.Text`，`ResponsiveLayout` 保留標題列固定高度。
 3. 泛型基底在 Designer 的表現（同 4.1 第 1 項）。
 
 ### 4.3 收尾

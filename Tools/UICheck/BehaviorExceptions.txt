@@ -27,3 +27,12 @@ B6 ThreePtTransformDlg tbxCAD* TextBox -> Label, confirmed display only (disable
 B6 ThreePtTransformDlg tbxMachine* TextBox -> DebouncedNumericUpDown (3 decimals, same default values); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
 B6 DesignSupportBracketDlg m_lblSection* section title labels moved to the m_sec* section titles
 B6 CNCAlarmPanel m_lblTitle title moved to the m_secAlarm section title
+
+# CNC panel titles become card titles (decision 2026-11-16 "卡片規格不因所在 UI 類別而分裂"); no code referenced them
+B6 CNCPanel m_lblAuxiliaryTitle title moved to m_grpAuxiliary
+B6 CNCPanel m_lblJogTitle title moved to m_grpJog
+B6 CNCPanel m_lblHomeTitle title moved to m_grpHome
+B6 CNCPanel m_lblStrategyTitle title moved to m_grpStrategy
+B6 CNCPanel m_lblMachiningTitle title moved to m_grpMachining
+B6 CNCInfoPanel m_lblHeightGroupTitle title moved to m_grpHeight
+B6 CNCInfoPanel m_lblMachiningTitle title moved to m_grpMachining
