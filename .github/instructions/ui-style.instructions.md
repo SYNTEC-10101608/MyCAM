@@ -45,7 +45,8 @@ applyTo: "**/*.cs"
 | `ACCENT_TINT` / `ACCENT_TINT_STRONG` | `#E8F1F9` / `#CFE2F3` | 選取列 / 工具執行中 |
 | `HOVER` / `PRESSED` | `#ECF0F5` / `#DFE5EC` | 白底控件的滑過 / 按下 |
 | `ERROR` / `WARNING` / `SUCCESS` | `#C42B1C` / `#A86200` / `#107C41` | 狀態 |
-| `CNC_START` / `CNC_HOLD` / `CNC_STOP` | `#3A9E62` / `#E8901E` / `#D6504A` | CNC 加工鈕底色（3.1），各有 `_HOVER` / `_PRESSED` |
+| `CNC_START` / `CNC_HOLD` / `CNC_STOP` | `#2E8452` / `#C26E0A` / `#C2413B` | CNC 加工鈕的框線與文字（3.1） |
+| `CNC_START_TINT` / `CNC_HOLD_TINT` / `CNC_STOP_TINT` | `#E5F3EA` / `#FDF0DE` / `#FBE6E4` | CNC 加工鈕底色，各有 `_HOVER` / `_PRESSED` |
 
 ### 2.2 字型 `ThemeFonts` 與文字角色 `TextRole`
 
@@ -124,9 +125,9 @@ CAM（對話框）與 CNC（嵌入式面板）對嚴重性的分級不同，各�
 | 共用 | `Normal` | 白底 | 其他動作：取消、重設、瀏覽、只把輸入歸零的「清除」、CNC 功能鈕 |
 | 對話框 | `Primary` | 藍色實心 | 讓這個對話框或這一步結束、有確定語意的動作（確定、生成、下一步）；每個容器最多一個，沒有就不設 |
 | 對話框 | `Danger` | 白底紅框紅字 | 可能造成資料遺失的動作：刪除、移除、清除已存在的資料 |
-| CNC 面板 | `Start` | 綠色實心 | 開始加工 |
-| CNC 面板 | `Hold` | 橘色實心 | 暫停、繼續 |
-| CNC 面板 | `Stop` | 紅色實心 | 停止 |
+| CNC 面板 | `Start` | 淡綠底、綠框綠字 | 開始加工 |
+| CNC 面板 | `Hold` | 淡橘底、橘框橘字 | 暫停、繼續 |
+| CNC 面板 | `Stop` | 淡紅底、紅框紅字 | 停止 |
 
 CNC 功能鈕的啟用狀態以 `Active`（藍色實心）或 `Indicator`（燈號）表示。
 
@@ -295,6 +296,9 @@ Form
 | T1–T7 | 文字截斷、超出容器、重疊等；T6 檢查 `Load` 前後版面與 Designer 相同；T7 檢查控制項顯示語系檔的文字。精靈依 `LayoutRunner.cs` 的 `STATE_MAP` 逐一檢查每個狀態 |
 | P1–P4 | 對話框置中（含 `ShowDialog` 開啟的）、CAM 區域、主視窗字族、主視窗中 CNC 面板以實際大小的文字與版面 |
 
+- 產品程式（`MyCAM`、`CncUI`、`CommonUI` 等）不放為了檢查而寫的程式：不加只給檢查用的方法、屬性、旗標或分支。
+  檢查需要的狀態，在檢查程式中呼叫產品本來就有的方法觸發（例：`STATE_MAP` 以 `SetCommandsEnabled` 呈現 CNC 連線後的按鈕），
+  或建立實際的環境（例：連線 CNC 模擬器）。檢查程式只在執行期間放在建置輸出，結束即刪除。
 - 執行時檢查開始前，`SyncLanguage.ps1` 會把過期的語系檔複製到建置輸出（等同 `CopyRef.bat` 的語系部分）。
 - 新增精靈或多狀態的對話框時，把各狀態加到 `STATE_MAP`。
 - 控制項改名時，把「類別 舊名 新名」加到 `RenameMap.txt`，行為比對會先把 `master` 的舊名換成新名再比較。

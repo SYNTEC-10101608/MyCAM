@@ -72,5 +72,8 @@ try {
 }
 finally {
 	Pop-Location
+
+	# the runners only live in the build output while they run, so they are never shipped with it
+	Remove-Item $runner, $hidden -ErrorAction SilentlyContinue
 }
 exit $result
