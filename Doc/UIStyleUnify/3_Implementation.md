@@ -23,32 +23,32 @@
 
 ## 3.2 外觀與行為分層（對應 2.2）
 
-- 新增 `CommonUI.Forms.DialogBase`，插在 `Form` 與 `FormBase` 之間；原本直接繼承 `Form` 的 `AddPathDlg`、`ConnectDlg`、
-  `CNCDlg`、`CNCThreePointDlg`、`CNCOffsetDialog` 與 `LoadingBarDlg` 改繼承 `DialogBase`。`FormBase` 的置中交給 `DialogBase`，
-  `Show( owner )` 的行為不變；`EditDialogBase<T>` 不動。
-- `DialogBase` 固定外框 `FixedToolWindow`、`AutoScaleMode = None`、字型、底色，並把這些屬性標成不序列化；
-  Designer 檔中的 `FormBorderStyle`、`StartPosition`、`MaximizeBox`、`MinimizeBox`、`ShowIcon`、`ShowInTaskbar`、
-  `AutoScaleMode`、`AutoScaleDimensions`、`Font`、`BackColor`、`ForeColor` 全部移除。
-- 新增 `PanelBase`（`CNCPanel`、`CNCInfoPanel`、`CNCAlarmPanel`、`VNCUserControl`）與 `MainWindowBase`（`StartupForm`）。
-- `Show` / `ShowDialog` 的呼叫點一律未改。
+1. 新增 `CommonUI.Forms.DialogBase`，插在 `Form` 與 `FormBase` 之間；原本直接繼承 `Form` 的 `AddPathDlg`、`ConnectDlg`、
+   `CNCDlg`、`CNCThreePointDlg`、`CNCOffsetDialog` 與 `LoadingBarDlg` 改繼承 `DialogBase`。`FormBase` 的置中交給 `DialogBase`，
+   `Show( owner )` 的行為不變；`EditDialogBase<T>` 不動。
+2. `DialogBase` 固定外框 `FixedToolWindow`、`AutoScaleMode = None`、字型、底色，並把這些屬性標成不序列化；
+   Designer 檔中的 `FormBorderStyle`、`StartPosition`、`MaximizeBox`、`MinimizeBox`、`ShowIcon`、`ShowInTaskbar`、
+   `AutoScaleMode`、`AutoScaleDimensions`、`Font`、`BackColor`、`ForeColor` 全部移除。
+3. 新增 `PanelBase`（`CNCPanel`、`CNCInfoPanel`、`CNCAlarmPanel`、`VNCUserControl`）與 `MainWindowBase`（`StartupForm`）。
+4. `Show` / `ShowDialog` 的呼叫點一律未改。
 
 ## 3.3 主題（對應 2.3）
 
-- `CommonUI.Theme`：`ThemeColors`（含 CNC 加工鈕的框線與淡色底 token）、`ThemeFonts`、`ThemeMetrics`、`TextRole`、`ThemeText`、
-  `ThemedToolStripRenderer`、`RoundDrawing`。
-- `MyApp.Initialize()`：讀設定、套用介面語系、`ThemeFonts.Initialize`；`Program.Main` 在建立 `StartupForm` 之前呼叫一次。
-  修正以 zh-CN 啟動時主視窗字族錯誤；`ToolStrip` 不繼承父容器字型，由 `MainWindowBase` 另外設定。
-- 約 180 處寫死顏色移除；資料色改為具名常數並登錄於 `Tools/UICheck/StaticExceptions.txt`
-  （`DesignSupportBracketDlg` X / Y 位置色、`CNCInfoPanel` 五軸色）。
-- 圖示：60 個工具列圖示以 `MyCAM/Resource/IconSource/RenderIcons.ps1` 產生透明背景 PNG（檔名不變），
-  功能工具列 40×40，選單、圖層列、視角列、右鍵選單 20×20。
+1. `CommonUI.Theme`：`ThemeColors`（含 CNC 加工鈕的框線與淡色底 token）、`ThemeFonts`、`ThemeMetrics`、`TextRole`、`ThemeText`、
+   `ThemedToolStripRenderer`、`RoundDrawing`。
+2. `MyApp.Initialize()`：讀設定、套用介面語系、`ThemeFonts.Initialize`；`Program.Main` 在建立 `StartupForm` 之前呼叫一次。
+   修正以 zh-CN 啟動時主視窗字族錯誤；`ToolStrip` 不繼承父容器字型，由 `MainWindowBase` 另外設定。
+3. 約 180 處寫死顏色移除；資料色改為具名常數並登錄於 `Tools/UICheck/StaticExceptions.txt`
+   （`DesignSupportBracketDlg` X / Y 位置色、`CNCInfoPanel` 五軸色）。
+4. 圖示：60 個工具列圖示以 `MyCAM/Resource/IconSource/RenderIcons.ps1` 產生透明背景 PNG（檔名不變），
+   功能工具列 40×40，選單、圖層列、視角列、右鍵選單 20×20。
 
 ## 3.4 Designer 如實呈現（對應 2.4）
 
-- 所有畫面 `InitializeComponent()` 之後不再設定字型、顏色、位置、大小（靜態檢查 S11）；原本在程式中調整尺寸與位置的
-  `DesignSupportBracketDlg` 改用 `SectionStack.FitToPage`，`CNCThreePointDlg` 手算的 `ClientSize` 改用 `SectionStack`。
-- 狀態文字改為 `ThemedLabel.Role`；非標籤控制項以 `ThemeText.SetRole`。
-- 使用者已在 Visual Studio Designer 開啟確認（含繼承泛型基底 `EditDialogBase<T>` 的 22 個對話框，不需非泛型中介類別）。
+1. 所有畫面 `InitializeComponent()` 之後不再設定字型、顏色、位置、大小（靜態檢查 S11）；原本在程式中調整尺寸與位置的
+   `DesignSupportBracketDlg` 改用 `SectionStack.FitToPage`，`CNCThreePointDlg` 手算的 `ClientSize` 改用 `SectionStack`。
+2. 狀態文字改為 `ThemedLabel.Role`；非標籤控制項以 `ThemeText.SetRole`。
+3. 使用者已在 Visual Studio Designer 開啟確認（含繼承泛型基底 `EditDialogBase<T>` 的 22 個對話框，不需非泛型中介類別）。
 
 ## 3.5 `CommonUI`（對應 2.5）
 
@@ -60,61 +60,61 @@
 | `Layout` | `SectionStack`、`DialogPlacement`；`ResponsiveLayout` 由 `CncUI/Helper` 移入並公開 |
 | `Language` | `LanguageApplier`、`CommonTexts`（`Language/CommonUI_<語系>.xml`） |
 
-- 刪除：`CommonUI/Controls/GroupPanel.cs`、`PanelButton.cs`、`MyCAM/Editor/Dialog/DebouncedNumericUpDown.cs`、
-  `SupportPositionRow.cs`、`MyCAM/Editor/MultiSelectTreeView.cs`、`CncUI/Helper/ResponsiveLayout.cs`。
-- `LanguageManager` 新增 `HasString`（不記錄缺少 ID 的查詢），供 `LanguageApplier` 判斷 ID 是否存在。
-- 收官時的整理：`SectionStack`、`DialogPlacement`、`ResponsiveLayout` 移到 `Layout`，`LanguageApplier`、`CommonTexts` 移到 `Language`，
-  `RoundDrawing` 移到 `Theme`，資料夾與 namespace 一致；`ValueRejectedEventArgs` 從 `DebouncedNumericUpDown.cs` 拆成獨立檔案；
-  `CommonUI` 所有公開型別、方法、屬性、事件補 XML 文件註解（token 常數由規範第 2 節的表格說明）。
+1. 刪除：`CommonUI/Controls/GroupPanel.cs`、`PanelButton.cs`、`MyCAM/Editor/Dialog/DebouncedNumericUpDown.cs`、
+   `SupportPositionRow.cs`、`MyCAM/Editor/MultiSelectTreeView.cs`、`CncUI/Helper/ResponsiveLayout.cs`。
+2. `LanguageManager` 新增 `HasString`（不記錄缺少 ID 的查詢），供 `LanguageApplier` 判斷 ID 是否存在。
+3. 收官時的整理：`SectionStack`、`DialogPlacement`、`ResponsiveLayout` 移到 `Layout`，`LanguageApplier`、`CommonTexts` 移到 `Language`，
+   `RoundDrawing` 移到 `Theme`，資料夾與 namespace 一致；`ValueRejectedEventArgs` 從 `DebouncedNumericUpDown.cs` 拆成獨立檔案；
+   `CommonUI` 所有公開型別、方法、屬性、事件補 XML 文件註解（token 常數由規範第 2 節的表格說明）。
 
 ## 3.6 版面（對應 2.6）
 
-- 對話框中的約 20 個 `TableLayoutPanel` 與所有 `FlowLayoutPanel`、`Dock`、`Anchor` 改為 Designer 固定座標，依規範 4.4 的格線；
-  `TabIndex` 依版面重排（`Tools/UICheck/FixTabOrder.ps1`）。
-- 精靈：`AddPathDlg` 4 步、`CNCThreePointDlg` 3 步的步驟卡片以 `SectionPanel.Highlighted` 表示目前步驟；
-  `DesignSupportBracketDlg` 3 頁以 `SectionStack.FitToPage` 換頁，X / Y 支架位置為兩張並排卡片。
-- 使用者回饋調整：`ToolVectorDlg` 三個轉換區塊合併為「控制點移動」一張卡片（高度 705 → 564）；
-  CNC 面板「參數設置」與倍率按鈕對齊。
-- 嵌入式面板：卡片間距、內距、第一列改用 `ThemeMetrics`，新增 `PANEL_MARGIN`、`INFO_ROW_HEIGHT`、`INFO_ROW_PITCH`；
-  移除所有 `DeviceDpi` 計算；設計尺寸 `CNCPanel` 288×756、`CNCInfoPanel` 736×240；
-  區塊標題一律改為 `SectionPanel.Text`，`ResponsiveLayout` 保持標題列固定高度、標題列內的控制項固定靠右。
-- 主視窗：`MainLayout` 的區域配置與比例不變，只新增 `GetDialogArea` 提供 CAM 區域給置中使用；
-  主視窗 Designer 移除寫死的底色與字型（見 3.15）。
+1. 對話框中的約 20 個 `TableLayoutPanel` 與所有 `FlowLayoutPanel`、`Dock`、`Anchor` 改為 Designer 固定座標，依規範 4.4 的格線；
+   `TabIndex` 依版面重排（`Tools/UICheck/FixTabOrder.ps1`）。
+2. 精靈：`AddPathDlg` 4 步、`CNCThreePointDlg` 3 步的步驟卡片以 `SectionPanel.Highlighted` 表示目前步驟；
+   `DesignSupportBracketDlg` 3 頁以 `SectionStack.FitToPage` 換頁，X / Y 支架位置為兩張並排卡片。
+3. 使用者回饋調整：`ToolVectorDlg` 三個轉換區塊合併為「控制點移動」一張卡片（高度 705 → 564）；
+   CNC 面板「參數設置」與倍率按鈕對齊。
+4. 嵌入式面板：卡片間距、內距、第一列改用 `ThemeMetrics`，新增 `PANEL_MARGIN`、`INFO_ROW_HEIGHT`、`INFO_ROW_PITCH`；
+   移除所有 `DeviceDpi` 計算；設計尺寸 `CNCPanel` 288×756、`CNCInfoPanel` 736×240；
+   區塊標題一律改為 `SectionPanel.Text`，`ResponsiveLayout` 保持標題列固定高度、標題列內的控制項固定靠右。
+5. 主視窗：`MainLayout` 的區域配置與比例不變，只新增 `GetDialogArea` 提供 CAM 區域給置中使用；
+   主視窗 Designer 移除寫死的底色與字型（見 3.15）。
 
 ## 3.7 置中（對應 2.7）
 
-- `DialogPlacement.GetCenterLocation` / `MoveToCenter`，CAM 區域由 `StartupForm` 註冊 `AreaProvider`。
-- 刪除原本的三套做法（`MyApp.CalculateDialogCenterLocation`、`LoadingBarDlg` 自算、Designer 的 `CenterParent`）。
-- `DialogShowHelper` 改呼叫 `DialogPlacement`；`CNCDlg` 直式定位到 CNC 區域維持原樣。
+1. `DialogPlacement.GetCenterLocation` / `MoveToCenter`，CAM 區域由 `StartupForm` 註冊 `AreaProvider`。
+2. 刪除原本的三套做法（`MyApp.CalculateDialogCenterLocation`、`LoadingBarDlg` 自算、Designer 的 `CenterParent`）。
+3. `DialogShowHelper` 改呼叫 `DialogPlacement`；`CNCDlg` 直式定位到 CNC 區域維持原樣。
 
 ## 3.8 多語系（對應 2.8）
 
-- 30 個對話框在 `InitializeComponent()` 後呼叫 `ApplyLanguage()`；嵌入式面板與主視窗在套用語系的方法中最先呼叫
-  `ApplyLanguage( languageManager )`。`StartupForm` 原本約 140 行的逐項套用、`CNCAlarmPanel` 的手寫欄位標題改為一次呼叫。
-- 語系 ID 改為控制項名稱，四語系 XML 同步修改；與控制項同名、但其實由程式組成的 ID 刪除或改名（`ToolVectorDlg` 軸名、
-  `LockMSAxisDlg` 格式字串）；刪除 9 個沒有控制項也沒被使用的 ID；主視窗 9 個不符命名的 ID 改為項目名。
-- 語系檔名與類別名不一致者改名：`LockABDlg` → `LockMSAxisDlg`、`CNCThreePointDialog` → `CNCThreePointDlg`。
-- 修正 `ExtendedGCodeDlg` 的 `IS_START_POINT` / `IS_END_POINT` / `IS_MIX_DATA` 與程式使用的 ID 不一致（簡中一直顯示繁中預設字）。
-- 確定鍵統一為「確定」（`CommonText`）；「應用」「生成路徑」「儲存 / 生成」等有明確動作的按鈕保留原文字。
+1. 30 個對話框在 `InitializeComponent()` 後呼叫 `ApplyLanguage()`；嵌入式面板與主視窗在套用語系的方法中最先呼叫
+   `ApplyLanguage( languageManager )`。`StartupForm` 原本約 140 行的逐項套用、`CNCAlarmPanel` 的手寫欄位標題改為一次呼叫。
+2. 語系 ID 改為控制項名稱，四語系 XML 同步修改；與控制項同名、但其實由程式組成的 ID 刪除或改名（`ToolVectorDlg` 軸名、
+   `LockMSAxisDlg` 格式字串）；刪除 9 個沒有控制項也沒被使用的 ID；主視窗 9 個不符命名的 ID 改為項目名。
+3. 語系檔名與類別名不一致者改名：`LockABDlg` → `LockMSAxisDlg`、`CNCThreePointDialog` → `CNCThreePointDlg`。
+4. 修正 `ExtendedGCodeDlg` 的 `IS_START_POINT` / `IS_END_POINT` / `IS_MIX_DATA` 與程式使用的 ID 不一致（簡中一直顯示繁中預設字）。
+5. 確定鍵統一為「確定」（`CommonText`）；「應用」「生成路徑」「儲存 / 生成」等有明確動作的按鈕保留原文字。
 
 ## 3.9 按鈕種類（對應 2.9）
 
-- `ButtonKind`：`Normal`、`Primary`、`Danger`、`Start`、`Hold`、`Stop`；`CNCPanel` 的開始 / 暫停 / 繼續 / 停止套用 CNC 種類
-  （淡色底、同色框線與文字）。
-- 依規則調整 `FlyCutDlg`：「移除」改 `Danger`、「新增」改 `Normal`。
+1. `ButtonKind`：`Normal`、`Primary`、`Danger`、`Start`、`Hold`、`Stop`；`CNCPanel` 的開始 / 暫停 / 繼續 / 停止套用 CNC 種類
+   （淡色底、同色框線與文字）。
+2. 依規則調整 `FlyCutDlg`：「移除」改 `Danger`、「新增」改 `Normal`。
 
 ## 3.10 數值與座標欄位（對應 2.10）
 
-- 改為 `DebouncedNumericUpDown`：`AxisTransformDlg` 原生數值框 6 個與步距 2 個、`AutoSortPathDlg` 2 個、`AddPathDlg` 3 個、
-  `PatternSettingDlg` 12 個、`ThreePtTransformDlg` 機械座標 9 個；範圍與小數位數對應原本的驗證。
-- 改為 `Label`：`ThreePtTransformDlg` CAD 座標 9 個、`CNCThreePointDlg` 圖面點 9 個、`CalibrationREFDlg` 參考點 9 個
-  （逐一確認只顯示、從不輸入）。
-- `CNCThreePointDlg` 工件點 9 欄與誤差容忍欄維持 `TextBox`（已決議，見 2.13）。
+1. 改為 `DebouncedNumericUpDown`：`AxisTransformDlg` 原生數值框 6 個與步距 2 個、`AutoSortPathDlg` 2 個、`AddPathDlg` 3 個、
+   `PatternSettingDlg` 12 個、`ThreePtTransformDlg` 機械座標 9 個；範圍與小數位數對應原本的驗證。
+2. 改為 `Label`：`ThreePtTransformDlg` CAD 座標 9 個、`CNCThreePointDlg` 圖面點 9 個、`CalibrationREFDlg` 參考點 9 個
+   （逐一確認只顯示、從不輸入）。
+3. `CNCThreePointDlg` 工件點 9 欄與誤差容忍欄維持 `TextBox`（已決議，見 2.13）。
 
 ## 3.11 命名（對應 2.11）
 
-- 控制項欄位依型別前綴全域改名 304 筆（`Doc/UIStyleUnify/Tests/RenameMap.txt`），事件方法、`.resx`、四語系 ID 一併改；
-  順帶修正拼字（`Legnth`、`Tolernece`、`SlowDonw`）。
+1. 控制項欄位依型別前綴全域改名 304 筆（`Doc/UIStyleUnify/Tests/RenameMap.txt`），事件方法、`.resx`、四語系 ID 一併改；
+   順帶修正拼字（`Legnth`、`Tolernece`、`SlowDonw`）。
 
 ## 3.12 檢查機制（對應 2.12）
 
@@ -123,32 +123,32 @@
 | `Tools/UICheck`（可持續使用） | `UICheck.bat`、`CheckStatic.ps1`、`DesignerParser.ps1`、`StaticExceptions.txt`、`CheckRuntimeLayout.ps1`、`LayoutRunner.cs`、`CaptureMainWindow.ps1`、`MainWindowRunner.cs`、`HiddenDesktopRun.cs`、`SyncLanguage.ps1`、`FixTabOrder.ps1` |
 | `Doc/UIStyleUnify/Tests`（本議題限定） | `RunIssueChecks.bat`、`CompareBehavior.ps1`、`RenameMap.txt`、`BehaviorExceptions.txt`、`CheckBranchRules.ps1` |
 
-- 收官時把行為比對三個檔案從 `Tools/UICheck` 移到議題資料夾，比對基準由 `master` 改為固定的分支起點 `a4b3826d`；
-  `UICheck.bat` 只留可持續使用的檢查。新增 `CheckBranchRules.ps1`（I1–I9）與入口 `RunIssueChecks.bat`。
-- 靜態檢查 S21 擴充為同時檢查 `CommonUI` 的資料夾、namespace 與元件目錄小節一致。
-- 產品程式盤點：本分支新增到產品專案的成員都由產品程式使用，沒有只給檢查用的方法、屬性、旗標或分支；
-  runner 執行結束即從建置輸出刪除（I9 檢查）。
+1. 收官時把行為比對三個檔案從 `Tools/UICheck` 移到議題資料夾，比對基準由 `master` 改為固定的分支起點 `a4b3826d`；
+   `UICheck.bat` 只留可持續使用的檢查。新增 `CheckBranchRules.ps1`（I1–I9）與入口 `RunIssueChecks.bat`。
+2. 靜態檢查 S21 擴充為同時檢查 `CommonUI` 的資料夾、namespace 與元件目錄小節一致。
+3. 產品程式盤點：本分支新增到產品專案的成員都由產品程式使用，沒有只給檢查用的方法、屬性、旗標或分支；
+   runner 執行結束即從建置輸出刪除（I9 檢查）。
 
 ## 3.13 收官時修正的通用規範問題
 
 最終盤點以 `CheckBranchRules.ps1` 檢查本議題寫入的程式碼，修正：
 
-- 本議題新增或改動的 C# 行超過 120 字元：`CommonUI` 10 處、`MyCAM` / `CncUI` 約 40 處（多為控制項改名後變長的既有行）、
-  檢查 runner 16 處，全部斷行（只換行，不改邏輯）。Designer 檔為 Visual Studio 產生，不在此列。
-- `StartupForm.cs` 一處 `this.m_TreeView` 改為 `m_TreeView`。
-- 內容重寫的 `LockMSAxisDlg_<語系>.xml` 補 UTF-8 BOM；`DesignerParser.ps1`、`BehaviorExceptions.txt` 補檔尾換行。
+1. 本議題新增或改動的 C# 行超過 120 字元：`CommonUI` 10 處、`MyCAM` / `CncUI` 約 40 處（多為控制項改名後變長的既有行）、
+   檢查 runner 16 處，全部斷行（只換行，不改邏輯）。Designer 檔為 Visual Studio 產生，不在此列。
+2. `StartupForm.cs` 一處 `this.m_TreeView` 改為 `m_TreeView`。
+3. 內容重寫的 `LockMSAxisDlg_<語系>.xml` 補 UTF-8 BOM；`DesignerParser.ps1`、`BehaviorExceptions.txt` 補檔尾換行。
 
 ## 3.14 逐檔明細：對話框
 
 所有對話框共同的改動，下表不再重複：
 
-- Designer 檔移除 `FormBorderStyle`、`StartPosition`、`MaximizeBox`、`MinimizeBox`、`ShowIcon`、`ShowInTaskbar`、
-  `AutoScaleMode`、`AutoScaleDimensions`、`Font`、`BackColor`、`ForeColor`；座標依規範 4.4 重排，`TabIndex` 依版面重編。
-- `Button` → `ThemedButton`、`GroupBox` / `GroupPanel` → `SectionPanel`、單位與提示 `Label` → `ThemedLabel`（`Role` 設在 Designer）。
-- 控制項欄位依規範第 3 節改名（`RenameMap.txt`），事件方法與語系 ID 跟著改名。
-- 手寫的 `ApplyResourcesToUI()`（逐一 `TryGetString`）刪除，改為建構子中 `InitializeComponent()` 後呼叫 `ApplyLanguage()`；
-  只為了取表單標題而存在的 `m_LanguageManager` 欄位一併刪除。
-- 確定 / 取消 / 重設鈕改設 `CommonText`，語系檔中對應的按鈕 ID 刪除（文字改取自 `CommonUI_<語系>.xml`）。
+1. Designer 檔移除 `FormBorderStyle`、`StartPosition`、`MaximizeBox`、`MinimizeBox`、`ShowIcon`、`ShowInTaskbar`、
+   `AutoScaleMode`、`AutoScaleDimensions`、`Font`、`BackColor`、`ForeColor`；座標依規範 4.4 重排，`TabIndex` 依版面重編。
+2. `Button` → `ThemedButton`、`GroupBox` / `GroupPanel` → `SectionPanel`、單位與提示 `Label` → `ThemedLabel`（`Role` 設在 Designer）。
+3. 控制項欄位依規範第 3 節改名（`RenameMap.txt`），事件方法與語系 ID 跟著改名。
+4. 手寫的 `ApplyResourcesToUI()`（逐一 `TryGetString`）刪除，改為建構子中 `InitializeComponent()` 後呼叫 `ApplyLanguage()`；
+   只為了取表單標題而存在的 `m_LanguageManager` 欄位一併刪除。
+5. 確定 / 取消 / 重設鈕改設 `CommonText`，語系檔中對應的按鈕 ID 刪除（文字改取自 `CommonUI_<語系>.xml`）。
 
 「尺寸」為 `ClientSize`（分支起點 → 現在）。「程式」只列改名以外的實質改動。
 
@@ -259,12 +259,12 @@
 
 ## 3.19 逐檔明細：資源
 
-- `MyCAM/Resource/*.png`：60 個工具列與選單圖示重繪為透明背景 PNG，檔名不變。
-- 新增 `MyCAM/Resource/IconSource/IconDefinitions.ps1`（圖示的向量定義）與 `RenderIcons.ps1`（產生 PNG）。
+1. `MyCAM/Resource/*.png`：60 個工具列與選單圖示重繪為透明背景 PNG，檔名不變。
+2. 新增 `MyCAM/Resource/IconSource/IconDefinitions.ps1`（圖示的向量定義）與 `RenderIcons.ps1`（產生 PNG）。
 
 ## 3.20 逐檔明細：指引與文件
 
-- `.github/instructions/ui-style.instructions.md`：新增，規範定稿。
-- `.github/copilot-instructions.md`、`CLAUDE.md`：指引目錄加入 UI 風格一列與 `@` 引用。
-- `Doc/UIStyleUnify/`：本議題報告（README 與第 1～6 章）與議題限定測試 `Tests/`；施工期間的
-  `Doc/UIStyle{Draft,Notes,Review,CheckReport,Handoff}.md` 已整併進本報告後刪除。
+1. `.github/instructions/ui-style.instructions.md`：新增，規範定稿。
+2. `.github/copilot-instructions.md`、`CLAUDE.md`：指引目錄加入 UI 風格一列與 `@` 引用。
+3. `Doc/UIStyleUnify/`：本議題報告（README 與第 1～6 章）與議題限定測試 `Tests/`；施工期間的
+   `Doc/UIStyle{Draft,Notes,Review,CheckReport,Handoff}.md` 已整併進本報告後刪除。
