@@ -251,7 +251,8 @@ namespace MyCAM.Editor.Dialog
 
 		void m_numStepDistance_Leave( object sender, EventArgs e )
 		{
-			if( decimal.TryParse( m_numStepDistance.Text, out decimal stepDistance ) && stepDistance > 0 && stepDistance < decimal.MaxValue ) {
+			if( decimal.TryParse( m_numStepDistance.Text, out decimal stepDistance )
+				&& stepDistance > 0 && stepDistance < decimal.MaxValue ) {
 				m_DisplacementIncrement = stepDistance;
 				foreach( var nud in GetDisplacementControls() ) {
 					nud.Increment = stepDistance;

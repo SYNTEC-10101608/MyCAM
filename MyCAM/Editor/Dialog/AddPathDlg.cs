@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
-using CommonUI.Controls;
 using CommonUI.Forms;
+using CommonUI.Layout;
 using MyCAM.App;
 using OCCTool;
 

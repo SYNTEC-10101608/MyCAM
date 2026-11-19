@@ -22,23 +22,30 @@ namespace MyCAM.Editor.Dialog
 		{
 			// circle panel labels
 			m_lblCircleDiameter.Text = m_LanguageManager.TryGetString( "m_lblDiameter", m_lblCircleDiameter.Text );
-			m_lblCircleRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", m_lblCircleRotateAngle.Text );
+			m_lblCircleRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle",
+				m_lblCircleRotateAngle.Text );
 
 			// rectangle panel labels
 			m_lblRectLength.Text = m_LanguageManager.TryGetString( "m_lblLength", m_lblRectLength.Text );
 			m_lblRectWidth.Text = m_LanguageManager.TryGetString( "m_lblWidth", m_lblRectWidth.Text );
-			m_lblRectFilletRadius.Text = m_LanguageManager.TryGetString( "m_lblCornerRadius", m_lblRectFilletRadius.Text );
-			m_lblRectRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", m_lblRectRotateAngle.Text );
+			m_lblRectFilletRadius.Text = m_LanguageManager.TryGetString( "m_lblCornerRadius",
+				m_lblRectFilletRadius.Text );
+			m_lblRectRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle",
+				m_lblRectRotateAngle.Text );
 
 			// runway panel labels
 			m_lblRunwayLength.Text = m_LanguageManager.TryGetString( "m_lblLength", m_lblRunwayLength.Text );
 			m_lblRunwayWidth.Text = m_LanguageManager.TryGetString( "m_lblWidth", m_lblRunwayWidth.Text );
-			m_lblRunwayRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", m_lblRunwayRotateAngle.Text );
+			m_lblRunwayRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle",
+				m_lblRunwayRotateAngle.Text );
 
 			// polygon panel labels
-			m_lblPolygonSideLength.Text = m_LanguageManager.TryGetString( "m_lblSideLength", m_lblPolygonSideLength.Text );
-			m_lblPolygonFilletRadius.Text = m_LanguageManager.TryGetString( "m_lblCornerRadius", m_lblPolygonFilletRadius.Text );
-			m_lblPolygonRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", m_lblPolygonRotateAngle.Text );
+			m_lblPolygonSideLength.Text = m_LanguageManager.TryGetString( "m_lblSideLength",
+				m_lblPolygonSideLength.Text );
+			m_lblPolygonFilletRadius.Text = m_LanguageManager.TryGetString( "m_lblCornerRadius",
+				m_lblPolygonFilletRadius.Text );
+			m_lblPolygonRotateAngle.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle",
+				m_lblPolygonRotateAngle.Text );
 
 			// Update combo box items with localized strings
 			UpdatePathTypeComboBoxItems();
@@ -425,7 +432,8 @@ namespace MyCAM.Editor.Dialog
 
 		void SetRectangleLength()
 		{
-			if( double.TryParse( m_numRecLength.Text, out double length ) && length > 0 && length > 2 * m_RectCornerRadius ) {
+			if( double.TryParse( m_numRecLength.Text, out double length ) && length > 0
+				&& length > 2 * m_RectCornerRadius ) {
 				if( !( m_NewStandardPatternGeomData is RectangleGeomData rectangleGeomData ) ) {
 					return;
 				}
@@ -453,7 +461,8 @@ namespace MyCAM.Editor.Dialog
 
 		void SetRectangleWidth()
 		{
-			if( double.TryParse( m_numRecWidth.Text, out double width ) && width > 0 && width > 2 * m_RectCornerRadius ) {
+			if( double.TryParse( m_numRecWidth.Text, out double width ) && width > 0
+				&& width > 2 * m_RectCornerRadius ) {
 				if( !( m_NewStandardPatternGeomData is RectangleGeomData rectangleGeomData ) ) {
 					return;
 				}
@@ -481,7 +490,8 @@ namespace MyCAM.Editor.Dialog
 
 		void SetRectangleCornerRadius()
 		{
-			if( double.TryParse( m_numRecCornerRadius.Text, out double cornerRadius ) && cornerRadius >= 0 && 2 * cornerRadius < m_RectLength && 2 * cornerRadius < m_RectWidth ) {
+			if( double.TryParse( m_numRecCornerRadius.Text, out double cornerRadius ) && cornerRadius >= 0
+				&& 2 * cornerRadius < m_RectLength && 2 * cornerRadius < m_RectWidth ) {
 				if( !( m_NewStandardPatternGeomData is RectangleGeomData rectangleGeomData ) ) {
 					return;
 				}
@@ -623,7 +633,8 @@ namespace MyCAM.Editor.Dialog
 
 		void SetPolygonSideLength()
 		{
-			if( double.TryParse( m_numPolygonSideLength.Text, out double sideLength ) && sideLength > 0 && sideLength > 2 * m_PolygonCornerRadius ) {
+			if( double.TryParse( m_numPolygonSideLength.Text, out double sideLength ) && sideLength > 0
+				&& sideLength > 2 * m_PolygonCornerRadius ) {
 				if( !( m_NewStandardPatternGeomData is PolygonGeomData polygonGeomData ) ) {
 					return;
 				}
@@ -686,7 +697,8 @@ namespace MyCAM.Editor.Dialog
 
 		void SetPolygonCornerRadius()
 		{
-			if( double.TryParse( m_numPolygonCornerRadius.Text, out double cornerRadius ) && cornerRadius >= 0 && 2 * cornerRadius < m_PolygonSideLength ) {
+			if( double.TryParse( m_numPolygonCornerRadius.Text, out double cornerRadius ) && cornerRadius >= 0
+				&& 2 * cornerRadius < m_PolygonSideLength ) {
 				if( !( m_NewStandardPatternGeomData is PolygonGeomData polygonGeomData ) ) {
 					return;
 				}

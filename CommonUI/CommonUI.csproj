@@ -46,11 +46,9 @@
 	<Compile Include="Controls\RemovableValueRow.cs">
 	  <SubType>Component</SubType>
 	</Compile>
-	<Compile Include="Controls\RoundDrawing.cs" />
 	<Compile Include="Controls\SectionPanel.cs">
 	  <SubType>Component</SubType>
 	</Compile>
-	<Compile Include="Controls\SectionStack.cs" />
 	<Compile Include="Controls\ThemedButton.cs">
 	  <SubType>Component</SubType>
 	</Compile>
@@ -60,19 +58,22 @@
 	<Compile Include="Controls\ThemedLabel.cs">
 	  <SubType>Component</SubType>
 	</Compile>
-	<Compile Include="Forms\CommonTexts.cs" />
+	<Compile Include="Controls\ValueRejectedEventArgs.cs" />
 	<Compile Include="Forms\DialogBase.cs">
 	  <SubType>Form</SubType>
 	</Compile>
-	<Compile Include="Forms\DialogPlacement.cs" />
-	<Compile Include="Forms\LanguageApplier.cs" />
 	<Compile Include="Forms\MainWindowBase.cs">
 	  <SubType>Form</SubType>
 	</Compile>
-	<Compile Include="Forms\ResponsiveLayout.cs" />
 	<Compile Include="Forms\PanelBase.cs">
 	  <SubType>UserControl</SubType>
 	</Compile>
+	<Compile Include="Language\CommonTexts.cs" />
+	<Compile Include="Language\LanguageApplier.cs" />
+	<Compile Include="Layout\DialogPlacement.cs" />
+	<Compile Include="Layout\ResponsiveLayout.cs" />
+	<Compile Include="Layout\SectionStack.cs" />
+	<Compile Include="Theme\RoundDrawing.cs" />
 	<Compile Include="Theme\TextRole.cs" />
 	<Compile Include="Theme\ThemeColors.cs" />
 	<Compile Include="Theme\ThemeFonts.cs" />

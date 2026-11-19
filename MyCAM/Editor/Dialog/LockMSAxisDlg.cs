@@ -266,11 +266,18 @@ namespace MyCAM.Editor
 		// texts that contain the axis names of the machine
 		void InitLocalizedTexts()
 		{
-			m_pnlRotaryDirection.Text = string.Format( m_LanguageManager.TryGetString( "Format_RotaryDirection", "{0}軸方向調整" ), m_RotaryAxisConfig.RotaryAxisName );
-			m_chkLockSlave.Text = string.Format( m_LanguageManager.TryGetString( "Format_LockSlave", "鎖{0}軸" ), m_RotaryAxisConfig.SlaveName );
-			m_lblSlaveAngle.Text = string.Format( m_LanguageManager.TryGetString( "Format_SlaveAngle", "{0}軸角度" ), m_RotaryAxisConfig.SlaveName );
-			m_chkLockMaster.Text = string.Format( m_LanguageManager.TryGetString( "Format_LockMaster", "鎖{0}軸" ), m_RotaryAxisConfig.MasterName );
-			m_lblMasterAngle.Text = string.Format( m_LanguageManager.TryGetString( "Format_MasterAngle", "{0}軸角度" ), m_RotaryAxisConfig.MasterName );
+			m_pnlRotaryDirection.Text = string.Format(
+				m_LanguageManager.TryGetString( "Format_RotaryDirection", "{0}軸方向調整" ),
+				m_RotaryAxisConfig.RotaryAxisName );
+			m_chkLockSlave.Text = string.Format( m_LanguageManager.TryGetString( "Format_LockSlave", "鎖{0}軸" ),
+				m_RotaryAxisConfig.SlaveName );
+			m_lblSlaveAngle.Text = string.Format( m_LanguageManager.TryGetString( "Format_SlaveAngle", "{0}軸角度" ),
+				m_RotaryAxisConfig.SlaveName );
+			m_chkLockMaster.Text = string.Format( m_LanguageManager.TryGetString( "Format_LockMaster", "鎖{0}軸" ),
+				m_RotaryAxisConfig.MasterName );
+			m_lblMasterAngle.Text = string.Format(
+				m_LanguageManager.TryGetString( "Format_MasterAngle", "{0}軸角度" ),
+				m_RotaryAxisConfig.MasterName );
 			m_btnRotaryPos.Text = m_RotaryAxisConfig.RotaryAxisName + " +";
 			m_btnRotaryNeg.Text = m_RotaryAxisConfig.RotaryAxisName + " -";
 		}
@@ -322,7 +329,8 @@ namespace MyCAM.Editor
 			checkLockMasterChanged?.Invoke( false );
 		}
 
-		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "LockMSAxisDlg" );
+		readonly LanguageManager.LanguageManager m_LanguageManager =
+			new LanguageManager.LanguageManager( "LockMSAxisDlg" );
 
 		RotaryAxisConfig m_RotaryAxisConfig;
 		readonly bool m_IsSpindle;

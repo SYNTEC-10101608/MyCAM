@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using CommonUI.Controls;
 using CommonUI.Forms;
+using CommonUI.Layout;
 using CommonUI.Theme;
 using CncManager;
 using CncUI;
@@ -74,7 +75,7 @@ namespace MyCAM
 			m_TreeView.Location = new System.Drawing.Point( 0, 0 );
 			m_TreeView.Name = "m_TreeView";
 			m_TreeView.TabIndex = 0;
-			m_pnlTreeView.Controls.Add( this.m_TreeView );
+			m_pnlTreeView.Controls.Add( m_TreeView );
 
 			// show G54
 			ShowG54Trihedron();
@@ -1743,7 +1744,8 @@ namespace MyCAM
 			ToolStripButton[] layerButtonArray = { m_tsbLayer1, m_tsbLayer2, m_tsbLayer3, m_tsbLayer4, m_tsbLayer5,
 				m_tsbLayer6, m_tsbLayer7, m_tsbLayer8, m_tsbLayer9, m_tsbLayer10 };
 			for( int i = 0; i < layerButtonArray.Length; i++ ) {
-				layerButtonArray[ i ].ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), i + 1 );
+				layerButtonArray[ i ].ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), i
+					+ 1 );
 			}
 		}
 

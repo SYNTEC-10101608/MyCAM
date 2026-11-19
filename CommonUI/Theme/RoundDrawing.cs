@@ -2,10 +2,19 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace CommonUI.Controls
+namespace CommonUI.Theme
 {
+	/// <summary>
+	/// Rounded rectangle paths for the drawing of CommonUI controls.
+	/// </summary>
 	public static class RoundDrawing
 	{
+		/// <summary>
+		/// Create a rounded rectangle path.
+		/// </summary>
+		/// <param name="bounds">Rectangle of the path.</param>
+		/// <param name="radius">Corner radius.</param>
+		/// <returns>The path; the caller disposes it.</returns>
 		public static GraphicsPath CreatePath( RectangleF bounds, float radius )
 		{
 			GraphicsPath path = new GraphicsPath();

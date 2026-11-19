@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace CommonUI.Forms
+namespace CommonUI.Layout
 {
 	/// <summary>
 	/// The only place that calculates where a dialog is centered (see ui-style.instructions.md, section 4.3).

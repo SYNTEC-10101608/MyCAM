@@ -66,7 +66,8 @@ namespace UICheck
 					string szLabel = stateArray[ i ] == null ? type.Name : type.Name + "[" + stateArray[ i ] + "]";
 					string szShotName = stateArray[ i ] == null ? type.Name : type.Name + "_" + ( i + 1 );
 					List<string> problemList;
-					string szError = CheckScreen( type, stateArray[ i ], szShotDir, szShotName, szLanguage, out problemList );
+					string szError = CheckScreen( type, stateArray[ i ], szShotDir, szShotName, szLanguage,
+						out problemList );
 
 					// a screen that cannot be opened is not checked, so it counts as a problem
 					if( szError != null ) {
@@ -97,7 +98,8 @@ namespace UICheck
 					continue;
 				}
 				bool isForm = typeof( Form ).IsAssignableFrom( type );
-				bool isPanel = typeof( UserControl ).IsAssignableFrom( type ) && PANEL_SIZE_MAP.ContainsKey( type.Name );
+				bool isPanel = typeof( UserControl ).IsAssignableFrom( type )
+					&& PANEL_SIZE_MAP.ContainsKey( type.Name );
 				if( isForm || isPanel ) {
 					yield return type;
 				}
@@ -191,7 +193,8 @@ namespace UICheck
 					argArray[ i ] = Enum.Parse( parameterType, szToken );
 				}
 				else {
-					argArray[ i ] = Convert.ChangeType( szToken, parameterType, System.Globalization.CultureInfo.InvariantCulture );
+					argArray[ i ] = Convert.ChangeType( szToken, parameterType,
+						System.Globalization.CultureInfo.InvariantCulture );
 				}
 			}
 			method.Invoke( instance, argArray );
@@ -260,7 +263,8 @@ namespace UICheck
 
 		internal static object CreateInstance( Type type )
 		{
-			ConstructorInfo[] ctorArray = type.GetConstructors( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
+			ConstructorInfo[] ctorArray =
+				type.GetConstructors( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
 			ConstructorInfo ctor = ctorArray.OrderBy( c => c.GetParameters().Length ).FirstOrDefault();
 			if( ctor == null ) {
 				throw new InvalidOperationException( "no constructor" );
@@ -291,11 +295,13 @@ namespace UICheck
 			}
 			if( type.IsValueType ) {
 				// a struct with a constructor gets its members filled, e.g. points that must not be null
-				ConstructorInfo structCtor = type.GetConstructors().OrderByDescending( c => c.GetParameters().Length ).FirstOrDefault();
+				ConstructorInfo structCtor = type.GetConstructors()
+					.OrderByDescending( c => c.GetParameters().Length ).FirstOrDefault();
 				if( structCtor == null || nDepth > 3 ) {
 					return Activator.CreateInstance( type );
 				}
-				return structCtor.Invoke( structCtor.GetParameters().Select( p => CreateArgument( p.ParameterType, nDepth + 1 ) ).ToArray() );
+				return structCtor.Invoke( structCtor.GetParameters().Select( p => CreateArgument( p.ParameterType,
+					nDepth + 1 ) ).ToArray() );
 			}
 			if( type.IsInterface || type.IsAbstract || nDepth > 3 ) {
 				return FindImplementation( type, nDepth );
@@ -307,7 +313,8 @@ namespace UICheck
 			if( ctor == null ) {
 				return null;
 			}
-			object[] argArray = ctor.GetParameters().Select( p => CreateArgument( p.ParameterType, nDepth + 1 ) ).ToArray();
+			object[] argArray = ctor.GetParameters().Select( p => CreateArgument( p.ParameterType, nDepth
+				+ 1 ) ).ToArray();
 			return ctor.Invoke( argArray );
 		}
 
@@ -315,7 +322,8 @@ namespace UICheck
 		{
 			// pick the first concrete type with a parameterless constructor
 			Type implementation = SafeGetTypes( type.Assembly ).FirstOrDefault( t => t.IsClass && !t.IsAbstract &&
-				!t.ContainsGenericParameters && type.IsAssignableFrom( t ) && t.GetConstructor( Type.EmptyTypes ) != null );
+				!t.ContainsGenericParameters && type.IsAssignableFrom( t )
+					&& t.GetConstructor( Type.EmptyTypes ) != null );
 			return implementation == null ? null : Activator.CreateInstance( implementation );
 		}
 

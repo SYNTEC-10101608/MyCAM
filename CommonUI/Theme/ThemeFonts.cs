@@ -24,12 +24,24 @@ namespace CommonUI.Theme
 			CreateFonts();
 		}
 
+		/// <summary>
+		/// Font of <see cref="TextRole.Body"/>, also of Secondary and the status roles.
+		/// </summary>
 		public static Font Body => m_Body;
 
+		/// <summary>
+		/// Font of <see cref="TextRole.Emphasis"/>.
+		/// </summary>
 		public static Font Emphasis => m_Emphasis;
 
+		/// <summary>
+		/// Font of <see cref="TextRole.Title"/>.
+		/// </summary>
 		public static Font Title => m_Title;
 
+		/// <summary>
+		/// Font of <see cref="TextRole.Value"/>.
+		/// </summary>
 		public static Font Value => m_Value;
 
 		/// <summary>

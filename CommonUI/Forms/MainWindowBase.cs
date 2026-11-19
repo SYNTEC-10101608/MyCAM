@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using CommonUI.Language;
 using CommonUI.Theme;
 
 namespace CommonUI.Forms
@@ -12,6 +13,9 @@ namespace CommonUI.Forms
 	/// </summary>
 	public class MainWindowBase : Form
 	{
+		/// <summary>
+		/// Apply the main window appearance and the theme renderer of menus and tool strips.
+		/// </summary>
 		public MainWindowBase()
 		{
 			// every menu and tool bar in the application draws with the theme
@@ -39,8 +43,8 @@ namespace CommonUI.Forms
 
 		/// <summary>
 		/// Apply the language texts by name, like <see cref="DialogBase"/>: caption controls, menu and tool bar items
-		/// (tool tips from "&lt;name&gt;_ToolTip"), including the context menus of the controls. The main window calls it
-		/// at start-up and when the language changes; runtime texts are set after it.
+		/// (tool tips from "&lt;name&gt;_ToolTip"), including the context menus of the controls.
+		/// The main window calls it at start-up and when the language changes; runtime texts are set after it.
 		/// </summary>
 		protected void ApplyLanguage( LanguageManager.LanguageManager languageManager )
 		{

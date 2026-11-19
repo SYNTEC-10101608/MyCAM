@@ -1,7 +1,8 @@
 ﻿using System.Windows.Forms;
 using CommonUI.Controls;
+using CommonUI.Forms;
 
-namespace CommonUI.Forms
+namespace CommonUI.Language
 {
 	/// <summary>
 	/// Apply language texts by control name (see ui-style.instructions.md, section 7).
@@ -42,7 +43,8 @@ namespace CommonUI.Forms
 		/// </summary>
 		/// <param name="itemCollection">Items of a menu, tool bar or context menu.</param>
 		/// <param name="languageManager">Language file of the screen.</param>
-		public static void ApplyToItems( ToolStripItemCollection itemCollection, LanguageManager.LanguageManager languageManager )
+		public static void ApplyToItems( ToolStripItemCollection itemCollection,
+			LanguageManager.LanguageManager languageManager )
 		{
 			// nothing to apply
 			if( itemCollection == null || languageManager == null ) {

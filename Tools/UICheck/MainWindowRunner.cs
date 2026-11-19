@@ -6,7 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using CommonUI.Forms;
+using CommonUI.Layout;
 
 namespace UICheck
 {
@@ -33,7 +33,8 @@ namespace UICheck
 		static int Main( string[] args )
 		{
 			if( args.Length < 5 ) {
-				Console.WriteLine( "usage: UICheckMainWindow.exe <language> <mode> <width> <height> <png> [dialog ...]" );
+				Console.WriteLine(
+					"usage: UICheckMainWindow.exe <language> <mode> <width> <height> <png> [dialog ...]" );
 				return 2;
 			}
 			string szLanguage = args[ 0 ];
@@ -119,7 +120,8 @@ namespace UICheck
 		{
 			if( isVertical == false ) {
 				if( area != mainForm.Bounds ) {
-					Console.WriteLine( "FAIL  P2 landscape dialog area {0} is not the window {1}", area, mainForm.Bounds );
+					Console.WriteLine( "FAIL  P2 landscape dialog area {0} is not the window {1}", area,
+						mainForm.Bounds );
 					return 1;
 				}
 				return 0;
@@ -215,7 +217,8 @@ namespace UICheck
 				Rectangle workingArea = Screen.FromControl( mainForm ).WorkingArea;
 				bool isInsideScreen = workingArea.Contains( new Rectangle( expected, dialog.Size ) );
 				if( isInsideScreen && shownLocation != expected ) {
-					Console.WriteLine( "FAIL  P1 {0} (ShowDialog) at {1}, expected {2}", szName, shownLocation, expected );
+					Console.WriteLine( "FAIL  P1 {0} (ShowDialog) at {1}, expected {2}", szName, shownLocation,
+						expected );
 					return 1;
 				}
 				Console.WriteLine( "OK    {0} (ShowDialog) at {1}{2}", szName, shownLocation,
@@ -242,7 +245,8 @@ namespace UICheck
 		{
 			int nProblemCount = 0;
 			if( mainForm.Font.Name != m_szExpectedFamily ) {
-				Console.WriteLine( "FAIL  P3 main window font {0}, expected {1}", mainForm.Font.Name, m_szExpectedFamily );
+				Console.WriteLine( "FAIL  P3 main window font {0}, expected {1}", mainForm.Font.Name,
+					m_szExpectedFamily );
 				nProblemCount++;
 			}
 			nProblemCount += CheckChildFontFamily( mainForm );
@@ -290,11 +294,13 @@ namespace UICheck
 			foreach( ToolStripItem item in itemList ) {
 				string szText;
 				if( textMap.TryGetValue( item.Name, out szText ) && item.Text != szText ) {
-					Console.WriteLine( "FAIL  P5 {0} shows '{1}', language file has '{2}'", item.Name, item.Text, szText );
+					Console.WriteLine( "FAIL  P5 {0} shows '{1}', language file has '{2}'", item.Name, item.Text,
+						szText );
 					nProblemCount++;
 				}
 				if( textMap.TryGetValue( item.Name + "_ToolTip", out szText ) && item.ToolTipText != szText ) {
-					Console.WriteLine( "FAIL  P5 {0} tool tip '{1}', language file has '{2}'", item.Name, item.ToolTipText, szText );
+					Console.WriteLine( "FAIL  P5 {0} tool tip '{1}', language file has '{2}'", item.Name,
+						item.ToolTipText, szText );
 					nProblemCount++;
 				}
 			}
@@ -386,7 +392,8 @@ namespace UICheck
 			// dashed outline of the area dialogs are centered in
 			using( Pen pen = new Pen( Color.FromArgb( 196, 43, 28 ), 3 ) ) {
 				pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
-				Rectangle local = new Rectangle( area.Left - mainForm.Left, area.Top - mainForm.Top, area.Width, area.Height );
+				Rectangle local = new Rectangle( area.Left - mainForm.Left, area.Top - mainForm.Top, area.Width,
+					area.Height );
 				local.Inflate( -2, -2 );
 				graphics.DrawRectangle( pen, local );
 			}
@@ -448,7 +455,8 @@ namespace UICheck
 		static extern bool PrintWindow( IntPtr hWnd, IntPtr hdc, uint nFlags );
 
 		[DllImport( "user32.dll" )]
-		static extern bool SetWindowPos( IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags );
+		static extern bool SetWindowPos( IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy,
+			uint uFlags );
 
 		const uint SWP_NOZORDER = 0x0004;
 		const uint SWP_NOACTIVATE = 0x0010;

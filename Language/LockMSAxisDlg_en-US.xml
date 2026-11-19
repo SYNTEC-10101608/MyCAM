@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
   <Message ID="LockMSAxisDlg" Content="Axis Lock Settings" />
   <Message ID="m_lblMode" Content="Mode" />

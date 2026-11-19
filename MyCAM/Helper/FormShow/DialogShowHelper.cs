@@ -1,5 +1,5 @@
 ﻿using System.Windows.Forms;
-using CommonUI.Forms;
+using CommonUI.Layout;
 
 namespace MyCAM.Helper.FormShow
 {

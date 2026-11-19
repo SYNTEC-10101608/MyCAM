@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using CommonUI.Forms;
+using CommonUI.Layout;
 using MyCAM.App;
 using VNCFormsApp;
 

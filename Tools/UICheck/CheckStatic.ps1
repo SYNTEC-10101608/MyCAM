@@ -27,7 +27,8 @@
 #   S18 alignment in a card: the first input of each row starts at the same x; a unit label is 6 after its input
 #   S19 main window designer: white list of types, no appearance except the data color swatches
 #   S20 data colors: every "static readonly Color" constant is a registered data color (StaticExceptions.txt)
-#   S21 every public type of CommonUI is listed in the component catalog (section 9)
+#   S21 every public type of CommonUI is listed in the component catalog (section 9), in the subsection of its folder;
+#       a file in CommonUI\<Folder> is in namespace CommonUI.<Folder>
 #   S22 title bar of a titled card (section 4.5): button 23 high at y=5, check box at y=5, label 24 high at y=4,
 #       the rightmost control ends at the content edge
 #   S23 code creates no control outside the white list (Button, GroupBox, NumericUpDown, TextBox ...)
@@ -39,7 +40,8 @@ $ErrorActionPreference = "Stop"
 
 $SCREEN_DIRS = @( "MyCAM\Editor\Dialog", "MyCAM\CNC", "CncUI\Panel", "CncUI\Dialog" )
 $CODE_SCOPE = @( "MyCAM\Editor\Dialog", "MyCAM\Editor\Action", "MyCAM\Editor\ViewManager.cs", "MyCAM\LogManager",
-	"MyCAM\StartupForm.cs", "MyCAM\Layout", "MyCAM\CNC", "CncUI", "CommonUI\Controls", "CommonUI\Forms" )
+	"MyCAM\StartupForm.cs", "MyCAM\Layout", "MyCAM\CNC", "CncUI", "CommonUI\Controls", "CommonUI\Forms",
+	"CommonUI\Layout", "CommonUI\Language" )
 $LANGUAGES = @( "zh-TW", "zh-CN", "en-US", "ru-RU" )
 
 $ALLOWED_TYPES = @(
@@ -761,16 +763,35 @@ if (-not $Only -or $mainScreen.ClassName -like $Only) {
 	}
 }
 
-# S21 the component catalog of the guideline lists every public type of CommonUI
+# S21 the component catalog of the guideline lists every public type of CommonUI, in the subsection of its folder;
+# the folder is the namespace (CommonUI\<Folder> is CommonUI.<Folder>)
 $guideline = Get-Content (Join-Path $Root ".github\instructions\ui-style.instructions.md") -Raw -Encoding UTF8
 $catalogIndex = $guideline.IndexOf("## 9. CommonUI")
 $catalog = if ($catalogIndex -ge 0) { $guideline.Substring($catalogIndex) } else { "" }
-foreach ($file in Get-ChildItem (Join-Path $Root "CommonUI") -Filter "*.cs" -Recurse | Where-Object { $_.FullName -notmatch "\\(bin|obj|Properties)\\" -and $_.Name -notlike "*.Designer.cs" }) {
+
+# each subsection names its namespace in the heading: "### 9.n <title>（`CommonUI.<Folder>`）"
+$catalogSectionMap = @{}
+foreach ($section in [regex]::Split($catalog, "(?m)^(?=### )")) {
+	if ($section -match "^### [^\r\n]*``(CommonUI\.\w+)``") {
+		$catalogSectionMap[$Matches[1]] = $section
+	}
+}
+$commonUIRoot = Join-Path $Root "CommonUI"
+foreach ($file in Get-ChildItem $commonUIRoot -Filter "*.cs" -Recurse | Where-Object { $_.FullName -notmatch "\\(bin|obj|Properties)\\" -and $_.Name -notlike "*.Designer.cs" }) {
 	$code = Get-Content $file.FullName -Raw -Encoding UTF8
+	$szFolder = $file.DirectoryName.Substring($commonUIRoot.Length).Trim("\")
+	$szNamespace = "CommonUI.$szFolder"
+	if ($code -notmatch "(?m)^namespace $([regex]::Escape($szNamespace))\s*$") {
+		Report "S21" $file.Name "*" "a file in CommonUI\$szFolder must be in namespace $szNamespace"
+	}
+	if (-not $catalogSectionMap.ContainsKey($szNamespace)) {
+		Report "S21" $file.Name "*" "the component catalog (guideline section 9) has no subsection for $szNamespace"
+		continue
+	}
 	foreach ($match in [regex]::Matches($code, "public (static |sealed |partial |abstract )*(class|enum|struct|interface) (\w+)")) {
 		$szType = $match.Groups[3].Value
-		if ($catalog -notmatch "``$szType``") {
-			Report "S21" $szType "*" "public CommonUI type is not listed in the component catalog (guideline section 9)"
+		if ($catalogSectionMap[$szNamespace] -notmatch "``$szType``") {
+			Report "S21" $szType "*" "public CommonUI type is not listed in the catalog subsection of $szNamespace (guideline section 9)"
 		}
 	}
 }

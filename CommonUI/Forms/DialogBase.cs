@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using CommonUI.Language;
+using CommonUI.Layout;
 using CommonUI.Theme;
 
 namespace CommonUI.Forms
@@ -14,6 +16,9 @@ namespace CommonUI.Forms
 	/// </summary>
 	public class DialogBase : Form
 	{
+		/// <summary>
+		/// Apply the dialog appearance: frame, font, colors and no auto scaling.
+		/// </summary>
 		public DialogBase()
 		{
 			base.AutoScaleMode = AutoScaleMode.None;
@@ -149,7 +154,8 @@ namespace CommonUI.Forms
 
 		/// <summary>
 		/// Apply the language texts: the dialog title by the class name, each caption control by its name.
-		/// Every dialog calls it right after InitializeComponent(), the base constructor runs before the controls exist.
+		/// Every dialog calls it right after InitializeComponent(), because the base constructor runs before the
+		/// controls exist.
 		/// </summary>
 		protected void ApplyLanguage()
 		{
