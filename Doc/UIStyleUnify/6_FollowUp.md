@@ -4,11 +4,12 @@
 
 | # | 事項 | 說明 |
 | --- | --- | --- |
-| 1 | 議題編號 | 決定後把分支 `AUTO-TBD_f_UIStyleUnify` 以 `git branch -m` 改名，並更新 [README.md](README.md) 的議題編號 |
+| 1 | 議題編號 | 已完成（2026-11-19）：AUTO-23254，分支改名為 `AUTO-23254_f_UIStyleUnify`；規範與 `StaticExceptions.txt` 的出處改寫議題編號 |
 | 2 | 人工確認 | [5_Verification.md](5_Verification.md) 5.3 的第 2～4 項（Designer、實機數值框、CNC 連線） |
 | 3 | 同步 `master` | `master` 已在分支起點之後前進兩個 commit（`8db7be81`、`7829c338`，只改開發環境檔案，與本議題沒有交集）。合併前 merge / rebase，重新建置，跑 `Tools\UICheck\UICheck.bat runtime` 與 `Doc\UIStyleUnify\Tests\RunIssueChecks.bat` |
 | 4 | 推送 | 尚未推送；推送前確認 remote（`origin` GitLab / `github` 個人）與分支 |
 | 5 | 語系檔部署 | 語系 ID 改名、`LockABDlg` / `CNCThreePointDialog` 語系檔改名；部署或更新建置輸出時重跑 `CopyRef.bat`，並移除建置輸出中舊檔名的語系檔。客製語系檔（`Custom/Language`）的舊 ID 會失效（已決議接受） |
+| 6 | 移除過程文件 | 過程文件不合併（2026-11-19 決議）：合併前另加一個 commit 刪除 `Doc/UIStyleUnify/`（含 `Tests/`），文件移到雲端空間；只留 AI 指引與專案指引，兩者只引用議題編號。檢查保留的檔案沒有引用 `Doc/UIStyleUnify` |
 
 ## 6.2 範圍外的後續議題
 

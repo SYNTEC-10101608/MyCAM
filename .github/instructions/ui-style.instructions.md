@@ -6,7 +6,7 @@ applyTo: "**/*.cs"
 
 適用於 `MyCAM`、`CncUI`、`CommonUI` 的所有畫面（主視窗、嵌入式面板、對話框、進度視窗）。
 另須遵守 [通用規則](coding-style-general.instructions.md) 與 [C#](coding-style-csharp.instructions.md)。
-設計緣由、決議過程與檢查腳本的維護方式見議題報告 `Doc/UIStyleUnify/`（架構規劃、討論紀錄、測試驗證）。
+本規範由議題 AUTO-23254（UI 風格統一）制定。
 
 不在本規範範圍：`MessageBox`、開檔 / 存檔對話框、授權視窗（`FALicenseChecker`）。
 
@@ -277,7 +277,7 @@ Form
 
 ## 8. 檢查腳本（`Tools/UICheck`）
 
-本節的檢查是規範的一部分，持續維護；腳本結構、例外登錄與維護注意事項見 `Doc/UIStyleUnify/5_Verification.md`。
+本節的檢查是規範的一部分，持續維護；維護方式見 8.1。
 
 | 指令 | 內容 |
 | --- | --- |
@@ -314,6 +314,44 @@ Form
 - 產品程式（`MyCAM`、`CncUI`、`CommonUI` 等）不放為了檢查而寫的程式：不加只給檢查用的方法、屬性、旗標或分支。
   檢查需要的狀態，在檢查程式中呼叫產品本來就有的方法觸發（例：`STATE_MAP` 以 `SetCommandsEnabled` 呈現 CNC 連線後的按鈕），
   或建立實際的環境（例：連線 CNC 模擬器）。檢查程式只在執行期間放在建置輸出，結束即刪除。
+
+### 8.1 維護
+
+| 檔案 | 用途 |
+| --- | --- |
+| `UICheck.bat` | 入口。無參數：靜態檢查；`runtime [截圖資料夾]`：另跑執行時版面與主視窗（需先建置 Debug） |
+| `CheckStatic.ps1`、`DesignerParser.ps1` | 靜態檢查 S1–S23 與 Designer 檔解析 |
+| `CheckRuntimeLayout.ps1`、`LayoutRunner.cs` | 執行時檢查 T1–T7 |
+| `CaptureMainWindow.ps1`、`MainWindowRunner.cs` | 主視窗截圖與 P1–P5 |
+| `HiddenDesktopRun.cs` | 讓 runner 在隱藏桌面執行；兩個 `.ps1` 加 `-Visible` 改回一般桌面 |
+| `SyncLanguage.ps1` | 執行時檢查前，把建置輸出中缺少或過期的語系檔從 `Language/` 複製過去 |
+| `FixTabOrder.ps1` | 依版面重編 `TabIndex`（修正 S10 的工具，不是檢查） |
+| `StaticExceptions.txt` | 資料色登錄、承載單一遠端內容的視窗、已決議的例外 |
+
+- **規則與規範同步**：本規範的規則改了，`CheckStatic.ps1` / `LayoutRunner.cs` / `MainWindowRunner.cs` 的對應規則要一起改，
+  並更新本節的規則表與腳本開頭的註解。新增規則時，故意做出違規的程式確認能檢出（反向測試），再還原。
+- **畫面資料夾**：靜態檢查只掃 `CheckStatic.ps1` 的 `$SCREEN_DIRS`（Designer 檔）與 `$CODE_SCOPE`（程式碼）；
+  `FixTabOrder.ps1` 也有一份 `$SCREEN_DIRS`。畫面放到新的資料夾時，兩處都要加。
+- **執行時檢查自動涵蓋新畫面**：runner 以反射找出 `MyCAM.exe`、`CncUI.dll` 中所有對話框與嵌入式面板
+  （`SKIP_TYPE_LIST` 除外）。建構子需要參數的畫面，runner 依參數型別產生預設值；無法開啟的畫面算失敗，不會被略過。
+- **多狀態畫面**：`STATE_MAP` 的格式為「方法名 參數…」，以反射呼叫產品既有的方法。
+  產品中被 `STATE_MAP` 呼叫的方法改名或改參數時，`STATE_MAP` 要一起改，否則該畫面會開啟失敗。
+- **置中檢查的對話框**：`CaptureMainWindow.ps1` 的 `-Dialogs`（`Show`）與 `-ModalDialogs`（`ShowDialog`）各列幾個代表；
+  開啟方式改變時同步調整。
+- **例外**：`StaticExceptions.txt` 格式為「規則 類別 控制項 理由」，理由寫明決議出處（議題編號與日期）。
+  新增資料色常數時登錄 S20。
+- **元件目錄**：`CommonUI` 新增公開型別時，放進所屬類別的資料夾，並在第 9 節該類別的小節加一列（S21）；
+  新增類別時，同時新增資料夾、namespace 與小節（小節標題寫 `` （`CommonUI.<類別>`） ``）。
+- **語系檔**：執行時檢查讀的是建置輸出的語系檔；`SyncLanguage.ps1` 會先同步，平常開發改了 `Language/` 仍要跑 `CopyRef.bat`。
+- **runner 的編譯**：兩個 `.ps1` 以 Visual Studio 的 Roslyn `csc` 把 runner 編譯到 `MyCAM\bin\<組態>`
+  （才能以與 `MyCAM.exe` 相同的方式找到語系檔與相依組件），執行結束即刪除；
+  runner 參考的組件改名或新增相依時，更新 `.ps1` 中的 `/r:` 清單。
+- **截圖**：輸出到指定的截圖資料夾，對話框為 `<語系>\<畫面>[_<狀態>].png`，主視窗為
+  `MainWindow_<語系>_<頁面>_<Landscape|Portrait>.png`（紅色虛線框為對話框置中的區域）；截圖資料夾不進版控。
+- **已知限制**：對話框截圖用 `DrawToBitmap`，執行時才填入的文字顯示的是 Designer 文字；隱藏桌面上 3D 檢視區（OpenGL）
+  是空白的，會出現 `wglMakeCurrent` 錯誤訊息，可忽略；`CNCDlg` 需連線，不由腳本開啟。
+  嵌入式面板的卡片座標沒有靜態檢查（由 T1–T4、P4 在實際大小下檢查）；執行時才填入的文字在 zh-CN 下的寬度、
+  CNC 連線中的狀態，需要假資料或實際連線確認。
 
 ## 9. CommonUI 元件目錄
 
