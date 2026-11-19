@@ -177,3 +177,11 @@ v0.3 外框的定義、只顯示座標的欄位改為標籤、語系 ID 以控�
 | 2026-11-16 | `CalibrationREFDlg` 的 KeyDown 在 Designer 與 `Init()` 重複訂閱，按 Delete 觸發兩次 | 既有行為，列後續 |
 | 2026-11-16 | 數值框取代 `TextBox` 的細節差異：可用上下鍵 / 滾輪；小數位數固定；`ThreePtTransformDlg` 機械座標不會再出現空白 | 屬已決議的統一，記在 `BehaviorExceptions.txt` 與後續事項 |
 | 2026-11-17 | `master` 在分支起點之後前進兩個 commit（`8db7be81`、`7829c338`），只改開發環境檔案（`.claude/settings.json`、`project-overview.instructions.md`、`.gitignore`、`.worktreeinclude`、`CopyRef.bat`），與本議題的檔案沒有交集 | 合併前 merge / rebase 後重跑檢查（[6_FollowUp.md](6_FollowUp.md)） |
+
+## 4.7 收官後的決議（2026-11-19）
+
+| 日期 | 問題 | 決議 |
+| --- | --- | --- |
+| 2026-11-19 | 第 3 章只寫到大方向，審查時無法逐檔對照 | 補上逐檔異動明細（3.14～3.20） |
+| 2026-11-19 | 議題過程文件是否合併 | 不合併。合併前另加一個 commit 刪除 `Doc/UIStyleUnify/`（含議題限定測試），文件移到雲端空間；最終只留 AI 指引與專案指引，兩者不引用過程文件，出處只寫議題編號。檢查腳本的維護注意事項因此移進規範 8.1 |
+| 2026-11-19 | 議題編號 | AUTO-23254，分支改名為 `AUTO-23254_f_UIStyleUnify` |

@@ -18,6 +18,6 @@ S19 StartupForm m_tsbNeedProcess machining legend swatch (section 6)
 S11 CNCDlg line* the remote screen dialog takes the size of the remote VNC screen and is placed on the CNC area
 S11 VNCUserControl line* the VNC view takes the resolution of the remote screen
 
-# ---- decided exceptions (Doc/UIStyleUnify/4_Discussion.md)
+# ---- decided exceptions (issue AUTO-23254)
 S1 CNCThreePointDlg m_txtWorkpiece* an empty field means the point is not entered yet and a numeric box cannot stay empty (decision 2026-11-16; a nullable numeric box is a follow-up)
 S1 CNCThreePointDlg m_txtTolerance same empty-text semantics as the workpiece fields (decision 2026-11-16)
