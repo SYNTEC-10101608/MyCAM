@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using CommonUI.Controls;
-using CommonUI.Forms;
+using CommonUI.Layout;
 using MyCAM.App;
 using MyCAM.Data;
 

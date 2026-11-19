@@ -11,6 +11,9 @@ namespace CommonUI.Controls
 	/// </summary>
 	public class SectionPanel : Panel
 	{
+		/// <summary>
+		/// Create a card with the theme surface, border and title bar.
+		/// </summary>
 		public SectionPanel()
 		{
 			SetStyle( ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint |

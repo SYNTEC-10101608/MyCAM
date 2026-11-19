@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using CommonUI.Forms;
+using CommonUI.Language;
 using CommonUI.Theme;
 
 namespace CommonUI.Controls
@@ -14,6 +14,9 @@ namespace CommonUI.Controls
 	/// </summary>
 	public class ThemedButton : Button
 	{
+		/// <summary>
+		/// Create a button drawn by its Kind in the theme colors.
+		/// </summary>
 		public ThemedButton()
 		{
 			SetStyle( ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint |
@@ -170,7 +173,9 @@ namespace CommonUI.Controls
 			// primary buttons and active toggles are filled with the accent
 			bool isAccent = m_Kind == ButtonKind.Primary || m_isActive;
 			if( isAccent ) {
-				fill = m_isPressed ? ThemeColors.ACCENT_PRESSED : m_isHovered ? ThemeColors.ACCENT_HOVER : ThemeColors.ACCENT;
+				fill = m_isPressed ? ThemeColors.ACCENT_PRESSED
+					: m_isHovered ? ThemeColors.ACCENT_HOVER
+					: ThemeColors.ACCENT;
 				border = fill;
 				text = ThemeColors.TEXT_ON_ACCENT;
 				return;
@@ -272,7 +277,8 @@ namespace CommonUI.Controls
 
 		TextFormatFlags GetTextFlags()
 		{
-			TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.EndEllipsis;
+			TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine |
+				TextFormatFlags.EndEllipsis;
 			if( TextAlign == ContentAlignment.MiddleLeft ) {
 				flags |= TextFormatFlags.Left;
 			}

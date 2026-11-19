@@ -1,6 +1,6 @@
 @echo off
 REM UI checks of .github/instructions/ui-style.instructions.md, section 8.
-REM   UICheck.bat            static check + behavior comparison with master
+REM   UICheck.bat            static check
 REM   UICheck.bat runtime    also opens every dialog / CNC panel in zh-TW and zh-CN, and the main window
 REM                          landscape / portrait with dialog placement (build Debug first)
 REM   UICheck.bat runtime ^<screenshot folder^>   ... and saves screenshots
@@ -9,9 +9,6 @@ set "HERE=%~dp0"
 set "RESULT=0"
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckStatic.ps1"
-if errorlevel 1 set "RESULT=1"
-
-powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CompareBehavior.ps1"
 if errorlevel 1 set "RESULT=1"
 
 if /i not "%~1"=="runtime" goto :report

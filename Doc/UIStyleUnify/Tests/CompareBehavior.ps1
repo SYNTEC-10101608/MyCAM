@@ -1,10 +1,12 @@
 ﻿param(
-	[string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
-	[string]$Base = "master",
+	[string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path,
+	[string]$Base = "a4b3826d",
 	[string]$Only = ""
 )
-# Behavior comparison against the version before the UI unification (ui-style.instructions.md, section 8).
-# Appearance may change; everything below must stay the same unless listed in BehaviorExceptions.txt.
+# Issue-only check of the UI style unification (Doc/UIStyleUnify/5_Verification.md): behavior comparison against
+# the version before the issue. The base is fixed to the commit the branch started from, so the result can be
+# reproduced after the merge. Appearance may change; everything below must stay the same unless listed in
+# BehaviorExceptions.txt.
 #
 #   B1  event subscriptions in the designer file
 #   B2  radio button groups (which radio buttons are exclusive to each other)
@@ -23,7 +25,7 @@
 # Exceptions: "<rule> <class> <control> <reason>" in BehaviorExceptions.txt. Exit code 1 on a difference.
 
 $ErrorActionPreference = "Stop"
-. (Join-Path $PSScriptRoot "DesignerParser.ps1")
+. (Join-Path $Root "Tools\UICheck\DesignerParser.ps1")
 
 $SCREEN_DIRS = @( "MyCAM\Editor\Dialog", "MyCAM\CNC", "CncUI\Panel", "CncUI\Dialog" )
 $BEHAVIOR_PROPS = @( "Minimum", "Maximum", "DecimalPlaces", "Increment", "Value", "Checked", "CheckState", "Enabled",

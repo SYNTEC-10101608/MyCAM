@@ -9,6 +9,9 @@ namespace CommonUI.Theme
 	/// </summary>
 	public class ThemedToolStripRenderer : ToolStripProfessionalRenderer
 	{
+		/// <summary>
+		/// Create the renderer with the theme colors.
+		/// </summary>
 		public ThemedToolStripRenderer()
 			: base( new ThemedColorTable() )
 		{
@@ -29,7 +32,8 @@ namespace CommonUI.Theme
 		protected override void OnRenderItemText( ToolStripItemTextRenderEventArgs e )
 		{
 			// the screen may color an item text (e.g. the layer legend); otherwise use the theme text colors
-			bool isDefaultColor = e.Item.ForeColor == SystemColors.ControlText || e.Item.ForeColor == SystemColors.MenuText;
+			bool isDefaultColor = e.Item.ForeColor == SystemColors.ControlText
+				|| e.Item.ForeColor == SystemColors.MenuText;
 			if( e.Item.Enabled == false ) {
 				e.TextColor = ThemeColors.TEXT_DISABLED;
 			}

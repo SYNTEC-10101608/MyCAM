@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Windows.Forms;
 using CommonUI.Controls;
 using CommonUI.Forms;
+using CommonUI.Layout;
 using CommonUI.Theme;
 
 namespace MyCAM.Editor.Dialog
@@ -61,7 +62,8 @@ namespace MyCAM.Editor.Dialog
 			ApplyResources();
 		}
 
-		internal LanguageManager.LanguageManager Language { get; } = new LanguageManager.LanguageManager( "CNCThreePointDlg" );
+		internal LanguageManager.LanguageManager Language { get; } =
+			new LanguageManager.LanguageManager( "CNCThreePointDlg" );
 		internal event Action<int> WorkpiecePointCaptureRequested;
 		internal event Action<int> DrawingPointResetRequested;
 		internal event Action CalculateRequested;
@@ -203,9 +205,12 @@ namespace MyCAM.Editor.Dialog
 			m_pnlWorkpiece.Enabled = calibrationEnabled && enabled && drawingComplete && !capturing;
 			m_txtTolerance.Enabled = calibrationEnabled && enabled;
 			m_btnCalculate.Enabled = calibrationEnabled && enabled && drawingComplete && !capturing;
-			SetStepAppearance( m_pnlDrawing, Language.TryGetString( "Step_Drawing", DRAWING_STEP ), ThreePointStep.Drawing, step );
-			SetStepAppearance( m_pnlWorkpiece, Language.TryGetString( "Step_Workpiece", WORKPIECE_STEP ), ThreePointStep.Workpiece, step );
-			SetStepAppearance( m_pnlCalculation, Language.TryGetString( "Step_Calculation", CALCULATION_STEP ), ThreePointStep.Calculation, step );
+			SetStepAppearance( m_pnlDrawing, Language.TryGetString( "Step_Drawing", DRAWING_STEP ),
+				ThreePointStep.Drawing, step );
+			SetStepAppearance( m_pnlWorkpiece, Language.TryGetString( "Step_Workpiece", WORKPIECE_STEP ),
+				ThreePointStep.Workpiece, step );
+			SetStepAppearance( m_pnlCalculation, Language.TryGetString( "Step_Calculation", CALCULATION_STEP ),
+				ThreePointStep.Calculation, step );
 			m_lblDrawingDescription.Text = picking
 				? pickIndex >= 0 ? string.Format( Language.TryGetString( "Drawing_Repicking", DRAWING_REPICKING ), pickIndex + 1 )
 				: string.Format( Language.TryGetString( "Drawing_Picking", DRAWING_PICKING ), pickCount + 1, pickCount )
@@ -236,9 +241,11 @@ namespace MyCAM.Editor.Dialog
 
 		void DisplayCalculationError( double? error, bool successful, bool completed )
 		{
-			m_lblErrorValue.Text = error.HasValue ? error.Value.ToString( NUMBER_FORMAT, CultureInfo.InvariantCulture ) + " mm"
+			m_lblErrorValue.Text = error.HasValue
+				? error.Value.ToString( NUMBER_FORMAT, CultureInfo.InvariantCulture ) + " mm"
 				: completed ? Language.TryGetString( "Error_Unavailable", ERROR_UNAVAILABLE ) : "— mm";
-			m_lblErrorValue.Role = !error.HasValue ? TextRole.Secondary : successful ? TextRole.Success : TextRole.Error;
+			m_lblErrorValue.Role = !error.HasValue ? TextRole.Secondary : successful ? TextRole.Success
+				: TextRole.Error;
 		}
 
 		public void ApplyResources()

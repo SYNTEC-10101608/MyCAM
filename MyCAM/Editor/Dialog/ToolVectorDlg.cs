@@ -75,8 +75,10 @@ namespace MyCAM.Editor
 			// update index edit UI
 			m_pnlIndexParam.Enabled = true;
 			m_pnlStartEndSwitch.Enabled = true;
-			m_numAngleA.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleA_deg : m_ToolVecParam.AngleA_deg );
-			m_numAngleB.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleB_deg : m_ToolVecParam.AngleB_deg );
+			m_numAngleA.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleA_deg
+				: m_ToolVecParam.AngleA_deg );
+			m_numAngleB.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleB_deg
+				: m_ToolVecParam.AngleB_deg );
 			m_numMaster.SilentSetValue = (decimal)m_ToolVecParam.Master_deg;
 			m_numSlave.SilentSetValue = (decimal)m_ToolVecParam.Slave_deg;
 		}
@@ -175,7 +177,8 @@ namespace MyCAM.Editor
 		// UI event - interpolate type changed
 		void m_cmbInterpolateType_SelectedIndexChanged( object sender, EventArgs e )
 		{
-			if( m_cmbInterpolateType.SelectedIndex < 0 || m_cmbInterpolateType.SelectedIndex >= m_AvailableTypes.Count ) {
+			if( m_cmbInterpolateType.SelectedIndex < 0
+				|| m_cmbInterpolateType.SelectedIndex >= m_AvailableTypes.Count ) {
 				return;
 			}
 			EToolVecInterpolateType selectedType = m_AvailableTypes[ m_cmbInterpolateType.SelectedIndex ];

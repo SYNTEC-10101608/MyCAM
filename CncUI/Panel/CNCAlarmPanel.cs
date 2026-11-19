@@ -153,7 +153,9 @@ namespace CncUI
 			if( m_dgvAlarms == null ) {
 				return;
 			}
-			int top = string.IsNullOrEmpty( m_lblStatus.Text ) ? m_lblStatus.Top : m_lblStatus.Bottom + ThemeMetrics.CONTROL_GAP;
+			int top = string.IsNullOrEmpty( m_lblStatus.Text )
+				? m_lblStatus.Top
+				: m_lblStatus.Bottom + ThemeMetrics.CONTROL_GAP;
 			m_dgvAlarms.SetBounds( ThemeMetrics.SECTION_PADDING, top,
 				Math.Max( 0, m_pnlAlarm.ClientSize.Width - 2 * ThemeMetrics.SECTION_PADDING ),
 				Math.Max( 0, m_pnlAlarm.ClientSize.Height - top - ThemeMetrics.SECTION_PADDING ) );

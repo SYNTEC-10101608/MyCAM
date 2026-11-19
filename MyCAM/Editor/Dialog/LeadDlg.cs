@@ -37,8 +37,10 @@ namespace MyCAM.Editor.Dialog
 		// the lead-in and lead-out rows share their texts
 		void InitLocalizedTexts()
 		{
-			m_lblLeadInLineLength.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength", m_lblLeadInLineLength.Text );
-			m_lblLeadOutLineLength.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength", m_lblLeadOutLineLength.Text );
+			m_lblLeadInLineLength.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength",
+				m_lblLeadInLineLength.Text );
+			m_lblLeadOutLineLength.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength",
+				m_lblLeadOutLineLength.Text );
 			m_lblLeadInAngle.Text = m_LanguageManager.TryGetString( "m_lblAngle", m_lblLeadInAngle.Text );
 			m_lblLeadOutAngle.Text = m_LanguageManager.TryGetString( "m_lblAngle", m_lblLeadOutAngle.Text );
 			m_lblLeadInLength.Text = m_LanguageManager.TryGetString( "m_lblRadius", m_lblLeadInLength.Text );

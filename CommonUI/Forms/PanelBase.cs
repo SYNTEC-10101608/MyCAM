@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using CommonUI.Language;
 using CommonUI.Theme;
 
 namespace CommonUI.Forms
@@ -11,6 +12,9 @@ namespace CommonUI.Forms
 	/// </summary>
 	public class PanelBase : UserControl
 	{
+		/// <summary>
+		/// Apply the embedded panel appearance: font, colors and no auto scaling.
+		/// </summary>
 		public PanelBase()
 		{
 			base.AutoScaleMode = AutoScaleMode.None;

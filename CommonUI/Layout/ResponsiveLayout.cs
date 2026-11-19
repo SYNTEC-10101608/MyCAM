@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using CommonUI.Controls;
 using CommonUI.Theme;
 
-namespace CommonUI.Forms
+namespace CommonUI.Layout
 {
 	/// <summary>
 	/// Proportional layout of an embedded panel (ui-style.instructions.md, section 6): remembers the designer

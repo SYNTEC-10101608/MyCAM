@@ -1,7 +1,7 @@
 ﻿using System.Windows.Forms;
 using CommonUI.Theme;
 
-namespace CommonUI.Controls
+namespace CommonUI.Layout
 {
 	/// <summary>
 	/// Re-arrange sections of a dialog after some of them are shown or hidden at runtime,

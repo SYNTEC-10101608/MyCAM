@@ -8,23 +8,38 @@ using CommonUI.Theme;
 
 namespace CommonUI.Controls
 {
+	/// <summary>
+	/// Tree view with multi selection (Ctrl / Shift click, Ctrl+A, Ctrl+R) and selection highlight in the theme color.
+	/// </summary>
 	public class MultiSelectTreeView : TreeView
 	{
-		// public read-only access to selected nodes
+		/// <summary>
+		/// Selected nodes in the order they were selected.
+		/// </summary>
 		[Browsable( false )]
 		public IReadOnlyList<TreeNode> SelectedNodes => m_SelectedNodes.AsReadOnly();
 
-		// event for selection changes
+		/// <summary>
+		/// Occurs when the selected nodes change.
+		/// </summary>
 		public event EventHandler SelectionChanged;
 
-		// event for node double click
+		/// <summary>
+		/// Occurs when a node is double clicked.
+		/// </summary>
 		public event TreeNodeMouseClickEventHandler NodeDoubleClicked;
 
+		/// <summary>
+		/// True to allow selecting more than one node; false makes every click a single selection.
+		/// </summary>
 		public bool isAllowMultiSelect
 		{
 			get; set;
 		} = true;
 
+		/// <summary>
+		/// Create the tree view; nodes never collapse.
+		/// </summary>
 		public MultiSelectTreeView()
 		{
 			// appearance of the theme
@@ -47,6 +62,9 @@ namespace CommonUI.Controls
 			this.NodeMouseDoubleClick += MultiSelectTreeView_NodeMouseDoubleClick;
 		}
 
+		/// <summary>
+		/// Select the unselected nodes and unselect the selected ones (multi selection only).
+		/// </summary>
 		public void ReverseSelection()
 		{
 			// is not allow at single select mode
@@ -66,6 +84,10 @@ namespace CommonUI.Controls
 			OnSelectionChanged();
 		}
 
+		/// <summary>
+		/// Add the node to the selection; it becomes the anchor of Shift selection unless Shift is pressed.
+		/// </summary>
+		/// <param name="node">Node to select; null is ignored.</param>
 		public void SelectNode( TreeNode node )
 		{
 			if( node == null ) {
@@ -84,6 +106,10 @@ namespace CommonUI.Controls
 			OnSelectionChanged();
 		}
 
+		/// <summary>
+		/// Remove the node from the selection.
+		/// </summary>
+		/// <param name="node">Node to unselect; null is ignored.</param>
 		public void UnselectNode( TreeNode node )
 		{
 			if( node == null ) {
@@ -95,6 +121,9 @@ namespace CommonUI.Controls
 			}
 		}
 
+		/// <summary>
+		/// Unselect all nodes.
+		/// </summary>
 		public void ClearSelection()
 		{
 			if( m_SelectedNodes.Count == 0 ) {
@@ -112,6 +141,9 @@ namespace CommonUI.Controls
 			m_SelectedNodes.Clear();
 		}
 
+		/// <summary>
+		/// Select all nodes (multi selection only).
+		/// </summary>
 		public void SelectAll()
 		{
 			if( isAllowMultiSelect == false ) {
@@ -185,6 +217,9 @@ namespace CommonUI.Controls
 			base.OnMouseDown( e );
 		}
 
+		/// <summary>
+		/// Raise <see cref="SelectionChanged"/>.
+		/// </summary>
 		protected virtual void OnSelectionChanged()
 		{
 			SelectionChanged?.Invoke( this, EventArgs.Empty );
@@ -299,6 +334,11 @@ namespace CommonUI.Controls
 			}
 		}
 
+		/// <summary>
+		/// Mark or unmark a node with a flag: emphasized error-colored text with a flag sign.
+		/// </summary>
+		/// <param name="node">Node to mark; null is ignored.</param>
+		/// <param name="setFlag">True to add the flag, false to remove it.</param>
 		public void SetFlagNode( TreeNode node, bool setFlag )
 		{
 			if( node == null ) {

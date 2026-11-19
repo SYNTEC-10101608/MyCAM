@@ -51,6 +51,9 @@ namespace CommonUI.Controls
 			}
 		}
 
+		/// <summary>
+		/// Create a numeric box with 3 decimals, range -99999 to 99999 and increment 1.
+		/// </summary>
 		public DebouncedNumericUpDown()
 		{
 			m_DebounceTimer = new Timer();
@@ -132,7 +135,8 @@ namespace CommonUI.Controls
 
 		protected override void OnKeyDown( KeyEventArgs e )
 		{
-			if( e.KeyCode == Keys.Enter && RevertOnOutOfRange && !m_IsProgrammaticChange && string.IsNullOrWhiteSpace( Text ) ) {
+			if( e.KeyCode == Keys.Enter && RevertOnOutOfRange && !m_IsProgrammaticChange
+				&& string.IsNullOrWhiteSpace( Text ) ) {
 				RevertToLastValue( 0m, Minimum, isBelowMin: true );
 				e.Handled = true;
 				e.SuppressKeyPress = true;
@@ -200,6 +204,9 @@ namespace CommonUI.Controls
 			m_DebounceTimer.Start();
 		}
 
+		/// <summary>
+		/// When true, only digits, the decimal separator and '-' (if the minimum is negative) can be typed.
+		/// </summary>
 		public bool RestrictInvalidCharacters
 		{
 			get; set;
@@ -290,30 +297,5 @@ namespace CommonUI.Controls
 		int m_DebounceInterval = 100;
 		bool m_IsProgrammaticChange = false;
 		decimal m_LastValue = 0;
-	}
-
-	public class ValueRejectedEventArgs : EventArgs
-	{
-		public decimal InputValue
-		{
-			get;
-		}
-
-		public decimal Limit
-		{
-			get;
-		}
-
-		public bool IsBelowMinimum
-		{
-			get;
-		}
-
-		public ValueRejectedEventArgs( decimal inputValue, decimal limit, bool isBelowMinimum )
-		{
-			InputValue = inputValue;
-			Limit = limit;
-			IsBelowMinimum = isBelowMinimum;
-		}
 	}
 }

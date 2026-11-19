@@ -1,7 +1,7 @@
 ﻿using System;
 using CommonUI.Controls;
 
-namespace CommonUI.Forms
+namespace CommonUI.Language
 {
 	/// <summary>
 	/// Texts shared by all screens (Language/CommonUI_&lt;language&gt;.xml).
@@ -52,6 +52,7 @@ namespace CommonUI.Forms
 
 		// created on first use, after the UI language is set
 		static readonly Lazy<LanguageManager.LanguageManager> m_LanguageManager =
-			new Lazy<LanguageManager.LanguageManager>( () => new LanguageManager.LanguageManager( LANGUAGE_FILE_NAME ) );
+			new Lazy<LanguageManager.LanguageManager>(
+				() => new LanguageManager.LanguageManager( LANGUAGE_FILE_NAME ) );
 	}
 }

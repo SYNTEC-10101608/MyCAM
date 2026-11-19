@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using CncManager.Definition;
 using CommonUI.Controls;
 using CommonUI.Forms;
+using CommonUI.Layout;
 using CommonUI.Theme;
 
 namespace CncUI

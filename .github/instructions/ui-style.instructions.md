@@ -6,7 +6,7 @@ applyTo: "**/*.cs"
 
 適用於 `MyCAM`、`CncUI`、`CommonUI` 的所有畫面（主視窗、嵌入式面板、對話框、進度視窗）。
 另須遵守 [通用規則](coding-style-general.instructions.md) 與 [C#](coding-style-csharp.instructions.md)。
-設計緣由與盤點結果見 `Doc/UIStyleDraft.md`、`Doc/UIStyleNotes.md`。
+設計緣由、決議過程與檢查腳本的維護方式見議題報告 `Doc/UIStyleUnify/`（架構規劃、討論紀錄、測試驗證）。
 
 不在本規範範圍：`MessageBox`、開檔 / 存檔對話框、授權視窗（`FALicenseChecker`）。
 
@@ -277,14 +277,14 @@ Form
 
 ## 8. 檢查腳本（`Tools/UICheck`）
 
+本節的檢查是規範的一部分，持續維護；腳本結構、例外登錄與維護注意事項見 `Doc/UIStyleUnify/5_Verification.md`。
+
 | 指令 | 內容 |
 | --- | --- |
-| `Tools\UICheck\UICheck.bat` | 靜態檢查（`CheckStatic.ps1`）+ 行為不變比對（`CompareBehavior.ps1`，與 `master` 比較） |
+| `Tools\UICheck\UICheck.bat` | 靜態檢查（`CheckStatic.ps1`，只讀原始碼，不需建置） |
 | `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | 另外以 Debug 建置結果開啟所有對話框與 CNC 面板，zh-TW / zh-CN 各跑一次（`CheckRuntimeLayout.ps1`）；並以 CAD / CAM / CNC 頁面 × 橫 / 直式截取主視窗、檢查對話框置中（`CaptureMainWindow.ps1`） |
 
-- 執行時檢查與主視窗截圖在**隱藏桌面**執行（`HiddenDesktopRun.cs`），視窗不會出現在螢幕上、不搶焦點，
-  執行期間可照常操作電腦；隱藏桌面上 3D 檢視區（OpenGL）是空白的。要看到視窗時，對 `CheckRuntimeLayout.ps1` /
-  `CaptureMainWindow.ps1` 加 `-Visible`。
+- 執行時檢查與主視窗截圖在**隱藏桌面**執行，視窗不會出現在螢幕上、不搶焦點；要看到視窗時加 `-Visible`。
 
 | 規則 | 內容 |
 | --- | --- |
@@ -301,30 +301,59 @@ Form
 | S18 | 卡片內各列第一個輸入欄左緣對齊；單位標籤（名稱以 `Unit` 結尾）在輸入欄右側 6 |
 | S19 | 主視窗 Designer 的控制項型別與外觀屬性（圖層色塊、圖例為例外） |
 | S20 | `static readonly Color` 常數必須登錄為資料色（`StaticExceptions.txt`） |
-| S21 | `CommonUI` 的公開型別都列在第 9 節 |
+| S21 | `CommonUI` 的公開型別都列在第 9 節、所屬資料夾的小節；資料夾與 namespace 一致 |
 | S22 | 卡片標題列內的控制項位置（4.5）：按鈕高 23、`y = 5`，`CheckBox` `y = 5`，標籤高 24、`y = 4`，最右者對齊內容右緣 |
 | S23 | 程式中建立白名單以外的控制項（`Button`、`GroupBox`、`NumericUpDown`、`TextBox`…） |
-| B1–B8 | 與 `master` 比較事件、行為屬性、`Show` / `ShowDialog` 等；B8 比對 `.cs` 的事件訂閱與 `Enabled` / `Visible` / `ReadOnly` / `Checked` 賦值 |
-| T1–T7 | 文字截斷、超出容器、重疊等；T6 檢查 `Load` 前後版面與 Designer 相同；T7 檢查控制項顯示語系檔的文字。精靈依 `LayoutRunner.cs` 的 `STATE_MAP` 逐一檢查每個狀態 |
+| T1–T7 | 文字截斷、超出容器、重疊等；T6 檢查 `Load` 前後版面與 Designer 相同；T7 檢查控制項顯示語系檔的文字。精靈與多狀態畫面依 `LayoutRunner.cs` 的 `STATE_MAP` 逐一檢查每個狀態 |
 | P1–P5 | 對話框置中（含 `ShowDialog` 開啟的）、CAM 區域、主視窗字族、主視窗中 CNC 面板以實際大小的文字與版面、選單與工具列項目顯示語系檔的文字 |
 
+- 修改畫面後必須跑 `UICheck.bat`，全部通過才可提交；新增畫面或改動版面時，另跑 `UICheck.bat runtime`。
+- 新增精靈或多狀態的畫面時，把各狀態加到 `STATE_MAP`。
+- 共用 / 執行時的標題文字、`SectionStack` 排列的卡片、精靈的頁，由檢查自行辨識，不列例外。
+  `StaticExceptions.txt` 只登錄資料色、承載單一遠端內容的視窗與已決議的例外，每行寫明理由。
 - 產品程式（`MyCAM`、`CncUI`、`CommonUI` 等）不放為了檢查而寫的程式：不加只給檢查用的方法、屬性、旗標或分支。
   檢查需要的狀態，在檢查程式中呼叫產品本來就有的方法觸發（例：`STATE_MAP` 以 `SetCommandsEnabled` 呈現 CNC 連線後的按鈕），
   或建立實際的環境（例：連線 CNC 模擬器）。檢查程式只在執行期間放在建置輸出，結束即刪除。
-- 執行時檢查開始前，`SyncLanguage.ps1` 會把過期的語系檔複製到建置輸出（等同 `CopyRef.bat` 的語系部分）。
-- 新增精靈或多狀態的對話框時，把各狀態加到 `STATE_MAP`。
-- 控制項改名時，把「類別 舊名 新名」加到 `RenameMap.txt`，行為比對會先把 `master` 的舊名換成新名再比較。
-- 共用 / 執行時的標題文字、`SectionStack` 排列的卡片、精靈的頁，由檢查自行辨識，不列例外。
-  `StaticExceptions.txt` 只登錄資料色、承載單一遠端內容的視窗與已決議的例外；`BehaviorExceptions.txt`
-  只列已決議的行為差異。每行寫明理由。
-- 修改畫面後必須跑 `UICheck.bat`，全部通過才可提交；新增畫面時一併確認執行時版面檢查。
 
 ## 9. CommonUI 元件目錄
 
 畫面需要下列用途時，一律使用對應的元件；元件不夠用時擴充元件本身（加屬性或參數），不在畫面裡另做一份。
-新增元件時同步在本節加一列（靜態檢查 S21）。
 
-### 9.1 基底
+`CommonUI` 依下列五類分資料夾，資料夾即 namespace（`CommonUI\<類別>` 為 `CommonUI.<類別>`），一個類別一個小節。
+新增元件時放進所屬類別的資料夾，並在該小節加一列（靜態檢查 S21）。
+
+| 類別 | 內容 |
+| --- | --- |
+| `Theme` | 主題：色票、字型、尺寸 token，文字角色，元件共用的繪製 |
+| `Controls` | 控制項，與只用於控制項屬性的列舉、事件參數 |
+| `Forms` | 畫面的外觀基底 |
+| `Layout` | 執行時的版面計算 |
+| `Language` | 語系文字的套用與共用文字 |
+
+### 9.1 主題（`CommonUI.Theme`）
+
+| 元件 | 用途 | 使用方式 |
+| --- | --- | --- |
+| `ThemeColors` / `ThemeFonts` / `ThemeMetrics` | 色票、字型、尺寸 token（第 2 節） | 畫面不寫顏色、字型、魔術數字 |
+| `TextRole` / `ThemeText` | 文字角色與其字型、顏色；`ThemeText.SetRole` 給非標籤控制項 | 見 2.2 |
+| `ThemedToolStripRenderer` | 選單與工具列的繪製 | 由 `MainWindowBase` 設定，畫面不直接使用 |
+| `RoundDrawing` | 圓角路徑繪製，供元件內部使用 | 畫面不直接使用 |
+
+### 9.2 控制項（`CommonUI.Controls`）
+
+| 元件 | 用途 | 使用方式 |
+| --- | --- | --- |
+| `SectionPanel` | 卡片 / 區塊；`Text` 是區塊標題，`Highlighted` 表示精靈目前步驟 | 版面規則見 4.4、4.5 |
+| `ThemedButton` | 唯一的按鈕；外觀由 `Kind` 決定（3.1），共用文字用 `CommonText`，CNC 用 `Indicator` / `Active` | 不自訂按鈕顏色 |
+| `ButtonKind` / `ButtonIndicator` / `CommonButtonText` | `ThemedButton` 的按鈕種類（3.1）、CNC 按鈕燈號、共用按鈕文字 | 在 Designer 設定 |
+| `ThemedLabel` | 需要文字角色的標籤（單位、提示、強調、狀態、機台數值） | 在 Designer 設 `Role`；依狀態改變時改 `Role` |
+| `DebouncedNumericUpDown` | 所有數值輸入；以 `Minimum` / `Maximum` / `DecimalPlaces` / `Increment` 表達範圍，連續輸入時延遲送出 `DebouncedValueChanged`；輸入被拒時送出 `ValueRejected`（參數 `ValueRejectedEventArgs`） | 不用 `TextBox` 輸入數值 |
+| `MultiSelectTreeView` | 可多選的樹 | — |
+| `ThemedDataGridView` | 唯讀清單；`CellRole` 表示儲存格文字角色 | — |
+| `RemovableValueRow` | 執行時增刪的數值列（序號 + 數值框 + 單位 + 刪除）；範圍、小數位數、單位、刪除文字由呼叫端傳入 | 以 `RemovableValueRow.Arrange` 排列 |
+| `LoadingBar` / `RoundedProgressBar` | 進度顯示（`LoadingBar` 含標題與階段文字，內部使用 `RoundedProgressBar`） | 進度視窗為 `LoadingBarDlg` |
+
+### 9.3 基底（`CommonUI.Forms`）
 
 | 元件 | 用途 | 使用方式 |
 | --- | --- | --- |
@@ -332,30 +361,17 @@ Form
 | `PanelBase` | 嵌入式面板的外觀層：字型、底色、關閉自動縮放、語系文字 | 取代直接繼承 `UserControl`；套用語系時呼叫 `ApplyLanguage( languageManager )` |
 | `MainWindowBase` | 主視窗的外觀層：字型、底色、工具列字型與繪製、語系文字（含選單與工具列項目） | 只給 `StartupForm`；套用語系時呼叫 `ApplyLanguage( languageManager )` |
 
-### 9.2 控制項
-
-| 元件 | 用途 | 使用方式 |
-| --- | --- | --- |
-| `SectionPanel` | 卡片 / 區塊；`Text` 是區塊標題，`Highlighted` 表示精靈目前步驟 | 版面規則見 4.4、4.5 |
-| `ThemedButton` | 唯一的按鈕；外觀由 `Kind` 決定（3.1），共用文字用 `CommonText`，CNC 用 `Indicator` / `Active` | 不自訂按鈕顏色 |
-| `ThemedLabel` | 需要文字角色的標籤（單位、提示、強調、狀態、機台數值） | 在 Designer 設 `Role`；依狀態改變時改 `Role` |
-| `DebouncedNumericUpDown` | 所有數值輸入；以 `Minimum` / `Maximum` / `DecimalPlaces` / `Increment` 表達範圍，連續輸入時延遲送出 `DebouncedValueChanged` | 不用 `TextBox` 輸入數值 |
-| `MultiSelectTreeView` | 可多選的樹 | — |
-| `ThemedDataGridView` | 唯讀清單；`CellRole` 表示儲存格文字角色 | — |
-| `RemovableValueRow` | 執行時增刪的數值列（序號 + 數值框 + 單位 + 刪除）；範圍、小數位數、單位、刪除文字由呼叫端傳入；`ValueRejectedEventArgs` 為其輸入被拒的事件參數 | 以 `RemovableValueRow.Arrange` 排列 |
-| `LoadingBar` / `RoundedProgressBar` | 進度顯示（`LoadingBar` 含標題與階段文字，內部使用 `RoundedProgressBar`） | 進度視窗為 `LoadingBarDlg` |
-| `ThemedToolStripRenderer` | 選單與工具列的繪製 | 由 `MainWindowBase` 設定，畫面不直接使用 |
-
-### 9.3 版面與文字工具
+### 9.4 版面（`CommonUI.Layout`）
 
 | 元件 | 用途 | 使用方式 |
 | --- | --- | --- |
 | `SectionStack` | 對話框執行時的版面變化：`Arrange`（隱藏區塊後補位）、`PlaceButtonBar`、`FitToPage`（精靈換頁） | 對話框內不手算座標 |
 | `DialogPlacement` | 對話框置中（4.3）；`MoveToCenter` 重新置中，`AreaProvider` 由主視窗註冊 | 不自行計算位置 |
 | `ResponsiveLayout` | 嵌入式面板依 Designer 座標等比縮放，標題列不縮放 | 只用於嵌入式面板 |
+
+### 9.5 語系（`CommonUI.Language`）
+
+| 元件 | 用途 | 使用方式 |
+| --- | --- | --- |
 | `LanguageApplier` | 以名稱為 ID 套用語系文字：標題類控制項、清單欄位、選單與工具列項目（`ApplyToItems`） | 由三個基底的 `ApplyLanguage` 呼叫，畫面不直接使用 |
-| `CommonTexts` / `CommonButtonText` | 共用按鈕文字（確定、取消、重設、預覽、關閉），取自 `Language/CommonUI_<語系>.xml` | 按鈕設 `ThemedButton.CommonText` |
-| `ThemeColors` / `ThemeFonts` / `ThemeMetrics` | 色票、字型、尺寸 token（第 2 節） | 畫面不寫顏色、字型、魔術數字 |
-| `TextRole` / `ThemeText` | 文字角色與其字型、顏色；`ThemeText.SetRole` 給非標籤控制項 | 見 2.2 |
-| `ButtonKind` / `ButtonIndicator` | 按鈕種類（3.1）與 CNC 按鈕燈號 | — |
-| `RoundDrawing` | 圓角路徑繪製，供元件內部使用 | 畫面不直接使用 |
+| `CommonTexts` | 共用按鈕文字（確定、取消、重設、預覽、關閉），取自 `Language/CommonUI_<語系>.xml` | 按鈕設 `ThemedButton.CommonText`，畫面不直接使用 |

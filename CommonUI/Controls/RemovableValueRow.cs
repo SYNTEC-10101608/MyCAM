@@ -87,16 +87,34 @@ namespace CommonUI.Controls
 			Size = new Size( ROW_WIDTH, ROW_HEIGHT );
 		}
 
+		/// <summary>
+		/// Occurs when the delete button is clicked; the owner removes the row.
+		/// </summary>
 		public event Action<RemovableValueRow> DeleteRequested;
 
+		/// <summary>
+		/// Occurs when a valid value is committed (debounced).
+		/// </summary>
 		public event Action<RemovableValueRow> ValueCommitted;
 
+		/// <summary>
+		/// Occurs when the input is out of range or not a number; the value reverts to the last valid one.
+		/// </summary>
 		public event EventHandler<ValueRejectedEventArgs> ValueRejected;
 
+		/// <summary>
+		/// The numeric box of the row.
+		/// </summary>
 		public DebouncedNumericUpDown ValueControl => m_numValue;
 
+		/// <summary>
+		/// The current valid value of the row.
+		/// </summary>
 		public double LastValidValue => (double)m_numValue.Value;
 
+		/// <summary>
+		/// True if the delete button is enabled.
+		/// </summary>
 		public bool CanDelete
 		{
 			get => m_btnDelete.Enabled;

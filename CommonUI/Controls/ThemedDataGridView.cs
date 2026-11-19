@@ -11,6 +11,9 @@ namespace CommonUI.Controls
 	/// </summary>
 	public class ThemedDataGridView : DataGridView
 	{
+		/// <summary>
+		/// Create a read-only list in the theme colors and fonts.
+		/// </summary>
 		public ThemedDataGridView()
 		{
 			base.BackgroundColor = ThemeColors.SURFACE;

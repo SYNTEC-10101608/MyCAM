@@ -217,7 +217,8 @@ namespace MyCAM.Editor.Dialog
 
 		void SetPnt1()
 		{
-			if( string.IsNullOrEmpty( m_lblPnt1XValue.Text ) || string.IsNullOrEmpty( m_lblPnt1YValue.Text ) || string.IsNullOrEmpty( m_lblPnt1ZValue.Text ) ) {
+			if( string.IsNullOrEmpty( m_lblPnt1XValue.Text ) || string.IsNullOrEmpty( m_lblPnt1YValue.Text )
+				|| string.IsNullOrEmpty( m_lblPnt1ZValue.Text ) ) {
 				m_CalibrationData.Ref_Pnt1 = null;
 				return;
 			}
@@ -231,7 +232,8 @@ namespace MyCAM.Editor.Dialog
 
 		void SetPnt2()
 		{
-			if( string.IsNullOrEmpty( m_lblPnt2XValue.Text ) || string.IsNullOrEmpty( m_lblPnt2YValue.Text ) || string.IsNullOrEmpty( m_lblPnt2ZValue.Text ) ) {
+			if( string.IsNullOrEmpty( m_lblPnt2XValue.Text ) || string.IsNullOrEmpty( m_lblPnt2YValue.Text )
+				|| string.IsNullOrEmpty( m_lblPnt2ZValue.Text ) ) {
 				m_CalibrationData.Ref_Pnt2 = null;
 				return;
 			}
@@ -245,7 +247,8 @@ namespace MyCAM.Editor.Dialog
 
 		void SetPnt3()
 		{
-			if( string.IsNullOrEmpty( m_lblPnt3XValue.Text ) || string.IsNullOrEmpty( m_lblPnt3YValue.Text ) || string.IsNullOrEmpty( m_lblPnt3ZValue.Text ) ) {
+			if( string.IsNullOrEmpty( m_lblPnt3XValue.Text ) || string.IsNullOrEmpty( m_lblPnt3YValue.Text )
+				|| string.IsNullOrEmpty( m_lblPnt3ZValue.Text ) ) {
 				m_CalibrationData.Ref_Pnt3 = null;
 				return;
 			}
