@@ -1071,39 +1071,14 @@ namespace MyCAM
 			}
 			m_CurrentUIStatus = uiStatus;
 
-			// the function tool bar container shows only the tool strip of this status
-			m_tscLevel1Container.Visible = true;
+			// the function tool bar shows only the tool strip of this status
 			ToolStrip shownToolStrip = m_UIStatusDic[ uiStatus ];
-			foreach( ToolStrip toolStrip in GetAllToolStrips( m_tscLevel1Container ) ) {
-				toolStrip.Visible = toolStrip == shownToolStrip;
+			foreach( Control control in m_pnlToolBar.Controls ) {
+				if( control is ToolStrip toolStrip ) {
+					toolStrip.Visible = toolStrip == shownToolStrip;
+				}
 			}
 			UpdateMainLayout();
-		}
-
-		List<ToolStrip> GetAllToolStrips( ToolStripContainer container )
-		{
-			List<ToolStrip> childToolStripList = new List<ToolStrip>();
-
-			// container with 5 panel
-			FindContainerAllToolStrips( container.TopToolStripPanel, childToolStripList );
-			FindContainerAllToolStrips( container.BottomToolStripPanel, childToolStripList );
-			FindContainerAllToolStrips( container.LeftToolStripPanel, childToolStripList );
-			FindContainerAllToolStrips( container.RightToolStripPanel, childToolStripList );
-			FindContainerAllToolStrips( container.ContentPanel, childToolStripList );
-			return childToolStripList;
-		}
-
-		// each container will include several tool strips, use this to know which tool strips are belong to this container
-		void FindContainerAllToolStrips( Control parent, List<ToolStrip> totalToolStripList )
-		{
-			foreach( Control control in parent.Controls ) {
-				if( control is ToolStrip toolStrip ) {
-					totalToolStripList.Add( toolStrip );
-				}
-				else if( control.HasChildren ) {
-					FindContainerAllToolStrips( control, totalToolStripList );
-				}
-			}
 		}
 
 		void EnableAllCAMEnterance()

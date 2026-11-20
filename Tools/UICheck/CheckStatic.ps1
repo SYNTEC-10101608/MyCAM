@@ -25,7 +25,8 @@
 #   S17 button bar order (section 4.4): auxiliary buttons from the left margin, the others from the right margin,
 #       8 apart; Primary is the rightmost, Cancel / Close right before it, Reset / Preview on the left
 #   S18 alignment in a card: the first input of each row starts at the same x; a unit label is 6 after its input
-#   S19 main window designer: white list of types (no TableLayoutPanel), no appearance except the not-machined legend
+#   S19 main window designer: white list of types (no TableLayoutPanel / ToolStripContainer), no appearance except
+#       the not-machined legend
 #   S20 data colors: every "static readonly Color" constant is a registered data color (StaticExceptions.txt)
 #   S21 every public type of CommonUI is listed in the component catalog (section 9), in the subsection of its folder;
 #       a file in CommonUI\<Folder> is in namespace CommonUI.<Folder>
@@ -59,7 +60,7 @@ $ALLOWED_TYPES = @(
 
 # main window only (section 3)
 $MAIN_WINDOW_TYPES = @( "System.Windows.Forms.MenuStrip", "System.Windows.Forms.ToolStrip",
-	"System.Windows.Forms.ToolStripContainer", "System.Windows.Forms.ContextMenuStrip",
+	"System.Windows.Forms.ContextMenuStrip",
 	"System.Windows.Forms.ToolStripButton", "System.Windows.Forms.ToolStripMenuItem",
 	"System.Windows.Forms.ToolStripSeparator" )
 
@@ -80,7 +81,7 @@ $PREFIX_MAP = @{
 	"CheckedListBox" = "m_clb"; "TrackBar" = "m_trb"; "PictureBox" = "m_pic"; "ThemedDataGridView" = "m_dgv"
 	"DataGridViewTextBoxColumn" = "m_col"; "ToolTip" = "m_ttp"; "Timer" = "m_tmr"
 	"MultiSelectTreeView" = "m_tv"; "TreeView" = "m_tv"; "LoadingBar" = "m_prg"; "RoundedProgressBar" = "m_prg"
-	"MenuStrip" = "m_ms"; "ToolStrip" = "m_ts"; "ToolStripContainer" = "m_tsc"; "ToolStripButton" = "m_tsb"
+	"MenuStrip" = "m_ms"; "ToolStrip" = "m_ts"; "ToolStripButton" = "m_tsb"
 	"ToolStripMenuItem" = "m_tsmi"; "ToolStripSeparator" = "m_tss"; "ContextMenuStrip" = "m_cms"
 }
 
@@ -459,9 +460,9 @@ function Test-DialogLayout( $screen ) {
 	$clientSize = ConvertTo-Size $client
 	$topLevel = @( $screen.Children["(form)"] | Where-Object { $_ } )
 
-	# a wizard that shows one page at a time (SectionStack.FitToPage): each page at (12, 12) is laid out like a dialog
+	# a wizard that shows one page at a time (SectionStack.ShowPage): each page at (12, 12) is laid out like a dialog
 	# without margins, and the dialog is fitted to it at runtime
-	$isPaged = $script:CurrentCode -match "SectionStack\.FitToPage\("
+	$isPaged = $script:CurrentCode -match "SectionStack\.ShowPage\("
 	if ($isPaged) {
 		foreach ($name in $topLevel) {
 			$page = Get-Bounds $screen $name

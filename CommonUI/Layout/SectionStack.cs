@@ -53,12 +53,39 @@ namespace CommonUI.Layout
 		}
 
 		/// <summary>
-		/// Fit the form to the one page of a wizard that is shown; the page sits at the top-left margin and holds
-		/// its own sections and buttons.
+		/// Show one page of a wizard and hide the others; the form fits the page and is centered again.
+		/// Each page sits at the top-left margin and holds its own sections and buttons.
 		/// </summary>
-		/// <param name="form">Dialog to resize.</param>
-		/// <param name="page">Page that is shown.</param>
-		public static void FitToPage( Form form, Control page )
+		/// <param name="form">Dialog to switch.</param>
+		/// <param name="page">Page to show.</param>
+		/// <param name="pageArray">All pages of the wizard.</param>
+		public static void ShowPage( Form form, Control page, params Control[] pageArray )
+		{
+			// hide the form during the switch so the user does not see the intermediate states
+			bool isShown = form.Visible;
+			if( isShown ) {
+				form.Hide();
+			}
+			form.SuspendLayout();
+
+			// hide all pages first so the form resizes without showing stale content
+			foreach( Control otherPage in pageArray ) {
+				otherPage.Visible = false;
+			}
+			FitToPage( form, page );
+			form.ResumeLayout( false );
+			form.PerformLayout();
+
+			// show the page only after the form has been resized, then center the new size
+			page.Visible = true;
+			DialogPlacement.MoveToCenter( form );
+			if( isShown ) {
+				form.Show();
+			}
+			form.Refresh();
+		}
+
+		static void FitToPage( Form form, Control page )
 		{
 			form.ClientSize = new System.Drawing.Size( page.Right + ThemeMetrics.DIALOG_MARGIN,
 				page.Bottom + ThemeMetrics.DIALOG_MARGIN );

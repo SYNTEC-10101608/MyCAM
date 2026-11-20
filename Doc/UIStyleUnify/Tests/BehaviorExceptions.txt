@@ -1,4 +1,4 @@
-# Confirmed behavior differences of CompareBehavior.ps1: <rule> <class> <control|*> <reason>
+﻿# Confirmed behavior differences of CompareBehavior.ps1: <rule> <class> <control|*> <reason>
 # Only items decided in Doc/UIStyleUnify/4_Discussion.md may be listed here.
 
 # numeric inputs become DebouncedNumericUpDown (decision 2026-11-15 "數值輸入")
@@ -53,6 +53,15 @@ B6 StartupForm m_tscLevel2Container empty container that was never shown, remove
 B6 StartupForm m_tscLevel3Container empty container that was never shown, removed
 B8 StartupForm m_tscLevel2Container hiding the removed container is no longer needed
 B8 StartupForm m_tscLevel3Container hiding the removed container is no longer needed
-B8 StartupForm m_ToolStripLevelList* the per-level loop shows only the first container, now m_tscLevel1Container.Visible = true
-B8 StartupForm m_tscLevel1Container the first container is shown as before (was the first item of m_ToolStripLevelList)
+B8 StartupForm m_ToolStripLevelList* the per-level loop only ever showed the first container, which is always shown
+B8 StartupForm m_tscLevel1Container the first container was never hidden; it is now m_pnlToolBar (see below)
 B8 StartupForm toolStrip the tool strip of the status is shown and the others hidden, in one assignment instead of two
+
+# function tool bar container ToolStripContainer -> Panel m_pnlToolBar (decision 2026-11-20 "功能工具列容器"): no tool strip
+# was ever docked in its tool strip panels, so it only held the tool strips like a panel
+B6 StartupForm m_tscLevel1Container replaced by the Panel m_pnlToolBar at the same place and size, holding the same tool strips
+
+# wizard pages switched by SectionStack.ShowPage (decision 2026-11-20 "精靈兩型"): the same steps moved into CommonUI
+B7 repository * SectionStack.ShowPage shows the form again after the switch, as DesignSupportBracketDlg.ShowPanel did
+B8 DesignSupportBracketDlg m_pnl*Page ShowPage hides all pages before fitting the form, as ShowPanel did
+B8 DesignSupportBracketDlg activePanel ShowPage shows the page after the form is fitted, as ShowPanel did

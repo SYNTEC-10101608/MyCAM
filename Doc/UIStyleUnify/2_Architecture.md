@@ -90,7 +90,7 @@ Form
 
 | 畫面 | 版面在何時決定 | 執行時的變化 |
 | --- | --- | --- |
-| 對話框 | Designer 固定座標，依規範 4.4 的格線 | 只有 `SectionStack`：部分卡片隱藏時其餘依序補位、精靈換頁（`FitToPage`） |
+| 對話框 | Designer 固定座標，依規範 4.4 的格線 | 只有 `SectionStack`：部分卡片隱藏時其餘依序補位、精靈換頁（`ShowPage`） |
 | `CNCPanel` | Designer 一份設計版面（即偏好尺寸） | 依主視窗給的大小以 `ResponsiveLayout` 等比縮放，橫、直式排列相同 |
 | `CNCInfoPanel` | Designer 為橫式版面 | 直式時卡片改為上下排列（只用 token 計算）後再縮放 |
 | `CNCAlarmPanel` | Designer | 以 `Dock` / `Anchor` 跟著可用空間延展，字型與列高不變 |
