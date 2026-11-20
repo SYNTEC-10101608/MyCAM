@@ -28,23 +28,23 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlLeadIn = new CommonUI.Controls.SectionPanel();
-			this.m_lblLeadInLineLength = new System.Windows.Forms.Label();
+			this.m_lblLeadInLineLength = new CommonUI.Controls.ThemedLabel();
 			this.m_numLeadInStraightLength = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblLeadInLineLengthUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_lblLeadInLength = new System.Windows.Forms.Label();
+			this.m_lblLeadInLength = new CommonUI.Controls.ThemedLabel();
 			this.m_numLeadInArcLength = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblLeadInLengthUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_lblLeadInAngle = new System.Windows.Forms.Label();
+			this.m_lblLeadInAngle = new CommonUI.Controls.ThemedLabel();
 			this.m_numLeadInAngle = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblLeadInAngleUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlLeadOut = new CommonUI.Controls.SectionPanel();
-			this.m_lblLeadOutLineLength = new System.Windows.Forms.Label();
+			this.m_lblLeadOutLineLength = new CommonUI.Controls.ThemedLabel();
 			this.m_numLeadOutStraightLength = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblLeadOutLineLengthUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_lblLeadOutLength = new System.Windows.Forms.Label();
+			this.m_lblLeadOutLength = new CommonUI.Controls.ThemedLabel();
 			this.m_numLeadOutArcLength = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblLeadOutLengthUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_lblLeadOutAngle = new System.Windows.Forms.Label();
+			this.m_lblLeadOutAngle = new CommonUI.Controls.ThemedLabel();
 			this.m_numLeadOutAngle = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblLeadOutAngleUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlOption = new CommonUI.Controls.SectionPanel();
@@ -330,23 +330,23 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlLeadIn;
-		private System.Windows.Forms.Label m_lblLeadInLineLength;
+		private CommonUI.Controls.ThemedLabel m_lblLeadInLineLength;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadInStraightLength;
 		private CommonUI.Controls.ThemedLabel m_lblLeadInLineLengthUnit;
-		private System.Windows.Forms.Label m_lblLeadInLength;
+		private CommonUI.Controls.ThemedLabel m_lblLeadInLength;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadInArcLength;
 		private CommonUI.Controls.ThemedLabel m_lblLeadInLengthUnit;
-		private System.Windows.Forms.Label m_lblLeadInAngle;
+		private CommonUI.Controls.ThemedLabel m_lblLeadInAngle;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadInAngle;
 		private CommonUI.Controls.ThemedLabel m_lblLeadInAngleUnit;
 		private CommonUI.Controls.SectionPanel m_pnlLeadOut;
-		private System.Windows.Forms.Label m_lblLeadOutLineLength;
+		private CommonUI.Controls.ThemedLabel m_lblLeadOutLineLength;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadOutStraightLength;
 		private CommonUI.Controls.ThemedLabel m_lblLeadOutLineLengthUnit;
-		private System.Windows.Forms.Label m_lblLeadOutLength;
+		private CommonUI.Controls.ThemedLabel m_lblLeadOutLength;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadOutArcLength;
 		private CommonUI.Controls.ThemedLabel m_lblLeadOutLengthUnit;
-		private System.Windows.Forms.Label m_lblLeadOutAngle;
+		private CommonUI.Controls.ThemedLabel m_lblLeadOutAngle;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numLeadOutAngle;
 		private CommonUI.Controls.ThemedLabel m_lblLeadOutAngleUnit;
 		private CommonUI.Controls.SectionPanel m_pnlOption;

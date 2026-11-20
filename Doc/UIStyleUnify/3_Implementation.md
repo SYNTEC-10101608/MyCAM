@@ -78,7 +78,7 @@
 4. 嵌入式面板：卡片間距、內距、第一列改用 `ThemeMetrics`，新增 `PANEL_MARGIN`、`INFO_ROW_HEIGHT`、`INFO_ROW_PITCH`；
    移除所有 `DeviceDpi` 計算；設計尺寸 `CNCPanel` 288×756、`CNCInfoPanel` 736×240；
    區塊標題一律改為 `SectionPanel.Text`，`ResponsiveLayout` 保持標題列固定高度、標題列內的控制項固定靠右。
-5. 主視窗：`MainLayout` 的區域配置與比例不變，只新增 `GetDialogArea` 提供 CAM 區域給置中使用；
+5. 主視窗：`MainLayout` 的區域配置與比例不變，只新增 `GetDialogArea` 提供 CAM 區域給置中使用（之後改為純計算，3.22）；
    主視窗 Designer 移除寫死的底色與字型（見 3.15）。
 
 ## 3.7 置中（對應 2.7）
@@ -91,7 +91,7 @@
 
 1. 30 個對話框在 `InitializeComponent()` 後呼叫 `ApplyLanguage()`；嵌入式面板與主視窗在套用語系的方法中最先呼叫
    `ApplyLanguage( languageManager )`。`StartupForm` 原本約 140 行的逐項套用、`CNCAlarmPanel` 的手寫欄位標題改為一次呼叫。
-2. 語系 ID 改為控制項名稱，四語系 XML 同步修改；與控制項同名、但其實由程式組成的 ID 刪除或改名（`ToolVectorDlg` 軸名、
+2. 語系 ID 改為控制項名稱，所有語系 XML 同步修改；與控制項同名、但其實由程式組成的 ID 刪除或改名（`ToolVectorDlg` 軸名、
    `LockMSAxisDlg` 格式字串）；刪除 9 個沒有控制項也沒被使用的 ID；主視窗 9 個不符命名的 ID 改為項目名。
 3. 語系檔名與類別名不一致者改名：`LockABDlg` → `LockMSAxisDlg`、`CNCThreePointDialog` → `CNCThreePointDlg`。
 4. 修正 `ExtendedGCodeDlg` 的 `IS_START_POINT` / `IS_END_POINT` / `IS_MIX_DATA` 與程式使用的 ID 不一致（簡中一直顯示繁中預設字）。
@@ -113,7 +113,7 @@
 
 ## 3.11 命名（對應 2.11）
 
-1. 控制項欄位依型別前綴全域改名 304 筆（`Doc/UIStyleUnify/Tests/RenameMap.txt`），事件方法、`.resx`、四語系 ID 一併改；
+1. 控制項欄位依型別前綴全域改名 304 筆（`Doc/UIStyleUnify/Tests/RenameMap.txt`），事件方法、`.resx`、所有語系 ID 一併改；
    順帶修正拼字（`Legnth`、`Tolernece`、`SlowDonw`）。
 
 ## 3.12 檢查機制（對應 2.12）
@@ -199,7 +199,7 @@
 | `CNCInfoPanel.cs` / `.Designer.cs` | 改繼承 `PanelBase`；`GroupPanel` 3 → `SectionPanel`、`PanelButton` → `ThemedButton`、標題 `Label` 2 → 卡片標題；尺寸 672×236 → 736×240，偏好尺寸改回傳 Designer 尺寸；刪除 `DeviceDpi` 換算；直式垂直排列改用 `PANEL_MARGIN` / `SECTION_GAP` / `INFO_ROW_HEIGHT` / `INFO_ROW_PITCH` / `CONTROL_GAP`，標題列內控制項不參與排列；加工狀態色 7 處 → `TextRole`；五軸色改具名資料色 `X/Y/Z/B/C_AXIS_COLOR`；新增 `ApplyLanguage( Language )` |
 | `CNCAlarmPanel.cs` / `.Designer.cs` | 改繼承 `PanelBase`；`DataGridView` → `ThemedDataGridView`，目前 / 歷史警報色改 `CellRole = Error / Secondary`；標題 `Label` → `m_pnlAlarm` 卡片標題；清單位置改用 `SECTION_PADDING` / `CONTROL_GAP`；手寫欄位標題常數改由 `ApplyLanguage( Language )` 以欄名套用 |
 | `VNCUserControl.cs` / `.Designer.cs` | 改繼承 `PanelBase`；Designer 移除 `AutoScaleMode` / `AutoScaleDimensions` |
-| `MainLayout.cs` | 新增 `GetDialogArea`（直式時為 CNC 承載區以上的 CAM 區域） |
+| `MainLayout.cs` | 新增 `GetDialogArea`（直式時為 CNC 承載區以上的 CAM 區域）；改為純計算、不用 `TableLayoutPanel`（3.22） |
 
 ## 3.16 逐檔明細：其他產品程式
 
@@ -234,7 +234,7 @@
 
 ## 3.18 逐檔明細：語系檔
 
-除了 `RenameMap.txt` 的控制項改名（ID 跟著改）與共用按鈕 ID 的刪除（3.14）之外，ID 的異動如下（四語系相同）：
+除了 `RenameMap.txt` 的控制項改名（ID 跟著改）與共用按鈕 ID 的刪除（3.14）之外，ID 的異動如下（各語系相同）：
 
 | 語系檔 | 刪除 | 新增 | 理由 |
 | --- | --- | --- | --- |
@@ -268,3 +268,66 @@
 2. `.github/copilot-instructions.md`、`CLAUDE.md`：指引目錄加入 UI 風格一列與 `@` 引用。
 3. `Doc/UIStyleUnify/`：本議題報告（README 與第 1～6 章）與議題限定測試 `Tests/`；施工期間的
    `Doc/UIStyle{Draft,Notes,Review,CheckReport,Handoff}.md` 已整併進本報告後刪除。
+4. `.github/instructions/project-overview.instructions.md`：多語系一節不再寫死語系數量，改為「`Language/` 中所有語系」。
+
+## 3.21 第三輪 Review 的調整（2026-11-19）
+
+1. 文字標籤只留 `ThemedLabel`（4.7 決議）：
+   1. 28 個對話框的 `.Designer.cs` 中原生 `Label` 201 個改為 `ThemedLabel`（只換型別，`Role` 為預設的 `Body`，外觀不變）；
+      本章前面寫「→ `Label`」的唯讀座標欄位，現在也是 `ThemedLabel`。
+   2. `CommonUI`：`LoadingBar` 的兩個標籤、`RemovableValueRow` 的序號標籤改為 `ThemedLabel`；`ThemedLabel` 的類別說明改為「唯一的文字標籤」。
+   3. `MyCAM/LogManager/LogHandler.cs`：日誌列改為 `ThemedLabel`，錯誤 / 警告 / 提示以 `Role = Error / Warning / Body`
+      表示，刪除三個顏色欄位。
+2. 圖層色單一定義（4.7 決議）：
+   1. 新增 `MyCAM/Editor/PathLayerColor.cs`：圖層色清單（OCCT 色名，索引 0 為不加工、1～10 為圖層）、3D 路徑色、
+      工具列色塊色（以 sRGB 換算）與色塊文字色（依對比度在 `TEXT` 與 `TEXT_ON_ACCENT` 間選擇）。
+   2. `ViewManager.cs`：刪除 `TECH_Layer_Color_List`，路徑色改由 `PathLayerColor.GetPathColor` 取得；3D 顏色不變。
+   3. `StartupForm.Designer.cs`：刪除 `m_tsbLayer1～10` 的 `BackColor` / `ForeColor`；`StartupForm.cs` 新增
+      `InitLayerSwatches()`，建構時從 `PathLayerColor` 套用。工具列色塊因此與 3D 路徑同色（原本例如 `Orange` 對
+      `DARKORANGE2`、`Sienna` 對 `BROWN`、`Green` 對 `GREEN3`）。
+   4. `StaticExceptions.txt`：S19 例外由 `m_tsbLayer*` 縮小為 `m_tsbLayerNone`（「不加工」圖例）。
+3. 檢查腳本 `CheckStatic.ps1`：
+   1. 白名單與前綴表刪除原生 `Label`、`DataGridView`；S23 另檢出程式中 `new Label` / `new DataGridView`。
+      反向測試：把 `OverCutDlg` 的標籤暫時改回原生 `Label`，S1、S9 報錯；在程式中加 `new Label()`，S23 報錯；還原後通過。
+   2. 語系清單改為從 `Language/` 的檔名自動取得，新增語系時 S6 自動涵蓋。
+4. 規範（`ui-style.instructions.md`）：
+   1. 新增 3.2 容器的選用（`PanelBase` / `SectionPanel` / `Panel` / `TableLayoutPanel`）、4.7 精靈的三種形式。
+   2. 4.1 補 `FormBase` / `EditDialogBase<T>` 的行為說明；4.2 拆為「基底自動處理」與「撰寫時須遵守」；
+      4.3 寫明置中包含在開啟流程中，以及執行時只改高度與換頁兩種情況的處理。
+   3. 確定鍵改寫為共用文字依語系使用慣用詞；`RoundedProgressBar` 寫全名；第 6 節圖層色改由 `PathLayerColor` 定義。
+   4. 刪除以「改動前 / 維持既有 / 不變」描述的句子（屬本議題施工的參考，不是規範），改寫為規則本身。
+
+## 3.22 主視窗移除 `TableLayoutPanel`（2026-11-19）
+
+依 4.7 決議與 4.8 的規劃施工。
+
+1. 建立基準：`MainWindowRunner.cs` 新增 `[region]` 輸出（各承載區在主視窗客戶區的座標）；改動前以
+   `Doc/UIStyleUnify/Tests/CompareMainLayout.ps1 -Update` 記錄 CAD / CAM / CNC 頁面 × 橫式 1920×1040、1366×768 ×
+   直式 1080×1880、900×1600，共 12 個情境，存為 `MainLayoutBaseline.txt`。
+2. `MyCAM/Layout/MainLayout.cs`：
+   1. 新增 `Calculate`（只處理尺寸、不碰控制項），回傳新類別 `MainLayoutRegions`（各區矩形，座標相對於所在容器）。
+   2. `Update` 依計算結果設定各區 `Bounds`、`Visible` 與所屬容器；不再使用列 / 欄樣式與跨欄，CNC 承載區也不再 `Dock = Fill`。
+   3. 比例改為具名常數（樹欄 22% / 15%、CNC 欄放大 1.1、底部列 15% / 25% / 至少 1/4、直式 54% / 6% / 其餘、
+      直式 CNC 區左側 55%、警報 20%、橫式日誌 40%），區域間距為 `HOST_MARGIN`（3，原本 `Panel` 的預設 `Margin`）。
+   4. 捨入照 `TableLayoutPanel` 原本的結果：每個百分比各自無條件捨去，直式 CNC 區取剩餘高度。
+   5. 刪除直式 CNC 承載區的 `SizeChanged` 處理：大小只由 `Update` 設定，同一次呼叫中已排好其中的面板
+      （`BehaviorExceptions.txt` 登錄 B8）。
+3. `StartupForm.Designer.cs`：
+   1. `m_pnlBackGround`、`m_pnlBottom` 由 `TableLayoutPanel` 改為 `Panel`；刪除列 / 欄樣式、跨欄、各承載區的
+      `Dock = Fill` 與 `Margin`，以及 `m_pnlLog` 殘留的跨欄設定。
+   2. 客戶區 1596×1055 → 1920×1009；各承載區寫成 `Calculate` 在橫式加工頁的結果。直式 CNC 承載區與其警報區大小為 0。
+   3. 刪除第二、三層工具列容器（`m_tscLevel2Container`、`m_tscLevel3Container`）：兩個都是空的，每個頁面只用一層工具列，
+      執行時從不顯示；刪除後 Designer 中背景從工具列下方開始，與執行時相同。`StartupForm.cs` 一併整理：
+      1. `m_UIStatusDic` 由「狀態 → 工具列清單」改為「狀態 → 工具列」（每個清單原本都只有一項）。
+      2. `RefreshToolStripLayout` 只在第一層容器中顯示該狀態的工具列；刪除逐層切換容器顯示的迴圈與 `m_ToolStripLevelList`。
+      3. 刪除 `ReLayOutUIZorder`：只在容器顯示數量改變時呼叫，而顯示數量從不改變（建構時主視窗尚未顯示，
+         其中的 `Visible` 讀值都是 false，不會呼叫 `SetChildIndex`），所以從未調整過 z-order。
+      4. `DefaultUISetting` 刪除隱藏第二、三層容器的兩行。
+   4. `StartupForm.cs` 建立 `MainLayout` 時多傳入樹與 3D 檢視的承載區。
+4. 檢查：
+   1. `CheckStatic.ps1`：主視窗白名單與前綴表刪除 `TableLayoutPanel`（S19）。
+   2. `MainWindowRunner.cs` / `CaptureMainWindow.ps1` 新增 P6（`-DesignerLayout`）：以 Designer 的客戶區大小開加工頁，
+      各承載區的 `Bounds` 必須等於 Designer 的 `Location` / `Size`，不符時列出應寫入的值；`UICheck.bat runtime` 加跑一次。
+   3. 新增本議題限定的 `CompareMainLayout.ps1`，加入 `RunIssueChecks.bat`。
+5. 規範：第 3 節不可使用加入 `TableLayoutPanel`（主視窗也不用）、3.2 刪除 `TableLayoutPanel` 列、
+   第 6 節第 3 點改寫為 `MainLayout` 的計算與 Designer 規則、第 8 節加 P6。

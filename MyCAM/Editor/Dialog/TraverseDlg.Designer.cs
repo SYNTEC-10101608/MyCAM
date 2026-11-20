@@ -28,13 +28,13 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlDistance = new CommonUI.Controls.SectionPanel();
-			this.m_lblLiftUpDistance = new System.Windows.Forms.Label();
+			this.m_lblLiftUpDistance = new CommonUI.Controls.ThemedLabel();
 			this.m_numLiftUpDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblLiftUpDistanceUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_lblCutDownDistance = new System.Windows.Forms.Label();
+			this.m_lblCutDownDistance = new CommonUI.Controls.ThemedLabel();
 			this.m_numCutDownDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblCutDownDistanceUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_lblFollowSaveDistance = new System.Windows.Forms.Label();
+			this.m_lblFollowSaveDistance = new CommonUI.Controls.ThemedLabel();
 			this.m_numFollowSafeDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblFollowSaveDistanceUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlTraverseMode = new CommonUI.Controls.SectionPanel();
@@ -45,19 +45,19 @@
 			this.m_rdoSafeSphere = new System.Windows.Forms.RadioButton();
 			this.m_pnlTraverse = new CommonUI.Controls.SectionPanel();
 			this.m_pnlFrogLeap = new System.Windows.Forms.Panel();
-			this.m_lblFrogLeapDistance = new System.Windows.Forms.Label();
+			this.m_lblFrogLeapDistance = new CommonUI.Controls.ThemedLabel();
 			this.m_numFrogLeapDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblFrogLeapDistanceUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlSafePlane = new System.Windows.Forms.Panel();
-			this.m_lblSafePlaneDistance = new System.Windows.Forms.Label();
+			this.m_lblSafePlaneDistance = new CommonUI.Controls.ThemedLabel();
 			this.m_numSafePlaneDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblSafePlaneDistanceUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlSafeCylinder = new System.Windows.Forms.Panel();
-			this.m_lblSafeCylinderRadius = new System.Windows.Forms.Label();
+			this.m_lblSafeCylinderRadius = new CommonUI.Controls.ThemedLabel();
 			this.m_numSafeCylinderRadius = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblSafeCylinderRadiusUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlSafeSphere = new System.Windows.Forms.Panel();
-			this.m_lblSafeSphereRadius = new System.Windows.Forms.Label();
+			this.m_lblSafeSphereRadius = new CommonUI.Controls.ThemedLabel();
 			this.m_numSafeSphereRadius = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblSafeSphereRadiusUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
@@ -475,13 +475,13 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlDistance;
-		private System.Windows.Forms.Label m_lblLiftUpDistance;
+		private CommonUI.Controls.ThemedLabel m_lblLiftUpDistance;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numLiftUpDistance;
 		private CommonUI.Controls.ThemedLabel m_lblLiftUpDistanceUnit;
-		private System.Windows.Forms.Label m_lblCutDownDistance;
+		private CommonUI.Controls.ThemedLabel m_lblCutDownDistance;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numCutDownDistance;
 		private CommonUI.Controls.ThemedLabel m_lblCutDownDistanceUnit;
-		private System.Windows.Forms.Label m_lblFollowSaveDistance;
+		private CommonUI.Controls.ThemedLabel m_lblFollowSaveDistance;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numFollowSafeDistance;
 		private CommonUI.Controls.ThemedLabel m_lblFollowSaveDistanceUnit;
 		private CommonUI.Controls.SectionPanel m_pnlTraverseMode;
@@ -492,19 +492,19 @@
 		private System.Windows.Forms.RadioButton m_rdoSafeSphere;
 		private CommonUI.Controls.SectionPanel m_pnlTraverse;
 		private System.Windows.Forms.Panel m_pnlFrogLeap;
-		private System.Windows.Forms.Label m_lblFrogLeapDistance;
+		private CommonUI.Controls.ThemedLabel m_lblFrogLeapDistance;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numFrogLeapDistance;
 		private CommonUI.Controls.ThemedLabel m_lblFrogLeapDistanceUnit;
 		private System.Windows.Forms.Panel m_pnlSafePlane;
-		private System.Windows.Forms.Label m_lblSafePlaneDistance;
+		private CommonUI.Controls.ThemedLabel m_lblSafePlaneDistance;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numSafePlaneDistance;
 		private CommonUI.Controls.ThemedLabel m_lblSafePlaneDistanceUnit;
 		private System.Windows.Forms.Panel m_pnlSafeCylinder;
-		private System.Windows.Forms.Label m_lblSafeCylinderRadius;
+		private CommonUI.Controls.ThemedLabel m_lblSafeCylinderRadius;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numSafeCylinderRadius;
 		private CommonUI.Controls.ThemedLabel m_lblSafeCylinderRadiusUnit;
 		private System.Windows.Forms.Panel m_pnlSafeSphere;
-		private System.Windows.Forms.Label m_lblSafeSphereRadius;
+		private CommonUI.Controls.ThemedLabel m_lblSafeSphereRadius;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numSafeSphereRadius;
 		private CommonUI.Controls.ThemedLabel m_lblSafeSphereRadiusUnit;
 		private CommonUI.Controls.ThemedButton m_btnConfirm;

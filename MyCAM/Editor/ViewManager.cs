@@ -121,20 +121,6 @@ namespace MyCAM.Editor
 
 	internal class ViewManager
 	{
-		static readonly List<Quantity_NameOfColor> TECH_Layer_Color_List = new List<Quantity_NameOfColor> {
-			Quantity_NameOfColor.Quantity_NOC_GRAY50,
-			Quantity_NameOfColor.Quantity_NOC_BLUE,
-			Quantity_NameOfColor.Quantity_NOC_DARKORANGE2,
-			Quantity_NameOfColor.Quantity_NOC_PURPLE,
-			Quantity_NameOfColor.Quantity_NOC_YELLOW2,
-			Quantity_NameOfColor.Quantity_NOC_GREEN3,
-			Quantity_NameOfColor.Quantity_NOC_TOMATO2,
-			Quantity_NameOfColor.Quantity_NOC_YELLOWGREEN,
-			Quantity_NameOfColor.Quantity_NOC_BROWN,
-			Quantity_NameOfColor.Quantity_NOC_MAGENTA1,
-			Quantity_NameOfColor.Quantity_NOC_CYAN1,
-		};
-
 		readonly Viewer m_Viewer;
 		readonly HashSet<string> m_PartIDSet = new HashSet<string>();
 		readonly HashSet<string> m_PathIDSet = new HashSet<string>();
@@ -566,7 +552,7 @@ namespace MyCAM.Editor
 			// create AIS with TechLayer color
 			AIS_Shape pathAIS = new AIS_Shape( shape );
 			int nPathColorIdx = GetPathColorIndex( pathID );
-			pathAIS.SetColor( new Quantity_Color( TECH_Layer_Color_List[ nPathColorIdx ] ) );
+			pathAIS.SetColor( PathLayerColor.GetPathColor( nPathColorIdx ) );
 			pathAIS.SetWidth( 3.0 );
 
 			// register shape-ID mapping for selection lookup
@@ -666,7 +652,7 @@ namespace MyCAM.Editor
 
 			// update color in case TechLayer changed
 			int nPathColorIdx = GetPathColorIndex( pathID );
-			pathAIS.SetColor( new Quantity_Color( TECH_Layer_Color_List[ nPathColorIdx ] ) );
+			pathAIS.SetColor( PathLayerColor.GetPathColor( nPathColorIdx ) );
 
 			// replace geometry and register new mapping
 			pathAIS.Set( shape );
@@ -1035,7 +1021,7 @@ namespace MyCAM.Editor
 				return NONE_PROCESS_PATH_COLOR_INDEX;
 			}
 			nColorIdx = craftData.TechLayer;
-			if( nColorIdx < 0 || nColorIdx >= TECH_Layer_Color_List.Count ) {
+			if( nColorIdx < 0 || nColorIdx >= PathLayerColor.Count ) {
 				nColorIdx = DEFAULT_PATH_COLOR_INDEX;
 			}
 			return nColorIdx;

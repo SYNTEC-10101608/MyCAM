@@ -28,13 +28,13 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlDistance = new CommonUI.Controls.SectionPanel();
-			this.m_lblEntryDistance = new System.Windows.Forms.Label();
+			this.m_lblEntryDistance = new CommonUI.Controls.ThemedLabel();
 			this.m_numEntryDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblEntryDistanceUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_lblExitDistance = new System.Windows.Forms.Label();
+			this.m_lblExitDistance = new CommonUI.Controls.ThemedLabel();
 			this.m_numExitDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblExitDistanceUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_lblFollowSafeDistance = new System.Windows.Forms.Label();
+			this.m_lblFollowSafeDistance = new CommonUI.Controls.ThemedLabel();
 			this.m_numFollowSafeDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblFollowSafeDistanceUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
@@ -189,13 +189,13 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlDistance;
-		private System.Windows.Forms.Label m_lblEntryDistance;
+		private CommonUI.Controls.ThemedLabel m_lblEntryDistance;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numEntryDistance;
 		private CommonUI.Controls.ThemedLabel m_lblEntryDistanceUnit;
-		private System.Windows.Forms.Label m_lblExitDistance;
+		private CommonUI.Controls.ThemedLabel m_lblExitDistance;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numExitDistance;
 		private CommonUI.Controls.ThemedLabel m_lblExitDistanceUnit;
-		private System.Windows.Forms.Label m_lblFollowSafeDistance;
+		private CommonUI.Controls.ThemedLabel m_lblFollowSafeDistance;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numFollowSafeDistance;
 		private CommonUI.Controls.ThemedLabel m_lblFollowSafeDistanceUnit;
 		private CommonUI.Controls.ThemedButton m_btnConfirm;

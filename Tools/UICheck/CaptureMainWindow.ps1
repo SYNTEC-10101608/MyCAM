@@ -8,13 +8,16 @@
 	[ValidateSet( "CAD", "CAM", "CNC" )][string]$Mode = "CAD",
 	[string[]]$Dialogs = @( "AddPathDlg", "OverCutDlg", "StartPointDlg" ),
 	[string[]]$ModalDialogs = @( "ConnectDlg", "GlassDXFImportDlg" ),
-	[switch]$Visible
+	[switch]$Visible,
+	[switch]$DesignerLayout
 )
 # Screenshot of the main window at a given size (e.g. 1920 x 1040 landscape, 1080 x 1880 portrait) and check
 # that dialogs are centered in the dialog area (see MainWindowRunner.cs). Landscape / portrait only depends on
 # the window's aspect ratio, so a portrait window is checked on a landscape screen by sizing it beyond the screen.
 # -Mode clicks the CAM or CNC (machining) page before the capture; CAD is the start page.
 # -ModalDialogs are opened with ShowDialog, as the program does, and checked the same way.
+# -DesignerLayout (P6) sizes the client like StartupForm.Designer.cs and checks that the regions are placed where the
+# designer shows them; use it with -Mode CNC, the page the designer shows. It opens no dialog.
 # The language is set in memory only; the setting file is not changed.
 # The runner works on a hidden desktop (HiddenDesktopRun.cs) so it does not take the screen; -Visible shows it.
 # On the hidden desktop the OpenGL 3D view stays empty.
@@ -60,6 +63,9 @@ New-Item -ItemType Directory -Force (Split-Path $outPath) | Out-Null
 
 # dialogs opened with ShowDialog are checked the same way, marked for the runner
 $dialogArguments = @( $Dialogs ) + @( $ModalDialogs | ForEach-Object { "modal:$_" } )
+if ($DesignerLayout) {
+	$dialogArguments = @( "designer:" + (Join-Path $Root "MyCAM\StartupForm.Designer.cs") )
+}
 Push-Location $binDir
 try {
 	if ($Visible) {

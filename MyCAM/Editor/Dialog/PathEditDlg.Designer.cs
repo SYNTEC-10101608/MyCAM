@@ -28,18 +28,18 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlMove = new CommonUI.Controls.SectionPanel();
-			this.m_lblRefCoordType = new System.Windows.Forms.Label();
+			this.m_lblRefCoordType = new CommonUI.Controls.ThemedLabel();
 			this.m_cmbRefCoordType = new System.Windows.Forms.ComboBox();
-			this.m_lblTotalDiff = new System.Windows.Forms.Label();
-			this.m_lblX = new System.Windows.Forms.Label();
+			this.m_lblTotalDiff = new CommonUI.Controls.ThemedLabel();
+			this.m_lblX = new CommonUI.Controls.ThemedLabel();
 			this.m_numX = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_lblTotalDX = new System.Windows.Forms.Label();
-			this.m_lblY = new System.Windows.Forms.Label();
+			this.m_lblTotalDX = new CommonUI.Controls.ThemedLabel();
+			this.m_lblY = new CommonUI.Controls.ThemedLabel();
 			this.m_numY = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_lblTotalDY = new System.Windows.Forms.Label();
-			this.m_lblZ = new System.Windows.Forms.Label();
+			this.m_lblTotalDY = new CommonUI.Controls.ThemedLabel();
+			this.m_lblZ = new CommonUI.Controls.ThemedLabel();
 			this.m_numZ = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_lblTotalDZ = new System.Windows.Forms.Label();
+			this.m_lblTotalDZ = new CommonUI.Controls.ThemedLabel();
 			this.m_btnReset = new CommonUI.Controls.ThemedButton();
 			this.m_btnClear = new CommonUI.Controls.ThemedButton();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
@@ -268,18 +268,18 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlMove;
-		private System.Windows.Forms.Label m_lblRefCoordType;
+		private CommonUI.Controls.ThemedLabel m_lblRefCoordType;
 		private System.Windows.Forms.ComboBox m_cmbRefCoordType;
-		private System.Windows.Forms.Label m_lblTotalDiff;
-		private System.Windows.Forms.Label m_lblX;
+		private CommonUI.Controls.ThemedLabel m_lblTotalDiff;
+		private CommonUI.Controls.ThemedLabel m_lblX;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numX;
-		private System.Windows.Forms.Label m_lblTotalDX;
-		private System.Windows.Forms.Label m_lblY;
+		private CommonUI.Controls.ThemedLabel m_lblTotalDX;
+		private CommonUI.Controls.ThemedLabel m_lblY;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numY;
-		private System.Windows.Forms.Label m_lblTotalDY;
-		private System.Windows.Forms.Label m_lblZ;
+		private CommonUI.Controls.ThemedLabel m_lblTotalDY;
+		private CommonUI.Controls.ThemedLabel m_lblZ;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numZ;
-		private System.Windows.Forms.Label m_lblTotalDZ;
+		private CommonUI.Controls.ThemedLabel m_lblTotalDZ;
 		private CommonUI.Controls.ThemedButton m_btnReset;
 		private CommonUI.Controls.ThemedButton m_btnClear;
 		private CommonUI.Controls.ThemedButton m_btnConfirm;

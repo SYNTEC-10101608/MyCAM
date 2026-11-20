@@ -36,20 +36,20 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlSort = new CommonUI.Controls.SectionPanel();
-			this.m_lblSortMethod = new System.Windows.Forms.Label();
+			this.m_lblSortMethod = new CommonUI.Controls.ThemedLabel();
 			this.m_cmbSortMethod = new System.Windows.Forms.ComboBox();
-			this.m_lblPathHint = new System.Windows.Forms.Label();
+			this.m_lblPathHint = new CommonUI.Controls.ThemedLabel();
 			this.m_lblSelectedPath = new CommonUI.Controls.ThemedLabel();
-			this.m_lblCylinderAxis = new System.Windows.Forms.Label();
+			this.m_lblCylinderAxis = new CommonUI.Controls.ThemedLabel();
 			this.m_cmbCylinderAxis = new System.Windows.Forms.ComboBox();
-			this.m_lblExtrusionDir = new System.Windows.Forms.Label();
+			this.m_lblExtrusionDir = new CommonUI.Controls.ThemedLabel();
 			this.m_cmbExtrusionDir = new System.Windows.Forms.ComboBox();
-			this.m_lblRotationDir = new System.Windows.Forms.Label();
+			this.m_lblRotationDir = new CommonUI.Controls.ThemedLabel();
 			this.m_cmbRotationDir = new System.Windows.Forms.ComboBox();
-			this.m_lblExtrusionBandwidth = new System.Windows.Forms.Label();
+			this.m_lblExtrusionBandwidth = new CommonUI.Controls.ThemedLabel();
 			this.m_numExtrusionBandwidth = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblExtrusionUnit = new CommonUI.Controls.ThemedLabel();
-			this.m_lblRotationBandwidth = new System.Windows.Forms.Label();
+			this.m_lblRotationBandwidth = new CommonUI.Controls.ThemedLabel();
 			this.m_numRotationBandwidth = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblRotationUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_picPreview = new System.Windows.Forms.PictureBox();
@@ -293,20 +293,20 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlSort;
-		private System.Windows.Forms.Label m_lblSortMethod;
+		private CommonUI.Controls.ThemedLabel m_lblSortMethod;
 		private System.Windows.Forms.ComboBox m_cmbSortMethod;
-		private System.Windows.Forms.Label m_lblPathHint;
+		private CommonUI.Controls.ThemedLabel m_lblPathHint;
 		private CommonUI.Controls.ThemedLabel m_lblSelectedPath;
-		private System.Windows.Forms.Label m_lblCylinderAxis;
+		private CommonUI.Controls.ThemedLabel m_lblCylinderAxis;
 		private System.Windows.Forms.ComboBox m_cmbCylinderAxis;
-		private System.Windows.Forms.Label m_lblExtrusionDir;
+		private CommonUI.Controls.ThemedLabel m_lblExtrusionDir;
 		private System.Windows.Forms.ComboBox m_cmbExtrusionDir;
-		private System.Windows.Forms.Label m_lblRotationDir;
+		private CommonUI.Controls.ThemedLabel m_lblRotationDir;
 		private System.Windows.Forms.ComboBox m_cmbRotationDir;
-		private System.Windows.Forms.Label m_lblExtrusionBandwidth;
+		private CommonUI.Controls.ThemedLabel m_lblExtrusionBandwidth;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numExtrusionBandwidth;
 		private CommonUI.Controls.ThemedLabel m_lblExtrusionUnit;
-		private System.Windows.Forms.Label m_lblRotationBandwidth;
+		private CommonUI.Controls.ThemedLabel m_lblRotationBandwidth;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numRotationBandwidth;
 		private CommonUI.Controls.ThemedLabel m_lblRotationUnit;
 		private System.Windows.Forms.PictureBox m_picPreview;

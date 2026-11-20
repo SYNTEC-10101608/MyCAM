@@ -17,10 +17,10 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlMeasure = new CommonUI.Controls.SectionPanel();
-			this.m_lblMethod = new System.Windows.Forms.Label();
+			this.m_lblMethod = new CommonUI.Controls.ThemedLabel();
 			this.m_cmbMethod = new System.Windows.Forms.ComboBox();
 			this.m_lblGuide = new CommonUI.Controls.ThemedLabel();
-			this.m_lblResult = new System.Windows.Forms.Label();
+			this.m_lblResult = new CommonUI.Controls.ThemedLabel();
 			this.m_txtResult = new System.Windows.Forms.TextBox();
 			this.m_pnlMeasure.SuspendLayout();
 			this.SuspendLayout();
@@ -98,10 +98,10 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlMeasure;
-		private System.Windows.Forms.Label m_lblMethod;
+		private CommonUI.Controls.ThemedLabel m_lblMethod;
 		private System.Windows.Forms.ComboBox m_cmbMethod;
 		private CommonUI.Controls.ThemedLabel m_lblGuide;
-		private System.Windows.Forms.Label m_lblResult;
+		private CommonUI.Controls.ThemedLabel m_lblResult;
 		private System.Windows.Forms.TextBox m_txtResult;
 	}
 }

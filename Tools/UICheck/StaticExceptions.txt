@@ -11,7 +11,7 @@ S20 CNCInfoPanel Z_AXIS_COLOR data color: CNC axis dot
 S20 CNCInfoPanel B_AXIS_COLOR data color: CNC axis dot
 S20 CNCInfoPanel C_AXIS_COLOR data color: CNC axis dot
 S2 ToolVectorDlg m_pnlColor* legend swatches in the data colors of the interpolation preview
-S19 StartupForm m_tsbLayer* layer color swatches (section 6)
+S19 StartupForm m_tsbLayerNone not-machined legend swatch (section 6)
 S19 StartupForm m_tsbNeedProcess machining legend swatch (section 6)
 
 # ---- windows that only host one remote content (section 4.4)

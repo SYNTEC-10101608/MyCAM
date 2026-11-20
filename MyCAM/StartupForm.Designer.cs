@@ -115,8 +115,6 @@
 			this.m_tsbManualTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsb3PntTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMeasureCAD = new System.Windows.Forms.ToolStripButton();
-			this.m_tscLevel2Container = new System.Windows.Forms.ToolStripContainer();
-			this.m_tscLevel3Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_pnlCNCVertical = new System.Windows.Forms.Panel();
 			this.m_pnlVerticalAlarm = new System.Windows.Forms.Panel();
 			this.m_pnlTreeView = new System.Windows.Forms.Panel();
@@ -125,7 +123,7 @@
 			this.m_pnlViewer = new System.Windows.Forms.Panel();
 			this.m_pnlCNC = new System.Windows.Forms.Panel();
 			this.m_pnlCNCInfo = new System.Windows.Forms.Panel();
-			this.m_pnlBottom = new System.Windows.Forms.TableLayoutPanel();
+			this.m_pnlBottom = new System.Windows.Forms.Panel();
 			this.m_tsLayer = new System.Windows.Forms.ToolStrip();
 			this.m_tsbLayer1 = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbLayer2 = new System.Windows.Forms.ToolStripButton();
@@ -153,7 +151,7 @@
 			this.m_tsbShowOrientation = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowTraverse = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowMarker = new System.Windows.Forms.ToolStripButton();
-			this.m_pnlBackGround = new System.Windows.Forms.TableLayoutPanel();
+			this.m_pnlBackGround = new System.Windows.Forms.Panel();
 			this.m_cmsMain = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
@@ -163,8 +161,6 @@
 			this.m_tsSimuFunc.SuspendLayout();
 			this.m_tsFileFunction.SuspendLayout();
 			this.m_tsCADFunction.SuspendLayout();
-			this.m_tscLevel2Container.SuspendLayout();
-			this.m_tscLevel3Container.SuspendLayout();
 			this.m_pnlViewer.SuspendLayout();
 			this.m_tsLayer.SuspendLayout();
 			this.m_tsViewerToolBar.SuspendLayout();
@@ -185,7 +181,7 @@
             this.m_tsmiSetting} );
 			this.m_msMode.Location = new System.Drawing.Point(0, 0);
 			this.m_msMode.Name = "m_msMode";
-			this.m_msMode.Size = new System.Drawing.Size(1596, 24);
+			this.m_msMode.Size = new System.Drawing.Size( 1920, 24 );
 			this.m_msMode.TabIndex = 1;
 			this.m_msMode.Text = "menuStrip1";
 			//
@@ -585,11 +581,11 @@
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsSimuFunc);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsFileFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
-			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size(1596, 50);
+			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size( 1920, 50 );
 			this.m_tscLevel1Container.Dock = System.Windows.Forms.DockStyle.Top;
 			this.m_tscLevel1Container.Location = new System.Drawing.Point(0, 24);
 			this.m_tscLevel1Container.Name = "m_tscLevel1Container";
-			this.m_tscLevel1Container.Size = new System.Drawing.Size(1596, 75);
+			this.m_tscLevel1Container.Size = new System.Drawing.Size( 1920, 75 );
 			this.m_tscLevel1Container.TabIndex = 5;
 			this.m_tscLevel1Container.Text = "toolStripContainer1";
 			//
@@ -945,127 +941,77 @@
 			this.m_tsbMeasureCAD.ToolTipText = "量測距離或角度";
 			this.m_tsbMeasureCAD.Click += new System.EventHandler(this.m_tsbMeasureCAD_Click);
 			//
-			// m_tscLevel2Container
-			//
-			//
-			// m_tscLevel2Container.ContentPanel
-			//
-			this.m_tscLevel2Container.ContentPanel.Size = new System.Drawing.Size(1596, 30);
-			this.m_tscLevel2Container.Dock = System.Windows.Forms.DockStyle.Top;
-			this.m_tscLevel2Container.Location = new System.Drawing.Point(0, 99);
-			this.m_tscLevel2Container.Name = "m_tscLevel2Container";
-			this.m_tscLevel2Container.Size = new System.Drawing.Size(1596, 30);
-			this.m_tscLevel2Container.TabIndex = 6;
-			this.m_tscLevel2Container.Text = "toolStripContainer1";
-			this.m_tscLevel2Container.TopToolStripPanelVisible = false;
-			//
-			// m_tscLevel3Container
-			//
-			this.m_tscLevel3Container.BottomToolStripPanelVisible = false;
-			//
-			// m_tscLevel3Container.ContentPanel
-			//
-			this.m_tscLevel3Container.ContentPanel.Size = new System.Drawing.Size(1596, 24);
-			this.m_tscLevel3Container.Dock = System.Windows.Forms.DockStyle.Top;
-			this.m_tscLevel3Container.LeftToolStripPanelVisible = false;
-			this.m_tscLevel3Container.Location = new System.Drawing.Point(0, 129);
-			this.m_tscLevel3Container.Name = "m_tscLevel3Container";
-			this.m_tscLevel3Container.RightToolStripPanelVisible = false;
-			this.m_tscLevel3Container.Size = new System.Drawing.Size(1596, 24);
-			this.m_tscLevel3Container.TabIndex = 8;
-			this.m_tscLevel3Container.Text = "toolStripContainer1";
-			this.m_tscLevel3Container.TopToolStripPanelVisible = false;
-			//
 			// m_pnlCNCVertical
 			//
 			this.m_pnlCNCVertical.Controls.Add( this.m_pnlVerticalAlarm );
-			this.m_pnlBackGround.SetColumnSpan( this.m_pnlCNCVertical, 3 );
-			this.m_pnlCNCVertical.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_pnlCNCVertical.Location = new System.Drawing.Point( 3, 478 );
+			this.m_pnlCNCVertical.Location = new System.Drawing.Point( 0, 0 );
 			this.m_pnlCNCVertical.Name = "m_pnlCNCVertical";
-			this.m_pnlCNCVertical.Size = new System.Drawing.Size( 1590, 418 );
+			this.m_pnlCNCVertical.Size = new System.Drawing.Size( 0, 0 );
 			this.m_pnlCNCVertical.TabIndex = 4;
 			//
 			// m_pnlVerticalAlarm
 			//
-			this.m_pnlVerticalAlarm.Location = new System.Drawing.Point( 3, 296 );
+			this.m_pnlVerticalAlarm.Location = new System.Drawing.Point( 0, 0 );
 			this.m_pnlVerticalAlarm.Name = "m_pnlVerticalAlarm";
-			this.m_pnlVerticalAlarm.Size = new System.Drawing.Size( 630, 119 );
+			this.m_pnlVerticalAlarm.Size = new System.Drawing.Size( 0, 0 );
 			this.m_pnlVerticalAlarm.TabIndex = 0;
 			//
 			// m_pnlTreeView
 			//
-			this.m_pnlTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_pnlTreeView.Location = new System.Drawing.Point(3, 3);
+			this.m_pnlTreeView.Location = new System.Drawing.Point( 3, 3 );
 			this.m_pnlTreeView.Name = "m_pnlTreeView";
-			this.m_pnlTreeView.Size = new System.Drawing.Size(233, 417);
+			this.m_pnlTreeView.Size = new System.Drawing.Size( 345, 658 );
 			this.m_pnlTreeView.TabIndex = 0;
 			//
 			// m_pnlLog
 			//
 			this.m_pnlLog.AutoScroll = true;
-			this.m_pnlBackGround.SetColumnSpan(this.m_pnlLog, 2);
-			this.m_pnlLog.Dock = System.Windows.Forms.DockStyle.None;
 			this.m_pnlLog.Location = new System.Drawing.Point( 0, 0 );
 			this.m_pnlLog.Name = "m_pnlLog";
-			this.m_pnlLog.Size = new System.Drawing.Size( 353, 47 );
+			this.m_pnlLog.Size = new System.Drawing.Size( 345, 240 );
 			this.m_pnlLog.TabIndex = 7;
 			//
 			// m_pnlMessages
 			//
 			this.m_pnlMessages.Controls.Add( this.m_pnlLog );
-			this.m_pnlMessages.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_pnlMessages.Location = new System.Drawing.Point( 3, 3 );
 			this.m_pnlMessages.Name = "m_pnlMessages";
-			this.m_pnlMessages.Size = new System.Drawing.Size( 353, 47 );
+			this.m_pnlMessages.Size = new System.Drawing.Size( 345, 240 );
 			this.m_pnlMessages.SizeChanged += new System.EventHandler( this.OnMessagesSizeChanged );
 			//
 			// m_pnlViewer
 			//
 			this.m_pnlViewer.Controls.Add(this.m_tsLayer);
 			this.m_pnlViewer.Controls.Add(this.m_tsViewerToolBar);
-			this.m_pnlViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_pnlViewer.Location = new System.Drawing.Point(242, 3);
+			this.m_pnlViewer.Location = new System.Drawing.Point( 354, 3 );
 			this.m_pnlViewer.Name = "m_pnlViewer";
-			this.m_pnlViewer.Size = new System.Drawing.Size(1351, 417);
+			this.m_pnlViewer.Size = new System.Drawing.Size( 1239, 658 );
 			this.m_pnlViewer.TabIndex = 1;
 			//
 			// m_pnlCNC
 			//
-			this.m_pnlCNC.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_pnlBackGround.SetRowSpan( this.m_pnlCNC, 2 );
-			this.m_pnlCNC.Location = new System.Drawing.Point( 1358, 3 );
+			this.m_pnlCNC.Location = new System.Drawing.Point( 1599, 3 );
 			this.m_pnlCNC.Name = "m_pnlCNC";
-			this.m_pnlCNC.Size = new System.Drawing.Size( 235, 416 );
+			this.m_pnlCNC.Size = new System.Drawing.Size( 318, 904 );
 			this.m_pnlCNC.TabIndex = 8;
 			this.m_pnlCNC.Visible = false;
 			//
 			// m_pnlCNCInfo
 			//
 			this.m_pnlCNCInfo.AutoScroll = false;
-			this.m_pnlCNCInfo.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_pnlCNCInfo.Location = new System.Drawing.Point( 1200, 425 );
-			this.m_pnlCNCInfo.Margin = new System.Windows.Forms.Padding( 3, 3, 0, 3 );
+			this.m_pnlCNCInfo.Location = new System.Drawing.Point( 354, 3 );
 			this.m_pnlCNCInfo.Name = "m_pnlCNCInfo";
-			this.m_pnlCNCInfo.Size = new System.Drawing.Size( 390, 47 );
+			this.m_pnlCNCInfo.Size = new System.Drawing.Size( 1242, 240 );
 			this.m_pnlCNCInfo.TabIndex = 9;
 			this.m_pnlCNCInfo.Visible = false;
 			//
 			// m_pnlBottom
 			//
-			this.m_pnlBottom.ColumnCount = 2;
-			this.m_pnlBottom.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 30F ) );
-			this.m_pnlBottom.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 70F ) );
-			this.m_pnlBottom.Controls.Add( this.m_pnlMessages, 0, 0 );
-			this.m_pnlBottom.Controls.Add( this.m_pnlCNCInfo, 1, 0 );
-			this.m_pnlBackGround.SetColumnSpan( this.m_pnlBottom, 2 );
-			this.m_pnlBottom.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_pnlBottom.Location = new System.Drawing.Point( 0, 422 );
-			this.m_pnlBottom.Margin = new System.Windows.Forms.Padding( 0 );
+			this.m_pnlBottom.Controls.Add( this.m_pnlMessages );
+			this.m_pnlBottom.Controls.Add( this.m_pnlCNCInfo );
+			this.m_pnlBottom.Location = new System.Drawing.Point( 0, 664 );
 			this.m_pnlBottom.Name = "m_pnlBottom";
-			this.m_pnlBottom.RowCount = 1;
-			this.m_pnlBottom.RowStyles.Add( new System.Windows.Forms.RowStyle( System.Windows.Forms.SizeType.Percent, 100F ) );
-			this.m_pnlBottom.Size = new System.Drawing.Size( 1197, 53 );
+			this.m_pnlBottom.Size = new System.Drawing.Size( 1596, 246 );
 			this.m_pnlBottom.TabIndex = 10;
 			//
 			// m_tsLayer
@@ -1095,9 +1041,7 @@
 			// m_tsbLayer1
 			//
 			this.m_tsbLayer1.AutoSize = false;
-			this.m_tsbLayer1.BackColor = System.Drawing.Color.Blue;
 			this.m_tsbLayer1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbLayer1.ForeColor = System.Drawing.Color.White;
 			this.m_tsbLayer1.Name = "m_tsbLayer1";
 			this.m_tsbLayer1.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer1.Text = "1";
@@ -1106,7 +1050,6 @@
 			// m_tsbLayer2
 			//
 			this.m_tsbLayer2.AutoSize = false;
-			this.m_tsbLayer2.BackColor = System.Drawing.Color.Orange;
 			this.m_tsbLayer2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
 			this.m_tsbLayer2.Name = "m_tsbLayer2";
 			this.m_tsbLayer2.Size = new System.Drawing.Size(24, 24);
@@ -1116,9 +1059,7 @@
 			// m_tsbLayer3
 			//
 			this.m_tsbLayer3.AutoSize = false;
-			this.m_tsbLayer3.BackColor = System.Drawing.Color.Purple;
 			this.m_tsbLayer3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbLayer3.ForeColor = System.Drawing.Color.White;
 			this.m_tsbLayer3.Name = "m_tsbLayer3";
 			this.m_tsbLayer3.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer3.Text = "3";
@@ -1127,7 +1068,6 @@
 			// m_tsbLayer4
 			//
 			this.m_tsbLayer4.AutoSize = false;
-			this.m_tsbLayer4.BackColor = System.Drawing.Color.Yellow;
 			this.m_tsbLayer4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
 			this.m_tsbLayer4.Name = "m_tsbLayer4";
 			this.m_tsbLayer4.Size = new System.Drawing.Size(24, 24);
@@ -1137,9 +1077,7 @@
 			// m_tsbLayer5
 			//
 			this.m_tsbLayer5.AutoSize = false;
-			this.m_tsbLayer5.BackColor = System.Drawing.Color.Green;
 			this.m_tsbLayer5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbLayer5.ForeColor = System.Drawing.Color.White;
 			this.m_tsbLayer5.Name = "m_tsbLayer5";
 			this.m_tsbLayer5.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer5.Text = "5";
@@ -1148,7 +1086,6 @@
 			// m_tsbLayer6
 			//
 			this.m_tsbLayer6.AutoSize = false;
-			this.m_tsbLayer6.BackColor = System.Drawing.Color.Tomato;
 			this.m_tsbLayer6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
 			this.m_tsbLayer6.Name = "m_tsbLayer6";
 			this.m_tsbLayer6.Size = new System.Drawing.Size(24, 24);
@@ -1158,7 +1095,6 @@
 			// m_tsbLayer7
 			//
 			this.m_tsbLayer7.AutoSize = false;
-			this.m_tsbLayer7.BackColor = System.Drawing.Color.GreenYellow;
 			this.m_tsbLayer7.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
 			this.m_tsbLayer7.Name = "m_tsbLayer7";
 			this.m_tsbLayer7.Size = new System.Drawing.Size(24, 24);
@@ -1168,9 +1104,7 @@
 			// m_tsbLayer8
 			//
 			this.m_tsbLayer8.AutoSize = false;
-			this.m_tsbLayer8.BackColor = System.Drawing.Color.Sienna;
 			this.m_tsbLayer8.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbLayer8.ForeColor = System.Drawing.Color.White;
 			this.m_tsbLayer8.Name = "m_tsbLayer8";
 			this.m_tsbLayer8.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer8.Text = "8";
@@ -1179,7 +1113,6 @@
 			// m_tsbLayer9
 			//
 			this.m_tsbLayer9.AutoSize = false;
-			this.m_tsbLayer9.BackColor = System.Drawing.Color.Fuchsia;
 			this.m_tsbLayer9.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
 			this.m_tsbLayer9.Name = "m_tsbLayer9";
 			this.m_tsbLayer9.Size = new System.Drawing.Size(24, 24);
@@ -1189,7 +1122,6 @@
 			// m_tsbLayer10
 			//
 			this.m_tsbLayer10.AutoSize = false;
-			this.m_tsbLayer10.BackColor = System.Drawing.Color.Cyan;
 			this.m_tsbLayer10.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
 			this.m_tsbLayer10.Name = "m_tsbLayer10";
 			this.m_tsbLayer10.Size = new System.Drawing.Size(24, 24);
@@ -1376,23 +1308,15 @@
 			//
 			// m_pnlBackGround
 			//
-			this.m_pnlBackGround.ColumnCount = 3;
-			this.m_pnlBackGround.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
-			this.m_pnlBackGround.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 60F ) );
-			this.m_pnlBackGround.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 25F ) );
-			this.m_pnlBackGround.Controls.Add( this.m_pnlCNCVertical, 0, 2 );
-			this.m_pnlBackGround.Controls.Add(this.m_pnlTreeView, 0, 0);
-			this.m_pnlBackGround.Controls.Add( this.m_pnlBottom, 0, 1 );
-			this.m_pnlBackGround.Controls.Add(this.m_pnlViewer, 1, 0);
-			this.m_pnlBackGround.Controls.Add( this.m_pnlCNC, 2, 0 );
+			this.m_pnlBackGround.Controls.Add( this.m_pnlCNCVertical );
+			this.m_pnlBackGround.Controls.Add( this.m_pnlTreeView );
+			this.m_pnlBackGround.Controls.Add( this.m_pnlBottom );
+			this.m_pnlBackGround.Controls.Add( this.m_pnlViewer );
+			this.m_pnlBackGround.Controls.Add( this.m_pnlCNC );
 			this.m_pnlBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_pnlBackGround.Location = new System.Drawing.Point(0, 153);
+			this.m_pnlBackGround.Location = new System.Drawing.Point( 0, 99 );
 			this.m_pnlBackGround.Name = "m_pnlBackGround";
-			this.m_pnlBackGround.RowCount = 3;
-			this.m_pnlBackGround.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 59F));
-			this.m_pnlBackGround.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6F));
-			this.m_pnlBackGround.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 35F));
-			this.m_pnlBackGround.Size = new System.Drawing.Size(1596, 902);
+			this.m_pnlBackGround.Size = new System.Drawing.Size( 1920, 910 );
 			this.m_pnlBackGround.TabIndex = 9;
 			//
 			// m_cmsMain
@@ -1405,10 +1329,8 @@
 			//
 			this.AutoScroll = true;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1596, 1055);
+			this.ClientSize = new System.Drawing.Size( 1920, 1009 );
 			this.Controls.Add(this.m_pnlBackGround);
-			this.Controls.Add(this.m_tscLevel3Container);
-			this.Controls.Add(this.m_tscLevel2Container);
 			this.Controls.Add(this.m_tscLevel1Container);
 			this.Controls.Add(this.m_msMode);
 			this.MainMenuStrip = this.m_msMode;
@@ -1433,10 +1355,6 @@
 			this.m_tsFileFunction.PerformLayout();
 			this.m_tsCADFunction.ResumeLayout(false);
 			this.m_tsCADFunction.PerformLayout();
-			this.m_tscLevel2Container.ResumeLayout(false);
-			this.m_tscLevel2Container.PerformLayout();
-			this.m_tscLevel3Container.ResumeLayout(false);
-			this.m_tscLevel3Container.PerformLayout();
 			this.m_pnlViewer.ResumeLayout(false);
 			this.m_pnlViewer.PerformLayout();
 			this.m_tsLayer.ResumeLayout(false);
@@ -1470,9 +1388,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbToolVec;
 		private System.Windows.Forms.ToolStripButton m_tsbAutoOrder;
 		private System.Windows.Forms.ToolStripContainer m_tscLevel1Container;
-		private System.Windows.Forms.ToolStripContainer m_tscLevel2Container;
 		private System.Windows.Forms.ToolStrip m_tsCADFunction;
-		private System.Windows.Forms.ToolStripContainer m_tscLevel3Container;
 		private System.Windows.Forms.ToolStripButton m_tsbSetTraverseData;
 		private System.Windows.Forms.ToolStripButton m_tsbFlyCut;
 		private System.Windows.Forms.ToolStripButton m_tsbConvertNC;
@@ -1505,7 +1421,7 @@
 		private System.Windows.Forms.ToolStrip m_tsViewerToolBar;
 		private System.Windows.Forms.Panel m_pnlCNC;
 		private System.Windows.Forms.Panel m_pnlCNCInfo;
-		private System.Windows.Forms.TableLayoutPanel m_pnlBottom;
+		private System.Windows.Forms.Panel m_pnlBottom;
 		private System.Windows.Forms.ToolStripButton m_tsbAXO;
 		private System.Windows.Forms.ToolStripButton m_tsbXPos;
 		private System.Windows.Forms.ToolStripButton m_tsbXNeg;
@@ -1519,7 +1435,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbShowOrientation;
 		private System.Windows.Forms.ToolStripButton m_tsbShowTraverse;
 		private System.Windows.Forms.ToolStripButton m_tsbShowMarker;
-		private System.Windows.Forms.TableLayoutPanel m_pnlBackGround;
+		private System.Windows.Forms.Panel m_pnlBackGround;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSetting;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiCNCConnection;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSimulation;

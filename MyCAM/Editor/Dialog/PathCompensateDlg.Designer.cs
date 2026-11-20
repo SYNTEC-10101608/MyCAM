@@ -28,10 +28,10 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlCompemsate = new CommonUI.Controls.SectionPanel();
-			this.m_lblCompensate = new System.Windows.Forms.Label();
+			this.m_lblCompensate = new CommonUI.Controls.ThemedLabel();
 			this.m_numCompensate = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_lblTotalCompensate = new System.Windows.Forms.Label();
-			this.m_lblTotalCompensateValue = new System.Windows.Forms.Label();
+			this.m_lblTotalCompensate = new CommonUI.Controls.ThemedLabel();
+			this.m_lblTotalCompensateValue = new CommonUI.Controls.ThemedLabel();
 			this.m_btnReset = new CommonUI.Controls.ThemedButton();
 			this.m_btnClear = new CommonUI.Controls.ThemedButton();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
@@ -147,10 +147,10 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlCompemsate;
-		private System.Windows.Forms.Label m_lblCompensate;
+		private CommonUI.Controls.ThemedLabel m_lblCompensate;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numCompensate;
-		private System.Windows.Forms.Label m_lblTotalCompensate;
-		private System.Windows.Forms.Label m_lblTotalCompensateValue;
+		private CommonUI.Controls.ThemedLabel m_lblTotalCompensate;
+		private CommonUI.Controls.ThemedLabel m_lblTotalCompensateValue;
 		private CommonUI.Controls.ThemedButton m_btnReset;
 		private CommonUI.Controls.ThemedButton m_btnClear;
 		private CommonUI.Controls.ThemedButton m_btnConfirm;
