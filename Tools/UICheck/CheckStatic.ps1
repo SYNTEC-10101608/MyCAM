@@ -25,14 +25,13 @@
 #   S17 button bar order (section 4.4): auxiliary buttons from the left margin, the others from the right margin,
 #       8 apart; Primary is the rightmost, Cancel / Close right before it, Reset / Preview on the left
 #   S18 alignment in a card: the first input of each row starts at the same x; a unit label is 6 after its input
-#   S19 main window designer: white list of types (no TableLayoutPanel / ToolStripContainer), no appearance except
-#       the not-machined legend
+#   S19 main window designer: only the white list of types (section 3), no appearance
 #   S20 data colors: every "static readonly Color" constant is a registered data color (StaticExceptions.txt)
 #   S21 every public type of CommonUI is listed in the component catalog (section 9), in the subsection of its folder;
 #       a file in CommonUI\<Folder> is in namespace CommonUI.<Folder>
 #   S22 title bar of a titled card (section 4.5): button 23 high at y=5, check box at y=5, label 24 high at y=4,
 #       the rightmost control ends at the content edge
-#   S23 code creates no control outside the white list (Button, Label, GroupBox, NumericUpDown, TextBox ...)
+#   S23 code creates no control outside the white list (section 3)
 #   S24 InitializeComponent contains only what the designer can read: no control flow, lambda, interpolated string,
 #       call of the screen's own methods, constant of the class, statement without "this."
 #
@@ -54,6 +53,7 @@ $ALLOWED_TYPES = @(
 	"CommonUI.Controls.SectionPanel", "CommonUI.Controls.ThemedButton", "CommonUI.Controls.ThemedLabel",
 	"CommonUI.Controls.DebouncedNumericUpDown", "CommonUI.Controls.MultiSelectTreeView",
 	"CommonUI.Controls.LoadingBar", "CommonUI.Controls.RoundedProgressBar", "CommonUI.Controls.ThemedDataGridView",
+	"CommonUI.Controls.ColorSwatch",
 	"System.Windows.Forms.CheckBox", "System.Windows.Forms.RadioButton",
 	"System.Windows.Forms.ComboBox", "System.Windows.Forms.CheckedListBox", "System.Windows.Forms.TrackBar",
 	"System.Windows.Forms.PictureBox",
@@ -80,7 +80,7 @@ $PREFIX_MAP = @{
 	"ThemedButton" = "m_btn"; "ThemedLabel" = "m_lbl"; "DebouncedNumericUpDown" = "m_num"
 	"TextBox" = "m_txt"; "CheckBox" = "m_chk"; "RadioButton" = "m_rdo"; "ComboBox" = "m_cmb"
 	"CheckedListBox" = "m_clb"; "TrackBar" = "m_trb"; "PictureBox" = "m_pic"; "ThemedDataGridView" = "m_dgv"
-	"DataGridViewTextBoxColumn" = "m_col"; "ToolTip" = "m_ttp"; "Timer" = "m_tmr"
+	"DataGridViewTextBoxColumn" = "m_col"; "ToolTip" = "m_ttp"; "Timer" = "m_tmr"; "ColorSwatch" = "m_swt"
 	"MultiSelectTreeView" = "m_tv"; "TreeView" = "m_tv"; "LoadingBar" = "m_prg"; "RoundedProgressBar" = "m_prg"
 	"MenuStrip" = "m_ms"; "ToolStrip" = "m_ts"; "ToolStripButton" = "m_tsb"
 	"ToolStripMenuItem" = "m_tsmi"; "ToolStripSeparator" = "m_tss"
@@ -806,7 +806,7 @@ if (-not $Only -or $mainScreen.ClassName -like $Only) {
 	$szMainText = Get-Content (Join-Path $Root "MyCAM\StartupForm.Designer.cs") -Raw -Encoding UTF8
 	Test-DesignerCode $mainScreen.ClassName $szMainText
 
-	# S19 types and appearance of the main window (the not-machined legend is an exception)
+	# S19 types and appearance of the main window
 	foreach ($name in $mainScreen.Fields.Keys) {
 		$szType = $mainScreen.Fields[$name]
 		if ($ALLOWED_TYPES -notcontains $szType -and $MAIN_WINDOW_TYPES -notcontains $szType) {

@@ -34,13 +34,7 @@ namespace MyCAM.Editor
 		/// <returns>Background color of the swatch.</returns>
 		public static Color GetSwatchColor( int nColorIndex )
 		{
-			// the named colors are sRGB values, as the screen shows them
-			Quantity_Color color = GetPathColor( nColorIndex );
-			double dRed = 0;
-			double dGreen = 0;
-			double dBlue = 0;
-			color.Values( ref dRed, ref dGreen, ref dBlue, Quantity_TypeOfColor.Quantity_TOC_sRGB );
-			return Color.FromArgb( ToByte( dRed ), ToByte( dGreen ), ToByte( dBlue ) );
+			return DataColor.ToScreenColor( GetColorName( nColorIndex ) );
 		}
 
 		/// <summary>
@@ -87,12 +81,6 @@ namespace MyCAM.Editor
 				return LAYER_COLOR_LIST[ DEFAULT_COLOR_INDEX ];
 			}
 			return LAYER_COLOR_LIST[ nColorIndex ];
-		}
-
-		static int ToByte( double dValue )
-		{
-			int nValue = (int)Math.Round( dValue * 255 );
-			return Math.Max( 0, Math.Min( 255, nValue ) );
 		}
 
 		// WCAG relative luminance of an sRGB color

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using CncManager.Definition;
+using CommonUI.Controls;
 using CommonUI.Forms;
 using CommonUI.Layout;
 using CommonUI.Theme;
@@ -36,15 +36,19 @@ namespace CncUI
 				{ CNCInfoField.FocusPosition, m_lblFocusValue },
 				{ CNCInfoField.MachiningTime, m_lblTimeValue }
 			};
-			m_AxisColors = new Dictionary<Label, Color> {
-				{ m_lblXTitle, X_AXIS_COLOR },
-				{ m_lblYTitle, Y_AXIS_COLOR },
-				{ m_lblZTitle, Z_AXIS_COLOR },
-				{ m_lblBTitle, B_AXIS_COLOR },
-				{ m_lblCTitle, C_AXIS_COLOR }
+			m_AxisMarkers = new Dictionary<Label, ColorSwatch> {
+				{ m_lblXTitle, m_swtX },
+				{ m_lblYTitle, m_swtY },
+				{ m_lblZTitle, m_swtZ },
+				{ m_lblBTitle, m_swtB },
+				{ m_lblCTitle, m_swtC }
 			};
+			m_swtX.SwatchColor = X_AXIS_COLOR;
+			m_swtY.SwatchColor = Y_AXIS_COLOR;
+			m_swtZ.SwatchColor = Z_AXIS_COLOR;
+			m_swtB.SwatchColor = B_AXIS_COLOR;
+			m_swtC.SwatchColor = C_AXIS_COLOR;
 			m_btnCoordinates.Click += ( sender, e ) => CoordinateModeClicked?.Invoke();
-			m_pnlCoordinates.Paint += OnCoordinatesPaint;
 			m_Layout = new ResponsiveLayout( this );
 			m_VerticalLayout = CreateVerticalLayout( out m_VerticalDesignSize );
 			ApplyResources();
@@ -108,6 +112,7 @@ namespace CncUI
 				else {
 					m_Layout.Apply( this );
 				}
+				PlaceAxisMarkers();
 				m_lblCoordinateHeader.Left = m_lblXValue.Right - m_lblCoordinateHeader.Width;
 				int gap = ThemeMetrics.CONTROL_GAP;
 				int titleWidth = TextRenderer.MeasureText( m_lblMainProgramTitle.Text, m_lblMainProgramTitle.Font ).Width;
@@ -195,8 +200,17 @@ namespace CncUI
 			foreach( Label unit in units ) {
 				unit.SetBounds( valueRight + gap, unit.Top, unitWidth, unit.Height );
 			}
-			foreach( Label axis in m_AxisColors.Keys ) {
+			foreach( Label axis in m_AxisMarkers.Keys ) {
 				axis.Left = m_lblCapacitanceTitle.Left + AXIS_MARKER_OFFSET;
+			}
+		}
+
+		// the axis markers keep their size and stay centered left of their axis names after scaling
+		void PlaceAxisMarkers()
+		{
+			foreach( KeyValuePair<Label, ColorSwatch> axis in m_AxisMarkers ) {
+				int nTop = axis.Key.Top + ( axis.Key.Height - AXIS_MARKER_SIZE ) / 2;
+				axis.Value.SetBounds( axis.Key.Left - AXIS_MARKER_OFFSET, nTop, AXIS_MARKER_SIZE, AXIS_MARKER_SIZE );
 			}
 		}
 
@@ -287,18 +301,8 @@ namespace CncUI
 			m_lblMachiningStatus.Role = role;
 		}
 
-		void OnCoordinatesPaint( object sender, PaintEventArgs e )
-		{
-			e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-			foreach( var axis in m_AxisColors ) {
-				using( SolidBrush brush = new SolidBrush( axis.Value ) ) {
-					e.Graphics.FillEllipse( brush, axis.Key.Left - AXIS_MARKER_OFFSET, axis.Key.Top + ( axis.Key.Height - 7 ) / 2F, 7, 7 );
-				}
-			}
-		}
-
 		readonly Dictionary<CNCInfoField, Label> m_Values;
-		readonly Dictionary<Label, Color> m_AxisColors;
+		readonly Dictionary<Label, ColorSwatch> m_AxisMarkers;
 
 		// data colors of the X / Y / Z / B / C axis markers
 		static readonly Color X_AXIS_COLOR = Color.FromArgb( 224, 90, 90 );
@@ -318,6 +322,7 @@ namespace CncUI
 		bool m_MachineCoordinates;
 
 		const int AXIS_MARKER_OFFSET = 12;
+		const int AXIS_MARKER_SIZE = 7;
 
 		const string AXIS_HEADER = "軸";
 		const string COORDINATE_HEADER = "座標";

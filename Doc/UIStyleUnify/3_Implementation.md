@@ -394,3 +394,25 @@
    2. 第 3 節白名單移除 `ContextMenuStrip`，`ToolTip` 註明只用於可能被截斷的執行時文字。
    3. 4.6 補上 `SectionStack.Arrange` 的 Designer 規劃。
    4. 6.7 改為引用圖示設計指引；第 7 節移除右鍵選單。
+
+## 3.26 規範 review 第二批（2026-11-20）
+
+決議見 4.11 第二批。
+
+1. 資料色的色塊：
+   1. 新增 `CommonUI/Controls/ColorSwatch.cs`、`SwatchShape.cs`：`Square` 為帶框線的色塊，`Dot` 為置中的圓點；
+      `SwatchColor` 不序列化，未設定或停用時畫中性色。
+   2. 新增 `MyCAM/Editor/DataColor.cs`（OCCT 具名顏色轉螢幕色）、`ToolVecInterpolateColor.cs`（刀軸內插色的唯一定義）；
+      `PathLayerColor` 改用 `DataColor`，`ToolVecEditRender` 改用 `ToolVecInterpolateColor`。
+   3. `ToolVectorDlg`：5 個圖例 `m_pnlColor*`（有底色的 `Panel`）改為 `ColorSwatch` `m_swt*`，顏色在建構子由
+      `ToolVecInterpolateColor` 設定。
+   4. `CNCInfoPanel`：軸點從 `m_pnlCoordinates.Paint` 自行繪製改為 5 個 `ColorSwatch`（`Dot`）`m_swtX`～`m_swtC`，
+      版面縮放後由 `PlaceAxisMarkers` 置於軸名左側並維持 7×7。
+2. 「加工 / 不加工」圖例：`IconDefinitions.ps1` 新增 `MachinePath`、`NoMachinePath`，產生 PNG 並加入 `Resources.resx`；
+   `m_tsbNeedProcess`、`m_tsbLayerNone` 改為圖示按鈕，Designer 不再寫顏色。
+3. CommonUI 公開 API 補 XML 註解：`ThemedButton.Kind` / `Indicator`、`ThemeColors`、`ThemeMetrics` 的每個常數，
+   `ButtonKind`、`ButtonIndicator`、`CommonButtonText`、`TextRole` 的每個值。
+4. 檢查：`CheckStatic.ps1` 白名單與前綴表加入 `ColorSwatch`（`m_swt`），S19、S23 的說明改為白名單；
+   `StaticExceptions.txt` 刪除 S2（`ToolVectorDlg` 圖例）與 S19（「加工 / 不加工」圖例）的例外。
+5. 規範：第 1 節總則、第 2 節開頭、第 3 節白名單（刪除「不可使用」、新增審查方式與 `ColorSwatch`）、3.2、4.2、4.4 開頭與
+   第 4、11 點、6.2、6.3、6.6、嵌入式面板第 7 點、規則表 S19 / S23、9.2；圖示設計指引的文字規則改為正面寫法。
