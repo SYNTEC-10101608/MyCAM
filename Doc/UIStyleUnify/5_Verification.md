@@ -1,6 +1,6 @@
 # 5. 測試驗證
 
-最後一次執行：2026-11-17，Debug 建置（`.\Build.bat Debug` 0 個錯誤），收官的程式整理之後。
+最後一次執行：2026-11-19，Debug 建置（`.\Build.bat Debug` 0 個錯誤），第三輪 Review 的調整（3.21）與主視窗移除 `TableLayoutPanel`（3.22）之後。
 
 | 類別 | 位置 | 入口 | 結果 |
 | --- | --- | --- | --- |
@@ -17,9 +17,9 @@
 
 | 腳本 | 規則 | 檢查對象 | 結果 |
 | --- | --- | --- | --- |
-| `CheckStatic.ps1`（+ `DesignerParser.ps1`、`StaticExceptions.txt`） | S1–S23 | 34 個 Designer 檔（31 個對話框、3 個 CNC 面板）與主視窗；畫面程式碼；`CommonUI`；四語系 XML；規範第 9 節 | 0 個問題 |
+| `CheckStatic.ps1`（+ `DesignerParser.ps1`、`StaticExceptions.txt`） | S1–S23 | 34 個 Designer 檔（31 個對話框、3 個 CNC 面板）與主視窗；畫面程式碼；`CommonUI`；所有語系 XML；規範第 9 節 | 0 個問題 |
 | `CheckRuntimeLayout.ps1`（+ `LayoutRunner.cs`） | T1–T7 | `MyCAM.exe`、`CncUI.dll` 中所有對話框與嵌入式面板，精靈與多狀態畫面逐一狀態；zh-TW、zh-CN | 各 42 個畫面狀態，0 個問題 |
-| `CaptureMainWindow.ps1`（+ `MainWindowRunner.cs`） | P1–P5 | 主視窗 zh-TW / zh-CN × CAD / CAM / CNC 頁面 × 橫式 1920×1040 / 直式 1080×1880，共 12 組；置中檢查 `Show` 開啟的 3 個與 `ShowDialog` 開啟的 2 個對話框 | 12 組 0 個問題 |
+| `CaptureMainWindow.ps1`（+ `MainWindowRunner.cs`） | P1–P6 | 主視窗 zh-TW / zh-CN × CAD / CAM / CNC 頁面 × 橫式 1920×1040 / 直式 1080×1880，共 12 組；置中檢查 `Show` 開啟的 3 個與 `ShowDialog` 開啟的 2 個對話框；另以 Designer 的客戶區 1920×1009 開加工頁，比對 10 個區域與 Designer（P6） | 13 組 0 個問題 |
 
 規則的內容見規範第 8 節與各腳本開頭的註解。輔助檔案：
 
@@ -37,9 +37,9 @@
 | --- | --- |
 | 對話框 31 個 | 靜態全部規則；執行時開啟後檢查。精靈逐一狀態：`AddPathDlg` 4 步、`DesignSupportBracketDlg` 3 頁、`CNCThreePointDlg` 4 個狀態 |
 | 嵌入式面板 `CNCPanel`、`CNCInfoPanel`、`CNCAlarmPanel` | 以 Designer 尺寸承載檢查；`CNCPanel` 另檢查連線後加工鈕可用的狀態；主視窗中以實際大小再檢查（P4） |
-| 主視窗 `StartupForm` | 控制項型別與外觀屬性（S19）、欄位前綴（S9）、字族（P3）、選單與工具列語系文字（P5）、截圖 |
+| 主視窗 `StartupForm` | 控制項型別與外觀屬性（S19）、欄位前綴（S9）、字族（P3）、選單與工具列語系文字（P5）、Designer 的區域與執行時一致（P6）、截圖 |
 | 對話框置中 | `Show` 開啟的 `AddPathDlg`、`OverCutDlg`、`StartPointDlg`，`ShowDialog` 開啟的 `ConnectDlg`、`GlassDXFImportDlg`，橫式與直式 |
-| 語系 | 每個畫面呼叫 `ApplyLanguage`（S14）、控制項顯示語系檔文字（T7、P5）、四語系 ID 一致（S6）、沒有孤兒 ID（S13） |
+| 語系 | 每個畫面呼叫 `ApplyLanguage`（S14）、控制項顯示語系檔文字（T7、P5）、各語系 ID 一致（S6）、沒有孤兒 ID（S13） |
 | `CommonUI` | 控制項類別只在 `CommonUI`（S15）；資料夾、namespace、元件目錄小節一致（S21） |
 | 產品程式 | 不含檢查用的程式（規範第 8 節；本議題另以 B 類 I9 檢查） |
 
@@ -51,6 +51,7 @@
 | --- | --- |
 | 對話框與 CNC 面板 × zh-TW / zh-CN（多狀態為 `<畫面>_<n>.png`） | `UICheckScreens\<語系>\` |
 | 主視窗 × zh-TW / zh-CN × CAD / CAM / CNC × 橫 / 直式 | `UICheckScreens\MainWindow_<語系>_<頁面>_<Landscape\|Portrait>.png` |
+| 主視窗 × Designer 的客戶區（P6） | `UICheckScreens\MainWindow_Designer.png` |
 
 `UICheckScreens/` 不進版控（資料夾內 `.gitignore` 為 `*`），以 `UICheck.bat runtime UICheckScreens` 重新產生。
 主視窗截圖中紅色虛線框是對話框置中的區域，框內疊上置中後的 `AddPathDlg`。
@@ -58,7 +59,8 @@
 ### 反向測試
 
 確認規則真的能檢出問題：S14、S16、T7（2026-11-16）、S21 的資料夾與 namespace 一致（2026-11-17，把 `RoundDrawing`
-的 namespace 暫時改錯，S21 報錯，還原後通過）。
+的 namespace 暫時改錯，S21 報錯，還原後通過）。S1、S9、S23 的原生 `Label`（2026-11-19，把 `OverCutDlg` 的標籤暫時改回原生 `Label`、在程式中加 `new Label()`，三條規則都報錯，還原後通過）。S19 與 P6（2026-11-19，把 `m_pnlBottom` 暫時改回 `TableLayoutPanel`、
+`m_pnlViewer` 的 Designer 寬度改為 1200，S19 與 P6 都報錯，P6 並列出應寫入的值，還原後通過）。
 
 ### 維護注意事項
 
@@ -94,11 +96,12 @@
 | 腳本 | 規則 | 檢查什麼 | 結果 |
 | --- | --- | --- | --- |
 | `CompareBehavior.ps1`（+ `RenameMap.txt`、`BehaviorExceptions.txt`） | B1–B8 | 與分支起點 `a4b3826d` 比對：Designer 的事件訂閱、RadioButton 群組、非外觀屬性、表單行為屬性、程式使用的控制項仍存在、型別只做外觀替換、全 repo 的 `Show` / `ShowDialog` 呼叫點、改動過的 `.cs` 中事件訂閱與 `Enabled` / `Visible` / `ReadOnly` / `Checked` 賦值。控制項改名先以 `RenameMap.txt`（304 筆）換算 | 0 個差異 |
-| `CheckBranchRules.ps1` | I1–I9 | 本議題新增或改動的檔案符合通用與 C# 規範：編碼與 BOM、檔尾換行、行尾空白、C# 行長 120、tab 縮排、不用 `this.`、註解為英文且不用 `/* */`、產品專案一檔一個頂層型別；產品程式不提到檢查程式、建置輸出沒有殘留 runner | 319 個檔案，0 個問題 |
-| `RunIssueChecks.bat` | — | 依序執行上面兩個腳本 | 全部通過 |
+| `CheckBranchRules.ps1` | I1–I9 | 本議題新增或改動的檔案符合通用與 C# 規範：編碼與 BOM、檔尾換行、行尾空白、C# 行長 120、tab 縮排、不用 `this.`、註解為英文且不用 `/* */`、產品專案一檔一個頂層型別；產品程式不提到檢查程式、建置輸出沒有殘留 runner | 331 個檔案，0 個問題 |
+| `CompareMainLayout.ps1`（+ `MainLayoutBaseline.txt`） | — | 主視窗各承載區的座標與移除 `TableLayoutPanel` 前的基準逐像素相同：CAD / CAM / CNC 頁面 × 橫式 1920×1040、1366×768 × 直式 1080×1880、900×1600，共 12 個情境（zh-TW；需先建置 Debug） | 152 行，0 個差異 |
+| `RunIssueChecks.bat` | — | 依序執行上面三個腳本 | 全部通過 |
 
-`BehaviorExceptions.txt` 列出已決議的行為差異（數值框取代、唯讀座標改標籤、區塊標題 `Label` 併入卡片、步驟標籤改卡片標題），
-每行附決議出處。
+`BehaviorExceptions.txt` 列出已決議的行為差異（數值框取代、唯讀座標改標籤、區塊標題 `Label` 併入卡片、步驟標籤改卡片標題、
+主視窗直式 CNC 承載區的 `SizeChanged` 處理移除、從不顯示的第二、三層工具列容器刪除），每行附決議出處。
 
 ### 判斷原則
 
@@ -113,6 +116,7 @@
 
 1. **何時跑**：本議題合併前；`master` 前進後 merge / rebase 再跑一次。合併之後不需要例行執行，只在需要重現本議題的驗證時使用。
 2. **基準固定為 `a4b3826d`**：兩個腳本都以 `-Base` 參數指定，預設為分支起點，合併後仍可重現。不要改成 `master`。
+   `CompareMainLayout.ps1` 的基準是 `MainLayoutBaseline.txt`（改動前以 `-Update` 記錄一次），不要重新記錄。
 3. **相依**：`CompareBehavior.ps1` 使用 `Tools/UICheck/DesignerParser.ps1`；`DesignerParser.ps1` 改動時，重跑一次確認仍可執行。
 4. **不再增修**：之後的開發不在 `RenameMap.txt`、`BehaviorExceptions.txt` 加項目；新的議題需要行為比對時，
    以本資料夾的腳本為範本，在該議題的資料夾另建一份並指定自己的基準。

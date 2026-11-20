@@ -28,7 +28,7 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlConnect = new CommonUI.Controls.SectionPanel();
-			this.m_lblIP = new System.Windows.Forms.Label();
+			this.m_lblIP = new CommonUI.Controls.ThemedLabel();
 			this.m_txtIP = new System.Windows.Forms.TextBox();
 			this.m_lblTips = new CommonUI.Controls.ThemedLabel();
 			this.m_btnConfirm = new CommonUI.Controls.ThemedButton();
@@ -97,7 +97,7 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlConnect;
-		private System.Windows.Forms.Label m_lblIP;
+		private CommonUI.Controls.ThemedLabel m_lblIP;
 		private System.Windows.Forms.TextBox m_txtIP;
 		private CommonUI.Controls.ThemedLabel m_lblTips;
 		private CommonUI.Controls.ThemedButton m_btnConfirm;

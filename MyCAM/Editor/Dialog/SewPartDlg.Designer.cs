@@ -28,7 +28,7 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlSew = new CommonUI.Controls.SectionPanel();
-			this.m_lblSewTol = new System.Windows.Forms.Label();
+			this.m_lblSewTol = new CommonUI.Controls.ThemedLabel();
 			this.m_numSewTol = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_btnOK = new CommonUI.Controls.ThemedButton();
 			this.m_pnlSew.SuspendLayout();
@@ -109,7 +109,7 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlSew;
-		private System.Windows.Forms.Label m_lblSewTol;
+		private CommonUI.Controls.ThemedLabel m_lblSewTol;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numSewTol;
 		private CommonUI.Controls.ThemedButton m_btnOK;
 	}

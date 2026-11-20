@@ -22,9 +22,12 @@ namespace UICheck
 	//   P3  main window or a control in it does not use the font family of the UI language
 	//   P4  a visible CNC panel at the size the main window gives it fails the T1 / T2 / T4 checks of LayoutRunner
 	//   P5  a menu / tool bar item whose name is a language ID does not show its text (tool tip: "<name>_ToolTip")
+	//   P6  with "designer:<StartupForm.Designer.cs>", the window gets the client size of the designer and a region
+	//       (REGION_NAME_LIST) is not placed where the designer shows it
 	//   a dialog that cannot be opened is a problem, not a skip
 	//
 	// Usage: UICheckMainWindow.exe <language> <mode> <width> <height> <png> [dialog type name ...]
+	// [region] lines print the bounds of the regions MainLayout places, for comparing layouts.
 	// <mode> is the page clicked before the capture: CAD (start page, nothing clicked), CAM, or CNC (machining).
 	// The first dialog is drawn into the screenshot at its centered location.
 	internal static class MainWindowRunner
@@ -45,8 +48,15 @@ namespace UICheck
 			}
 			Size windowSize = new Size( int.Parse( args[ 2 ] ), int.Parse( args[ 3 ] ) );
 			string szOutFile = Path.GetFullPath( args[ 4 ] );
-			string[] dialogNameArray = new string[ args.Length - 5 ];
-			Array.Copy( args, 5, dialogNameArray, 0, dialogNameArray.Length );
+			List<string> dialogNameList = new List<string>();
+			for( int i = 5; i < args.Length; i++ ) {
+				if( args[ i ].StartsWith( DESIGNER_PREFIX, StringComparison.Ordinal ) ) {
+					m_szDesignerFile = args[ i ].Substring( DESIGNER_PREFIX.Length );
+					continue;
+				}
+				dialogNameList.Add( args[ i ] );
+			}
+			string[] dialogNameArray = dialogNameList.ToArray();
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault( false );
 
@@ -78,6 +88,15 @@ namespace UICheck
 		{
 			// Form clamps its size to the screen; raising MaximumSize lets the native resize go beyond it
 			mainForm.WindowState = FormWindowState.Normal;
+
+			// P6 runs with the client size of the designer, so the frame is added to it
+			Dictionary<string, Rectangle> designerMap = null;
+			if( m_szDesignerFile != null ) {
+				Size designerClient;
+				designerMap = ReadDesignerBounds( m_szDesignerFile, out designerClient );
+				Size frameSize = mainForm.Size - mainForm.ClientSize;
+				windowSize = designerClient + frameSize;
+			}
 			mainForm.MaximumSize = windowSize;
 			SetWindowPos( mainForm.Handle, IntPtr.Zero, 0, 0, windowSize.Width, windowSize.Height,
 				SWP_NOZORDER | SWP_NOACTIVATE );
@@ -96,7 +115,11 @@ namespace UICheck
 			Rectangle area = DialogPlacement.AreaProvider();
 			Console.WriteLine( "main window {0}x{1} ({2}), dialog area {3}", mainForm.Width, mainForm.Height,
 				isVertical ? "portrait" : "landscape", area );
+			PrintRegions( mainForm );
 			int nProblemCount = CheckArea( mainForm, isVertical, area );
+			if( designerMap != null ) {
+				nProblemCount += CheckDesignerRegions( mainForm, designerMap );
+			}
 			nProblemCount += CheckFontFamily( mainForm );
 			nProblemCount += CheckPanels( mainForm );
 			nProblemCount += CheckItemTexts( mainForm );
@@ -115,6 +138,107 @@ namespace UICheck
 			Console.WriteLine( "{0} problems", nProblemCount );
 			return nProblemCount == 0 ? 0 : 1;
 		}
+
+		// the regions MainLayout places, in client coordinates of the main window, so a layout change can be compared
+		static void PrintRegions( Form mainForm )
+		{
+			Console.WriteLine( "[region] client {0}x{1}", mainForm.ClientSize.Width, mainForm.ClientSize.Height );
+			foreach( string szName in REGION_NAME_LIST ) {
+				Control[] foundArray = mainForm.Controls.Find( szName, true );
+				if( foundArray.Length == 0 ) {
+					Console.WriteLine( "[region] {0} not found", szName );
+					continue;
+				}
+				PrintRegion( mainForm, szName, foundArray[ 0 ] );
+			}
+			List<Control> panelList = new List<Control>();
+			FindPanels( mainForm, panelList );
+			foreach( Control panel in panelList ) {
+				PrintRegion( mainForm, panel.GetType().Name, panel );
+			}
+		}
+
+		static void PrintRegion( Form mainForm, string szName, Control control )
+		{
+			if( control.Visible == false ) {
+				Console.WriteLine( "[region] {0} hidden", szName );
+				return;
+			}
+			Rectangle bounds = mainForm.RectangleToClient( control.RectangleToScreen( control.ClientRectangle ) );
+			Console.WriteLine( "[region] {0} {1},{2},{3},{4}", szName, bounds.X, bounds.Y, bounds.Width,
+				bounds.Height );
+		}
+
+		// P6: with the client size and page of the designer, MainLayout places each region where the designer shows it,
+		// so the designer is what the user sees (ui-style.instructions.md, section 6)
+		static int CheckDesignerRegions( Form mainForm, Dictionary<string, Rectangle> designerMap )
+		{
+			int nProblemCount = 0;
+			foreach( string szName in REGION_NAME_LIST ) {
+				Rectangle designerBounds;
+				if( designerMap.TryGetValue( szName, out designerBounds ) == false ) {
+					Console.WriteLine( "FAIL  P6 {0} has no Location / Size in the designer", szName );
+					nProblemCount++;
+					continue;
+				}
+				Rectangle bounds = FindControl( mainForm, szName ).Bounds;
+				if( bounds != designerBounds ) {
+					Console.WriteLine( "FAIL  P6 {0} is placed at {1}, the designer has {2}; " +
+						"write Location ( {3}, {4} ) Size ( {5}, {6} )", szName, bounds, designerBounds, bounds.X,
+						bounds.Y, bounds.Width, bounds.Height );
+					nProblemCount++;
+				}
+			}
+			Console.WriteLine( "P6 {0} regions compared with the designer, {1} problems", REGION_NAME_LIST.Length,
+				nProblemCount );
+			return nProblemCount;
+		}
+
+		// Location / Size of every control in the designer file, and the client size of the form
+		static Dictionary<string, Rectangle> ReadDesignerBounds( string szPath, out Size clientSize )
+		{
+			Dictionary<string, Point> locationMap = new Dictionary<string, Point>();
+			Dictionary<string, Size> sizeMap = new Dictionary<string, Size>();
+			clientSize = Size.Empty;
+			System.Text.RegularExpressions.Regex pairRegex = new System.Text.RegularExpressions.Regex(
+				@"^\s*this\.(?:(\w+)\.)?(Location|Size|ClientSize) = new System\.Drawing\.(?:Point|Size)" +
+				@"\(\s*(-?\d+),\s*(-?\d+)\s*\);" );
+			foreach( string szLine in File.ReadAllLines( szPath ) ) {
+				System.Text.RegularExpressions.Match match = pairRegex.Match( szLine );
+				if( match.Success == false ) {
+					continue;
+				}
+				string szName = match.Groups[ 1 ].Value;
+				string szProperty = match.Groups[ 2 ].Value;
+				int nX = int.Parse( match.Groups[ 3 ].Value );
+				int nY = int.Parse( match.Groups[ 4 ].Value );
+				if( szName == "" && szProperty == "ClientSize" ) {
+					clientSize = new Size( nX, nY );
+				}
+				else if( szProperty == "Location" ) {
+					locationMap[ szName ] = new Point( nX, nY );
+				}
+				else if( szProperty == "Size" ) {
+					sizeMap[ szName ] = new Size( nX, nY );
+				}
+			}
+			Dictionary<string, Rectangle> boundsMap = new Dictionary<string, Rectangle>();
+			foreach( KeyValuePair<string, Size> pair in sizeMap ) {
+				Point location;
+				locationMap.TryGetValue( pair.Key, out location );
+				boundsMap[ pair.Key ] = new Rectangle( location, pair.Value );
+			}
+			return boundsMap;
+		}
+
+		const string DESIGNER_PREFIX = "designer:";
+
+		// host panels of the main window that MainLayout sizes
+		static readonly string[] REGION_NAME_LIST =
+		{
+			"m_pnlBackGround", "m_pnlTreeView", "m_pnlViewer", "m_pnlCNC", "m_pnlBottom", "m_pnlMessages", "m_pnlLog",
+			"m_pnlCNCInfo", "m_pnlCNCVertical", "m_pnlVerticalAlarm",
+		};
 
 		static int CheckArea( Form mainForm, bool isVertical, Rectangle area )
 		{
@@ -472,6 +596,7 @@ namespace UICheck
 
 		const string VALUE_FAMILY = "Consolas";
 
+		static string m_szDesignerFile;
 		static string m_szExpectedFamily;
 		static string m_szLanguage;
 		static Assembly m_App;

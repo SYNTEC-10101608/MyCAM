@@ -28,7 +28,7 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlExtendedGCode = new CommonUI.Controls.SectionPanel();
-			this.m_lblInsertType = new System.Windows.Forms.Label();
+			this.m_lblInsertType = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlRadioButton = new System.Windows.Forms.Panel();
 			this.m_rdoTraverseStart = new System.Windows.Forms.RadioButton();
 			this.m_rdoTraverseEnd = new System.Windows.Forms.RadioButton();
@@ -36,10 +36,10 @@
 			this.m_rdoPathEnd = new System.Windows.Forms.RadioButton();
 			this.m_rdoControlPoint = new System.Windows.Forms.RadioButton();
 			this.m_pnlToStartOrEnd = new System.Windows.Forms.Panel();
-			this.m_lblToStartOrEnd = new System.Windows.Forms.Label();
+			this.m_lblToStartOrEnd = new CommonUI.Controls.ThemedLabel();
 			this.m_btnToStartOrEnd = new CommonUI.Controls.ThemedButton();
-			this.m_lblIsStartOrEnd = new System.Windows.Forms.Label();
-			this.m_lblGCode = new System.Windows.Forms.Label();
+			this.m_lblIsStartOrEnd = new CommonUI.Controls.ThemedLabel();
+			this.m_lblGCode = new CommonUI.Controls.ThemedLabel();
 			this.m_lblIsMixData = new CommonUI.Controls.ThemedLabel();
 			this.m_txtGCode = new System.Windows.Forms.TextBox();
 			this.m_btnAdd = new CommonUI.Controls.ThemedButton();
@@ -260,7 +260,7 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlExtendedGCode;
-		private System.Windows.Forms.Label m_lblInsertType;
+		private CommonUI.Controls.ThemedLabel m_lblInsertType;
 		private System.Windows.Forms.Panel m_pnlRadioButton;
 		private System.Windows.Forms.RadioButton m_rdoTraverseStart;
 		private System.Windows.Forms.RadioButton m_rdoTraverseEnd;
@@ -268,10 +268,10 @@
 		private System.Windows.Forms.RadioButton m_rdoPathEnd;
 		private System.Windows.Forms.RadioButton m_rdoControlPoint;
 		private System.Windows.Forms.Panel m_pnlToStartOrEnd;
-		private System.Windows.Forms.Label m_lblToStartOrEnd;
+		private CommonUI.Controls.ThemedLabel m_lblToStartOrEnd;
 		private CommonUI.Controls.ThemedButton m_btnToStartOrEnd;
-		private System.Windows.Forms.Label m_lblIsStartOrEnd;
-		private System.Windows.Forms.Label m_lblGCode;
+		private CommonUI.Controls.ThemedLabel m_lblIsStartOrEnd;
+		private CommonUI.Controls.ThemedLabel m_lblGCode;
 		private CommonUI.Controls.ThemedLabel m_lblIsMixData;
 		private System.Windows.Forms.TextBox m_txtGCode;
 		private CommonUI.Controls.ThemedButton m_btnAdd;

@@ -30,7 +30,7 @@
 
 | 納入 | 不納入 |
 | --- | --- |
-| 主視窗（`StartupForm`）的外觀：選單、工具列、圖示、樹與日誌的文字色、區域邊距 | 主視窗的狀態與流程邏輯、`MainLayout` 的區域配置與比例 |
+| 主視窗（`StartupForm`）的外觀：選單、工具列、圖示、樹與日誌的文字色、區域配置（`MainLayout` 改為純計算，不用 `TableLayoutPanel`；比例不變） | 主視窗的狀態與流程邏輯 |
 | 嵌入式面板：`CNCPanel`、`CNCInfoPanel`、`CNCAlarmPanel`、`VNCUserControl` | `MessageBox`、開檔 / 存檔對話框 |
 | 對話框 31 個（含 `CncUI` 的 `CNCOffsetDialog`、進度視窗 `LoadingBarDlg`） | 授權視窗（`FALicenseChecker`） |
 | 共用控制項移入 `CommonUI` 並統一 | 對話框行為基底的事件機制、`Show` / `ShowDialog` 的統一 |

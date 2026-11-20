@@ -28,7 +28,7 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlDisplacement = new CommonUI.Controls.SectionPanel();
-			this.m_lblStepDis = new System.Windows.Forms.Label();
+			this.m_lblStepDis = new CommonUI.Controls.ThemedLabel();
 			this.m_numStepDistance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblX = new CommonUI.Controls.ThemedLabel();
 			this.m_numX = new CommonUI.Controls.DebouncedNumericUpDown();
@@ -37,7 +37,7 @@
 			this.m_lblZ = new CommonUI.Controls.ThemedLabel();
 			this.m_numZ = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_pnlRotation = new CommonUI.Controls.SectionPanel();
-			this.m_lblStapAngle = new System.Windows.Forms.Label();
+			this.m_lblStapAngle = new CommonUI.Controls.ThemedLabel();
 			this.m_numStepAngle = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblRx = new CommonUI.Controls.ThemedLabel();
 			this.m_numRx = new CommonUI.Controls.DebouncedNumericUpDown();
@@ -349,7 +349,7 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlDisplacement;
-		private System.Windows.Forms.Label m_lblStepDis;
+		private CommonUI.Controls.ThemedLabel m_lblStepDis;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numStepDistance;
 		private CommonUI.Controls.ThemedLabel m_lblX;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numX;
@@ -358,7 +358,7 @@
 		private CommonUI.Controls.ThemedLabel m_lblZ;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numZ;
 		private CommonUI.Controls.SectionPanel m_pnlRotation;
-		private System.Windows.Forms.Label m_lblStapAngle;
+		private CommonUI.Controls.ThemedLabel m_lblStapAngle;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numStepAngle;
 		private CommonUI.Controls.ThemedLabel m_lblRx;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numRx;

@@ -186,3 +186,71 @@ v0.3 外框的定義、只顯示座標的欄位改為標籤、語系 ID 以控�
 | 2026-11-19 | 議題過程文件是否合併 | 不合併。合併前另加一個 commit 刪除 `Doc/UIStyleUnify/`（含議題限定測試），文件移到雲端空間；最終只留 AI 指引與專案指引，兩者不引用過程文件，出處只寫議題編號。檢查腳本的維護注意事項因此移進規範 8.1 |
 | 2026-11-19 | 議題編號 | AUTO-23254，分支改名為 `AUTO-23254_f_UIStyleUnify` |
 | 2026-11-19 | 文件條列格式 | 條列一律用數字標號（巢狀也編號），方便溝通時指出第幾項；規範與本報告已全部轉換 |
+| 2026-11-19 | 原生 `Label` 與 `ThemedLabel` 並存，何時用哪個難以理解 | 只留 `ThemedLabel`，一般文字用預設的 `Body` 角色；原生 `Label` 移入不可使用（3.21） |
+| 2026-11-19 | 圖層色在工具列（Designer）與 3D（`ViewManager`）各寫一份且不一致 | 本議題直接處理：以 `PathLayerColor` 單一定義，以 3D 的顏色為準，工具列色塊跟著改（3.21） |
+| 2026-11-19 | 原生 `DataGridView` 沒有任何畫面使用 | 從白名單刪除；唯一的清單是 `ThemedDataGridView` |
+| 2026-11-19 | `TrackBar` 是否需要 | 保留：只有 `CNCPanel` 的進給倍率滑桿使用，拖動即時送出倍率，改成數值框會改變操作 |
+| 2026-11-19 | 語系的寫法 | 文件不寫死語系數量；zh-TW、zh-CN 為主要維護語系，其他語系隨 `Language/` 擴充。檢查腳本的語系清單改為自動取得 |
+| 2026-11-19 | 規範中「與改動前相同」「維持既有」「時機不變」等描述 | 屬本議題施工的參考，不是規範；全面改寫為規則本身 |
+| 2026-11-19 | 未來移除 `ComboBox`、`DialogShowHelper.SetFormConfig` 的重複設定 | 列為後續議題（6.2） |
+| 2026-11-19 | 主視窗的 `TableLayoutPanel` 是否保留為特例 | 不保留，本議題直接移除。區域比例分配屬於外觀；本議題是重構，主視窗的版面也在範圍內，規範、檢查與文件一併修改。Designer 要能看到區域分布（預設呈現橫式）。施工規劃見 4.8 |
+| 2026-11-19 | 第二、三層工具列容器 | 已沒有行為、只是遺留，本議題直接刪除，並整理 `StartupForm.cs` 的多層切換邏輯（3.22） |
+
+## 4.8 主視窗移除 `TableLayoutPanel` 的施工規劃（2026-11-19，已定稿並施工，3.22）
+
+### 現況確認
+
+Designer 目前**不是**橫式，而是執行時不會出現的混合狀態：
+
+| 項目 | Designer | 執行時橫式 | 執行時直式 |
+| --- | --- | --- | --- |
+| 客戶區 | 1596×1055 | 依視窗大小（最大化） | 依視窗大小 |
+| 欄（樹 / 3D / CNC 操作） | 15% / 60% / 25% | 樹為（寬 − CNC 欄）× 22%；CNC 欄為操作面板偏好寬 × 1.1，只在顯示 CNC 面板時才有 | 15% / 85% / 0 |
+| 列（上方 / 訊息 / 直式 CNC 承載區） | 59% / 6% / 35% | 上方其餘；訊息 15%（CAD / CAM）或 25%（加工頁），顯示 CNC 面板時改為固定高度；直式承載區 0 | 54% / 6% / 40% |
+
+1. Designer 同時放了橫式才有的 CNC 欄與直式才有的 CNC 承載區（`m_pnlCNCVertical` 橫跨三欄、佔 35%）。
+2. 各承載區的 `Location` / `Size` 是過期的存檔值（例如 `m_pnlViewer` 寬 1351，但所在欄只有 60%）。
+3. `m_pnlLog` 的父容器是 `m_pnlMessages`，Designer 卻殘留一行 `m_pnlBackGround.SetColumnSpan( m_pnlLog, 2 )`。
+4. `MainLayout` 本身也混用兩種做法：外層靠 `TableLayoutPanel` 的列 / 欄樣式與跨欄，直式承載區與訊息區則自己算座標後 `SetBounds`。
+
+### 施工步驟
+
+1. 建立基準：改動前，以 `MainWindowRunner` 輸出所有情境（zh-TW / zh-CN × CAD / CAM / CNC 頁面 × 橫 / 直式）中
+   每個承載區的螢幕座標，存成議題限定測試的基準檔。
+2. `MainLayout` 改為純計算：
+   1. 新增計算方法：輸入客戶區大小與狀態（直 / 橫式、是否顯示 CNC 面板、是否在加工頁、操作與監控面板的偏好尺寸），
+      回傳每個承載區的矩形；不碰控制項，可單獨驗證。
+   2. `Update` 只負責依計算結果 `SetBounds`、切換 `Visible` 與搬移父容器；不再使用列 / 欄樣式與跨欄。
+   3. 比例改為具名常數（現有的 15 / 22 / 25 / 54 / 6 / 40 等數字），集中在 `MainLayout`。
+3. `StartupForm.Designer.cs`：
+   1. `m_pnlBackGround`、`m_pnlBottom` 改為無外觀的 `Panel`；承載區不再 `Dock = Fill`，位置由 `MainLayout` 設定。
+   2. 客戶區與各承載區的 `Location` / `Size` 寫成計算方法在 Designer 狀態（Q1）下的結果，Designer 即呈現橫式的區域分布。
+   3. 刪除 `m_pnlLog` 的殘留跨欄設定。
+4. 檢查（可持續使用，`Tools/UICheck`）：
+   1. `CheckStatic.ps1`：主視窗白名單與前綴表刪除 `TableLayoutPanel`。
+   2. `MainWindowRunner.cs` 新增 P6：以 Designer 的客戶區大小與狀態執行時，各承載區的位置與大小必須等於 Designer 上的值
+      （主視窗的 Designer 如實呈現）；不一致時列出應改成的值。
+5. 檢查（本議題限定，`Doc/UIStyleUnify/Tests`）：新增區域配置比對，改動後的承載區座標必須與第 1 步的基準相同（Q4）。
+   既有的行為比對已允許 `TableLayoutPanel` → `Panel` 的型別替換。
+6. 文件：
+   1. 規範：第 3 節白名單、3.2、4.4、第 6 節改為「主視窗的區域由 `MainLayout` 計算；Designer 呈現橫式」，第 8 節加 P6。
+   2. 議題報告：1_Goal 的範圍（`MainLayout` 的區域配置改列入範圍）、2_Architecture 版面一節、3_Implementation 新增一節、
+      5_Verification（P6 與區域比對）、6_FollowUp「主視窗行為重構」改為只剩行為部分。
+7. 驗證：建置、`UICheck.bat runtime`、`RunIssueChecks.bat`；人工以 Visual Studio Designer 開啟 `StartupForm` 確認區域分布。
+
+### 待決問題（2026-11-19 使用者決議：全部照建議）
+
+| # | 問題 | 建議（採用） | 另一個選項 |
+| --- | --- | --- | --- |
+| Q1 | Designer 呈現哪一個橫式狀態 | 橫式加工頁：CNC 操作欄與資訊區都顯示，所有橫式區域都看得到 | 橫式啟動狀態（CAD 頁）：與啟動畫面相同，但 CNC 區寬度為 0，看不到 |
+| Q2 | 直式專用的承載區（`m_pnlCNCVertical`、`m_pnlVerticalAlarm`）在 Designer 怎麼放 | 保留在 Designer，`Visible = false`、大小為 0（橫式本來就不顯示；`StartupForm` 定位 `CNCDlg` 時仍用到它） | 改由 `MainLayout` 在執行時建立，Designer 不出現 |
+| Q3 | Designer 的客戶區大小 | 規格 1920×1080 最大化時的客戶區（實測 1920×1009：工作區扣掉 Windows 工作列 48 為 1920×1032，最大化時外框推出螢幕，再扣標題列 23） | 保留現在的 1596×1055 |
+| Q4 | 改動前後區域配置的等價標準 | 所有情境的承載區座標逐像素相同；若因百分比捨入出現 1px 差異，逐項列出再決定 | 允許 ±1px |
+
+### 施工結果
+
+1. Q2 的 `Visible = false` 未寫入 Designer：大小為 0 已看不到，寫入會被行為比對（B3）視為初始顯示狀態的改變；執行時由 `MainLayout.Update` 設定顯示。
+2. Q4：12 個情境、152 行座標與改動前逐像素相同，沒有 1px 差異。
+3. 施工中發現第二、三層工具列容器從不顯示（每個頁面只用一層）。使用者決議（2026-11-19）：已無行為、只是遺留，
+   本議題直接刪除（3.22）。
+4. 工具列高度依語系不同：zh-CN 的背景比 zh-TW 少 1px，所以 Designer（zh-TW）與 P6 以 zh-TW 為準。

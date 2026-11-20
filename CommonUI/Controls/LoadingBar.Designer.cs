@@ -2,14 +2,14 @@
 {
 	partial class LoadingBar
 	{
-		internal System.Windows.Forms.Label m_TopicLabel;
-		internal System.Windows.Forms.Label m_StageLabel;
+		internal CommonUI.Controls.ThemedLabel m_TopicLabel;
+		internal CommonUI.Controls.ThemedLabel m_StageLabel;
 		internal RoundedProgressBar m_ProgressBar;
 
 		private void InitializeComponent()
 		{
-			this.m_TopicLabel = new System.Windows.Forms.Label();
-			this.m_StageLabel = new System.Windows.Forms.Label();
+			this.m_TopicLabel = new CommonUI.Controls.ThemedLabel();
+			this.m_StageLabel = new CommonUI.Controls.ThemedLabel();
 			this.m_ProgressBar = new RoundedProgressBar();
 			this.SuspendLayout();
 

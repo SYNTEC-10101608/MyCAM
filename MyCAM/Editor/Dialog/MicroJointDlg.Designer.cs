@@ -17,7 +17,7 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlLength = new CommonUI.Controls.SectionPanel();
-			this.m_lblLength = new System.Windows.Forms.Label();
+			this.m_lblLength = new CommonUI.Controls.ThemedLabel();
 			this.m_numMicroJointLength = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_btnClearAll = new CommonUI.Controls.ThemedButton();
 			this.m_btnDelete = new CommonUI.Controls.ThemedButton();
@@ -107,7 +107,7 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlLength;
-		private System.Windows.Forms.Label m_lblLength;
+		private CommonUI.Controls.ThemedLabel m_lblLength;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numMicroJointLength;
 		private CommonUI.Controls.ThemedButton m_btnClearAll;
 		private CommonUI.Controls.ThemedButton m_btnDelete;

@@ -28,9 +28,9 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlParam = new CommonUI.Controls.SectionPanel();
-			this.m_lblRadius = new System.Windows.Forms.Label();
+			this.m_lblRadius = new CommonUI.Controls.ThemedLabel();
 			this.m_numRadius = new CommonUI.Controls.DebouncedNumericUpDown();
-			this.m_lblHeight = new System.Windows.Forms.Label();
+			this.m_lblHeight = new CommonUI.Controls.ThemedLabel();
 			this.m_numHeight = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_btnCancel = new CommonUI.Controls.ThemedButton();
 			this.m_btnOK = new CommonUI.Controls.ThemedButton();
@@ -150,9 +150,9 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlParam;
-		private System.Windows.Forms.Label m_lblRadius;
+		private CommonUI.Controls.ThemedLabel m_lblRadius;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numRadius;
-		private System.Windows.Forms.Label m_lblHeight;
+		private CommonUI.Controls.ThemedLabel m_lblHeight;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numHeight;
 		private CommonUI.Controls.ThemedButton m_btnCancel;
 		private CommonUI.Controls.ThemedButton m_btnOK;

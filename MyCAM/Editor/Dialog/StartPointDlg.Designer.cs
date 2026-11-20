@@ -32,7 +32,7 @@
 			this.m_rdoAutoSelect = new System.Windows.Forms.RadioButton();
 			this.m_pnlAutoSelect = new System.Windows.Forms.Panel();
 			this.m_clbStrategy = new System.Windows.Forms.CheckedListBox();
-			this.m_lblTolerance = new System.Windows.Forms.Label();
+			this.m_lblTolerance = new CommonUI.Controls.ThemedLabel();
 			this.m_numTolerance = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_btnIncreasePriority = new CommonUI.Controls.ThemedButton();
 			this.m_btnDecreasePriority = new CommonUI.Controls.ThemedButton();
@@ -177,7 +177,7 @@
 		private System.Windows.Forms.RadioButton m_rdoAutoSelect;
 		private System.Windows.Forms.Panel m_pnlAutoSelect;
 		private System.Windows.Forms.CheckedListBox m_clbStrategy;
-		private System.Windows.Forms.Label m_lblTolerance;
+		private CommonUI.Controls.ThemedLabel m_lblTolerance;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numTolerance;
 		private CommonUI.Controls.ThemedButton m_btnIncreasePriority;
 		private CommonUI.Controls.ThemedButton m_btnDecreasePriority;

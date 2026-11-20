@@ -20,7 +20,7 @@
 			this.m_rdoSequentialOrder = new System.Windows.Forms.RadioButton();
 			this.m_rdoPathSwap = new System.Windows.Forms.RadioButton();
 			this.m_pnlContent = new CommonUI.Controls.SectionPanel();
-			this.m_lblSequentialDesc = new System.Windows.Forms.Label();
+			this.m_lblSequentialDesc = new CommonUI.Controls.ThemedLabel();
 			this.m_btnMoveUp = new CommonUI.Controls.ThemedButton();
 			this.m_btnMoveDown = new CommonUI.Controls.ThemedButton();
 			this.m_btnMoveToTop = new CommonUI.Controls.ThemedButton();
@@ -142,7 +142,7 @@
 		private System.Windows.Forms.RadioButton m_rdoSequentialOrder;
 		private System.Windows.Forms.RadioButton m_rdoPathSwap;
 		private CommonUI.Controls.SectionPanel m_pnlContent;
-		private System.Windows.Forms.Label m_lblSequentialDesc;
+		private CommonUI.Controls.ThemedLabel m_lblSequentialDesc;
 		private CommonUI.Controls.ThemedButton m_btnMoveUp;
 		private CommonUI.Controls.ThemedButton m_btnMoveDown;
 		private CommonUI.Controls.ThemedButton m_btnMoveToTop;

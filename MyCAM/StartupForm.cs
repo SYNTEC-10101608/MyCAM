@@ -50,14 +50,16 @@ namespace MyCAM
 
 			// need to init befor myapp because myapp will use LogPanel
 			InitializeComponent();
-			m_MainLayout = new MainLayout( m_pnlBackGround, m_pnlBottom, m_pnlCNC, m_pnlCNCInfo,
-				m_pnlMessages, m_pnlLog, m_pnlCNCVertical, m_pnlVerticalAlarm, m_tsmiCNC, m_tsmiController );
+			m_MainLayout = new MainLayout( m_pnlBackGround, m_pnlTreeView, m_pnlViewer, m_pnlBottom, m_pnlCNC,
+				m_pnlCNCInfo, m_pnlMessages, m_pnlLog, m_pnlCNCVertical, m_pnlVerticalAlarm, m_tsmiCNC,
+				m_tsmiController );
 			m_pnlBackGround.SizeChanged += OnMainLayoutSizeChanged;
 			DialogPlacement.AreaProvider = () => m_MainLayout.GetDialogArea( this );
 
 			// app
 			MyApp.MainForm = this;
 			UIListSetting();
+			InitLayerSwatches();
 			InitCNCModule();
 
 			// create the viewer
@@ -343,8 +345,7 @@ namespace MyCAM
 
 		// UI list
 		readonly MainLayout m_MainLayout;
-		Dictionary<EUIStatus, List<Control>> m_UIStatusDic;
-		List<ToolStripContainer> m_ToolStripLevelList;
+		Dictionary<EUIStatus, ToolStrip> m_UIStatusDic;
 		EUIStatus m_CurrentUIStatus = EUIStatus.File;
 
 		// UI color
@@ -1070,45 +1071,11 @@ namespace MyCAM
 			}
 			m_CurrentUIStatus = uiStatus;
 
-			// get which tool strip need to show on container
-			List<Control> ShownToolStripList = m_UIStatusDic[ uiStatus ];
-
-			// change tool strip container visible
-			int nContainerLayerToShow = ShownToolStripList.Count;
-			bool bToolStirpShownCountChange = false;
-			for( int i = 0; i < m_ToolStripLevelList.Count; i++ ) {
-
-				// these container visible change
-				if( m_ToolStripLevelList[ i ].Visible != ( i < nContainerLayerToShow ) ) {
-					bToolStirpShownCountChange = true;
-				}
-				m_ToolStripLevelList[ i ].Visible = i < nContainerLayerToShow;
-			}
-
-			// change witch tool strip will be show
-			for( int i = 0; i < ShownToolStripList.Count; i++ ) {
-
-				// level 1 container always show on form
-				if( i == 0 && m_ToolStripLevelList[ i ].Visible != true ) {
-					m_ToolStripLevelList[ i ].Visible = true;
-				}
-
-				// change tool strip visible in this container
-				List<ToolStrip> thisToolStrip = GetAllToolStrips( m_ToolStripLevelList[ i ] );
-				foreach( ToolStrip toolStrip in thisToolStrip ) {
-					if( toolStrip == ShownToolStripList[ i ] ) {
-						if( toolStrip.Visible != true ) {
-							toolStrip.Visible = true;
-						}
-						continue;
-					}
-					toolStrip.Visible = false;
-				}
-			}
-
-			// visible will cause layout change need to make sure container layout order correct
-			if( bToolStirpShownCountChange ) {
-				ReLayOutUIZorder();
+			// the function tool bar container shows only the tool strip of this status
+			m_tscLevel1Container.Visible = true;
+			ToolStrip shownToolStrip = m_UIStatusDic[ uiStatus ];
+			foreach( ToolStrip toolStrip in GetAllToolStrips( m_tscLevel1Container ) ) {
+				toolStrip.Visible = toolStrip == shownToolStrip;
 			}
 			UpdateMainLayout();
 		}
@@ -1136,29 +1103,6 @@ namespace MyCAM
 				else if( control.HasChildren ) {
 					FindContainerAllToolStrips( control, totalToolStripList );
 				}
-			}
-		}
-
-		// to make sure container disply order is level 1 -> 3
-		void ReLayOutUIZorder()
-		{
-			int currentIndex = 0;
-
-			// layout from bottom to top
-			if( m_pnlBackGround.Visible ) {
-				Controls.SetChildIndex( m_pnlBackGround, currentIndex++ );
-			}
-			if( m_tscLevel3Container.Visible ) {
-				Controls.SetChildIndex( m_tscLevel3Container, currentIndex++ );
-			}
-			if( m_tscLevel2Container.Visible ) {
-				Controls.SetChildIndex( m_tscLevel2Container, currentIndex++ );
-			}
-			if( m_tscLevel1Container.Visible ) {
-				Controls.SetChildIndex( m_tscLevel1Container, currentIndex++ );
-			}
-			if( m_msMode.Visible ) {
-				Controls.SetChildIndex( m_msMode, currentIndex++ );
 			}
 		}
 
@@ -1232,10 +1176,6 @@ namespace MyCAM
 		// UI setting
 		void DefaultUISetting()
 		{
-			// hide tool strip container
-			m_tscLevel2Container.Visible = false;
-			m_tscLevel3Container.Visible = false;
-
 			// default is cad mode
 			RefreshToolStripLayout( EUIStatus.File );
 			VisibleCAMQuickToolBarButtons( false );
@@ -1249,25 +1189,32 @@ namespace MyCAM
 		// this setting is for main form to know what situation ui need to refresh as what look like
 		void UIListSetting()
 		{
-			m_UIStatusDic = new Dictionary<EUIStatus, List<Control>>()
+			m_UIStatusDic = new Dictionary<EUIStatus, ToolStrip>()
 			{
-				{ EUIStatus.File, new List<Control>() { m_tsFileFunction } },
-				{ EUIStatus.CAD , new List<Control>() { m_tsCADFunction } },
-				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction } },
-				{ EUIStatus.Machining, new List<Control>() { m_tsMachiningFunction } },
-				{ EUIStatus.Simulation, new List<Control>() { m_tsSimuFunc } },
-			};
-			m_ToolStripLevelList = new List<ToolStripContainer>()
-			{
-				m_tscLevel1Container,
-				m_tscLevel2Container,
-				m_tscLevel3Container
+				{ EUIStatus.File, m_tsFileFunction },
+				{ EUIStatus.CAD, m_tsCADFunction },
+				{ EUIStatus.CAM, m_tsCAMFunction },
+				{ EUIStatus.Machining, m_tsMachiningFunction },
+				{ EUIStatus.Simulation, m_tsSimuFunc },
 			};
 		}
 
 		void AdjustToCurrentScreen()
 		{
 			WindowState = FormWindowState.Maximized;
+		}
+
+		// each layer swatch shows the 3D path color of its tech layer (data colors from PathLayerColor)
+		void InitLayerSwatches()
+		{
+			ToolStripButton[] swatchArray = { m_tsbLayer1, m_tsbLayer2, m_tsbLayer3, m_tsbLayer4, m_tsbLayer5,
+				m_tsbLayer6, m_tsbLayer7, m_tsbLayer8, m_tsbLayer9, m_tsbLayer10 };
+			for( int i = 0; i < swatchArray.Length; i++ ) {
+				int nTechLayer = i + 1;
+				Color swatchColor = PathLayerColor.GetSwatchColor( nTechLayer );
+				swatchArray[ i ].BackColor = swatchColor;
+				swatchArray[ i ].ForeColor = PathLayerColor.GetSwatchTextColor( swatchColor );
+			}
 		}
 
 		#region Get machine data

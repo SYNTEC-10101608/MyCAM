@@ -28,14 +28,14 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlMode = new CommonUI.Controls.SectionPanel();
-			this.m_lblMode = new System.Windows.Forms.Label();
+			this.m_lblMode = new CommonUI.Controls.ThemedLabel();
 			this.m_rdoDefault = new System.Windows.Forms.RadioButton();
 			this.m_rdoLockAB = new System.Windows.Forms.RadioButton();
 			this.m_pnlLockAB = new CommonUI.Controls.SectionPanel();
 			this.m_chkLockSlave = new System.Windows.Forms.CheckBox();
 			this.m_pnlSlaveSettings = new System.Windows.Forms.Panel();
 			this.m_pnlSlaveAngle = new System.Windows.Forms.Panel();
-			this.m_lblSlaveAngle = new System.Windows.Forms.Label();
+			this.m_lblSlaveAngle = new CommonUI.Controls.ThemedLabel();
 			this.m_rdoSlaveAuto = new System.Windows.Forms.RadioButton();
 			this.m_rdoSlaveManual = new System.Windows.Forms.RadioButton();
 			this.m_numSlave = new CommonUI.Controls.DebouncedNumericUpDown();
@@ -43,13 +43,13 @@
 			this.m_btnRotaryPos = new CommonUI.Controls.ThemedButton();
 			this.m_btnRotaryNeg = new CommonUI.Controls.ThemedButton();
 			this.m_pnlMachiningDir = new CommonUI.Controls.SectionPanel();
-			this.m_lblMachiningDir = new System.Windows.Forms.Label();
+			this.m_lblMachiningDir = new CommonUI.Controls.ThemedLabel();
 			this.m_cmbMachiningDir = new System.Windows.Forms.ComboBox();
 			this.m_lblMachiningDirHint = new CommonUI.Controls.ThemedLabel();
 			this.m_chkLockMaster = new System.Windows.Forms.CheckBox();
 			this.m_pnlMasterSettings = new System.Windows.Forms.Panel();
 			this.m_pnlMasterAngle = new System.Windows.Forms.Panel();
-			this.m_lblMasterAngle = new System.Windows.Forms.Label();
+			this.m_lblMasterAngle = new CommonUI.Controls.ThemedLabel();
 			this.m_rdoMasterAuto = new System.Windows.Forms.RadioButton();
 			this.m_rdoMasterManual = new System.Windows.Forms.RadioButton();
 			this.m_numMaster = new CommonUI.Controls.DebouncedNumericUpDown();
@@ -390,14 +390,14 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlMode;
-		private System.Windows.Forms.Label m_lblMode;
+		private CommonUI.Controls.ThemedLabel m_lblMode;
 		private System.Windows.Forms.RadioButton m_rdoDefault;
 		private System.Windows.Forms.RadioButton m_rdoLockAB;
 		private CommonUI.Controls.SectionPanel m_pnlLockAB;
 		private System.Windows.Forms.CheckBox m_chkLockSlave;
 		private System.Windows.Forms.Panel m_pnlSlaveSettings;
 		private System.Windows.Forms.Panel m_pnlSlaveAngle;
-		private System.Windows.Forms.Label m_lblSlaveAngle;
+		private CommonUI.Controls.ThemedLabel m_lblSlaveAngle;
 		private System.Windows.Forms.RadioButton m_rdoSlaveAuto;
 		private System.Windows.Forms.RadioButton m_rdoSlaveManual;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numSlave;
@@ -405,13 +405,13 @@
 		private CommonUI.Controls.ThemedButton m_btnRotaryPos;
 		private CommonUI.Controls.ThemedButton m_btnRotaryNeg;
 		private CommonUI.Controls.SectionPanel m_pnlMachiningDir;
-		private System.Windows.Forms.Label m_lblMachiningDir;
+		private CommonUI.Controls.ThemedLabel m_lblMachiningDir;
 		private System.Windows.Forms.ComboBox m_cmbMachiningDir;
 		private CommonUI.Controls.ThemedLabel m_lblMachiningDirHint;
 		private System.Windows.Forms.CheckBox m_chkLockMaster;
 		private System.Windows.Forms.Panel m_pnlMasterSettings;
 		private System.Windows.Forms.Panel m_pnlMasterAngle;
-		private System.Windows.Forms.Label m_lblMasterAngle;
+		private CommonUI.Controls.ThemedLabel m_lblMasterAngle;
 		private System.Windows.Forms.RadioButton m_rdoMasterAuto;
 		private System.Windows.Forms.RadioButton m_rdoMasterManual;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numMaster;

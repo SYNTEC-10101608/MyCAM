@@ -44,3 +44,15 @@ B8 CNCThreePointDlg m_pnlWorkpiece same statement as above, written without the 
 B8 ToolVectorDlg m_pnlStartEndSwitch the start / end switch row left m_pnlIndexParam; its panel is enabled at the same time (decision 2026-11-16 ToolVectorDlg)
 B6 DesignSupportBracketDlg m_lblXPositionsTitle title moved to the card m_pnlXBracket (2026-11-16: no sub-titles inside a card)
 B6 DesignSupportBracketDlg m_lblYPositionsTitle title moved to the card m_pnlYBracket (2026-11-16: no sub-titles inside a card)
+
+# main window regions are placed by MainLayout instead of TableLayoutPanel (decision 2026-11-19 "主視窗的 TableLayoutPanel")
+B8 MainLayout m_VerticalHost the SizeChanged handler is removed: only MainLayout.Update sizes the vertical CNC host and places its panels in the same call
+
+# unused second / third tool bar containers removed (decision 2026-11-19 "第二、三層工具列容器"): every page shows one tool strip, so they were never shown
+B6 StartupForm m_tscLevel2Container empty container that was never shown, removed
+B6 StartupForm m_tscLevel3Container empty container that was never shown, removed
+B8 StartupForm m_tscLevel2Container hiding the removed container is no longer needed
+B8 StartupForm m_tscLevel3Container hiding the removed container is no longer needed
+B8 StartupForm m_ToolStripLevelList* the per-level loop shows only the first container, now m_tscLevel1Container.Visible = true
+B8 StartupForm m_tscLevel1Container the first container is shown as before (was the first item of m_ToolStripLevelList)
+B8 StartupForm toolStrip the tool strip of the status is shown and the others hidden, in one assignment instead of two

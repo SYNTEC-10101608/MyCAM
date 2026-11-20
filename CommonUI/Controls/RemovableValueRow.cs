@@ -39,7 +39,7 @@ namespace CommonUI.Controls
 			int nValueLeft = INDEX_WIDTH + ThemeMetrics.CONTROL_GAP;
 			int nUnitLeft = nValueLeft + VALUE_WIDTH + ThemeMetrics.CONTROL_GAP;
 			int nDeleteLeft = nUnitLeft + UNIT_WIDTH + ThemeMetrics.CONTROL_GAP;
-			m_lblIndex = new Label
+			m_lblIndex = new ThemedLabel
 			{
 				AutoSize = false,
 				Location = new Point( 0, ThemeMetrics.LABEL_OFFSET ),
@@ -166,7 +166,7 @@ namespace CommonUI.Controls
 		const int UNIT_WIDTH = 28;
 		const int DELETE_WIDTH = 56;
 
-		readonly Label m_lblIndex;
+		readonly ThemedLabel m_lblIndex;
 		readonly DebouncedNumericUpDown m_numValue;
 		readonly ThemedLabel m_lblUnit;
 		readonly ThemedButton m_btnDelete;

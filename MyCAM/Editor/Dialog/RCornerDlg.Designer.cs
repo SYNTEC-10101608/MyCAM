@@ -28,7 +28,7 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlStatus = new CommonUI.Controls.SectionPanel();
-			this.m_lblStatus = new System.Windows.Forms.Label();
+			this.m_lblStatus = new CommonUI.Controls.ThemedLabel();
 			this.m_btnDelete = new CommonUI.Controls.ThemedButton();
 			this.m_btnSwitchStartOrEnd = new CommonUI.Controls.ThemedButton();
 			this.m_btnDone = new CommonUI.Controls.ThemedButton();
@@ -98,7 +98,7 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlStatus;
-		private System.Windows.Forms.Label m_lblStatus;
+		private CommonUI.Controls.ThemedLabel m_lblStatus;
 		private CommonUI.Controls.ThemedButton m_btnDelete;
 		private CommonUI.Controls.ThemedButton m_btnSwitchStartOrEnd;
 		private CommonUI.Controls.ThemedButton m_btnDone;

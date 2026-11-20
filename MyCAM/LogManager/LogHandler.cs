@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
+using CommonUI.Controls;
 using CommonUI.Theme;
 using MyCAM.App;
 
@@ -15,43 +15,40 @@ namespace MyCAM.LogManager
 
 		public void ShowOnLogPanel( string message, MyApp.NoticeType type, bool needMessageBox = false )
 		{
-			// Get color and icon based on type
-			Color color;
+			// Get text role and icon based on type
+			TextRole role;
 			MessageBoxIcon icon;
 			bool forceMessageBox = false;
 
 			switch( type ) {
 				case MyApp.NoticeType.Error:
-					color = ERROR_Color;
+					role = TextRole.Error;
 					icon = MessageBoxIcon.Error;
 					forceMessageBox = true;
 					break;
 				case MyApp.NoticeType.Warning:
-					color = WARNING_Color;
+					role = TextRole.Warning;
 					icon = MessageBoxIcon.Warning;
 					break;
 				case MyApp.NoticeType.Hint:
 				default:
-					color = NORMAL_HintColor;
+					role = TextRole.Body;
 					icon = MessageBoxIcon.Information;
 					break;
 			}
 
-			AddLog( message, color, icon, forceMessageBox || needMessageBox );
+			AddLog( message, role, icon, forceMessageBox || needMessageBox );
 		}
 
 		Panel m_PanelShowMessage;
-		readonly Color ERROR_Color = ThemeColors.ERROR;
-		readonly Color WARNING_Color = ThemeColors.WARNING;
-		readonly Color NORMAL_HintColor = ThemeColors.TEXT;
 
-		void AddLog( string message, Color color, MessageBoxIcon icon, bool needMessageBox )
+		void AddLog( string message, TextRole role, MessageBoxIcon icon, bool needMessageBox )
 		{
 			// Add label to panel
-			Label lblStickOnPanel = new Label
+			ThemedLabel lblStickOnPanel = new ThemedLabel
 			{
 				AutoSize = true,
-				ForeColor = color,
+				Role = role,
 				Text = $"{DateTime.Now:HH:mm:ss} - {message}",
 				Dock = DockStyle.Top
 			};

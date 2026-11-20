@@ -34,6 +34,11 @@ for %%L in (zh-TW zh-CN) do (
 	)
 )
 
+REM P6: the regions at the client size and page of the designer are where the designer shows them
+echo ## main window: designer layout
+powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Mode CNC -DesignerLayout -OutFile "%SHOTS%\MainWindow_Designer.png"
+if errorlevel 1 set "RESULT=1"
+
 :report
 if "%RESULT%"=="0" (
 	echo [UICheck] all checks passed.

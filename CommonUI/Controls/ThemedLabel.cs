@@ -6,7 +6,8 @@ using CommonUI.Theme;
 namespace CommonUI.Controls
 {
 	/// <summary>
-	/// Label with a text role (emphasis, value, secondary, status). Plain body text uses Label.
+	/// The only label of the screens. Body (the default) is plain text that inherits from its parent; the other roles
+	/// are emphasis, value, secondary and status.
 	/// Font and color follow the role and are not written to the designer file.
 	/// </summary>
 	public class ThemedLabel : Label

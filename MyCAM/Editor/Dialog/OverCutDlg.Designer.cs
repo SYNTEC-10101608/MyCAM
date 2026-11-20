@@ -28,7 +28,7 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlParam = new CommonUI.Controls.SectionPanel();
-			this.m_lblOverCutLength = new System.Windows.Forms.Label();
+			this.m_lblOverCutLength = new CommonUI.Controls.ThemedLabel();
 			this.m_numOverCutLength = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblOverCutUnit = new CommonUI.Controls.ThemedLabel();
 			this.m_btnSure = new CommonUI.Controls.ThemedButton();
@@ -112,7 +112,7 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlParam;
-		private System.Windows.Forms.Label m_lblOverCutLength;
+		private CommonUI.Controls.ThemedLabel m_lblOverCutLength;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numOverCutLength;
 		private CommonUI.Controls.ThemedLabel m_lblOverCutUnit;
 		private CommonUI.Controls.ThemedButton m_btnSure;

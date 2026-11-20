@@ -17,10 +17,10 @@
 		private void InitializeComponent()
 		{
 			this.m_pnlAlign = new CommonUI.Controls.SectionPanel();
-			this.m_lblMethod = new System.Windows.Forms.Label();
+			this.m_lblMethod = new CommonUI.Controls.ThemedLabel();
 			this.m_cmbMethod = new System.Windows.Forms.ComboBox();
 			this.m_lblGuide = new CommonUI.Controls.ThemedLabel();
-			this.m_lblAxisPlane = new System.Windows.Forms.Label();
+			this.m_lblAxisPlane = new CommonUI.Controls.ThemedLabel();
 			this.m_cmbAxisPlane = new System.Windows.Forms.ComboBox();
 			this.m_lblMoveStatus = new CommonUI.Controls.ThemedLabel();
 			this.m_lblError = new CommonUI.Controls.ThemedLabel();
@@ -138,10 +138,10 @@
 		#endregion
 
 		private CommonUI.Controls.SectionPanel m_pnlAlign;
-		private System.Windows.Forms.Label m_lblMethod;
+		private CommonUI.Controls.ThemedLabel m_lblMethod;
 		private System.Windows.Forms.ComboBox m_cmbMethod;
 		private CommonUI.Controls.ThemedLabel m_lblGuide;
-		private System.Windows.Forms.Label m_lblAxisPlane;
+		private CommonUI.Controls.ThemedLabel m_lblAxisPlane;
 		private System.Windows.Forms.ComboBox m_cmbAxisPlane;
 		private CommonUI.Controls.ThemedLabel m_lblMoveStatus;
 		private CommonUI.Controls.ThemedLabel m_lblError;

@@ -9,8 +9,8 @@
 #   S3  every dialog derives from DialogBase (directly or through FormBase / EditDialogBase), panels from PanelBase
 #   S4  screen code contains no Color / SystemColors / new Font (data colors: named static readonly constants)
 #   S5  dialog layout (section 4.4): margins, section width / gap, row grid, card height, button bar
-#   S6  language: captions written in Chinese have their ID in zh-TW and zh-CN; the four languages have the same
-#       IDs; the language file is named after the class
+#   S6  language: captions written in Chinese have their ID in zh-TW and zh-CN; every language in Language\ has the
+#       same IDs; the language file is named after the class
 #   S7  language: a control whose name is an ID is not applied by hand (ApplyLanguage applies it)
 #   S8  section titles (section 4.5): a card title is SectionPanel.Text; no emphasized label in a card's title bar
 #   S9  control field names start with the prefix of their type (section 3), also in the main window
@@ -25,13 +25,13 @@
 #   S17 button bar order (section 4.4): auxiliary buttons from the left margin, the others from the right margin,
 #       8 apart; Primary is the rightmost, Cancel / Close right before it, Reset / Preview on the left
 #   S18 alignment in a card: the first input of each row starts at the same x; a unit label is 6 after its input
-#   S19 main window designer: white list of types, no appearance except the data color swatches
+#   S19 main window designer: white list of types (no TableLayoutPanel), no appearance except the not-machined legend
 #   S20 data colors: every "static readonly Color" constant is a registered data color (StaticExceptions.txt)
 #   S21 every public type of CommonUI is listed in the component catalog (section 9), in the subsection of its folder;
 #       a file in CommonUI\<Folder> is in namespace CommonUI.<Folder>
 #   S22 title bar of a titled card (section 4.5): button 23 high at y=5, check box at y=5, label 24 high at y=4,
 #       the rightmost control ends at the content edge
-#   S23 code creates no control outside the white list (Button, GroupBox, NumericUpDown, TextBox ...)
+#   S23 code creates no control outside the white list (Button, Label, GroupBox, NumericUpDown, TextBox ...)
 #
 # Exceptions are listed in StaticExceptions.txt: "<rule> <class> <control> <reason>". Exit code 1 on a problem.
 
@@ -42,15 +42,18 @@ $SCREEN_DIRS = @( "MyCAM\Editor\Dialog", "MyCAM\CNC", "CncUI\Panel", "CncUI\Dial
 $CODE_SCOPE = @( "MyCAM\Editor\Dialog", "MyCAM\Editor\Action", "MyCAM\Editor\ViewManager.cs", "MyCAM\LogManager",
 	"MyCAM\StartupForm.cs", "MyCAM\Layout", "MyCAM\CNC", "CncUI", "CommonUI\Controls", "CommonUI\Forms",
 	"CommonUI\Layout", "CommonUI\Language" )
-$LANGUAGES = @( "zh-TW", "zh-CN", "en-US", "ru-RU" )
+# every language that has language files (file name "<class>_<language>.xml")
+$LANGUAGES = @( Get-ChildItem (Join-Path $Root "Language") -Filter "*.xml" |
+	ForEach-Object { [regex]::Match($_.Name, "_([a-z]{2}-[A-Z]{2})\.xml$").Groups[1].Value } |
+	Where-Object { $_ } | Sort-Object -Unique )
 
 $ALLOWED_TYPES = @(
 	"CommonUI.Controls.SectionPanel", "CommonUI.Controls.ThemedButton", "CommonUI.Controls.ThemedLabel",
 	"CommonUI.Controls.DebouncedNumericUpDown", "CommonUI.Controls.MultiSelectTreeView",
 	"CommonUI.Controls.LoadingBar", "CommonUI.Controls.RoundedProgressBar", "CommonUI.Controls.ThemedDataGridView",
-	"System.Windows.Forms.Label", "System.Windows.Forms.CheckBox", "System.Windows.Forms.RadioButton",
+	"System.Windows.Forms.CheckBox", "System.Windows.Forms.RadioButton",
 	"System.Windows.Forms.ComboBox", "System.Windows.Forms.CheckedListBox", "System.Windows.Forms.TrackBar",
-	"System.Windows.Forms.PictureBox", "System.Windows.Forms.DataGridView",
+	"System.Windows.Forms.PictureBox",
 	"System.Windows.Forms.DataGridViewTextBoxColumn", "System.Windows.Forms.Panel",
 	"System.Windows.Forms.ToolTip", "System.Windows.Forms.Timer", "System.ComponentModel.IContainer" )
 
@@ -58,7 +61,7 @@ $ALLOWED_TYPES = @(
 $MAIN_WINDOW_TYPES = @( "System.Windows.Forms.MenuStrip", "System.Windows.Forms.ToolStrip",
 	"System.Windows.Forms.ToolStripContainer", "System.Windows.Forms.ContextMenuStrip",
 	"System.Windows.Forms.ToolStripButton", "System.Windows.Forms.ToolStripMenuItem",
-	"System.Windows.Forms.ToolStripSeparator", "System.Windows.Forms.TableLayoutPanel" )
+	"System.Windows.Forms.ToolStripSeparator" )
 
 # non-numeric text fields (section 3)
 $ALLOWED_TEXTBOX = @( "ConnectDlg.m_txtIP", "MeasureDlg.m_txtResult", "ExtendedGCodeDlg.m_txtGCode",
@@ -71,11 +74,11 @@ $FORBIDDEN_CONTROL_PROPS = @( "Font", "BackColor", "ForeColor", "FlatStyle", "Us
 
 # field name prefix of each control type (section 3)
 $PREFIX_MAP = @{
-	"SectionPanel" = "m_pnl"; "Panel" = "m_pnl"; "TableLayoutPanel" = "m_pnl"
-	"ThemedButton" = "m_btn"; "ThemedLabel" = "m_lbl"; "Label" = "m_lbl"; "DebouncedNumericUpDown" = "m_num"
+	"SectionPanel" = "m_pnl"; "Panel" = "m_pnl"
+	"ThemedButton" = "m_btn"; "ThemedLabel" = "m_lbl"; "DebouncedNumericUpDown" = "m_num"
 	"TextBox" = "m_txt"; "CheckBox" = "m_chk"; "RadioButton" = "m_rdo"; "ComboBox" = "m_cmb"
 	"CheckedListBox" = "m_clb"; "TrackBar" = "m_trb"; "PictureBox" = "m_pic"; "ThemedDataGridView" = "m_dgv"
-	"DataGridView" = "m_dgv"; "DataGridViewTextBoxColumn" = "m_col"; "ToolTip" = "m_ttp"; "Timer" = "m_tmr"
+	"DataGridViewTextBoxColumn" = "m_col"; "ToolTip" = "m_ttp"; "Timer" = "m_tmr"
 	"MultiSelectTreeView" = "m_tv"; "TreeView" = "m_tv"; "LoadingBar" = "m_prg"; "RoundedProgressBar" = "m_prg"
 	"MenuStrip" = "m_ms"; "ToolStrip" = "m_ts"; "ToolStripContainer" = "m_tsc"; "ToolStripButton" = "m_tsb"
 	"ToolStripMenuItem" = "m_tsmi"; "ToolStripSeparator" = "m_tss"; "ContextMenuStrip" = "m_cms"
@@ -742,7 +745,7 @@ if (-not $Only -or $mainScreen.ClassName -like $Only) {
 	Test-FieldNames $mainScreen
 	Test-OrphanIds $mainScreen (Join-Path $Root "MyCAM\StartupForm.cs")
 
-	# S19 types and appearance of the main window (the data color swatches are exceptions)
+	# S19 types and appearance of the main window (the not-machined legend is an exception)
 	foreach ($name in $mainScreen.Fields.Keys) {
 		$szType = $mainScreen.Fields[$name]
 		if ($ALLOWED_TYPES -notcontains $szType -and $MAIN_WINDOW_TYPES -notcontains $szType) {
@@ -842,7 +845,7 @@ foreach ($file in $codeFiles) {
 		if ($line -match "\bDeviceDpi\b") {
 			Report "S12" $szClass "line$nLine" "DPI scaling is not used (96 DPI only): $($line.Trim())"
 		}
-		if ($line -match "\bnew (System\.Windows\.Forms\.)?(Button|GroupBox|NumericUpDown|FlowLayoutPanel|TableLayoutPanel|TextBox|ListBox|SplitContainer|TabControl|ProgressBar)\s*[\(\{]") {
+		if ($line -match "\bnew (System\.Windows\.Forms\.)?(Button|Label|GroupBox|NumericUpDown|FlowLayoutPanel|TableLayoutPanel|TextBox|ListBox|SplitContainer|TabControl|ProgressBar|DataGridView)\s*[\(\{]") {
 			Report "S23" $szClass "line$nLine" "control type outside the white list created in code: $($line.Trim())"
 		}
 		$isAppearanceCode = $line -match "(\bm_\w+\.|\bthis\.|^\s*)(Font|ForeColor|BackColor|Location|Size|ClientSize|Left|Top|Width|Height|Bounds)\s*=[^=]|\bm_\w+\.SetBounds\("
