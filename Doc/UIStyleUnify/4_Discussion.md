@@ -324,3 +324,30 @@ Designer 目前**不是**橫式，而是執行時不會出現的混合狀態：
 
 1. 使用者實測時存下的 `StartupForm.Designer.cs` / `.resx` 是 Designer 的標準輸出，依原則保留提交。
 2. `DesignerDiff.ps1` 把那次存檔 186 行的文字差異濃縮為 3 個屬性變化，resx 判定為只有格式差異。
+
+## 4.11 規範 review（2026-11-20，進行中）
+
+### 已定稿並施工
+
+| 日期 | 問題 | 決議 |
+| --- | --- | --- |
+| 2026-11-20 | 2.2 第 1 點「`ToolStrip` 不繼承父容器字型」難以理解 | 改為「選單與工具列的字型由 `MainWindowBase` 設定（`ToolStrip` 預設使用系統選單字型），Designer 不設定」 |
+| 2026-11-20 | `SectionStack.Arrange` 的 Designer 做法沒有寫在規範 | 程式不改；4.6 補上 Designer 規劃：呈現全部卡片都顯示的狀態、只重排上下位置、疊放卡片的層次（開啟時顯示的在最上層） |
+| 2026-11-20 | 圖示色票與 `ThemeColors` 不一致（墨色 `#334155` ≠ `TEXT` `#1E2936`） | 色票定位為圖示繪圖色、不是 UI token，只有 `a`、`r` 須等於 `ACCENT`、`ERROR`；不改圖示外觀，`RenderIcons.ps1` 註解同步更正 |
+| 2026-11-20 | `ContextMenuStrip` 沒有在用 | 移除 `StartupForm.m_cmsMain`（空的、沒有掛到任何控制項）；白名單、`MainWindowBase` 的右鍵選單語系與字型、檢查程式與規範一併移除 |
+| 2026-11-20 | `ToolTip` 在排版調整後是否還需要 | 保留：`CNCInfoPanel` 主程式名稱（欄寬 92px）、`CNCAlarmPanel` 讀取失敗訊息（含例外訊息）都是長度不固定的執行時文字。白名單註明只用於可能被截斷的執行時文字 |
+| 2026-11-20 | 以 AI 產生圖示時沒有可依循的設計規範 | 依現有圖示歸納，新增獨立指引 `icon-design.instructions.md`（`applyTo` 圖示原始檔），含產生方式、格線、線寬、色彩、共用元素與 AI 提示範本；UI 風格 6.7 改為引用 |
+| 2026-11-20 | Designer 異動的合理性如何判斷 | 維持現狀：`DesignerDiff.ps1` 只列出語意差異（報告），合理性由人 review，`UICheck` 的規則（型別白名單等）是硬性門檻；不另建「允許的異動」清單 |
+
+### 待決
+
+1. 1.2、1.3 的改寫：外觀與行為解耦（議題的驗收描述移出規範）；Designer 呈現全部卡片都顯示的狀態，執行時只透過 4.6 的方法改變。
+2. 第 3 節「不可使用」改為白名單審查機制（新增型別需審查並同步修改規範與檢查）；兩條 `TextBox` 用途限制併入白名單與第 5 節。
+3. 3.2 圖例色塊的例外：新增 `CommonUI.Controls.ColorSwatch`，資料色改為具名類別、與 3D 繪圖共用（`ToolVectorDlg`、`CNCInfoPanel`）。
+4. 6.2「加工 / 不加工」圖例：改用 `RenderIcons.ps1` 產生的 20×20 圖示，移除 Designer 顏色與 S19 例外。
+5. 4.4 第 4 點：一個容器只有一組單選鈕時直接放在容器內，兩組以上才以 `Panel` 包住（3.2 同步）。
+6. 4.4 第 11 點：補「不能取得焦點的控件由系統略過，不需設定 `TabStop`」。
+7. 6.6 截圖說明拆成用途、參數表、橫直式判斷三點。
+8. `ThemedButton.Kind`、`Indicator` 補 XML 註解；`ThemeColors`、`ThemeMetrics` 是否每個常數補 `///`。
+9. 全文黑名單寫法改為規則與白名單（第 2 節開頭、4.2 第 1 點、4.4 開頭、6.3、S19、S23）。
+10. `DialogBase.ApplyLanguage` 維持由各對話框在建構子呼叫（建議維持，待確認）。

@@ -52,7 +52,8 @@ applyTo: "**/*.cs"
 
 1. 字族依介面語系：zh-TW `Microsoft JhengHei UI`、zh-CN `Microsoft YaHei UI`、其他 `Segoe UI`。
    `Program.Main` 在建立任何畫面前呼叫 `MyApp.Initialize()`（讀設定、設語系、`ThemeFonts.Initialize`）；
-   Designer 中固定顯示 zh-TW 字型。`ToolStrip` 不繼承父容器字型，由 `MainWindowBase` 另外設定。
+   Designer 中固定顯示 zh-TW 字型。選單與工具列的字型由 `MainWindowBase` 設定（`ToolStrip` 預設使用系統選單字型），
+   Designer 不設定。
 
 | `TextRole` | 字型 | 顏色 | 用途 |
 | --- | --- | --- | --- |
@@ -104,8 +105,8 @@ applyTo: "**/*.cs"
 | | `TrackBar` / `PictureBox` | `m_trb` / `m_pic` |
 | 原生（只限非數值文字） | `TextBox`（IP、路徑、G-code、量測結果等） | `m_txt` |
 | 原生（無外觀的容器） | `Panel`（用途見 3.2） | `m_pnl` |
-| 原生（元件） | `ToolTip` / `Timer` | `m_ttp` / `m_tmr` |
-| 主視窗 | `MenuStrip` / `ToolStrip` / `ContextMenuStrip` | `m_ms` / `m_ts` / `m_cms` |
+| 原生（元件） | `ToolTip`（只用於長度不固定、可能被截斷的執行時文字） / `Timer` | `m_ttp` / `m_tmr` |
+| 主視窗 | `MenuStrip` / `ToolStrip` | `m_ms` / `m_ts` |
 | | `ToolStripButton` / `ToolStripMenuItem` / `ToolStripSeparator` | `m_tsb` / `m_tsmi` / `m_tss` |
 
 1. 同一個值的標題與顯示值並列時，標題用一般名稱、顯示值加 `Value`（`m_lblPnt1X` 顯示「X」，`m_lblPnt1XValue` 顯示座標）。
@@ -245,6 +246,15 @@ Form
 | 動態增刪的數值列 | `RemovableValueRow` |
 | 精靈換頁（各頁是一個 `Panel`，放在 `(12, 12)`） | `SectionStack.ShowPage( this, page, 所有頁 )`：隱藏其他頁、對話框大小配合該頁並重新置中（4.3） |
 
+以 `SectionStack.Arrange` 補位的對話框，Designer 依下列方式規劃：
+
+1. Designer 呈現全部卡片都顯示的狀態：卡片依 4.4 由上往下排列，按鈕列與 `ClientSize` 依最後一張卡片計算。
+   執行時 `Arrange` 把實際顯示的卡片往上補位，`PlaceButtonBar` 再把按鈕列移到內容下方、調整對話框高度（位置不動，4.3）。
+2. `Arrange` 與 `PlaceButtonBar` 只改上下位置與對話框高度；卡片與按鈕的左右位置、寬度維持 Designer 的值。
+   寬度會改變的版面變化只有精靈換頁（`ShowPage`）。
+3. 同一位置輪流顯示的卡片放在相同座標、同寬同高（4.4 第 6 點）。開啟時顯示的那一張放在最上層
+   （文件大綱的最上方），其餘在下層。編輯下層卡片時可暫時移到最上層，存檔前移回原本的順序。
+
 ### 4.7 精靈
 
 依步驟操作的對話框分為兩型，依「後面的步驟是否需要對照前面步驟的內容」選用：
@@ -302,8 +312,9 @@ Form
    `-Mode CNC -DesignerLayout` 改用 Designer 的客戶區大小，檢查各區是否在 Designer 上的位置（P6）。
    橫 / 直式只依主視窗外框的長寬比（`Height > Width`）判斷，與系統顯示方向無關；直式（1080×1880）在橫式螢幕上
    以超出螢幕的視窗大小截圖，不需旋轉螢幕。腳本同時檢查對話框是否置中在 4.3 的區域。
-7. 圖示：`ImageScalingSize` 功能工具列 40×40，選單、圖層列、視角列、右鍵選單 20×20；
-   圖示為透明背景 PNG，由 `MyCAM/Resource/IconSource/RenderIcons.ps1` 產生，不使用 Magenta 透明色。
+7. 圖示：`ImageScalingSize` 功能工具列 40×40，選單、圖層列、視角列 20×20。
+   圖示一律是 `MyCAM/Resource/IconSource` 產生的 40×40 透明背景 PNG（20×20 處由 `ImageScalingSize` 縮小），
+   產生方式與設計規則見 [圖示設計](icon-design.instructions.md)。
 
 ### 嵌入式面板
 
@@ -331,7 +342,7 @@ Form
    | 主視窗 | `ApplyLanguage( languageManager )`（`MainWindowBase`） | 同上 |
 
 2. 套用對象：標題類控制項（`ThemedLabel`、按鈕、`CheckBox`、`RadioButton`、`SectionPanel`）、清單欄位標題（以欄名）、
-   選單與工具列項目（以項目名；提示文字的 ID 為 `<項目名>_ToolTip`，含右鍵選單）。輸入框的內容不受影響。
+   選單與工具列項目（以項目名；提示文字的 ID 為 `<項目名>_ToolTip`）。輸入框的內容不受影響。
    嵌入式面板是另一個畫面，各自套用自己的語系檔。
 3. 表單標題：以**類別名稱**當 ID，對話框由同一個呼叫套用。
 4. 多個控制項共用的文字、執行時才決定的文字：在程式中明確呼叫 `TryGetString`，且該 ID **不可**等於任何控制項名稱

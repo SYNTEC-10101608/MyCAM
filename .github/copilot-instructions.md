@@ -12,6 +12,7 @@
 | [Coding Style：C#](instructions/coding-style-csharp.instructions.md) | C# 格式、命名、程式結構、語言用法 | `*.cs` |
 | [Coding Style：C / C++](instructions/coding-style-cpp.instructions.md) | C / C++ 格式、命名、語言用法 | `*.c` `*.cpp` `*.h` `*.hpp` |
 | [UI 風格](instructions/ui-style.instructions.md) | 主題 token、控制項白名單、對話框外觀層與版面、多語系自動套用、檢查腳本 | `*.cs`（畫面） |
+| [圖示設計](instructions/icon-design.instructions.md) | 工具列圖示的產生方式、格線、線寬、色彩、共用元素、以 AI 產生圖示 | `MyCAM/Resource/IconSource/**` |
 
 格式類規則同時寫在 repo 根目錄的 `.editorconfig`，衝突時以 `.editorconfig` 為準。
 

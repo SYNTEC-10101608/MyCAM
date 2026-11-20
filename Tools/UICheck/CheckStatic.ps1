@@ -62,7 +62,6 @@ $ALLOWED_TYPES = @(
 
 # main window only (section 3)
 $MAIN_WINDOW_TYPES = @( "System.Windows.Forms.MenuStrip", "System.Windows.Forms.ToolStrip",
-	"System.Windows.Forms.ContextMenuStrip",
 	"System.Windows.Forms.ToolStripButton", "System.Windows.Forms.ToolStripMenuItem",
 	"System.Windows.Forms.ToolStripSeparator" )
 
@@ -84,7 +83,7 @@ $PREFIX_MAP = @{
 	"DataGridViewTextBoxColumn" = "m_col"; "ToolTip" = "m_ttp"; "Timer" = "m_tmr"
 	"MultiSelectTreeView" = "m_tv"; "TreeView" = "m_tv"; "LoadingBar" = "m_prg"; "RoundedProgressBar" = "m_prg"
 	"MenuStrip" = "m_ms"; "ToolStrip" = "m_ts"; "ToolStripButton" = "m_tsb"
-	"ToolStripMenuItem" = "m_tsmi"; "ToolStripSeparator" = "m_tss"; "ContextMenuStrip" = "m_cms"
+	"ToolStripMenuItem" = "m_tsmi"; "ToolStripSeparator" = "m_tss"
 }
 
 function Test-FieldNames( $screen ) {

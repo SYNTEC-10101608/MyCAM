@@ -152,7 +152,6 @@
 			this.m_pnlCNCInfo = new System.Windows.Forms.Panel();
 			this.m_pnlBottom = new System.Windows.Forms.Panel();
 			this.m_pnlBackGround = new System.Windows.Forms.Panel();
-			this.m_cmsMain = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_tsMachiningFunction.SuspendLayout();
@@ -1314,12 +1313,6 @@
 			this.m_pnlBackGround.Size = new System.Drawing.Size(1920, 910);
 			this.m_pnlBackGround.TabIndex = 9;
 			// 
-			// m_cmsMain
-			// 
-			this.m_cmsMain.ImageScalingSize = new System.Drawing.Size(20, 20);
-			this.m_cmsMain.Name = "m_cmsMain";
-			this.m_cmsMain.Size = new System.Drawing.Size(61, 4);
-			// 
 			// StartupForm
 			// 
 			this.AutoScroll = true;
@@ -1437,7 +1430,6 @@
 		private System.Windows.Forms.ToolStripButton m_tsbPlay;
 		private System.Windows.Forms.ToolStripButton m_tsbPause;
 		private System.Windows.Forms.ToolStripButton m_tsbStop;
-		private System.Windows.Forms.ContextMenuStrip m_cmsMain;
 		private System.Windows.Forms.ToolStripButton m_tsbPreviousPath;
 		private System.Windows.Forms.ToolStripButton m_tsbNextPath;
 		private System.Windows.Forms.ToolStripButton m_tsbPreCollision;

@@ -10,3 +10,4 @@
 @.github/instructions/coding-style-csharp.instructions.md
 @.github/instructions/coding-style-cpp.instructions.md
 @.github/instructions/ui-style.instructions.md
+@.github/instructions/icon-design.instructions.md

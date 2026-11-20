@@ -43,7 +43,7 @@ namespace CommonUI.Forms
 
 		/// <summary>
 		/// Apply the language texts by name, like <see cref="DialogBase"/>: caption controls, menu and tool bar items
-		/// (tool tips from "&lt;name&gt;_ToolTip"), including the context menus of the controls.
+		/// (tool tips from "&lt;name&gt;_ToolTip").
 		/// The main window calls it at start-up and when the language changes; runtime texts are set after it.
 		/// </summary>
 		protected void ApplyLanguage( LanguageManager.LanguageManager languageManager )
@@ -53,17 +53,6 @@ namespace CommonUI.Forms
 				return;
 			}
 			LanguageApplier.Apply( this, languageManager );
-			ApplyContextMenuLanguage( this, languageManager );
-		}
-
-		static void ApplyContextMenuLanguage( Control parent, LanguageManager.LanguageManager languageManager )
-		{
-			foreach( Control child in parent.Controls ) {
-				if( child.ContextMenuStrip != null ) {
-					LanguageApplier.ApplyToItems( child.ContextMenuStrip.Items, languageManager );
-				}
-				ApplyContextMenuLanguage( child, languageManager );
-			}
 		}
 
 		// a tool strip does not inherit its parent's font but uses the system menu font, which ignores the UI language;
@@ -73,9 +62,6 @@ namespace CommonUI.Forms
 			foreach( Control child in parent.Controls ) {
 				if( child is ToolStrip ) {
 					child.Font = ThemeFonts.Body;
-				}
-				if( child.ContextMenuStrip != null ) {
-					child.ContextMenuStrip.Font = ThemeFonts.Body;
 				}
 				ApplyToolStripFont( child );
 			}

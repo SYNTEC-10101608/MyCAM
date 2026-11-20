@@ -8,7 +8,7 @@ param(
 )
 Add-Type -AssemblyName PresentationCore, PresentationFramework, WindowsBase
 
-# palette, aligned with CommonUI.Theme.ThemeColors
+# icon drawing palette, not UI tokens; a and r equal CommonUI.Theme.ThemeColors.ACCENT and ERROR
 $Palette = @{
 	k = "#334155"	# ink: objects and outlines
 	a = "#0067AD"	# accent: the action or the result
