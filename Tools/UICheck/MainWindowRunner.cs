@@ -439,9 +439,6 @@ namespace UICheck
 				if( toolStrip != null ) {
 					CollectItems( toolStrip.Items, itemList );
 				}
-				if( child.ContextMenuStrip != null ) {
-					CollectItems( child.ContextMenuStrip.Items, itemList );
-				}
 				CollectItems( child, itemList );
 			}
 		}

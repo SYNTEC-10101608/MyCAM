@@ -378,3 +378,19 @@
 5. `StartupForm.Designer.cs` / `.resx`：保留使用者實測時 Designer 存出的內容（`AddRange` 續行為空白、
    設定選單項目寬度 158、resx 重複的 `TrayLocation`）。
 6. 後續議題（6.2）：評估改用 WPF。
+
+## 3.25 規範 review 第一批（2026-11-20）
+
+決議見 4.11。
+
+1. 移除未使用的右鍵選單：
+   1. `MyCAM/StartupForm.Designer.cs` / `.resx`：刪除 `m_cmsMain`（空的、沒有掛到任何控制項）與其 `TrayLocation`。
+   2. `CommonUI/Forms/MainWindowBase.cs`：刪除右鍵選單的語系套用與字型設定。
+   3. `Tools/UICheck/CheckStatic.ps1`：白名單與前綴表移除 `ContextMenuStrip`；`MainWindowRunner.cs` 收集項目時不再走訪右鍵選單。
+2. 新增 `.github/instructions/icon-design.instructions.md`（圖示設計），登錄於 `copilot-instructions.md` 指引目錄與 `CLAUDE.md`。
+3. `MyCAM/Resource/IconSource/RenderIcons.ps1`：色票註解改為「圖示繪圖色，`a`、`r` 等於 `ACCENT`、`ERROR`」。
+4. UI 規範：
+   1. 2.2 第 1 點改寫選單與工具列字型的說明。
+   2. 第 3 節白名單移除 `ContextMenuStrip`，`ToolTip` 註明只用於可能被截斷的執行時文字。
+   3. 4.6 補上 `SectionStack.Arrange` 的 Designer 規劃。
+   4. 6.7 改為引用圖示設計指引；第 7 節移除右鍵選單。
