@@ -27,9 +27,9 @@ function Read-DesignerText( [string]$szText, [string]$szCode ) {
 	}
 
 	# statements of InitializeComponent, joined so that multi-line values are read whole
-	$body = $szText
-	if ($szText -match "(?s)void InitializeComponent\(\)\s*\{(.*)\r?\n\t\t\}") {
-		$body = $Matches[1]
+	$body = Get-InitializeBody $szText
+	if ($null -eq $body) {
+		$body = $szText
 	}
 	$body = $body -replace "(?m)^\s*//.*$", ""
 	$statements = [regex]::Split(($body -replace "\r?\n\s*", " "), ";(?=\s*(this\.|\(\(|$))")
@@ -60,6 +60,61 @@ function Read-DesignerText( [string]$szText, [string]$szCode ) {
 		}
 	}
 	return $screen
+}
+
+# Body of InitializeComponent between its braces, or $null. Braces are counted (string literals skipped), so the
+# indentation does not matter: Visual Studio writes tabs or spaces depending on the settings of each machine.
+function Get-InitializeBody( [string]$szText ) {
+	$match = [regex]::Match($szText, "void InitializeComponent\(\s*\)\s*\{")
+	if (-not $match.Success) {
+		return $null
+	}
+	$nStart = $match.Index + $match.Length
+	$nDepth = 1
+	$isInString = $false
+	for ($i = $nStart; $i -lt $szText.Length; $i++) {
+		$c = $szText[$i]
+		if ($isInString) {
+			if ($c -eq '\') {
+				$i++
+			}
+			elseif ($c -eq '"') {
+				$isInString = $false
+			}
+		}
+		elseif ($c -eq '"') {
+			$isInString = $true
+		}
+		elseif ($c -eq '{') {
+			$nDepth++
+		}
+		elseif ($c -eq '}') {
+			$nDepth--
+			if ($nDepth -eq 0) {
+				return $szText.Substring($nStart, $i - $nStart)
+			}
+		}
+	}
+	return $null
+}
+
+# Statements of InitializeComponent, one per entry, with the whitespace normalized: runs of whitespace become one
+# space and there is none inside parentheses, so "Size( 54, 23 )" and "Size(54, 23)" read the same. A statement ends
+# with ";" at the end of a line (string literals never contain a line break).
+function Get-DesignerStatements( [string]$szText ) {
+	$body = Get-InitializeBody $szText
+	$statementList = New-Object System.Collections.Generic.List[string]
+	if ($null -eq $body) {
+		return , $statementList
+	}
+	$body = $body -replace "(?m)^\s*//.*$", ""
+	foreach ($part in [regex]::Split($body, ";[ \t]*(?:\r?\n|$)")) {
+		$s = ($part -replace "\s+", " ").Trim() -replace "\(\s+", "(" -replace "\s+\)", ")"
+		if ($s) {
+			$statementList.Add($s)
+		}
+	}
+	return , $statementList
 }
 
 function Read-DesignerFile( [string]$szPath ) {
