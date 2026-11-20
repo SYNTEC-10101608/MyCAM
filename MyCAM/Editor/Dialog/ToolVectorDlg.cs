@@ -27,6 +27,7 @@ namespace MyCAM.Editor
 			// struct would not be null
 			InitializeComponent();
 			ApplyLanguage();
+			SetLegendColors();
 			m_IsPathRevese = isPathReverse;
 			ResetToolVecParam( param );
 
@@ -48,6 +49,20 @@ namespace MyCAM.Editor
 			// update interpolation type combo box with actual axis names
 			UpdateInterpolateTypeNames();
 			ResetType();
+		}
+
+		// the legend shows the same data colors as the 3D segments
+		void SetLegendColors()
+		{
+			m_swtNormal.SwatchColor = ToolVecInterpolateColor.GetSwatchColor( EToolVecInterpolateType.Normal );
+			m_swtRotary.SwatchColor =
+				ToolVecInterpolateColor.GetSwatchColor( EToolVecInterpolateType.VectorInterpolation );
+			m_swtBevel.SwatchColor =
+				ToolVecInterpolateColor.GetSwatchColor( EToolVecInterpolateType.TiltAngleInterpolation );
+			m_swtMaster.SwatchColor =
+				ToolVecInterpolateColor.GetSwatchColor( EToolVecInterpolateType.MasterInterpolationSlaveNormal );
+			m_swtSlave.SwatchColor =
+				ToolVecInterpolateColor.GetSwatchColor( EToolVecInterpolateType.MasterNormalSlaveInterpolation );
 		}
 
 		public void ResetPathReverse( bool isReverse )
@@ -164,11 +179,11 @@ namespace MyCAM.Editor
 			m_btnRotaryNeg.Enabled = false;
 
 			// hide legend of unavailable interpolate types
-			m_pnlColorBevel.Enabled = false;
+			m_swtBevel.Enabled = false;
 			m_lblLegendBevel.Enabled = false;
-			m_pnlColorSlave.Enabled = false;
+			m_swtSlave.Enabled = false;
 			m_lblLegendSlave.Enabled = false;
-			m_pnlColorMaster.Enabled = false;
+			m_swtMaster.Enabled = false;
 			m_lblLegendMaster.Enabled = false;
 		}
 

@@ -226,7 +226,7 @@ namespace MyCAM.Editor.Renderer
 						}
 
 						AIS_Shape segmentAIS = new AIS_Shape( segmentWire );
-						segmentAIS.SetColor( new Quantity_Color( GetInterpolateColor( interpType ) ) );
+						segmentAIS.SetColor( new Quantity_Color( ToolVecInterpolateColor.GetPathColor( interpType ) ) );
 						segmentAIS.SetWidth( 3.0 );
 						segmentAIS.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Top );
 						if( trsf != null ) {
@@ -259,23 +259,6 @@ namespace MyCAM.Editor.Renderer
 				modifyMap = contourCache.GetMapedModifyMap();
 			}
 			return modifyMap;
-		}
-
-		static Quantity_NameOfColor GetInterpolateColor( EToolVecInterpolateType interpType )
-		{
-			switch( interpType ) {
-				case EToolVecInterpolateType.VectorInterpolation:
-					return Quantity_NameOfColor.Quantity_NOC_ORANGE;
-				case EToolVecInterpolateType.TiltAngleInterpolation:
-					return Quantity_NameOfColor.Quantity_NOC_CYAN1;
-				case EToolVecInterpolateType.MasterNormalSlaveInterpolation:
-					return Quantity_NameOfColor.Quantity_NOC_YELLOW;
-				case EToolVecInterpolateType.MasterInterpolationSlaveNormal:
-					return Quantity_NameOfColor.Quantity_NOC_MAGENTA1;
-				case EToolVecInterpolateType.Normal:
-				default:
-					return Quantity_NameOfColor.Quantity_NOC_BLUE;
-			}
 		}
 
 		void RemovePaths( List<string> pathIDList )

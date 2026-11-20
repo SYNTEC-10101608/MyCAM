@@ -36,6 +36,9 @@
   <ItemGroup>
 	<Compile Include="Controls\ButtonIndicator.cs" />
 	<Compile Include="Controls\ButtonKind.cs" />
+	<Compile Include="Controls\ColorSwatch.cs">
+	  <SubType>Component</SubType>
+	</Compile>
 	<Compile Include="Controls\CommonButtonText.cs" />
 	<Compile Include="Controls\DebouncedNumericUpDown.cs">
 	  <SubType>Component</SubType>
@@ -58,6 +61,7 @@
 	<Compile Include="Controls\ThemedLabel.cs">
 	  <SubType>Component</SubType>
 	</Compile>
+	<Compile Include="Controls\SwatchShape.cs" />
 	<Compile Include="Controls\ValueRejectedEventArgs.cs" />
 	<Compile Include="Forms\DialogBase.cs">
 	  <SubType>Form</SubType>

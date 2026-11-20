@@ -26,6 +26,9 @@ namespace CommonUI.Controls
 			base.BackColor = ThemeColors.SURFACE;
 		}
 
+		/// <summary>
+		/// Kind of the button, which decides its colors (Normal, Primary, Danger; Start / Hold / Stop on CNC panels).
+		/// </summary>
 		[Category( "Appearance" )]
 		[DefaultValue( ButtonKind.Normal )]
 		public ButtonKind Kind
@@ -55,6 +58,9 @@ namespace CommonUI.Controls
 			}
 		}
 
+		/// <summary>
+		/// Indicator lamp of a CNC function button (on / off / unknown); None shows no lamp.
+		/// </summary>
 		[Category( "Appearance" )]
 		[DefaultValue( ButtonIndicator.None )]
 		public ButtonIndicator Indicator

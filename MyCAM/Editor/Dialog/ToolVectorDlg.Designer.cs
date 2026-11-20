@@ -63,15 +63,15 @@
 			this.m_lblCtrlPnt = new CommonUI.Controls.ThemedLabel();
 			this.m_btnPreCtrlPnt = new CommonUI.Controls.ThemedButton();
 			this.m_btnNextCtrlPnt = new CommonUI.Controls.ThemedButton();
-			this.m_pnlColorNormal = new System.Windows.Forms.Panel();
+			this.m_swtNormal = new CommonUI.Controls.ColorSwatch();
 			this.m_lblLegendNormal = new CommonUI.Controls.ThemedLabel();
-			this.m_pnlColorRotary = new System.Windows.Forms.Panel();
+			this.m_swtRotary = new CommonUI.Controls.ColorSwatch();
 			this.m_lblLegendRotary = new CommonUI.Controls.ThemedLabel();
-			this.m_pnlColorBevel = new System.Windows.Forms.Panel();
+			this.m_swtBevel = new CommonUI.Controls.ColorSwatch();
 			this.m_lblLegendBevel = new CommonUI.Controls.ThemedLabel();
-			this.m_pnlColorMaster = new System.Windows.Forms.Panel();
+			this.m_swtMaster = new CommonUI.Controls.ColorSwatch();
 			this.m_lblLegendMaster = new CommonUI.Controls.ThemedLabel();
-			this.m_pnlColorSlave = new System.Windows.Forms.Panel();
+			this.m_swtSlave = new CommonUI.Controls.ColorSwatch();
 			this.m_lblLegendSlave = new CommonUI.Controls.ThemedLabel();
 			this.m_pnlIndexParam.SuspendLayout();
 			this.m_pnlToolVecInfo.SuspendLayout();
@@ -79,11 +79,6 @@
 			this.m_pnlSetting.SuspendLayout();
 			this.m_pnlMovePnt.SuspendLayout();
 			this.m_pnlStartEndSwitch.SuspendLayout();
-			this.m_pnlColorNormal.SuspendLayout();
-			this.m_pnlColorRotary.SuspendLayout();
-			this.m_pnlColorBevel.SuspendLayout();
-			this.m_pnlColorMaster.SuspendLayout();
-			this.m_pnlColorSlave.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.m_numAngleA)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_numAngleB)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_numMaster)).BeginInit();
@@ -114,15 +109,15 @@
 			this.m_pnlToolVecInfo.Controls.Add(this.m_btnRotaryNeg);
 			this.m_pnlToolVecInfo.Controls.Add(this.m_lblInterpolateType);
 			this.m_pnlToolVecInfo.Controls.Add(this.m_cmbInterpolateType);
-			this.m_pnlToolVecInfo.Controls.Add(this.m_pnlColorNormal);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_swtNormal);
 			this.m_pnlToolVecInfo.Controls.Add(this.m_lblLegendNormal);
-			this.m_pnlToolVecInfo.Controls.Add(this.m_pnlColorRotary);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_swtRotary);
 			this.m_pnlToolVecInfo.Controls.Add(this.m_lblLegendRotary);
-			this.m_pnlToolVecInfo.Controls.Add(this.m_pnlColorBevel);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_swtBevel);
 			this.m_pnlToolVecInfo.Controls.Add(this.m_lblLegendBevel);
-			this.m_pnlToolVecInfo.Controls.Add(this.m_pnlColorMaster);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_swtMaster);
 			this.m_pnlToolVecInfo.Controls.Add(this.m_lblLegendMaster);
-			this.m_pnlToolVecInfo.Controls.Add(this.m_pnlColorSlave);
+			this.m_pnlToolVecInfo.Controls.Add(this.m_swtSlave);
 			this.m_pnlToolVecInfo.Controls.Add(this.m_lblLegendSlave);
 			this.m_pnlToolVecInfo.Location = new System.Drawing.Point(0, 0);
 			this.m_pnlToolVecInfo.Name = "m_pnlToolVecInfo";
@@ -470,13 +465,12 @@
 			this.m_btnNextCtrlPnt.Text = "後控制點";
 			this.m_btnNextCtrlPnt.Click += new System.EventHandler(this.m_btnNextCtrlPnt_Click);
 			//
-			// m_pnlColorNormal
+			// m_swtNormal
 			//
-			this.m_pnlColorNormal.BackColor = System.Drawing.Color.Blue;
-			this.m_pnlColorNormal.Location = new System.Drawing.Point(100, 159);
-			this.m_pnlColorNormal.Name = "m_pnlColorNormal";
-			this.m_pnlColorNormal.Size = new System.Drawing.Size(16, 16);
-			this.m_pnlColorNormal.TabIndex = 12;
+			this.m_swtNormal.Location = new System.Drawing.Point(100, 159);
+			this.m_swtNormal.Name = "m_swtNormal";
+			this.m_swtNormal.Size = new System.Drawing.Size(16, 16);
+			this.m_swtNormal.TabIndex = 12;
 			//
 			// m_lblLegendNormal
 			//
@@ -487,13 +481,12 @@
 			this.m_lblLegendNormal.TabIndex = 13;
 			this.m_lblLegendNormal.Text = "維持";
 			//
-			// m_pnlColorRotary
+			// m_swtRotary
 			//
-			this.m_pnlColorRotary.BackColor = System.Drawing.Color.Orange;
-			this.m_pnlColorRotary.Location = new System.Drawing.Point(214, 159);
-			this.m_pnlColorRotary.Name = "m_pnlColorRotary";
-			this.m_pnlColorRotary.Size = new System.Drawing.Size(16, 16);
-			this.m_pnlColorRotary.TabIndex = 14;
+			this.m_swtRotary.Location = new System.Drawing.Point(214, 159);
+			this.m_swtRotary.Name = "m_swtRotary";
+			this.m_swtRotary.Size = new System.Drawing.Size(16, 16);
+			this.m_swtRotary.TabIndex = 14;
 			//
 			// m_lblLegendRotary
 			//
@@ -504,13 +497,12 @@
 			this.m_lblLegendRotary.TabIndex = 15;
 			this.m_lblLegendRotary.Text = "旋轉軸平滑";
 			//
-			// m_pnlColorBevel
+			// m_swtBevel
 			//
-			this.m_pnlColorBevel.BackColor = System.Drawing.Color.Cyan;
-			this.m_pnlColorBevel.Location = new System.Drawing.Point(328, 159);
-			this.m_pnlColorBevel.Name = "m_pnlColorBevel";
-			this.m_pnlColorBevel.Size = new System.Drawing.Size(16, 16);
-			this.m_pnlColorBevel.TabIndex = 16;
+			this.m_swtBevel.Location = new System.Drawing.Point(328, 159);
+			this.m_swtBevel.Name = "m_swtBevel";
+			this.m_swtBevel.Size = new System.Drawing.Size(16, 16);
+			this.m_swtBevel.TabIndex = 16;
 			//
 			// m_lblLegendBevel
 			//
@@ -521,13 +513,12 @@
 			this.m_lblLegendBevel.TabIndex = 17;
 			this.m_lblLegendBevel.Text = "傾角切坡口";
 			//
-			// m_pnlColorMaster
+			// m_swtMaster
 			//
-			this.m_pnlColorMaster.BackColor = System.Drawing.Color.Magenta;
-			this.m_pnlColorMaster.Location = new System.Drawing.Point(100, 189);
-			this.m_pnlColorMaster.Name = "m_pnlColorMaster";
-			this.m_pnlColorMaster.Size = new System.Drawing.Size(16, 16);
-			this.m_pnlColorMaster.TabIndex = 18;
+			this.m_swtMaster.Location = new System.Drawing.Point(100, 189);
+			this.m_swtMaster.Name = "m_swtMaster";
+			this.m_swtMaster.Size = new System.Drawing.Size(16, 16);
+			this.m_swtMaster.TabIndex = 18;
 			//
 			// m_lblLegendMaster
 			//
@@ -538,13 +529,12 @@
 			this.m_lblLegendMaster.TabIndex = 19;
 			this.m_lblLegendMaster.Text = "主軸";
 			//
-			// m_pnlColorSlave
+			// m_swtSlave
 			//
-			this.m_pnlColorSlave.BackColor = System.Drawing.Color.Yellow;
-			this.m_pnlColorSlave.Location = new System.Drawing.Point(214, 189);
-			this.m_pnlColorSlave.Name = "m_pnlColorSlave";
-			this.m_pnlColorSlave.Size = new System.Drawing.Size(16, 16);
-			this.m_pnlColorSlave.TabIndex = 20;
+			this.m_swtSlave.Location = new System.Drawing.Point(214, 189);
+			this.m_swtSlave.Name = "m_swtSlave";
+			this.m_swtSlave.Size = new System.Drawing.Size(16, 16);
+			this.m_swtSlave.TabIndex = 20;
 			//
 			// m_lblLegendSlave
 			//
@@ -571,11 +561,6 @@
 			this.m_pnlMovePnt.PerformLayout();
 			this.m_pnlStartEndSwitch.ResumeLayout(false);
 			this.m_pnlStartEndSwitch.PerformLayout();
-			this.m_pnlColorNormal.ResumeLayout(false);
-			this.m_pnlColorRotary.ResumeLayout(false);
-			this.m_pnlColorBevel.ResumeLayout(false);
-			this.m_pnlColorMaster.ResumeLayout(false);
-			this.m_pnlColorSlave.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.m_numAngleA)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_numAngleB)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_numMaster)).EndInit();
@@ -622,15 +607,15 @@
 		private CommonUI.Controls.ThemedLabel m_lblCtrlPnt;
 		private CommonUI.Controls.ThemedButton m_btnPreCtrlPnt;
 		private CommonUI.Controls.ThemedButton m_btnNextCtrlPnt;
-		private System.Windows.Forms.Panel m_pnlColorNormal;
+		private CommonUI.Controls.ColorSwatch m_swtNormal;
 		private CommonUI.Controls.ThemedLabel m_lblLegendNormal;
-		private System.Windows.Forms.Panel m_pnlColorRotary;
+		private CommonUI.Controls.ColorSwatch m_swtRotary;
 		private CommonUI.Controls.ThemedLabel m_lblLegendRotary;
-		private System.Windows.Forms.Panel m_pnlColorBevel;
+		private CommonUI.Controls.ColorSwatch m_swtBevel;
 		private CommonUI.Controls.ThemedLabel m_lblLegendBevel;
-		private System.Windows.Forms.Panel m_pnlColorMaster;
+		private CommonUI.Controls.ColorSwatch m_swtMaster;
 		private CommonUI.Controls.ThemedLabel m_lblLegendMaster;
-		private System.Windows.Forms.Panel m_pnlColorSlave;
+		private CommonUI.Controls.ColorSwatch m_swtSlave;
 		private CommonUI.Controls.ThemedLabel m_lblLegendSlave;
 	}
 }

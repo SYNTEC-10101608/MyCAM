@@ -388,7 +388,9 @@
     <Compile Include="Editor\Dialog\ToolVectorDlg.Designer.cs">
       <DependentUpon>ToolVectorDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\DataColor.cs" />
     <Compile Include="Editor\PathLayerColor.cs" />
+    <Compile Include="Editor\ToolVecInterpolateColor.cs" />
     <Compile Include="Editor\ViewManager.cs" />
     <Compile Include="Data\Object\BasicObject.cs" />
     <Compile Include="Editor\CAMEditor.cs" />

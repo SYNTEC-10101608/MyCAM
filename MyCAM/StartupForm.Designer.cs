@@ -1100,23 +1100,21 @@
 			// m_tsbLayerNone
 			// 
 			this.m_tsbLayerNone.AutoSize = false;
-			this.m_tsbLayerNone.BackColor = System.Drawing.Color.White;
-			this.m_tsbLayerNone.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbLayerNone.ForeColor = System.Drawing.Color.Red;
+			this.m_tsbLayerNone.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbLayerNone.Image = global::MyCAM.Properties.Resources.CAM_NoMachinePath;
 			this.m_tsbLayerNone.Name = "m_tsbLayerNone";
 			this.m_tsbLayerNone.Size = new System.Drawing.Size(24, 24);
-			this.m_tsbLayerNone.Text = "X";
+			this.m_tsbLayerNone.Text = "不加工";
 			this.m_tsbLayerNone.Click += new System.EventHandler(this.m_tsbLayerNone_Click);
 			// 
 			// m_tsbNeedProcess
 			// 
 			this.m_tsbNeedProcess.AutoSize = false;
-			this.m_tsbNeedProcess.BackColor = System.Drawing.Color.White;
-			this.m_tsbNeedProcess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbNeedProcess.ForeColor = System.Drawing.Color.Blue;
+			this.m_tsbNeedProcess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbNeedProcess.Image = global::MyCAM.Properties.Resources.CAM_MachinePath;
 			this.m_tsbNeedProcess.Name = "m_tsbNeedProcess";
 			this.m_tsbNeedProcess.Size = new System.Drawing.Size(24, 24);
-			this.m_tsbNeedProcess.Text = "✓";
+			this.m_tsbNeedProcess.Text = "加工";
 			this.m_tsbNeedProcess.Click += new System.EventHandler(this.m_tsbNeedProcess_Click);
 			// 
 			// m_tsViewerToolBar

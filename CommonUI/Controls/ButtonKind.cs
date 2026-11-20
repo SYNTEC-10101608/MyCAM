@@ -1,26 +1,26 @@
 ﻿namespace CommonUI.Controls
 {
 	/// <summary>
-	/// Look of a ThemedButton (ui-style.instructions.md, section 3).
+	/// Look of a ThemedButton (ui-style.instructions.md, section 3.1).
 	/// </summary>
 	public enum ButtonKind
 	{
-		// secondary actions: cancel, reset, browse, CNC functions
+		/// <summary>White: other actions such as cancel, reset, browse, CNC functions.</summary>
 		Normal,
 
-		// the action that completes the dialog or the step: confirm, generate
+		/// <summary>Filled accent: the action that completes the dialog or the step (confirm, generate, next).</summary>
 		Primary,
 
-		// actions that may lose data: delete, remove, clear data
+		/// <summary>Red border and text: actions that may lose data (delete, remove, clear data).</summary>
 		Danger,
 
-		// CNC panel only: cycle start (filled green)
+		/// <summary>CNC panel only: cycle start (light green).</summary>
 		Start,
 
-		// CNC panel only: feed hold and resume (filled amber)
+		/// <summary>CNC panel only: feed hold and resume (light amber).</summary>
 		Hold,
 
-		// CNC panel only: stop (filled red)
+		/// <summary>CNC panel only: stop (light red).</summary>
 		Stop
 	}
 }

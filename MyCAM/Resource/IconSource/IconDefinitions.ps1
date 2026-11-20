@@ -364,6 +364,15 @@ $IconMap = [ordered]@{
 		"a|w|1.6|-|$(C 7.5 17 2.2)"
 	)
 
+	# layer bar legends, shown at 20 x 20: machined as an accent check, not machined as an ink cross
+	MachinePath = @(
+		"a|-|2.6|-|M5 12.5 L10 17.5 L19 7"
+	)
+
+	NoMachinePath = @(
+		"k|-|2.4|-|M6.5 6.5 L17.5 17.5 M17.5 6.5 L6.5 17.5"
+	)
+
 	#endregion
 
 	#region Simulation
