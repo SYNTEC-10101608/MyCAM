@@ -117,33 +117,7 @@ namespace MyCAM.Editor.Dialog
 
 		void ShowPanel( Panel activePanel )
 		{
-			// hide the dialog during the switch so user won't see the intermediate states
-			bool isShown = Visible;
-			if( isShown ) {
-				Hide();
-			}
-			SuspendLayout();
-
-			// Hide all panels first so the window resizes without showing stale content
-			m_pnlSelectFacePage.Visible = false;
-			m_pnlInputParametersPage.Visible = false;
-			m_pnlSaveDxfPage.Visible = false;
-
-			SectionStack.FitToPage( this, activePanel );
-			ResumeLayout( false );
-			PerformLayout();
-
-			// Show the target panel only after the window has been resized
-			activePanel.Visible = true;
-
-			// keep the dialog centered after the size change
-			DialogPlacement.MoveToCenter( this );
-
-			// show the dialog when everything is ready
-			if( isShown ) {
-				Show();
-			}
-			Refresh();
+			SectionStack.ShowPage( this, activePanel, m_pnlSelectFacePage, m_pnlInputParametersPage, m_pnlSaveDxfPage );
 		}
 
 		internal void TriggerInitialParameterChanged()

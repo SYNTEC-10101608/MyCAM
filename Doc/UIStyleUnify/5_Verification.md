@@ -1,6 +1,6 @@
 # 5. 測試驗證
 
-最後一次執行：2026-11-19，Debug 建置（`.\Build.bat Debug` 0 個錯誤），第三輪 Review 的調整（3.21）與主視窗移除 `TableLayoutPanel`（3.22）之後。
+最後一次執行：2026-11-20，Debug 建置（`.\Build.bat Debug` 0 個錯誤），功能工具列容器與精靈兩型（3.23）之後。
 
 | 類別 | 位置 | 入口 | 結果 |
 | --- | --- | --- | --- |
@@ -60,7 +60,7 @@
 
 確認規則真的能檢出問題：S14、S16、T7（2026-11-16）、S21 的資料夾與 namespace 一致（2026-11-17，把 `RoundDrawing`
 的 namespace 暫時改錯，S21 報錯，還原後通過）。S1、S9、S23 的原生 `Label`（2026-11-19，把 `OverCutDlg` 的標籤暫時改回原生 `Label`、在程式中加 `new Label()`，三條規則都報錯，還原後通過）。S19 與 P6（2026-11-19，把 `m_pnlBottom` 暫時改回 `TableLayoutPanel`、
-`m_pnlViewer` 的 Designer 寬度改為 1200，S19 與 P6 都報錯，P6 並列出應寫入的值，還原後通過）。
+`m_pnlViewer` 的 Designer 寬度改為 1200，S19 與 P6 都報錯，P6 並列出應寫入的值，還原後通過）。S9、S19 的 `ToolStripContainer`（2026-11-20，把 `m_pnlToolBar` 暫時改回 `ToolStripContainer`，兩條規則都報錯，還原後通過）。
 
 ### 維護注意事項
 
@@ -96,12 +96,13 @@
 | 腳本 | 規則 | 檢查什麼 | 結果 |
 | --- | --- | --- | --- |
 | `CompareBehavior.ps1`（+ `RenameMap.txt`、`BehaviorExceptions.txt`） | B1–B8 | 與分支起點 `a4b3826d` 比對：Designer 的事件訂閱、RadioButton 群組、非外觀屬性、表單行為屬性、程式使用的控制項仍存在、型別只做外觀替換、全 repo 的 `Show` / `ShowDialog` 呼叫點、改動過的 `.cs` 中事件訂閱與 `Enabled` / `Visible` / `ReadOnly` / `Checked` 賦值。控制項改名先以 `RenameMap.txt`（304 筆）換算 | 0 個差異 |
-| `CheckBranchRules.ps1` | I1–I9 | 本議題新增或改動的檔案符合通用與 C# 規範：編碼與 BOM、檔尾換行、行尾空白、C# 行長 120、tab 縮排、不用 `this.`、註解為英文且不用 `/* */`、產品專案一檔一個頂層型別；產品程式不提到檢查程式、建置輸出沒有殘留 runner | 331 個檔案，0 個問題 |
+| `CheckBranchRules.ps1` | I1–I9 | 本議題新增或改動的檔案符合通用與 C# 規範：編碼與 BOM、檔尾換行、行尾空白、C# 行長 120、tab 縮排、不用 `this.`、註解為英文且不用 `/* */`、產品專案一檔一個頂層型別；產品程式不提到檢查程式、建置輸出沒有殘留 runner | 335 個檔案，0 個問題 |
 | `CompareMainLayout.ps1`（+ `MainLayoutBaseline.txt`） | — | 主視窗各承載區的座標與移除 `TableLayoutPanel` 前的基準逐像素相同：CAD / CAM / CNC 頁面 × 橫式 1920×1040、1366×768 × 直式 1080×1880、900×1600，共 12 個情境（zh-TW；需先建置 Debug） | 152 行，0 個差異 |
 | `RunIssueChecks.bat` | — | 依序執行上面三個腳本 | 全部通過 |
 
 `BehaviorExceptions.txt` 列出已決議的行為差異（數值框取代、唯讀座標改標籤、區塊標題 `Label` 併入卡片、步驟標籤改卡片標題、
-主視窗直式 CNC 承載區的 `SizeChanged` 處理移除、從不顯示的第二、三層工具列容器刪除），每行附決議出處。
+主視窗直式 CNC 承載區的 `SizeChanged` 處理移除、從不顯示的第二、三層工具列容器刪除、功能工具列容器改為 `Panel`、
+精靈換頁移入 `SectionStack.ShowPage`），每行附決議出處。
 
 ### 判斷原則
 
@@ -126,7 +127,7 @@
 | # | 項目 | 狀態 |
 | --- | --- | --- |
 | 1 | Visual Studio Designer 開啟所有畫面，外觀與執行時一致（含泛型基底 `EditDialogBase<T>` 的對話框） | 2026-11-16 已確認 |
-| 2 | Designer 開啟第二輪之後改動的畫面：`DesignSupportBracketDlg`（X / Y 支架位置兩張卡片）、`CNCPanel`（加工鈕種類）；以及收官時 namespace 變動後的任一對話框與 CNC 面板（確認 Designer 仍能載入 `CommonUI`） | 待確認 |
+| 2 | Designer 開啟第二輪之後改動的畫面：`DesignSupportBracketDlg`（X / Y 支架位置兩張卡片）、`CNCPanel`（加工鈕種類）；以及收官時 namespace 變動後的任一對話框與 CNC 面板（確認 Designer 仍能載入 `CommonUI`）；`StartupForm` 的區域分布與功能工具列區（2026-11-20 改為 `Panel` 後） | 待確認 |
 | 3 | 實機操作數值框取代 `TextBox` 的對話框（`AxisTransformDlg`、`AddPathDlg`、`PatternSettingDlg`、`ThreePtTransformDlg`、`AutoSortPathDlg`）的輸入與預覽 | 待確認 |
 | 4 | CNC 實際連線：`CNCPanel` / `CNCInfoPanel` / `CNCAlarmPanel` 的數值、燈號、警報清單；直式時 `CNCDlg`（VNC）定位到 CNC 區域 | 待確認 |
 

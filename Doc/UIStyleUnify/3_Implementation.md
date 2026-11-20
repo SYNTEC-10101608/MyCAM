@@ -46,7 +46,7 @@
 ## 3.4 Designer 如實呈現（對應 2.4）
 
 1. 所有畫面 `InitializeComponent()` 之後不再設定字型、顏色、位置、大小（靜態檢查 S11）；原本在程式中調整尺寸與位置的
-   `DesignSupportBracketDlg` 改用 `SectionStack.FitToPage`，`CNCThreePointDlg` 手算的 `ClientSize` 改用 `SectionStack`。
+   `DesignSupportBracketDlg` 改用 `SectionStack.ShowPage`，`CNCThreePointDlg` 手算的 `ClientSize` 改用 `SectionStack`。
 2. 狀態文字改為 `ThemedLabel.Role`；非標籤控制項以 `ThemeText.SetRole`。
 3. 使用者已在 Visual Studio Designer 開啟確認（含繼承泛型基底 `EditDialogBase<T>` 的 22 個對話框，不需非泛型中介類別）。
 
@@ -71,8 +71,9 @@
 
 1. 對話框中的約 20 個 `TableLayoutPanel` 與所有 `FlowLayoutPanel`、`Dock`、`Anchor` 改為 Designer 固定座標，依規範 4.4 的格線；
    `TabIndex` 依版面重排（`Tools/UICheck/FixTabOrder.ps1`）。
-2. 精靈：`AddPathDlg` 4 步、`CNCThreePointDlg` 3 步的步驟卡片以 `SectionPanel.Highlighted` 表示目前步驟；
-   `DesignSupportBracketDlg` 3 頁以 `SectionStack.FitToPage` 換頁，X / Y 支架位置為兩張並排卡片。
+2. 精靈（規範 4.7 的兩型，3.23）：`CNCThreePointDlg` 3 步為展開式，以 `SectionPanel.Highlighted` 表示目前步驟；
+   `AddPathDlg` 4 步為切換式（固定大小），步驟卡片以 `SectionStack.Arrange` 擇一顯示；
+   `DesignSupportBracketDlg` 3 頁為切換式（換頁），以 `SectionStack.ShowPage` 換頁，X / Y 支架位置為兩張並排卡片。
 3. 使用者回饋調整：`ToolVectorDlg` 三個轉換區塊合併為「控制點移動」一張卡片（高度 705 → 564）；
    CNC 面板「參數設置」與倍率按鈕對齊。
 4. 嵌入式面板：卡片間距、內距、第一列改用 `ThemeMetrics`，新增 `PANEL_MARGIN`、`INFO_ROW_HEIGHT`、`INFO_ROW_PITCH`；
@@ -162,7 +163,7 @@
 | `CNCThreePointDlg` | `Form` → `DialogBase` | 484×576 → 484×508 | `GroupPanel` 2 → `SectionPanel` 4（圖面、選項、工件、計算）；`PanelButton` 9 → `ThemedButton`；圖面點 `TextBox` 9 → `Label`；工件點與誤差 `TextBox` 10 保留（例外，見 2.13） | 計算 `Primary` | 步驟標籤改為卡片標題（`SetStepAppearance` 改設 `SectionPanel.Text` / `Highlighted`）；說明與誤差文字色改 `Role`；顯示 / 隱藏工件與計算卡片改用 `SectionStack`，刪除手算 `ClientSize`；刪除 4 個寫死顏色常數與 `DrawingPoints` / `WorkpiecePoints` 兩個標題字串；語系檔名 `CNCThreePointDialog` → `CNCThreePointDlg` |
 | `ConnectDlg` | `Form` → `DialogBase` | 335×103 → 320×141 | `Button` → `ThemedButton`；加 `SectionPanel` 1；提示改 `ThemedLabel` | 確定 `Primary`、`CommonText` | 提示色 `Color.Red` → `Role = Error`；表單標題 ID `FormTitle` → `ConnectDlg`；`m_lblTips_Default` 改為以控制項名稱 `m_lblTips` 為 ID |
 | `ContourEditDlg` | `EditDialogBase<object>` | 521×443 → 440×333 | `GroupBox` → `SectionPanel`；`TableLayoutPanel` 2、`FlowLayoutPanel` 4 → 固定座標與無外觀 `Panel` 2 | 儲存 `Primary`、移除 `Danger` | 只有改名 |
-| `DesignSupportBracketDlg` | `EditDialogBase<double>` | 執行時決定 → 584×967（Designer 上三頁並列） | 標題 `Label` → `SectionPanel` 9；`SupportPositionRow` → `RemovableValueRow` | 下一步 / 生成 / 儲存 DXF 各頁一個 `Primary` | 換頁改 `SectionStack.FitToPage`、置中改 `DialogPlacement.MoveToCenter`；位置列排列改 `RemovableValueRow.Arrange`；新增位置範圍常數（-99999～99999、1 位、mm）；X / Y 位置色改具名資料色 `X_POSITION_COLOR` / `Y_POSITION_COLOR`；三頁 `Panel` 改名加 `Page` 後綴 |
+| `DesignSupportBracketDlg` | `EditDialogBase<double>` | 執行時決定 → 584×967（Designer 上三頁並列） | 標題 `Label` → `SectionPanel` 9；`SupportPositionRow` → `RemovableValueRow` | 下一步 / 生成 / 儲存 DXF 各頁一個 `Primary` | 換頁與重新置中改 `SectionStack.ShowPage`（3.23）；位置列排列改 `RemovableValueRow.Arrange`；新增位置範圍常數（-99999～99999、1 位、mm）；X / Y 位置色改具名資料色 `X_POSITION_COLOR` / `Y_POSITION_COLOR`；三頁 `Panel` 改名加 `Page` 後綴 |
 | `EntryAndExitDlg` | `EditDialogBase<EntryAndExitData>` | 460×186 → 320×171 | `TableLayoutPanel` → 固定座標；加 `SectionPanel` 1 | 確定 `Primary`、`CommonText` | 只有改名 |
 | `ExtendedGCodeDlg` | `EditDialogBase<object>` | 607×389 → 500×358 | `TableLayoutPanel` 1、`FlowLayoutPanel` 4 → 無外觀 `Panel` 2 | 完成 `Primary`、`CommonText`；刪除 `Danger` | 只有改名；語系檔的 `IS_START_POINT` / `IS_END_POINT` / `IS_MIX_DATA` 改為程式實際使用的 `IsStartPOINT` / `IsEndPOINT` / `IsMixData`（3.8） |
 | `FlyCutDlg` | `EditDialogBase<object>` | 535×251 → 380×248 | `GroupBox` → `SectionPanel` 2；`TableLayoutPanel` 2、`FlowLayoutPanel` 5 → 無外觀 `Panel` 3 | 移除 `Danger`、新增 `Normal` | 只有改名 |
@@ -291,7 +292,7 @@
       反向測試：把 `OverCutDlg` 的標籤暫時改回原生 `Label`，S1、S9 報錯；在程式中加 `new Label()`，S23 報錯；還原後通過。
    2. 語系清單改為從 `Language/` 的檔名自動取得，新增語系時 S6 自動涵蓋。
 4. 規範（`ui-style.instructions.md`）：
-   1. 新增 3.2 容器的選用（`PanelBase` / `SectionPanel` / `Panel` / `TableLayoutPanel`）、4.7 精靈的三種形式。
+   1. 新增 3.2 容器的選用（`PanelBase` / `SectionPanel` / `Panel` / `TableLayoutPanel`）、4.7 精靈的三種形式（3.23 改為兩型）。
    2. 4.1 補 `FormBase` / `EditDialogBase<T>` 的行為說明；4.2 拆為「基底自動處理」與「撰寫時須遵守」；
       4.3 寫明置中包含在開啟流程中，以及執行時只改高度與換頁兩種情況的處理。
    3. 確定鍵改寫為共用文字依語系使用慣用詞；`RoundedProgressBar` 寫全名；第 6 節圖層色改由 `PathLayerColor` 定義。
@@ -331,3 +332,28 @@
    3. 新增本議題限定的 `CompareMainLayout.ps1`，加入 `RunIssueChecks.bat`。
 5. 規範：第 3 節不可使用加入 `TableLayoutPanel`（主視窗也不用）、3.2 刪除 `TableLayoutPanel` 列、
    第 6 節第 3 點改寫為 `MainLayout` 的計算與 Designer 規則、第 8 節加 P6。
+
+## 3.23 功能工具列容器與精靈兩型（2026-11-20）
+
+依 4.9 決議施工。
+
+1. 功能工具列容器：
+   1. `StartupForm.Designer.cs`：`m_tscLevel1Container`（`ToolStripContainer`）改為無外觀的 `Panel` `m_pnlToolBar`，
+      位置與大小不變（`Dock = Top`、1920×75），五條功能工具列照舊 `Dock = Fill`。原本 Designer 中上方空的工具列
+      停靠區佔 25 px、工具列只剩 50 px，執行時停靠區高度為 0；改為 `Panel` 後 Designer 與執行時相同。
+   2. `StartupForm.cs`：`RefreshToolStripLayout` 改為只走訪 `m_pnlToolBar` 中的工具列；刪除走訪四個停靠區與內容區的
+      `GetAllToolStrips` / `FindContainerAllToolStrips`，以及多餘的 `m_tscLevel1Container.Visible = true`（容器從未隱藏）。
+   3. 使用者以 Visual Studio Designer 開啟並儲存過 `StartupForm`，`StartupForm.Designer.cs` 的宣告順序、`m_tsLayer` 等
+      控制項的大小與 `StartupForm.resx` 的元件匣位置隨之重新產生；縮排改回 tab，其餘保留 Designer 的輸出。
+2. 精靈：
+   1. `CommonUI.Layout.SectionStack` 新增 `ShowPage( form, page, pageArray )`：切換期間隱藏對話框、隱藏其他頁、
+      對話框大小配合該頁、顯示該頁並重新置中；`FitToPage` 改為內部方法。
+   2. `DesignSupportBracketDlg.ShowPanel` 改為呼叫 `SectionStack.ShowPage`，步驟與原本的程式相同，只是移到 `CommonUI`。
+3. 檢查：
+   1. `CheckStatic.ps1`：主視窗白名單與前綴表刪除 `ToolStripContainer`（S19、S9）；換頁精靈的辨識改為 `SectionStack.ShowPage(`。
+   2. `BehaviorExceptions.txt` 登錄 `m_tscLevel1Container` 的型別替換（B6）、`ShowPage` 中的 `Show()`（B7）與頁的顯示切換（B8）。
+4. 規範：
+   1. 第 3 節白名單刪除 `ToolStripContainer`、列入不可使用；3.2 `Panel` 用途加入功能工具列區；第 6 節第 3 點加功能工具列區。
+   2. 4.7 改寫為展開式 / 切換式兩型，切換式再依各步驟大小分固定大小與換頁，並列出所有精靈共通的規則；
+      4.3、4.4 第 6、7 點、4.6、9.4 改用兩型的名稱與 `ShowPage`。
+5. 後續議題（6.2）：步驟流程元件。

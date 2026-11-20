@@ -105,14 +105,15 @@ applyTo: "**/*.cs"
 | 原生（只限非數值文字） | `TextBox`（IP、路徑、G-code、量測結果等） | `m_txt` |
 | 原生（無外觀的容器） | `Panel`（用途見 3.2） | `m_pnl` |
 | 原生（元件） | `ToolTip` / `Timer` | `m_ttp` / `m_tmr` |
-| 主視窗 | `MenuStrip` / `ToolStrip` / `ToolStripContainer` / `ContextMenuStrip` | `m_ms` / `m_ts` / `m_tsc` / `m_cms` |
+| 主視窗 | `MenuStrip` / `ToolStrip` / `ContextMenuStrip` | `m_ms` / `m_ts` / `m_cms` |
 | | `ToolStripButton` / `ToolStripMenuItem` / `ToolStripSeparator` | `m_tsb` / `m_tsmi` / `m_tss` |
 
 1. 同一個值的標題與顯示值並列時，標題用一般名稱、顯示值加 `Value`（`m_lblPnt1X` 顯示「X」，`m_lblPnt1XValue` 顯示座標）。
 2. 前綴只用於畫面自己擁有的控制項；從其他類別傳入的參考（如各 Action 的 `m_TreeView`）依一般物件命名。
 
 不可使用：`Label`（一律用 `ThemedLabel`）、`GroupBox`、`Button`、`NumericUpDown`、`DataGridView`、`FlowLayoutPanel`、
-`TableLayoutPanel`（主視窗也不用，區域由 `MainLayout` 計算，第 6 節）、當數值輸入用的 `TextBox`、
+`TableLayoutPanel`（主視窗也不用，區域由 `MainLayout` 計算，第 6 節）、`ToolStripContainer`（工具列不拖放停靠）、
+當數值輸入用的 `TextBox`、
 只顯示座標的 `TextBox`（用 `ThemedLabel`，第 5 節）。
 
 ### 3.1 按鈕種類 `ButtonKind`
@@ -143,7 +144,7 @@ CNC 功能鈕的啟用狀態以 `Active`（藍色實心）或 `Indicator`（燈�
 1. 把 `RadioButton` 分組。
 2. 包住要一起切換 `Enabled` / `Visible` 的區域。
 3. 精靈換頁的每一頁（4.7）。
-4. 主視窗的區域（背景、樹、3D 檢視、訊息、CNC 承載區），位置與大小由 `MainLayout` 計算（第 6 節）。
+4. 主視窗的區域：功能工具列區，以及背景、樹、3D 檢視、訊息、CNC 承載區（位置與大小由 `MainLayout` 計算，第 6 節）。
 
 例外：資料色的圖例色塊可用設了底色的 `Panel`（登錄於 `StaticExceptions.txt`）。
 
@@ -195,7 +196,7 @@ Form
    不呼叫置中、不自行計算位置。
 3. 執行時改變大小：
    1. 只改變高度（展開 / 收合區段，`SectionStack.PlaceButtonBar`）：位置不動，對話框往下延伸，避免畫面在使用者操作時跳動。
-   2. 寬高都改變（精靈換頁，`SectionStack.FitToPage`）：換頁後呼叫 `DialogPlacement.MoveToCenter( this )` 重新置中。
+   2. 寬高都改變（精靈換頁，`SectionStack.ShowPage`）：換頁時由 `ShowPage` 一併重新置中（`DialogPlacement.MoveToCenter`）。
 4. 例外：`CNCDlg` 承載 VNC 遠端畫面，大小依遠端解析度與螢幕工作區決定；橫式時置中，直式時定位到 CNC 區域。
 
 ### 4.4 版面（Designer 固定座標）
@@ -209,9 +210,9 @@ Form
 3. 卡片內的動作按鈕（只作用於該卡片，或須隨卡片一起停用）放在列上，高 23。
 4. RadioButton 群組、會切換 `Enabled` / `Visible` 的區域，用無外觀的 `Panel` 包住；`Panel` 內的列以其頂端為 0 起算。
 5. 列：有標題卡片第一列 `y = 36`、無標題 `y = 10`，之後每列 `+30`；標籤 `+4`、`CheckBox` / `RadioButton` `+2`。
-6. 卡片高 = 最後一列頂端 + 23 + 10。同一位置輪流顯示的步驟卡片（由 `SectionStack.Arrange` 擇一顯示）取其中最高者，
+6. 卡片高 = 最後一列頂端 + 23 + 10。同一位置輪流顯示的步驟卡片（切換式精靈的固定大小，4.7）取其中最高者，
    切換步驟時下方卡片不跳動；並排的兩張卡片同高。
-7. 精靈換頁（4.6 `FitToPage`）：每一頁是放在 `(12, 12)` 的無外觀 `Panel`，頁內以頁的左上角為 `(0, 0)`、
+7. 精靈換頁（切換式精靈的換頁，4.7）：每一頁是放在 `(12, 12)` 的無外觀 `Panel`，頁內以頁的左上角為 `(0, 0)`、
    依本節規則排列卡片與按鈕列（按鈕列底即頁底），對話框大小在換頁時配合該頁。
 8. 按鈕列：在最後一張卡片下方 16，高 28、寬至少 80、間距 8，距底邊 12。
    主要動作（確定）在最右，取消在其左；輔助動作（重設、預覽、另存…）靠左，從 `x = 12` 開始。
@@ -240,22 +241,33 @@ Form
 | --- | --- |
 | 狀態文字變色 | `ThemedLabel.Role = TextRole.Error` 等，不直接寫顏色 |
 | 顯示 / 隱藏區段後重新排列 | `SectionStack.Arrange( ... )` + `SectionStack.PlaceButtonBar( ... )`，不在對話框內手算座標 |
-| 精靈的目前步驟 | `SectionPanel.Highlighted = true`（標題列加強調底色） |
+| 展開式精靈的目前步驟 | `SectionPanel.Highlighted = true`（標題列加強調底色） |
 | 動態增刪的數值列 | `RemovableValueRow` |
-| 精靈切換步驟頁（各頁是一個 `Panel`，放在 `(12, 12)`） | `SectionStack.FitToPage( this, page )` |
-| 換頁後重新置中 | `DialogPlacement.MoveToCenter( this )`（4.3） |
+| 精靈換頁（各頁是一個 `Panel`，放在 `(12, 12)`） | `SectionStack.ShowPage( this, page, 所有頁 )`：隱藏其他頁、對話框大小配合該頁並重新置中（4.3） |
 
 ### 4.7 精靈
 
-依步驟操作的對話框，依步驟之間的關係選用下列一種形式：
+依步驟操作的對話框分為兩型，依「後面的步驟是否需要對照前面步驟的內容」選用：
 
-| 形式 | 適用情況 | 做法 | 例 |
+| 型 | 適用情況 | 做法 | 例 |
 | --- | --- | --- | --- |
-| 同頁逐步 | 操作時需要同時看到前面步驟的結果 | 所有步驟卡片同時顯示；目前步驟 `SectionPanel.Highlighted = true`（標題列加強調底色），標題文字標示各步驟的狀態 | `CNCThreePointDlg` |
-| 輪流顯示步驟卡片 | 各步驟共用其他區塊（選項、按鈕列），只有步驟內容不同 | 各步驟卡片放在同一位置，以 `SectionStack.Arrange` 擇一顯示；卡片高取各步驟中最高者，換步驟時對話框大小不變 | `AddPathDlg` |
-| 換頁 | 各步驟的內容與按鈕列都不同 | 每頁是一個無外觀的 `Panel`（4.4 第 7 點），以 `SectionStack.FitToPage` 換頁，對話框大小配合該頁並重新置中（4.3） | `DesignSupportBracketDlg` |
+| 展開式 | 後面的步驟要對照前面步驟的內容（例：工件點對應圖紙點），且全部步驟放得下 | 所有步驟卡片同時顯示，以 `SectionStack.Arrange` 排列；目前步驟 `SectionPanel.Highlighted = true`，標題文字標示各步驟的狀態 | `CNCThreePointDlg` |
+| 切換式 | 每一步只需要看目前這一步 | 只顯示目前這一步，依各步驟的大小選下表一種方式 | `AddPathDlg`、`DesignSupportBracketDlg` |
 
-新增或改動精靈時，把各步驟加到檢查程式的 `STATE_MAP`（8.1）。
+切換式依各步驟的大小選用：
+
+| 方式 | 適用情況 | 做法 | 例 |
+| --- | --- | --- | --- |
+| 固定大小 | 各步驟大小相近，共用其他卡片與按鈕列 | 各步驟卡片放在同一位置、取最高者（4.4 第 6 點），以 `SectionStack.Arrange` 擇一顯示；對話框大小不變 | `AddPathDlg` |
+| 換頁 | 各步驟大小差異大，或按鈕列也不同 | 每步一頁（4.4 第 7 點），以 `SectionStack.ShowPage` 換頁；對話框大小配合該頁並重新置中 | `DesignSupportBracketDlg` |
+
+所有精靈共通：
+
+1. 每一步的內容放在 `SectionPanel`，以區塊標題說明（4.5），不另放步驟標籤。
+2. 按鈕種類依 3.1：結束這一步或完成精靈的動作用 `Primary`，每個容器最多一個。
+3. 版面變化只透過上兩表的 `SectionStack` 方法，對話框不自行計算座標、大小與位置。
+4. `Highlighted` 只用於展開式；切換式畫面上只有目前這一步，不另外標示。
+5. 新增或改動精靈時，把各步驟加到檢查程式的 `STATE_MAP`（8.1）。
 
 ## 5. 數值輸入
 
@@ -275,10 +287,12 @@ Form
       不碰控制項；比例是 `MainLayout` 的具名常數。`Update` 依計算結果設定各區的位置與大小、顯示與所屬容器。
    2. 各區是無外觀的 `Panel`，不用 `TableLayoutPanel`，也不以 `Dock` 填滿；只有背景 `m_pnlBackGround` 以
       `Dock = Fill` 接在工具列下方。畫面程式不自行調整區域大小。
-   3. Designer 呈現橫式加工頁（CNC 操作欄與資訊區都顯示）：客戶區 1920×1009（1920×1080 螢幕扣掉 Windows 工作列 48
+   3. 選單下方的功能工具列區是無外觀的 `m_pnlToolBar`（`Dock = Top`，不用 `ToolStripContainer`）；各頁的功能工具列都放在
+      這裡、以 `Dock = Fill` 填滿，同時只顯示目前頁面的一條。
+   4. Designer 呈現橫式加工頁（CNC 操作欄與資訊區都顯示）：客戶區 1920×1009（1920×1080 螢幕扣掉 Windows 工作列 48
       與標題列 23），各區寫成 `Calculate` 在這個狀態下的結果。直式才有的 CNC 承載區（`m_pnlCNCVertical`、
       `m_pnlVerticalAlarm`）在 Designer 大小為 0。
-   4. 改了比例、CNC 面板的偏好尺寸或工具列高度時，依 P6（第 8 節）列出的值更新 Designer。
+   5. 改了比例、CNC 面板的偏好尺寸或工具列高度時，依 P6（第 8 節）列出的值更新 Designer。
 4. 選單與工具列使用 `ThemedToolStripRenderer`（由 `MainWindowBase` 設為 `ToolStripManager.Renderer`）；
    工具列「執行中」的底色取自 `ACCENT_TINT_STRONG`，結束時設回 `Color.Empty`。
 5. 樹與日誌的文字色：一般 `TEXT`、隱藏 / 不加工 `TEXT_DISABLED`、錯誤 `ERROR`、警告 `WARNING`
@@ -351,7 +365,7 @@ Form
 | S16 | `Start` / `Hold` / `Stop` 用在 CNC 面板以外；同一容器有兩個以上 `Primary` |
 | S17 | 按鈕列順序：輔助動作從左邊距、其餘從右邊距以 8 相接；`Primary` 最右、取消 / 關閉緊鄰其左、重設 / 預覽在左 |
 | S18 | 卡片內各列第一個輸入欄左緣對齊；單位標籤（名稱以 `Unit` 結尾）在輸入欄右側 6 |
-| S19 | 主視窗 Designer 的控制項型別（不可有 `TableLayoutPanel`）與外觀屬性（「加工 / 不加工」圖例為例外） |
+| S19 | 主視窗 Designer 的控制項型別（不可有 `TableLayoutPanel`、`ToolStripContainer`）與外觀屬性（「加工 / 不加工」圖例為例外） |
 | S20 | `static readonly Color` 常數必須登錄為資料色（`StaticExceptions.txt`） |
 | S21 | `CommonUI` 的公開型別都列在第 9 節、所屬資料夾的小節；資料夾與 namespace 一致 |
 | S22 | 卡片標題列內的控制項位置（4.5）：按鈕高 23、`y = 5`，`CheckBox` `y = 5`，標籤高 24、`y = 4`，最右者對齊內容右緣 |
@@ -456,7 +470,7 @@ Form
 
 | 元件 | 用途 | 使用方式 |
 | --- | --- | --- |
-| `SectionStack` | 對話框執行時的版面變化：`Arrange`（隱藏區塊後補位）、`PlaceButtonBar`、`FitToPage`（精靈換頁） | 對話框內不手算座標 |
+| `SectionStack` | 對話框執行時的版面變化：`Arrange`（隱藏區塊後補位）、`PlaceButtonBar`、`ShowPage`（精靈換頁，含重新置中） | 對話框內不手算座標 |
 | `DialogPlacement` | 對話框置中（4.3）；`MoveToCenter` 重新置中，`AreaProvider` 由主視窗註冊 | 不自行計算位置 |
 | `ResponsiveLayout` | 嵌入式面板依 Designer 座標等比縮放，標題列不縮放 | 只用於嵌入式面板 |
 
