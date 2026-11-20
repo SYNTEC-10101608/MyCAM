@@ -357,3 +357,24 @@
    2. 4.7 改寫為展開式 / 切換式兩型，切換式再依各步驟大小分固定大小與換頁，並列出所有精靈共通的規則；
       4.3、4.4 第 6、7 點、4.6、9.4 改用兩型的名稱與 `ShowPage`。
 5. 後續議題（6.2）：步驟流程元件。
+
+## 3.24 Designer 的協作方式（2026-11-20）
+
+依 4.10 決議施工。
+
+1. `Tools/UICheck/DesignerParser.ps1`：
+   1. `InitializeComponent` 的範圍改以大括號配對找出（略過字串），不再依賴 tab 縮排；空白縮排的檔案也能正確解析。
+   2. 新增 `Get-DesignerStatements`：逐一取出陳述式並正規化空白（`Size( 54, 23 )` 與 `Size(54, 23)` 相同）。
+2. `Tools/UICheck/DesignerDiff.ps1`（新增）：比對兩個版本（預設工作目錄對 `HEAD`）的 `.Designer.cs` / `.resx`，
+   列出控制項（增刪、型別、父容器、子項順序）、屬性、事件、其他陳述式與 resx 資源的增減；忽略縮排、宣告順序、
+   版面暫停呼叫（`SuspendLayout` 等）、Designer 一律寫出的 `Name`、resx 的設計時資訊；只有格式不同的檔案標示
+   `formatting only`。是報告，不是檢查。
+3. `Tools/UICheck/CheckStatic.ps1`：新增 S24，`InitializeComponent` 只能有 Designer 讀得懂的寫法。檢出：
+   不以 `this.` / `((` 開頭的陳述式（流程控制、沒有 `this.` 的欄位或呼叫）、lambda / 匿名方法 / null 運算子、
+   字串插補、類別常數、呼叫畫面自己的方法；Designer 自己宣告的區域變數（儲存格樣式、資源）允許。
+4. 規範：
+   1. 專案概觀「WinForms Designer」改寫為四個階段（撰寫、檢視、微調、review）與三條原則。
+   2. UI 規範第 8 節規則表加 S24、第 5 點（Designer 檔格式不審查）；8.1 加 `DesignerDiff.ps1`。
+5. `StartupForm.Designer.cs` / `.resx`：保留使用者實測時 Designer 存出的內容（`AddRange` 續行為空白、
+   設定選單項目寬度 158、resx 重複的 `TrayLocation`）。
+6. 後續議題（6.2）：評估改用 WPF。

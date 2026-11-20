@@ -173,12 +173,12 @@
 			// 
 			this.m_msMode.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.m_msMode.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.m_tsmiFile,
-			this.m_tsmiCAD,
-			this.m_tsmiCAM,
-			this.m_tsmiSimulation,
-			this.m_tsmiCNC,
-			this.m_tsmiSetting});
+            this.m_tsmiFile,
+            this.m_tsmiCAD,
+            this.m_tsmiCAM,
+            this.m_tsmiSimulation,
+            this.m_tsmiCNC,
+            this.m_tsmiSetting});
 			this.m_msMode.Location = new System.Drawing.Point(0, 0);
 			this.m_msMode.Name = "m_msMode";
 			this.m_msMode.Size = new System.Drawing.Size(1920, 24);
@@ -224,9 +224,9 @@
 			// m_tsmiSetting
 			// 
 			this.m_tsmiSetting.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.m_tsmiCNCConnection,
-			this.m_tsmiController,
-			this.m_tsmiLanguage});
+            this.m_tsmiCNCConnection,
+            this.m_tsmiController,
+            this.m_tsmiLanguage});
 			this.m_tsmiSetting.Name = "m_tsmiSetting";
 			this.m_tsmiSetting.Size = new System.Drawing.Size(43, 20);
 			this.m_tsmiSetting.Text = "設定";
@@ -234,21 +234,21 @@
 			// m_tsmiCNCConnection
 			// 
 			this.m_tsmiCNCConnection.Name = "m_tsmiCNCConnection";
-			this.m_tsmiCNCConnection.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiCNCConnection.Size = new System.Drawing.Size(158, 22);
 			this.m_tsmiCNCConnection.Text = "CNC連線設定";
 			this.m_tsmiCNCConnection.Click += new System.EventHandler(this.m_tsmiCNCConnection_Click);
 			// 
 			// m_tsmiController
 			// 
 			this.m_tsmiController.Name = "m_tsmiController";
-			this.m_tsmiController.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiController.Size = new System.Drawing.Size(158, 22);
 			this.m_tsmiController.Text = "控制器進階設定";
 			this.m_tsmiController.Click += new System.EventHandler(this.m_tsmiController_Click);
 			// 
 			// m_tsmiLanguage
 			// 
 			this.m_tsmiLanguage.Name = "m_tsmiLanguage";
-			this.m_tsmiLanguage.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiLanguage.Size = new System.Drawing.Size(158, 22);
 			this.m_tsmiLanguage.Text = "語系切換";
 			// 
 			// m_tsCAMFunction
@@ -256,29 +256,29 @@
 			this.m_tsCAMFunction.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_tsCAMFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
 			this.m_tsCAMFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.m_tsbAddPath,
-			this.m_tsbDeletePath,
-			this.m_tsbAutoOrder,
-			this.m_tsbManualOrder,
-			this.m_tsbStartPoint,
-			this.m_tsbReverse,
-			this.m_tsbEntryAndExitSetting,
-			this.m_tsbSetTraverseData,
-			this.m_tsbSetLead,
-			this.m_tsbOverCut,
-			this.m_tsbMicroJoint,
-			this.m_tsbRCorner,
-			this.m_tsbExtendedGCode,
-			this.m_tsbToolVec,
-			this.m_tsbFlyCut,
-			this.m_tsbFixedToolVec,
-			this.m_tsbToolVecReverse,
-			this.m_tsbOptimizeIK,
-			this.m_tsbPatternSetting,
-			this.m_tsbPathEdit,
-			this.m_tsbPathCompensation,
-			this.m_tsbContourEdit,
-			this.m_tsbMeasureCAM});
+            this.m_tsbAddPath,
+            this.m_tsbDeletePath,
+            this.m_tsbAutoOrder,
+            this.m_tsbManualOrder,
+            this.m_tsbStartPoint,
+            this.m_tsbReverse,
+            this.m_tsbEntryAndExitSetting,
+            this.m_tsbSetTraverseData,
+            this.m_tsbSetLead,
+            this.m_tsbOverCut,
+            this.m_tsbMicroJoint,
+            this.m_tsbRCorner,
+            this.m_tsbExtendedGCode,
+            this.m_tsbToolVec,
+            this.m_tsbFlyCut,
+            this.m_tsbFixedToolVec,
+            this.m_tsbToolVecReverse,
+            this.m_tsbOptimizeIK,
+            this.m_tsbPatternSetting,
+            this.m_tsbPathEdit,
+            this.m_tsbPathCompensation,
+            this.m_tsbContourEdit,
+            this.m_tsbMeasureCAM});
 			this.m_tsCAMFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCAMFunction.Name = "m_tsCAMFunction";
 			this.m_tsCAMFunction.Size = new System.Drawing.Size(1920, 75);
@@ -520,10 +520,10 @@
 			this.m_tsMachiningFunction.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_tsMachiningFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
 			this.m_tsMachiningFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.m_tsbSetOffset,
-			this.m_tsbCalibrationPnt,
-			this.m_tsbProcessSettings,
-			this.m_tsbConvertNC});
+            this.m_tsbSetOffset,
+            this.m_tsbCalibrationPnt,
+            this.m_tsbProcessSettings,
+            this.m_tsbConvertNC});
 			this.m_tsMachiningFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsMachiningFunction.Name = "m_tsMachiningFunction";
 			this.m_tsMachiningFunction.Size = new System.Drawing.Size(1920, 75);
@@ -589,18 +589,18 @@
 			this.m_tsSimuFunc.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_tsSimuFunc.ImageScalingSize = new System.Drawing.Size(40, 40);
 			this.m_tsSimuFunc.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.m_tsbPlay,
-			this.m_tsbPause,
-			this.m_tsbStop,
-			this.m_tsbPreviousPath,
-			this.m_tsbNextPath,
-			this.m_tsbPreCollision,
-			this.m_tsbNextCol,
-			this.m_tsbPrePoint,
-			this.m_tsbNextPoint,
-			this.m_tsbSpeedUp,
-			this.m_tsbSlowDown,
-			this.m_tsbCheck});
+            this.m_tsbPlay,
+            this.m_tsbPause,
+            this.m_tsbStop,
+            this.m_tsbPreviousPath,
+            this.m_tsbNextPath,
+            this.m_tsbPreCollision,
+            this.m_tsbNextCol,
+            this.m_tsbPrePoint,
+            this.m_tsbNextPoint,
+            this.m_tsbSpeedUp,
+            this.m_tsbSlowDown,
+            this.m_tsbCheck});
 			this.m_tsSimuFunc.Location = new System.Drawing.Point(0, 0);
 			this.m_tsSimuFunc.Name = "m_tsSimuFunc";
 			this.m_tsSimuFunc.Size = new System.Drawing.Size(1920, 75);
@@ -732,11 +732,11 @@
 			this.m_tsFileFunction.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_tsFileFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
 			this.m_tsFileFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.m_tsbImport3DFile,
-			this.m_tsbAddRevolution,
-			this.m_tsbAddTube,
-			this.m_tsbReadProjectFile,
-			this.m_tsbSaveProjectFile});
+            this.m_tsbImport3DFile,
+            this.m_tsbAddRevolution,
+            this.m_tsbAddTube,
+            this.m_tsbReadProjectFile,
+            this.m_tsbSaveProjectFile});
 			this.m_tsFileFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsFileFunction.Name = "m_tsFileFunction";
 			this.m_tsFileFunction.Size = new System.Drawing.Size(1920, 75);
@@ -798,18 +798,18 @@
 			this.m_tsCADFunction.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_tsCADFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
 			this.m_tsCADFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.m_tsbSewPart,
-			this.m_tsbDesignSupportBracket,
-			this.m_tsbAddPoint_BoundingBoxCenter,
-			this.m_tsbAddPoint_EdgeCenter,
-			this.m_tsbAddPoint_PointCenter,
-			this.m_tsbAddPoint_AcrCenter,
-			this.m_tsbAddLine_TwoVertexConnect,
-			this.m_tsbWireDiscreteVertex,
-			this.m_tsbAxisTransform,
-			this.m_tsbManualTransform,
-			this.m_tsb3PntTransform,
-			this.m_tsbMeasureCAD});
+            this.m_tsbSewPart,
+            this.m_tsbDesignSupportBracket,
+            this.m_tsbAddPoint_BoundingBoxCenter,
+            this.m_tsbAddPoint_EdgeCenter,
+            this.m_tsbAddPoint_PointCenter,
+            this.m_tsbAddPoint_AcrCenter,
+            this.m_tsbAddLine_TwoVertexConnect,
+            this.m_tsbWireDiscreteVertex,
+            this.m_tsbAxisTransform,
+            this.m_tsbManualTransform,
+            this.m_tsb3PntTransform,
+            this.m_tsbMeasureCAD});
 			this.m_tsCADFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCADFunction.Name = "m_tsCADFunction";
 			this.m_tsCADFunction.Size = new System.Drawing.Size(1920, 75);
@@ -990,18 +990,18 @@
 			this.m_tsLayer.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
 			this.m_tsLayer.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.m_tsLayer.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.m_tsbLayer1,
-			this.m_tsbLayer2,
-			this.m_tsbLayer3,
-			this.m_tsbLayer4,
-			this.m_tsbLayer5,
-			this.m_tsbLayer6,
-			this.m_tsbLayer7,
-			this.m_tsbLayer8,
-			this.m_tsbLayer9,
-			this.m_tsbLayer10,
-			this.m_tsbLayerNone,
-			this.m_tsbNeedProcess});
+            this.m_tsbLayer1,
+            this.m_tsbLayer2,
+            this.m_tsbLayer3,
+            this.m_tsbLayer4,
+            this.m_tsbLayer5,
+            this.m_tsbLayer6,
+            this.m_tsbLayer7,
+            this.m_tsbLayer8,
+            this.m_tsbLayer9,
+            this.m_tsbLayer10,
+            this.m_tsbLayerNone,
+            this.m_tsbNeedProcess});
 			this.m_tsLayer.Location = new System.Drawing.Point(1214, 0);
 			this.m_tsLayer.Name = "m_tsLayer";
 			this.m_tsLayer.Size = new System.Drawing.Size(25, 658);
@@ -1126,19 +1126,19 @@
 			this.m_tsViewerToolBar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
 			this.m_tsViewerToolBar.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.m_tsViewerToolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.m_tsbAXO,
-			this.m_tsbXPos,
-			this.m_tsbXNeg,
-			this.m_tsbYPos,
-			this.m_tsbYNeg,
-			this.m_tsbZPos,
-			this.m_tsbZNeg,
-			this.m_tssViewerToolBar,
-			this.m_tsbShowVec,
-			this.m_tsbShowOrder,
-			this.m_tsbShowOrientation,
-			this.m_tsbShowTraverse,
-			this.m_tsbShowMarker});
+            this.m_tsbAXO,
+            this.m_tsbXPos,
+            this.m_tsbXNeg,
+            this.m_tsbYPos,
+            this.m_tsbYNeg,
+            this.m_tsbZPos,
+            this.m_tsbZNeg,
+            this.m_tssViewerToolBar,
+            this.m_tsbShowVec,
+            this.m_tsbShowOrder,
+            this.m_tsbShowOrientation,
+            this.m_tsbShowTraverse,
+            this.m_tsbShowMarker});
 			this.m_tsViewerToolBar.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
 			this.m_tsViewerToolBar.Location = new System.Drawing.Point(0, 0);
 			this.m_tsViewerToolBar.Name = "m_tsViewerToolBar";

@@ -370,6 +370,7 @@ Form
 | S21 | `CommonUI` 的公開型別都列在第 9 節、所屬資料夾的小節；資料夾與 namespace 一致 |
 | S22 | 卡片標題列內的控制項位置（4.5）：按鈕高 23、`y = 5`，`CheckBox` `y = 5`，標籤高 24、`y = 4`，最右者對齊內容右緣 |
 | S23 | 程式中建立白名單以外的控制項（`Button`、`Label`、`GroupBox`、`NumericUpDown`、`TextBox`…） |
+| S24 | `InitializeComponent` 中 Designer 讀不懂的寫法：流程控制、lambda、字串插補、呼叫畫面自己的方法、類別常數、不以 `this.` 開頭的陳述式 |
 | T1–T7 | 文字截斷、超出容器、重疊等；T6 檢查 `Load` 前後版面與 Designer 相同；T7 檢查控制項顯示語系檔的文字。精靈與多狀態畫面依 `LayoutRunner.cs` 的 `STATE_MAP` 逐一檢查每個狀態 |
 | P1–P6 | 對話框置中（含 `ShowDialog` 開啟的）、CAM 區域、主視窗字族、主視窗中 CNC 面板以實際大小的文字與版面、選單與工具列項目顯示語系檔的文字；P6 以 Designer 的客戶區大小與加工頁執行時，主視窗各區的位置與大小等於 Designer 上的值（不符時列出應寫入的值） |
 
@@ -380,18 +381,21 @@ Form
 4. 產品程式（`MyCAM`、`CncUI`、`CommonUI` 等）不放為了檢查而寫的程式：不加只給檢查用的方法、屬性、旗標或分支。
    檢查需要的狀態，在檢查程式中呼叫產品本來就有的方法觸發（例：`STATE_MAP` 以 `SetCommandsEnabled` 呈現 CNC 連線後的按鈕），
    或建立實際的環境（例：連線 CNC 模擬器）。檢查程式只在執行期間放在建置輸出，結束即刪除。
+5. Designer 檔的格式不審查；review 以 `DesignerDiff.ps1` 的語意差異與本節的檢查結果為準
+   （專案概觀「WinForms Designer」）。
 
 ### 8.1 維護
 
 | 檔案 | 用途 |
 | --- | --- |
 | `UICheck.bat` | 入口。無參數：靜態檢查；`runtime [截圖資料夾]`：另跑執行時版面與主視窗（需先建置 Debug） |
-| `CheckStatic.ps1`、`DesignerParser.ps1` | 靜態檢查 S1–S23 與 Designer 檔解析 |
+| `CheckStatic.ps1`、`DesignerParser.ps1` | 靜態檢查 S1–S24 與 Designer 檔解析（縮排不拘，tab 或空白皆可） |
 | `CheckRuntimeLayout.ps1`、`LayoutRunner.cs` | 執行時檢查 T1–T7 |
 | `CaptureMainWindow.ps1`、`MainWindowRunner.cs` | 主視窗截圖與 P1–P6；輸出各區座標（`[region]`） |
 | `HiddenDesktopRun.cs` | 讓 runner 在隱藏桌面執行；兩個 `.ps1` 加 `-Visible` 改回一般桌面 |
 | `SyncLanguage.ps1` | 執行時檢查前，把建置輸出中缺少或過期的語系檔從 `Language/` 複製過去 |
 | `FixTabOrder.ps1` | 依版面重編 `TabIndex`（修正 S10 的工具，不是檢查） |
+| `DesignerDiff.ps1` | Designer 檔（`.Designer.cs`、`.resx`）的語意差異，供提交前與 review 使用（報告，不是檢查；用法見專案概觀的「WinForms Designer」） |
 | `StaticExceptions.txt` | 資料色登錄、承載單一遠端內容的視窗、已決議的例外 |
 
 1. **規則與規範同步**：本規範的規則改了，`CheckStatic.ps1` / `LayoutRunner.cs` / `MainWindowRunner.cs` 的對應規則要一起改，

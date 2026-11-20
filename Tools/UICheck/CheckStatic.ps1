@@ -33,6 +33,8 @@
 #   S22 title bar of a titled card (section 4.5): button 23 high at y=5, check box at y=5, label 24 high at y=4,
 #       the rightmost control ends at the content edge
 #   S23 code creates no control outside the white list (Button, Label, GroupBox, NumericUpDown, TextBox ...)
+#   S24 InitializeComponent contains only what the designer can read: no control flow, lambda, interpolated string,
+#       call of the screen's own methods, constant of the class, statement without "this."
 #
 # Exceptions are listed in StaticExceptions.txt: "<rule> <class> <control> <reason>". Exit code 1 on a problem.
 
@@ -333,6 +335,60 @@ if (Test-Path $exceptionFile) {
 }
 
 $problems = New-Object System.Collections.Generic.List[string]
+# S24 InitializeComponent contains only statements in the forms the designer writes, so that the designer can open
+# the file: assignments and calls on "this", local variables it declares itself (cell styles, resources), casts for
+# BeginInit / EndInit. Control flow, lambdas, interpolated strings, calls of the screen's own methods and constants
+# of the class cannot be read by the designer.
+function Test-DesignerCode( [string]$szClass, [string]$szText ) {
+	$LAYOUT_CALL_LIST = @( "SuspendLayout", "ResumeLayout", "PerformLayout" )
+	$statementList = Get-DesignerStatements $szText
+	$localList = New-Object System.Collections.Generic.List[string]
+	$fieldMap = @{}
+	foreach ($match in [regex]::Matches($szText, "(?m)^\s*(?:(?:private|internal|public|protected)\s+)?(?:readonly\s+)?[\w.]+(?:<[^>]+>)?\s+(\w+)\s*;")) {
+		$fieldMap[$match.Groups[1].Value] = $true
+	}
+	foreach ($s in $statementList) {
+		# a closing brace left over from a block is reported with the statement that opened it
+		$s = $s -replace "^[{}\s]+", ""
+		if (-not $s) {
+			continue
+		}
+		# string literals are not code
+		$szCode = $s -replace '"(\\.|[^"\\])*"', '""'
+		if ($szCode -match "^[\w.]+(<[\w.,\s]+>)? (\w+) = new ") {
+			$localList.Add($Matches[2])
+			continue
+		}
+		$isLocalUse = $szCode -match "^(\w+)\." -and $localList -contains $Matches[1]
+		$isDesignerForm = $szCode -match "^this\." -or $szCode -match "^\(\(" -or $isLocalUse
+		$szProblem = ""
+		if (-not $isDesignerForm) {
+			$szProblem = "not in a form the designer writes (control flow, a call without this., a field without this.)"
+		}
+		elseif ($szCode -match "=>|\bdelegate\b|\?\.|\?\?") {
+			$szProblem = "lambda, anonymous method or null operator"
+		}
+		elseif ($s -match '\$"') {
+			$szProblem = "interpolated string"
+		}
+		elseif ($szCode -match "(?<![\w.])[A-Z][A-Z0-9]*_[A-Z0-9_]+\b") {
+			$szProblem = "constant of the class (write the value, the designer cannot read class members)"
+		}
+		else {
+			foreach ($call in [regex]::Matches($szCode, "\bthis\.(\w+)\(")) {
+				$szMethod = $call.Groups[1].Value
+				if ($LAYOUT_CALL_LIST -notcontains $szMethod -and -not $fieldMap.ContainsKey($szMethod)) {
+					$szProblem = "call of the screen's own method $szMethod()"
+				}
+			}
+		}
+		if ($szProblem) {
+			$szShort = if ($s.Length -gt 100) { $s.Substring(0, 100) + " ..." } else { $s }
+			Report "S24" $szClass "InitializeComponent" "$szProblem : $szShort"
+		}
+	}
+}
+
 function Report( [string]$szRule, [string]$szClass, [string]$szControl, [string]$szMessage ) {
 	# an exception may use wildcards, e.g. "B6 CalibrationREFDlg m_tbxPnt*"
 	$key = "$szRule $szClass $szControl"
@@ -738,6 +794,9 @@ foreach ($file in $designerFiles) {
 	Test-FieldNames $screen
 	Test-TabOrder $screen
 	Test-OrphanIds $screen ($file.FullName -replace "\.Designer\.cs$", ".cs")
+
+	# S24 the designer can read InitializeComponent
+	Test-DesignerCode $szClass (Get-Content $file.FullName -Raw -Encoding UTF8)
 }
 
 # S9 the main window follows the same naming; its layout is computed by MainLayout, so S10 does not apply
@@ -745,6 +804,8 @@ $mainScreen = Read-DesignerFile (Join-Path $Root "MyCAM\StartupForm.Designer.cs"
 if (-not $Only -or $mainScreen.ClassName -like $Only) {
 	Test-FieldNames $mainScreen
 	Test-OrphanIds $mainScreen (Join-Path $Root "MyCAM\StartupForm.cs")
+	$szMainText = Get-Content (Join-Path $Root "MyCAM\StartupForm.Designer.cs") -Raw -Encoding UTF8
+	Test-DesignerCode $mainScreen.ClassName $szMainText
 
 	# S19 types and appearance of the main window (the not-machined legend is an exception)
 	foreach ($name in $mainScreen.Fields.Keys) {

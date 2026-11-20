@@ -284,3 +284,43 @@ Designer 目前**不是**橫式，而是執行時不會出現的混合狀態：
 1. 主視窗各區座標與改動前相同（`CompareMainLayout` 0 個差異），Designer 中背景仍從 y = 99 開始。
 2. 現有三個精靈都符合兩型的規則，除 `DesignSupportBracketDlg` 改呼叫 `ShowPage` 外不需改程式。
 3. 3.6 原本寫 `AddPathDlg` 以 `Highlighted` 表示目前步驟，實際只有 `CNCThreePointDlg` 使用；已更正。
+
+## 4.10 Designer 的協作方式（2026-11-20，已定稿並施工，3.24）
+
+### 要求
+
+1. 使用者每次以 Designer 開啟並儲存 `StartupForm`，都出現大量差異，詢問是否符合預期、之後如何協作。
+2. 使用者的分工前提：約九成由 AI 直接寫 `.Designer.cs`；人只開 Designer 檢視（能否開啟、位置是否符合預期），
+   偶爾拖曳微調，很少從頭手做整個畫面。各人電腦的 VS 環境不可能逐一規範，希望反過來以檢查保證正確，
+   只要行為正確，格式與 Designer 自己加的異動都可忽略。
+
+### 實測（VS 18.12.0 英文版，`StartupForm`）
+
+1. 設定 C# Tabs 為 Keep tabs 後，Designer 存出的一般程式行為 tab，BOM 保留。
+2. `AddRange` 陣列的續行固定是 12 個空白，不受設定影響；分支起點的檔案也是如此（本議題先前改成 tab 是多餘的）。
+3. 開檔即出現 `*`：Designer 開檔時重新量測下拉選單項目的寬度（180 → 158）。存過一次後再開仍出現 `*`，
+   但存出的內容不變。
+4. 改 `TabIndex` 再改回並存檔：`.Designer.cs` 只留下真正改的值；`.resx` 多寫一份重複的 `TrayLocation`
+   （設計時資訊，不編入程式，建置 0 個錯誤）。
+
+### 待決問題（2026-11-20 使用者決議：全部照建議）
+
+| # | 問題 | 建議（採用） | 另一個選項 |
+| --- | --- | --- | --- |
+| Q1 | 只檢視時是否存檔 | 不存檔（出現 `*` 也選 No） | 存了也無妨 |
+| Q2 | AI 寫的格式 | 依 Designer 的輸出，沿用檔案現有的縮排與格式 | 依 `.editorconfig` 全部 tab |
+| Q3 | 是否一次把所有 Designer 檔以 Designer 存過 | 不做，各檔第一次被人存檔時自然統一 | 本議題一次做完 |
+| Q4 | 語意差異腳本 | 本議題做 `Tools/UICheck/DesignerDiff.ps1`，review 看它而不看文字 diff | 列後續議題 |
+| Q5 | 「Designer 能正常開啟」的檢查 | 靜態檢查 S24（Designer 讀不懂的寫法）＋人工檢視 | 只靠人工檢視 |
+| Q6 | 寫在哪裡 | 專案概觀「WinForms Designer」寫階段與原則；UI 規範第 8 節加 S24 與 `DesignerDiff.ps1` | — |
+
+### 另一個問題：改用 WPF
+
+使用者詢問改用 WPF 是否能一勞永逸。回覆：Designer 重新產生程式碼、手排座標、DPI 縮放的問題大多會消失，
+主題也是框架內建能力；但要重寫所有畫面與檢查，OCCT 3D 檢視與 VNC 遠端畫面的承載是最大風險，團隊需學 MVVM。
+建議不在本議題處理，另開評估議題先做概念驗證（6.2）。
+
+### 施工結果
+
+1. 使用者實測時存下的 `StartupForm.Designer.cs` / `.resx` 是 Designer 的標準輸出，依原則保留提交。
+2. `DesignerDiff.ps1` 把那次存檔 186 行的文字差異濃縮為 3 個屬性變化，resx 判定為只有格式差異。
