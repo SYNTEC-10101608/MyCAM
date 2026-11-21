@@ -8,7 +8,9 @@
 		/// <summary>White: other actions such as cancel, reset, browse, CNC functions.</summary>
 		Normal,
 
-		/// <summary>Filled accent: the action that completes the dialog or the step (confirm, generate, next).</summary>
+		/// <summary>
+		/// Filled accent: the action that completes the dialog or the step (confirm, generate, next).
+		/// </summary>
 		Primary,
 
 		/// <summary>Red border and text: actions that may lose data (delete, remove, clear data).</summary>
