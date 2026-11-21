@@ -1,8 +1,8 @@
 @echo off
 REM UI checks of .github/instructions/ui-style.instructions.md, section 8.
 REM   UICheck.bat            static check
-REM   UICheck.bat runtime    also opens every dialog / CNC panel in zh-TW and zh-CN, and the main window
-REM                          landscape / portrait with dialog placement (build Debug first)
+REM   UICheck.bat runtime    also opens every dialog / CNC panel in zh-TW and zh-CN, checks the numeric input, and
+REM                          the main window landscape / portrait with dialog placement (build Debug first)
 REM   UICheck.bat runtime ^<screenshot folder^>   ... and saves screenshots
 setlocal
 set "HERE=%~dp0"
@@ -18,6 +18,10 @@ if "%~2"=="" (
 	REM full path, the layout runner works in the build output folder
 	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntimeLayout.ps1" -ShotDir "%~f2"
 )
+if errorlevel 1 set "RESULT=1"
+
+REM behavior of the shared numeric input
+powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckControls.ps1"
 if errorlevel 1 set "RESULT=1"
 
 REM main window screenshots go to the temp folder when no screenshot folder is given

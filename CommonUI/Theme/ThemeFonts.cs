@@ -35,11 +35,6 @@ namespace CommonUI.Theme
 		public static Font Emphasis => m_Emphasis;
 
 		/// <summary>
-		/// Font of <see cref="TextRole.Title"/>.
-		/// </summary>
-		public static Font Title => m_Title;
-
-		/// <summary>
 		/// Font of <see cref="TextRole.Value"/>.
 		/// </summary>
 		public static Font Value => m_Value;
@@ -60,8 +55,6 @@ namespace CommonUI.Theme
 					return m_Body;
 				case TextRole.Emphasis:
 					return m_Emphasis;
-				case TextRole.Title:
-					return m_Title;
 				case TextRole.Value:
 					return m_Value;
 				default:
@@ -91,7 +84,6 @@ namespace CommonUI.Theme
 		{
 			m_Body = new Font( m_szFamily, BODY_SIZE, FontStyle.Regular, GraphicsUnit.Point );
 			m_Emphasis = new Font( m_szFamily, BODY_SIZE, FontStyle.Bold, GraphicsUnit.Point );
-			m_Title = new Font( m_szFamily, TITLE_SIZE, FontStyle.Regular, GraphicsUnit.Point );
 			m_Value = new Font( FAMILY_VALUE, VALUE_SIZE, FontStyle.Regular, GraphicsUnit.Point );
 		}
 
@@ -102,13 +94,11 @@ namespace CommonUI.Theme
 		const string FAMILY_OTHER = "Segoe UI";
 		const string FAMILY_VALUE = "Consolas";
 		const float BODY_SIZE = 9F;
-		const float TITLE_SIZE = 10.5F;
 		const float VALUE_SIZE = 10F;
 
 		static string m_szFamily = FAMILY_ZH_TW;
 		static Font m_Body;
 		static Font m_Emphasis;
-		static Font m_Title;
 		static Font m_Value;
 	}
 }

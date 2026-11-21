@@ -7,7 +7,7 @@
 
 | # | 事項 | 做法 | 負責 |
 | --- | --- | --- | --- |
-| 1 | 人工確認 | [5_Verification.md](5_Verification.md) 5.3 的第 2～4 項：Designer 開啟所有畫面、實機操作數值框、CNC 實際連線 | 使用者 |
+| 1 | 人工確認（合併門檻） | [5_Verification.md](5_Verification.md) 5.3 的第 2～4 項：Designer 開啟所有畫面、實機操作數值框、CNC 實際連線；三項都完成才合併（2026-11-21 Round 1 review 決議） | 使用者 |
 | 2 | 同步 `master` | `git fetch origin` 後 merge / rebase `master`，重新建置，跑 `Tools\UICheck\UICheck.bat runtime` 與 `Doc\UIStyleUnify\Tests\RunIssueChecks.bat`。目前已知 `master` 前進兩個 commit（`8db7be81`、`7829c338`，只改開發環境檔案）；2026-11-21 未連上公司網路，fetch 失敗，需重新確認 | AI |
 | 3 | 推送 | 推送前確認 remote（`origin` GitLab / `github` 個人）與分支 | 使用者決定，AI 執行 |
 | 4 | Merge Request 說明 | 寫入 [7_Compatibility.md](7_Compatibility.md) 的相容性異動，讓部署與現場人員知道 | AI 起草，使用者確認 |

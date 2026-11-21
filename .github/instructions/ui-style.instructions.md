@@ -63,7 +63,6 @@ applyTo: "**/*.cs"
 | --- | --- | --- | --- |
 | `Body` | 9pt | `TEXT` | 一般文字（預設，字型與顏色繼承父容器） |
 | `Emphasis` | 9pt 粗體 | `TEXT` | 軸名、需要強調的欄位 |
-| `Title` | 10.5pt | `TEXT` | 主視窗模式頁籤 |
 | `Value` | Consolas 10pt | `TEXT` | 持續變動的機台數值 |
 | `Secondary` | 9pt | `TEXT_SECONDARY` | 單位、提示 |
 | `Error` / `Warning` / `Success` | 9pt | 對應狀態色 | 狀態文字 |
@@ -284,6 +283,10 @@ Form
 1. 所有數值輸入一律是 `DebouncedNumericUpDown`，以 `Minimum` / `Maximum` / `DecimalPlaces` / `Increment`
    表達欄位的範圍；不在程式中 `double.TryParse` 文字框。
 2. 只顯示座標、從不輸入的欄位用 `ThemedLabel`（`AutoSize = false`、寬同輸入欄）。
+3. `DebouncedNumericUpDown` 的操作行為（由 8 節的 N1–N3 檢查）：
+   1. 無法解析或超出範圍的輸入被拒，回復為最新的合法值（不夾到上下限），回復本身不送出 `ValueChanged`。
+   2. 任何值的變化（包括最後一位小數的一步）都在停止變動後送出一次 `DebouncedValueChanged`。
+   3. 滾輪一格改變一個 `Increment`，超出範圍時停在上下限。
 
 ## 6. 主視窗與嵌入式面板
 
@@ -368,7 +371,7 @@ Form
 | 指令 | 內容 |
 | --- | --- |
 | `Tools\UICheck\UICheck.bat` | 靜態檢查（`CheckStatic.ps1`，只讀原始碼，不需建置） |
-| `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | 另外以 Debug 建置結果開啟所有對話框與 CNC 面板，zh-TW / zh-CN 各跑一次（`CheckRuntimeLayout.ps1`）；並以 CAD / CAM / CNC 頁面 × 橫 / 直式截取主視窗、檢查對話框置中，再以 Designer 的大小檢查主視窗區域（`CaptureMainWindow.ps1`） |
+| `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | 另外以 Debug 建置結果開啟所有對話框與 CNC 面板，zh-TW / zh-CN 各跑一次（`CheckRuntimeLayout.ps1`）；檢查共用數值框的操作行為（`CheckControls.ps1`）；並以 CAD / CAM / CNC 頁面 × 橫 / 直式截取主視窗、檢查對話框置中，再以 Designer 的大小檢查主視窗區域（`CaptureMainWindow.ps1`） |
 
 1. 執行時檢查與主視窗截圖在**隱藏桌面**執行，視窗不會出現在螢幕上、不搶焦點；要看到視窗時加 `-Visible`。
 
@@ -393,6 +396,7 @@ Form
 | S24 | `InitializeComponent` 中 Designer 讀不懂的寫法：流程控制、lambda、字串插補、呼叫畫面自己的方法、類別常數、不以 `this.` 開頭的陳述式 |
 | S25 | 畫面的 `.Designer.cs` 以 `ComponentResourceManager` 讀取資源，或畫面的 `.resx` 有 `<data>` 資源（8.1 第 3 點） |
 | T1–T7 | 文字截斷、超出容器、重疊等；T6 檢查 `Load` 前後版面與 Designer 相同；T7 檢查控制項顯示語系檔的文字。精靈與多狀態畫面依 `LayoutRunner.cs` 的 `STATE_MAP` 逐一檢查每個狀態 |
+| N1–N3 | `DebouncedNumericUpDown` 的操作行為（第 5 節第 3 點）：被拒的輸入回復最新合法值且不送出 `ValueChanged`、最後一位小數的一步也送出 `DebouncedValueChanged`、滾輪一格一個 `Increment` |
 | P1–P6 | 對話框置中（含 `ShowDialog` 開啟的）、CAM 區域、主視窗字族、主視窗中 CNC 面板以實際大小的文字與版面、選單與工具列項目顯示語系檔的文字；P6 以 Designer 的客戶區大小與加工頁執行時，主視窗各區的位置與大小等於 Designer 上的值（不符時列出應寫入的值） |
 
 1. 修改畫面後必須跑 `UICheck.bat`，全部通過才可提交；新增畫面或改動版面時，另跑 `UICheck.bat runtime`。
@@ -437,6 +441,7 @@ Designer 存檔時會依各台電腦的 VS 設定重新產生整個 `InitializeC
 | `UICheck.bat` | 入口。無參數：靜態檢查；`runtime [截圖資料夾]`：另跑執行時版面與主視窗（需先建置 Debug） |
 | `CheckStatic.ps1`、`DesignerParser.ps1` | 靜態檢查 S1–S25 與 Designer 檔解析（縮排不拘，tab 或空白皆可） |
 | `CheckRuntimeLayout.ps1`、`LayoutRunner.cs` | 執行時檢查 T1–T7 |
+| `CheckControls.ps1`、`ControlRunner.cs` | 共用數值框的操作行為 N1–N3（不開視窗，只需建置 `CommonUI`） |
 | `CaptureMainWindow.ps1`、`MainWindowRunner.cs` | 主視窗截圖與 P1–P6；輸出各區座標（`[region]`） |
 | `HiddenDesktopRun.cs` | 讓 runner 在隱藏桌面執行；兩個 `.ps1` 加 `-Visible` 改回一般桌面 |
 | `SyncLanguage.ps1` | 執行時檢查前，把建置輸出中缺少或過期的語系檔從 `Language/` 複製過去 |
@@ -444,7 +449,7 @@ Designer 存檔時會依各台電腦的 VS 設定重新產生整個 `InitializeC
 | `DesignerDiff.ps1` | Designer 檔（`.Designer.cs`、`.resx`）的語意差異，供提交前與 review 使用（報告，不是檢查；用法見 8.1） |
 | `StaticExceptions.txt` | 資料色登錄、承載單一遠端內容的視窗、已決議的例外 |
 
-1. **規則與規範同步**：本規範的規則改了，`CheckStatic.ps1` / `LayoutRunner.cs` / `MainWindowRunner.cs` 的對應規則要一起改，
+1. **規則與規範同步**：本規範的規則改了，`CheckStatic.ps1` / `LayoutRunner.cs` / `ControlRunner.cs` / `MainWindowRunner.cs` 的對應規則要一起改，
    並更新本節的規則表與腳本開頭的註解。新增規則時，故意做出違規的程式確認能檢出（反向測試），再還原。
 2. **畫面資料夾**：靜態檢查只掃 `CheckStatic.ps1` 的 `$SCREEN_DIRS`（Designer 檔）與 `$CODE_SCOPE`（程式碼）；
    `FixTabOrder.ps1` 也有一份 `$SCREEN_DIRS`。畫面放到新的資料夾時，兩處都要加。
@@ -459,8 +464,9 @@ Designer 存檔時會依各台電腦的 VS 設定重新產生整個 `InitializeC
 7. **元件目錄**：`CommonUI` 新增公開型別時，放進所屬類別的資料夾，並在第 9 節該類別的小節加一列（S21）；
    新增類別時，同時新增資料夾、namespace 與小節（小節標題寫 `` （`CommonUI.<類別>`） ``）。
 8. **語系檔**：執行時檢查讀的是建置輸出的語系檔；`SyncLanguage.ps1` 會先同步，平常開發改了 `Language/` 仍要跑 `CopyRef.bat`。
-9. **runner 的編譯**：兩個 `.ps1` 以 Visual Studio 的 Roslyn `csc` 把 runner 編譯到 `MyCAM\bin\<組態>`
-   （才能以與 `MyCAM.exe` 相同的方式找到語系檔與相依組件），執行結束即刪除；
+9. **runner 的編譯**：`CheckRuntimeLayout.ps1`、`CheckControls.ps1`、`CaptureMainWindow.ps1` 以 Visual Studio 的 Roslyn
+   `csc` 把 runner 編譯到 `MyCAM\bin\<組態>`（才能以與 `MyCAM.exe` 相同的方式找到語系檔與相依組件），執行結束即刪除；
+   刪除寫在包住編譯、準備與執行全程的 `finally`，編譯或準備失敗也不會留下 runner；
    runner 參考的組件改名或新增相依時，更新 `.ps1` 中的 `/r:` 清單。
 10. **截圖**：輸出到指定的截圖資料夾，對話框為 `<語系>\<畫面>[_<狀態>].png`，主視窗為
     `MainWindow_<語系>_<頁面>_<Landscape|Portrait>.png`（紅色虛線框為對話框置中的區域），P6 為 `MainWindow_Designer.png`；

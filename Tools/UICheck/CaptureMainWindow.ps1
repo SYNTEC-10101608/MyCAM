@@ -43,43 +43,47 @@ $runner = Join-Path $binDir "UICheckMainWindow.exe"
 $references = @( "System.dll", "System.Core.dll", "System.Drawing.dll", "System.Windows.Forms.dll", "System.Xml.dll",
 	(Join-Path $binDir "CommonUI.dll"), (Join-Path $binDir "LanguageManager.dll") ) | ForEach-Object { "/r:$_" }
 $sources = @( (Join-Path $PSScriptRoot "MainWindowRunner.cs"), (Join-Path $PSScriptRoot "LayoutRunner.cs") )
-& $csc /nologo /target:exe /platform:anycpu /main:UICheck.MainWindowRunner /out:$runner @references @sources
-if ($LASTEXITCODE -ne 0) {
-	Write-Host "[UICheck] failed to compile MainWindowRunner.cs"
-	exit 2
-}
 $hidden = Join-Path $binDir "UICheckHidden.exe"
-& $csc /nologo /target:exe /platform:anycpu /out:$hidden (Join-Path $PSScriptRoot "HiddenDesktopRun.cs")
-if ($LASTEXITCODE -ne 0) {
-	Write-Host "[UICheck] failed to compile HiddenDesktopRun.cs"
-	exit 2
-}
-
-$outPath = $OutFile
-if (-not [System.IO.Path]::IsPathRooted($outPath)) {
-	$outPath = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $OutFile))
-}
-New-Item -ItemType Directory -Force (Split-Path $outPath) | Out-Null
-
-# dialogs opened with ShowDialog are checked the same way, marked for the runner
-$dialogArguments = @( $Dialogs ) + @( $ModalDialogs | ForEach-Object { "modal:$_" } )
-if ($DesignerLayout) {
-	$dialogArguments = @( "designer:" + (Join-Path $Root "MyCAM\StartupForm.Designer.cs") )
-}
-Push-Location $binDir
+# the runners only live in the build output while they run, so they are never shipped with it; the cleanup also
+# covers a failed compile or preparation
 try {
-	if ($Visible) {
-		& $runner $Language $Mode $Width $Height $outPath @dialogArguments
+	& $csc /nologo /target:exe /platform:anycpu /main:UICheck.MainWindowRunner /out:$runner @references @sources
+	if ($LASTEXITCODE -ne 0) {
+		Write-Host "[UICheck] failed to compile MainWindowRunner.cs"
+		exit 2
 	}
-	else {
-		& $hidden $runner $Language $Mode $Width $Height $outPath @dialogArguments
+	& $csc /nologo /target:exe /platform:anycpu /out:$hidden (Join-Path $PSScriptRoot "HiddenDesktopRun.cs")
+	if ($LASTEXITCODE -ne 0) {
+		Write-Host "[UICheck] failed to compile HiddenDesktopRun.cs"
+		exit 2
 	}
-	$result = $LASTEXITCODE
+
+	$outPath = $OutFile
+	if (-not [System.IO.Path]::IsPathRooted($outPath)) {
+		$outPath = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $OutFile))
+	}
+	New-Item -ItemType Directory -Force (Split-Path $outPath) | Out-Null
+
+	# dialogs opened with ShowDialog are checked the same way, marked for the runner
+	$dialogArguments = @( $Dialogs ) + @( $ModalDialogs | ForEach-Object { "modal:$_" } )
+	if ($DesignerLayout) {
+		$dialogArguments = @( "designer:" + (Join-Path $Root "MyCAM\StartupForm.Designer.cs") )
+	}
+	Push-Location $binDir
+	try {
+		if ($Visible) {
+			& $runner $Language $Mode $Width $Height $outPath @dialogArguments
+		}
+		else {
+			& $hidden $runner $Language $Mode $Width $Height $outPath @dialogArguments
+		}
+		$result = $LASTEXITCODE
+	}
+	finally {
+		Pop-Location
+	}
 }
 finally {
-	Pop-Location
-
-	# the runners only live in the build output while they run, so they are never shipped with it
 	Remove-Item $runner, $hidden -ErrorAction SilentlyContinue
 }
 exit $result

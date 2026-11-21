@@ -73,6 +73,7 @@ namespace CommonUI.Controls
 				Location = new Point( nDeleteLeft, 0 ),
 				Size = new Size( DELETE_WIDTH, ThemeMetrics.INPUT_HEIGHT ),
 				Text = szDeleteText,
+				Kind = ButtonKind.Danger,
 				TabStop = false
 			};
 			Controls.Add( m_lblIndex );

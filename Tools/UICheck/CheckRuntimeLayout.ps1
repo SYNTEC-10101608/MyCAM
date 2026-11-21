@@ -28,27 +28,29 @@ $csc = Join-Path (Split-Path $msbuild) "Roslyn\csc.exe"
 $runner = Join-Path $binDir "UICheckRunner.exe"
 $references = @( "System.dll", "System.Core.dll", "System.Drawing.dll", "System.Windows.Forms.dll", "System.Xml.dll",
 	(Join-Path $binDir "CommonUI.dll"), (Join-Path $binDir "LanguageManager.dll") ) | ForEach-Object { "/r:$_" }
-& $csc /nologo /target:exe /platform:anycpu /out:$runner @references (Join-Path $PSScriptRoot "LayoutRunner.cs")
-if ($LASTEXITCODE -ne 0) {
-	Write-Host "[UICheck] failed to compile LayoutRunner.cs"
-	exit 2
-}
 $hidden = Join-Path $binDir "UICheckHidden.exe"
-& $csc /nologo /target:exe /platform:anycpu /out:$hidden (Join-Path $PSScriptRoot "HiddenDesktopRun.cs")
-if ($LASTEXITCODE -ne 0) {
-	Write-Host "[UICheck] failed to compile HiddenDesktopRun.cs"
-	exit 2
-}
-
-# the runner works in the output folder, so a relative screenshot folder is resolved here first
-if (-not $ShotDir) {
-	$ShotDir = "-"
-}
-elseif (-not [System.IO.Path]::IsPathRooted($ShotDir)) {
-	$ShotDir = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $ShotDir))
-}
-$result = 0
+# the runners only live in the build output while they run, so they are never shipped with it; the cleanup also
+# covers a failed compile or preparation
 try {
+	& $csc /nologo /target:exe /platform:anycpu /out:$runner @references (Join-Path $PSScriptRoot "LayoutRunner.cs")
+	if ($LASTEXITCODE -ne 0) {
+		Write-Host "[UICheck] failed to compile LayoutRunner.cs"
+		exit 2
+	}
+	& $csc /nologo /target:exe /platform:anycpu /out:$hidden (Join-Path $PSScriptRoot "HiddenDesktopRun.cs")
+	if ($LASTEXITCODE -ne 0) {
+		Write-Host "[UICheck] failed to compile HiddenDesktopRun.cs"
+		exit 2
+	}
+
+	# the runner works in the output folder, so a relative screenshot folder is resolved here first
+	if (-not $ShotDir) {
+		$ShotDir = "-"
+	}
+	elseif (-not [System.IO.Path]::IsPathRooted($ShotDir)) {
+		$ShotDir = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $ShotDir))
+	}
+	$result = 0
 	foreach ($szLanguage in $Languages) {
 		Write-Host "## runtime layout: $szLanguage"
 		$arguments = @( $szLanguage, $ShotDir )
@@ -73,7 +75,6 @@ try {
 	}
 }
 finally {
-	# the runners only live in the build output while they run, so they are never shipped with it
 	Remove-Item $runner, $hidden -ErrorAction SilentlyContinue
 }
 exit $result

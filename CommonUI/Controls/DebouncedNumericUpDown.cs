@@ -66,6 +66,7 @@ namespace CommonUI.Controls
 			this.Increment = 1;
 
 			m_LastValue = this.Value;
+			m_LastValidValue = m_LastValue;
 			RevertOnOutOfRange = true;
 		}
 
@@ -177,17 +178,21 @@ namespace CommonUI.Controls
 		void RevertToLastValue( decimal inputValue, decimal limit, bool isBelowMin )
 		{
 			ValueRejected?.Invoke( this, new ValueRejectedEventArgs( inputValue, limit, isBelowMin ) );
+
+			// restore the latest valid value, not the last notified one (m_LastValue), which lags behind while the
+			// debounce timer runs or after a change too small to notify; reading Value here would validate again
 			// Directly set Text to bypass NumericUpDown's internal userEdit/ParseEditText/clamp flow.
-			string formatted = m_LastValue.ToString( "F" + DecimalPlaces,
+			string formatted = m_LastValidValue.ToString( "F" + DecimalPlaces,
 				System.Globalization.CultureInfo.CurrentCulture );
 			m_IsProgrammaticChange = true;
 			Text = formatted;
-			Value = m_LastValue;
 			m_IsProgrammaticChange = false;
 		}
 
 		protected override void OnValueChanged( EventArgs e )
 		{
+			// every accepted value, by the user or by the program, is the value to restore on rejected input
+			m_LastValidValue = Value;
 			base.OnValueChanged( e );
 
 			// programmatic change, don't trigger debounce
@@ -195,8 +200,8 @@ namespace CommonUI.Controls
 				return;
 			}
 
-			// if value actually changed beyond epsilon threshold
-			if( Math.Abs( (double)Value - (double)m_LastValue ) <= EPSILON ) {
+			// decimal is exact, so any change the user can make (even one step of the last decimal place) is notified
+			if( Value == m_LastValue ) {
 				return;
 			}
 
@@ -292,10 +297,10 @@ namespace CommonUI.Controls
 			base.Dispose( disposing );
 		}
 
-		const double EPSILON = 1e-3;
 		Timer m_DebounceTimer;
 		int m_DebounceInterval = 100;
 		bool m_IsProgrammaticChange = false;
 		decimal m_LastValue = 0;
+		decimal m_LastValidValue = 0;
 	}
 }
