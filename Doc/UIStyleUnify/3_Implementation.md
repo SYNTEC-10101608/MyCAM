@@ -19,7 +19,12 @@
 | 使用者回饋 | `489815c5` ～ `87b6ddff` | CNC 面板按鈕對齊、`ToolVectorDlg` 區塊合併、隱藏桌面執行、CNC 面板標題改卡片標題 |
 | Review 第一輪 | `933030d4` ～ `af642ace` | 字型初始化移到 `MyApp`、控制項全域改名、CNC 面板改用 `ThemeMetrics`、檢查補強 |
 | Review 第二輪 | `972eb5c2` ～ `e6c733a0` | 按鈕種類分兩組、語系改在建構子套用、元件目錄、檢查補強、最終盤點 |
-| 收官 | 本次提交 | `CommonUI` 五類重整、XML 文件註解、行長修正、測試分類、議題報告整併 |
+| 收官 | `293d3d47` ～ `7f17bce1` | `CommonUI` 五類重整、XML 文件註解、行長修正、測試分類、議題報告整併、規範以議題編號標示出處 |
+| Review 第三輪 | `87ec4ce0` | 文字標籤統一為 `ThemedLabel`、圖層色單一定義（3.21）；主視窗移除 `TableLayoutPanel`（3.22） |
+| 主視窗與精靈 | `510f7a2b` | 功能工具列容器改為 `Panel`、精靈兩型與 `SectionStack.ShowPage`（3.23） |
+| Designer 協作 | `cee5aa26` | `DesignerDiff.ps1`、靜態檢查 S24（3.24） |
+| 規範 review | `c0e32b7a`、`1a18d8f0`、`019bcca3`、`cdeb98b0` | 第一～三批（3.25～3.27） |
+| 收尾盤點 | `d5f3c1df` ～ 最新 | 後續處理重整、相容性異動文件、自我 review 的文件修正 |
 
 ## 3.2 外觀與行為分層（對應 2.2）
 
@@ -41,7 +46,7 @@
 3. 約 180 處寫死顏色移除；資料色改為具名常數並登錄於 `Tools/UICheck/StaticExceptions.txt`
    （`DesignSupportBracketDlg` X / Y 位置色、`CNCInfoPanel` 五軸色）。
 4. 圖示：60 個工具列圖示以 `MyCAM/Resource/IconSource/RenderIcons.ps1` 產生透明背景 PNG（檔名不變），
-   功能工具列 40×40，選單、圖層列、視角列、右鍵選單 20×20。
+   功能工具列 40×40，選單、圖層列、視角列 20×20；「加工 / 不加工」圖例的 2 個圖示於 3.26 新增。
 
 ## 3.4 Designer 如實呈現（對應 2.4）
 
@@ -114,15 +119,15 @@
 
 ## 3.11 命名（對應 2.11）
 
-1. 控制項欄位依型別前綴全域改名 304 筆（`Doc/UIStyleUnify/Tests/RenameMap.txt`），事件方法、`.resx`、所有語系 ID 一併改；
+1. 控制項欄位依型別前綴全域改名 309 筆（`Doc/UIStyleUnify/Tests/RenameMap.txt`），事件方法、`.resx`、所有語系 ID 一併改；
    順帶修正拼字（`Legnth`、`Tolernece`、`SlowDonw`）。
 
 ## 3.12 檢查機制（對應 2.12）
 
 | 位置 | 檔案 |
 | --- | --- |
-| `Tools/UICheck`（可持續使用） | `UICheck.bat`、`CheckStatic.ps1`、`DesignerParser.ps1`、`StaticExceptions.txt`、`CheckRuntimeLayout.ps1`、`LayoutRunner.cs`、`CaptureMainWindow.ps1`、`MainWindowRunner.cs`、`HiddenDesktopRun.cs`、`SyncLanguage.ps1`、`FixTabOrder.ps1` |
-| `Doc/UIStyleUnify/Tests`（本議題限定） | `RunIssueChecks.bat`、`CompareBehavior.ps1`、`RenameMap.txt`、`BehaviorExceptions.txt`、`CheckBranchRules.ps1` |
+| `Tools/UICheck`（可持續使用） | `UICheck.bat`、`CheckStatic.ps1`、`DesignerParser.ps1`、`StaticExceptions.txt`、`CheckRuntimeLayout.ps1`、`LayoutRunner.cs`、`CaptureMainWindow.ps1`、`MainWindowRunner.cs`、`HiddenDesktopRun.cs`、`SyncLanguage.ps1`、`FixTabOrder.ps1`、`DesignerDiff.ps1`（3.24） |
+| `Doc/UIStyleUnify/Tests`（本議題限定） | `RunIssueChecks.bat`、`CompareBehavior.ps1`、`RenameMap.txt`、`BehaviorExceptions.txt`、`CheckBranchRules.ps1`、`CompareMainLayout.ps1`、`MainLayoutBaseline.txt`（3.22） |
 
 1. 收官時把行為比對三個檔案從 `Tools/UICheck` 移到議題資料夾，比對基準由 `master` 改為固定的分支起點 `a4b3826d`；
    `UICheck.bat` 只留可持續使用的檢查。新增 `CheckBranchRules.ps1`（I1–I9）與入口 `RunIssueChecks.bat`。
@@ -182,7 +187,7 @@
 | `SewPartDlg` | `EditDialogBase<double>` | 387×122 → 320×111 | `TableLayoutPanel` → 固定座標；加 `SectionPanel` 1 | 確定 `Primary`、`CommonText` | 只有語系 |
 | `StartPointDlg` | `EditDialogBase<object>` | 395×293 → 380×247 | `TableLayoutPanel` 3、`FlowLayoutPanel` 1 → 無外觀 `Panel` 1；加 `SectionPanel` 1 | 套用 `Primary` | 只有語系 |
 | `ThreePtTransformDlg` | `EditDialogBase<TransParam>` | 485×385 → 400×334 | `TableLayoutPanel` → `SectionPanel` 2；CAD 座標 `TextBox` 9 → `Label`；機械座標 `TextBox` 9 → `DebouncedNumericUpDown`；新增三個點的標題 `m_lblMachinePoint1～3` | 確定 `Primary`、`CommonText` | 原本未加前綴的 `tbx*`、`btnOK`、`label1～3` 依規範改名；確定鈕的解析與「座標無效」提示不變 |
-| `ToolVectorDlg` | `EditDialogBase<EToolVecInterpolateType>` | 449×395 → 476×564 | `GroupBox` 5 → `SectionPanel` 4（三個轉換區塊合併為「控制點移動」，3.6）；`TableLayoutPanel` → 固定座標；圖例 `GroupBox` → 無外觀 `Panel` 的色塊（資料色例外） | 移除 / 清除 `Danger` | 起點 / 終點切換列移出 `m_pnlIndexParam`，與其同時停用 / 啟用（`m_pnlStartEndSwitch`）；欄位 `m` → `m_lblInterpolateType` |
+| `ToolVectorDlg` | `EditDialogBase<EToolVecInterpolateType>` | 449×395 → 476×564 | `GroupBox` 5 → `SectionPanel` 4（三個轉換區塊合併為「控制點移動」，3.6）；`TableLayoutPanel` → 固定座標；圖例 `GroupBox` → 無外觀 `Panel`，色塊改為 `ColorSwatch`（3.26） | 移除 / 清除 `Danger` | 起點 / 終點切換列移出 `m_pnlIndexParam`，與其同時停用 / 啟用（`m_pnlStartEndSwitch`）；欄位 `m` → `m_lblInterpolateType` |
 | `TraverseDlg` | `EditDialogBase<TraverseData>` | 388×289 → 380×299 | `GroupBox` → `SectionPanel` 3；`TableLayoutPanel` 6、`FlowLayoutPanel` 1 → 無外觀 `Panel` 5 | 確定 `Primary`、`CommonText` | 只有語系 |
 | `CNCOffsetDialog`（`CncUI`） | `Form` → `DialogBase` | 300×232 → 320×231 | `PanelButton` 6 → `ThemedButton`；`Panel` → `SectionPanel`；`Label` 10 → `ThemedLabel` | 清除 `Danger` | 新增 `ApplyLanguage()`；按鈕陣列型別改 `ThemedButton` |
 | `LoadingBarDlg` | `Form` → `DialogBase` | 480×140（程式建立） | — | — | 刪除自設的外框屬性與 `OnLoad` 自算置中（改由 `DialogBase`）；進度條 `Dock = Fill` 保留 |
@@ -194,10 +199,10 @@
 | 檔案 | 改動 |
 | --- | --- |
 | `StartupForm.cs` | 改繼承 `MainWindowBase`；設定與語系初始化移到 `MyApp.Initialize()`；註冊 `DialogPlacement.AreaProvider`；約 140 行逐項套用語系改為 `ApplyLanguage( m_LanguageManager )`，只保留圖層提示的格式化文字；切換語系時重新 `ThemeFonts.Initialize` 與 `ApplyThemeFont()`；工具列「執行中」底色 `FromArgb( 233, 180, 159 )` → `ACCENT_TINT_STRONG`、預設 `SystemColors.Control` → `Color.Empty`；樹的 `ForeColor = Black` 刪除（由 `MultiSelectTreeView` 給）；`CNCPanel.GetPreferredSizeForDpi` → `CNCPanel.PREFERRED_SIZE`；逐項套用時當預設文字的 6 個常數（`SET_OFFSET`、`PROCESS_SETTINGS`、`NEED_PROCESS` 等）刪除，ID 不存在時改保留 Designer 上的文字；`this.m_TreeView` → `m_TreeView` |
-| `StartupForm.Designer.cs` | 移除 9 處寫死底色、3 處字型、`AutoScaleMode`、68 處 `ImageTransparentColor`（Magenta）；右鍵選單圖示 24×24 → 20×20；控制項改名（`m_pan*` → `m_pnl*`、`m_tlp*` → `m_pnl*`、`m_btn*` 工具列鈕 → `m_tsb*`、`contextMenuStrip1` → `m_cmsMain` 等）；圖層色塊與加工圖例保留（資料色） |
-| `StartupForm.resx` | `contextMenuStrip1` → `m_cmsMain` |
+| `StartupForm.Designer.cs` | 移除 9 處寫死底色、3 處字型、`AutoScaleMode`、68 處 `ImageTransparentColor`（Magenta）；控制項改名（`m_pan*` → `m_pnl*`、`m_tlp*` → `m_pnl*`、`m_btn*` 工具列鈕 → `m_tsb*` 等）；未使用的右鍵選單 `contextMenuStrip1` 刪除（3.25）；圖層色塊的顏色改由 `StartupForm.cs` 從 `PathLayerColor` 套用（3.21）；「加工 / 不加工」圖例改為圖示按鈕（3.26） |
+| `StartupForm.resx` | 右鍵選單的 `TrayLocation` 刪除（3.25）；其餘為 Designer 存檔的設計時資訊（3.24） |
 | `CNCPanel.cs` / `.Designer.cs` | 改繼承 `PanelBase`；`GroupPanel` 5 → `SectionPanel`、`PanelButton` 35 → `ThemedButton`（開始 `Start`、暫停 / 繼續 `Hold`、停止 `Stop`）、標題 `Label` 5 → 卡片標題；刪除 `DeviceDpi` 換算與 `OnDpiChangedAfterParent`；偏好尺寸 240×620（乘 DPI）→ `PREFERRED_SIZE` 288×756；內距改 `PANEL_MARGIN`；新增 `ApplyLanguage( Language )` |
-| `CNCInfoPanel.cs` / `.Designer.cs` | 改繼承 `PanelBase`；`GroupPanel` 3 → `SectionPanel`、`PanelButton` → `ThemedButton`、標題 `Label` 2 → 卡片標題；尺寸 672×236 → 736×240，偏好尺寸改回傳 Designer 尺寸；刪除 `DeviceDpi` 換算；直式垂直排列改用 `PANEL_MARGIN` / `SECTION_GAP` / `INFO_ROW_HEIGHT` / `INFO_ROW_PITCH` / `CONTROL_GAP`，標題列內控制項不參與排列；加工狀態色 7 處 → `TextRole`；五軸色改具名資料色 `X/Y/Z/B/C_AXIS_COLOR`；新增 `ApplyLanguage( Language )` |
+| `CNCInfoPanel.cs` / `.Designer.cs` | 改繼承 `PanelBase`；`GroupPanel` 3 → `SectionPanel`、`PanelButton` → `ThemedButton`、標題 `Label` 2 → 卡片標題；尺寸 672×236 → 736×240，偏好尺寸改回傳 Designer 尺寸；刪除 `DeviceDpi` 換算；直式垂直排列改用 `PANEL_MARGIN` / `SECTION_GAP` / `INFO_ROW_HEIGHT` / `INFO_ROW_PITCH` / `CONTROL_GAP`，標題列內控制項不參與排列；加工狀態色 7 處 → `TextRole`；五軸色改具名資料色 `X/Y/Z/B/C_AXIS_COLOR`，軸點改為 `ColorSwatch`（3.26）；新增 `ApplyLanguage( Language )` |
 | `CNCAlarmPanel.cs` / `.Designer.cs` | 改繼承 `PanelBase`；`DataGridView` → `ThemedDataGridView`，目前 / 歷史警報色改 `CellRole = Error / Secondary`；標題 `Label` → `m_pnlAlarm` 卡片標題；清單位置改用 `SECTION_PADDING` / `CONTROL_GAP`；手寫欄位標題常數改由 `ApplyLanguage( Language )` 以欄名套用 |
 | `VNCUserControl.cs` / `.Designer.cs` | 改繼承 `PanelBase`；Designer 移除 `AutoScaleMode` / `AutoScaleDimensions` |
 | `MainLayout.cs` | 新增 `GetDialogArea`（直式時為 CNC 承載區以上的 CAM 區域）；改為純計算、不用 `TableLayoutPanel`（3.22） |
@@ -267,7 +272,7 @@
 
 1. `.github/instructions/ui-style.instructions.md`：新增，規範定稿。
 2. `.github/copilot-instructions.md`、`CLAUDE.md`：指引目錄加入 UI 風格一列與 `@` 引用。
-3. `Doc/UIStyleUnify/`：本議題報告（README 與第 1～6 章）與議題限定測試 `Tests/`；施工期間的
+3. `Doc/UIStyleUnify/`：本議題報告（README 與第 1～7 章）與議題限定測試 `Tests/`；施工期間的
    `Doc/UIStyle{Draft,Notes,Review,CheckReport,Handoff}.md` 已整併進本報告後刪除。
 4. `.github/instructions/project-overview.instructions.md`：多語系一節不再寫死語系數量，改為「`Language/` 中所有語系」。
 
