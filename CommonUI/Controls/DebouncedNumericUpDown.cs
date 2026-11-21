@@ -66,7 +66,6 @@ namespace CommonUI.Controls
 			this.Increment = 1;
 
 			m_LastValue = this.Value;
-			m_LastValidValue = m_LastValue;
 			RevertOnOutOfRange = true;
 		}
 
@@ -148,6 +147,10 @@ namespace CommonUI.Controls
 
 		protected override void ValidateEditText()
 		{
+			// nothing typed since the value was shown; parsing the shown (rounded) text would change the value
+			if( !UserEdit ) {
+				return;
+			}
 			if( RevertOnOutOfRange && !m_IsProgrammaticChange ) {
 				if( !decimal.TryParse( Text, System.Globalization.NumberStyles.Number,
 					System.Globalization.CultureInfo.CurrentCulture, out decimal parsed ) ) {
@@ -179,20 +182,18 @@ namespace CommonUI.Controls
 		{
 			ValueRejected?.Invoke( this, new ValueRejectedEventArgs( inputValue, limit, isBelowMin ) );
 
-			// restore the latest valid value, not the last notified one (m_LastValue), which lags behind while the
-			// debounce timer runs or after a change too small to notify; reading Value here would validate again
-			// Directly set Text to bypass NumericUpDown's internal userEdit/ParseEditText/clamp flow.
-			string formatted = m_LastValidValue.ToString( "F" + DecimalPlaces,
-				System.Globalization.CultureInfo.CurrentCulture );
+			// the rejected text never reached the value, so the current value is the latest valid one;
+			// drop the user edit before reading and showing it, or the shown (rounded) text is parsed as a new value
+			UserEdit = false;
+			string formatted = Value.ToString( "F" + DecimalPlaces, System.Globalization.CultureInfo.CurrentCulture );
 			m_IsProgrammaticChange = true;
+			ChangingText = true;
 			Text = formatted;
 			m_IsProgrammaticChange = false;
 		}
 
 		protected override void OnValueChanged( EventArgs e )
 		{
-			// every accepted value, by the user or by the program, is the value to restore on rejected input
-			m_LastValidValue = Value;
 			base.OnValueChanged( e );
 
 			// programmatic change, don't trigger debounce
@@ -301,6 +302,5 @@ namespace CommonUI.Controls
 		int m_DebounceInterval = 100;
 		bool m_IsProgrammaticChange = false;
 		decimal m_LastValue = 0;
-		decimal m_LastValidValue = 0;
 	}
 }

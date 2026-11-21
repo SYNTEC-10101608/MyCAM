@@ -283,10 +283,13 @@ Form
 1. 所有數值輸入一律是 `DebouncedNumericUpDown`，以 `Minimum` / `Maximum` / `DecimalPlaces` / `Increment`
    表達欄位的範圍；不在程式中 `double.TryParse` 文字框。
 2. 只顯示座標、從不輸入的欄位用 `ThemedLabel`（`AutoSize = false`、寬同輸入欄）。
-3. `DebouncedNumericUpDown` 的操作行為（由 8 節的 N1–N3 檢查）：
-   1. 無法解析或超出範圍的輸入被拒，回復為最新的合法值（不夾到上下限），回復本身不送出 `ValueChanged`。
-   2. 任何值的變化（包括最後一位小數的一步）都在停止變動後送出一次 `DebouncedValueChanged`。
-   3. 滾輪一格改變一個 `Increment`，超出範圍時停在上下限。
+3. `DebouncedNumericUpDown` 的操作行為（由 8 節的 N1–N4 檢查）：
+   1. 無法解析或超出範圍的輸入被拒，回復為最新的合法值（不夾到上下限；比顯示位數精確的值也原值保留），
+      回復本身不送出 `ValueChanged`；上下限本身可以輸入。
+   2. 值的變化（包括最後一位小數的一步、程式直接設定 `Value`）在停止變動後送出一次 `DebouncedValueChanged`，
+      間隔內的連續變化只送出一次最後的值；`SilentSetValue` 不送出，並取消尚未送出的通知。
+   3. 滾輪一格改變一個 `Increment`，超出範圍時停在上下限；`ReadOnly` 時滾輪與上下鍵不改值。
+   4. 清空後按 Enter 或離開欄位，回復最新的合法值（該次 Enter 不再往下傳）；離開欄位時立即送出尚未送出的通知。
 
 ## 6. 主視窗與嵌入式面板
 
@@ -396,7 +399,7 @@ Form
 | S24 | `InitializeComponent` 中 Designer 讀不懂的寫法：流程控制、lambda、字串插補、呼叫畫面自己的方法、類別常數、不以 `this.` 開頭的陳述式 |
 | S25 | 畫面的 `.Designer.cs` 以 `ComponentResourceManager` 讀取資源，或畫面的 `.resx` 有 `<data>` 資源（8.1 第 3 點） |
 | T1–T7 | 文字截斷、超出容器、重疊等；T6 檢查 `Load` 前後版面與 Designer 相同；T7 檢查控制項顯示語系檔的文字。精靈與多狀態畫面依 `LayoutRunner.cs` 的 `STATE_MAP` 逐一檢查每個狀態 |
-| N1–N3 | `DebouncedNumericUpDown` 的操作行為（第 5 節第 3 點）：被拒的輸入回復最新合法值且不送出 `ValueChanged`、最後一位小數的一步也送出 `DebouncedValueChanged`、滾輪一格一個 `Increment` |
+| N1–N4 | `DebouncedNumericUpDown` 的操作行為（第 5 節第 3 點）：N1 被拒的輸入回復最新合法值（含比顯示位數精確的值）且不送出 `ValueChanged`、上下限可輸入；N2 最後一位小數的一步也送出 `DebouncedValueChanged`、連續變化只送一次；N3 滾輪一格一個 `Increment`、停在上下限、`ReadOnly` 不改值；N4 `SilentSetValue` 取消待送通知、清空後 Enter / 離開欄位的回復與通知 |
 | P1–P6 | 對話框置中（含 `ShowDialog` 開啟的）、CAM 區域、主視窗字族、主視窗中 CNC 面板以實際大小的文字與版面、選單與工具列項目顯示語系檔的文字；P6 以 Designer 的客戶區大小與加工頁執行時，主視窗各區的位置與大小等於 Designer 上的值（不符時列出應寫入的值） |
 
 1. 修改畫面後必須跑 `UICheck.bat`，全部通過才可提交；新增畫面或改動版面時，另跑 `UICheck.bat runtime`。
@@ -441,7 +444,7 @@ Designer 存檔時會依各台電腦的 VS 設定重新產生整個 `InitializeC
 | `UICheck.bat` | 入口。無參數：靜態檢查；`runtime [截圖資料夾]`：另跑執行時版面與主視窗（需先建置 Debug） |
 | `CheckStatic.ps1`、`DesignerParser.ps1` | 靜態檢查 S1–S25 與 Designer 檔解析（縮排不拘，tab 或空白皆可） |
 | `CheckRuntimeLayout.ps1`、`LayoutRunner.cs` | 執行時檢查 T1–T7 |
-| `CheckControls.ps1`、`ControlRunner.cs` | 共用數值框的操作行為 N1–N3（不開視窗，只需建置 `CommonUI`） |
+| `CheckControls.ps1`、`ControlRunner.cs` | 共用數值框的操作行為 N1–N4（不開視窗，只需建置 `CommonUI`） |
 | `CaptureMainWindow.ps1`、`MainWindowRunner.cs` | 主視窗截圖與 P1–P6；輸出各區座標（`[region]`） |
 | `HiddenDesktopRun.cs` | 讓 runner 在隱藏桌面執行；兩個 `.ps1` 加 `-Visible` 改回一般桌面 |
 | `SyncLanguage.ps1` | 執行時檢查前，把建置輸出中缺少或過期的語系檔從 `Language/` 複製過去 |

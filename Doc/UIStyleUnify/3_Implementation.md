@@ -25,7 +25,8 @@
 | Designer 協作 | `cee5aa26` | `DesignerDiff.ps1`、靜態檢查 S24（3.24） |
 | 規範 review | `c0e32b7a`、`1a18d8f0`、`019bcca3`、`cdeb98b0` | 第一～三批（3.25～3.27） |
 | 收尾盤點 | `d5f3c1df` ～ `3d4b5ffd` | 後續處理重整、相容性異動文件、自我 review 的文件修正 |
-| Round 1 整體審查 | `e7825de8` ～ 最新 | 數值框回復與通知修正、新增 N1–N3、行為比對防線限縮、runner 清理、刪除 `Title`、刪除鈕改 `Danger`（3.28） |
+| Round 1 整體審查 | `e7825de8` ～ `1afaf20d` | 數值框回復與通知修正、新增 N1–N3、行為比對防線限縮、runner 清理、刪除 `Title`、刪除鈕改 `Danger`（3.28） |
+| Round 2 整體審查 | `6086614e` ～ 最新 | 數值框回復保留完整精度、N1–N4 補案例、B3 改比對生效值、文件同步（3.29） |
 
 ## 3.2 外觀與行為分層（對應 2.2）
 
@@ -446,9 +447,8 @@
 決議見 4.15，逐項回覆見 [9_ReviewRound1-reply.md](9_ReviewRound1-reply.md)。
 
 1. `CommonUI/Controls/DebouncedNumericUpDown.cs`：
-   1. 新增 `m_LastValidValue`，在 `OnValueChanged` 記錄每個被接受的值（使用者或程式設定）；`RevertToLastValue` 改為回復它，
-      不再回復上次通知的值 `m_LastValue`，也不再設定 `Value`，所以回復不送出 `ValueChanged`。
-      不在回復時讀 `Value`：編輯中的文字尚未被接受時，讀 `Value` 會再次驗證而無限遞迴。
+   1. `RevertToLastValue` 改為回復最新的合法值，不再回復上次通知的值 `m_LastValue`，也不再設定 `Value`，所以回復不送出 `ValueChanged`。
+      Round 1 以新增的 `m_LastValidValue` 記錄合法值；Round 2 改為控制項目前的值，`m_LastValidValue` 已刪除（3.29）。
    2. 是否啟動 debounce 改為 `Value == m_LastValue`（`decimal` 直接比較），刪除 `EPSILON`。
 2. `CommonUI/Controls/RemovableValueRow.cs`：刪除按鈕設 `Kind = ButtonKind.Danger`。
 3. `CommonUI/Theme`：刪除 `TextRole.Title`、`ThemeFonts.Title`（與 `TITLE_SIZE`）、`ThemeText.GetColor` 的 `Title` 分支；
@@ -467,3 +467,32 @@
       8.2 檔案表新增兩個檔、第 1 點加 `ControlRunner.cs`、第 9 點改為三支腳本並寫明失敗也會清理。
    2. 專案概觀：`CommonUI` 的說明改為現行內容（原本列已刪除的 `GroupPanel`）。
 7. 議題文件：README 狀態、5 章結果與合併門檻、6.1 第 1 項、相容性異動第 3 項、本節與 3.1、3.12、3.16。
+
+## 3.29 Round 2 整體審查的修正（2026-11-21）
+
+決議見 4.16，逐項回覆見 [11_ReviewRound2-reply.md](11_ReviewRound2-reply.md)。
+
+1. `CommonUI/Controls/DebouncedNumericUpDown.cs`：
+   1. `RevertToLastValue`：被拒的文字從未進入 `Value`，所以目前的 `Value` 就是最新的合法值。先 `UserEdit = false`（之後讀 `Value`
+      不再驗證、也不會遞迴），再以 `ChangingText = true` 寫回格式化的文字，寫回不會被當成使用者的輸入；刪除 `m_LastValidValue`。
+      原作法只寫回格式化的文字，原生控制項把它當成使用者的輸入，下次讀 `Value` 時以捨入後的文字（1.23456 → 1.235）改值並送出 `ValueChanged`。
+   2. `ValidateEditText` 在沒有使用者輸入（`UserEdit` 為 false）時直接返回：此時顯示的是目前值的捨入文字，再解析會改值。
+      不用原生的 `UpdateEditText()` 回寫：文字為空時它不更新文字。
+2. `Tools/UICheck/ControlRunner.cs`：
+   1. N1 新增比顯示位數精確的值（1.23456，3 位小數）被拒後保留原值、之後沒有輸入的驗證也不改值；上下限本身可輸入、
+      超出一個最小單位被拒。
+   2. N2 新增間隔內的兩次變化只送出一次最後的值；N3 新增停在下限、`ReadOnly` 時滾輪與上下鍵不改值。
+   3. 新增 N4：`SilentSetValue` 取消待送通知、之後的變化仍會通知；清空後離開欄位回復並立即送出待送通知；
+      清空後按 Enter 回復且該次按鍵被吃掉（`Handled`、`SuppressKeyPress`）。
+   4. 輸入改為寫入內部的編輯框，再走 `ValidateEditText`：直接設定控制項的 `Text` 會立刻驗證，不是使用者輸入的路徑。
+3. `Doc/UIStyleUnify/Tests/CompareBehavior.ps1`：
+   1. 型別替換後的 B3 改比對「生效值」：Designer 有寫的值，或以反射建立該型別的新實例讀出的預設值；
+      只有新型別才有的屬性不比對；新型別沒有的屬性，只有舊控制項改過預設值時才報。
+      數值以去掉尾端 0 的 `decimal`、列舉以名稱比較。需要 Debug 建置的 `CommonUI.dll`。
+   2. B3 例外的 key 加入屬性名稱（`B3 <畫面> <控制項> <屬性> <理由>`），同一控制項的其他屬性仍會比對。
+4. `Doc/UIStyleUnify/Tests/BehaviorExceptions.txt`：既有 3 行 B3 例外改為屬性格式；新增唯讀座標改標籤的 `TabStop`
+   （`CalibrationREFDlg`、`ThreePtTransformDlg`）與 `AxisTransformDlg` 的 `Minimum` / `Maximum` / `DecimalPlaces`
+   （兩型別的 Designer 預設值不同，兩個版本都在建構子設定），共 5 行。
+5. 指引：UI 規範第 5 節第 3 點改寫並新增第 4 小點（精度、上下限、`SilentSetValue`、連續變化、`ReadOnly`、空白輸入），
+   第 8 節規則表與 8.2 檔案表改為 N1–N4。
+6. 議題文件：2.3 的 `TextRole` 摘要刪除「標題」、2.12 檢查表加 N1–N4；5 章結果、反向測試與比對範圍；README；本節與 3.1、3.28。

@@ -406,3 +406,16 @@ VS Copilot 的審查紀錄見 [8_ReviewRound1.md](8_ReviewRound1.md)（快照，
 | R1-08 | 專案概觀仍列已刪除的 `GroupPanel`；逐檔紀錄漏列 `CommonUI.csproj` | 專案概觀改為現行 `CommonUI` 的內容；3.16 補 `CommonUI.csproj` |
 | R1-C1 | `AutoSortPathDlg` 的滾輪（原生一格 = 系統捲動行數 × `Increment`，現為一個 `Increment`）與超出範圍（原生夾到上限，現為回復合法值）未具體確認 | 正式接受：是全 App 數值框一致的行為，具體差異寫入 `BehaviorExceptions.txt` 的理由與規範第 5 節第 3 點，由 N1、N3 檢查 |
 | 紀錄 | 決議與回覆放哪裡 | 決議寫在本節；另寫 `9_ReviewRound1-reply.md` 回覆 Copilot，`8_ReviewRound1.md` 不動；處理完成後在議題資料夾放 `review-reply-done.txt` 通知 Copilot 進行 Round 2 |
+
+## 4.16 Round 2 整體審查（2026-11-21，已定稿並施工，3.29）
+
+VS Copilot 的審查紀錄見 [10_ReviewRound2.md](10_ReviewRound2.md)（快照，不修改），逐項回覆見 [11_ReviewRound2-reply.md](11_ReviewRound2-reply.md)。
+查證後 3 個問題與 10.5 的測試缺口都屬實；使用者決議照建議處理。
+
+| # | 問題 | 決議 |
+| --- | --- | --- |
+| R2-01 | 比顯示位數精確的合法值（如 `SilentSetValue` 載入的 1.23456，3 位小數）遇到被拒的輸入，被捨入為 1.235 並送出 `ValueChanged`；`LeadDlg` 等以 `SilentSetValue` 載入既有參數的畫面會存下捨入後的值 | 回復時清除使用者輸入狀態（`UserEdit = false`），以控制項目前的值（完整精度）寫回文字，刪除 `m_LastValidValue`；沒有使用者輸入時的驗證不再解析顯示的文字。另一個選項「保留 `m_LastValidValue` 再清狀態」效果相同但多一份要維護的狀態，不採用 |
+| R2-02 | 型別替換後 B3 跳過「舊版沒寫、新版新寫」的屬性（例：新增 `ReadOnly = true` 不會報）；B3 例外不分屬性 | 改比對生效值：沒寫的屬性以反射讀兩型別的預設值，只有新型別才有的屬性不比對；B3 例外 key 加屬性名稱。不採用「只在文件寫明限制」：B3 是行為不變的主要防線。改後新報出的 `TabStop`（唯讀座標改標籤）與 `AxisTransformDlg` 的範圍預設值（建構子都會覆寫）屬已決議的範圍，登錄為屬性例外 |
+| 測試缺口 | N1–N3 沒有涵蓋精度、`SilentSetValue`、空白 Enter / 離焦、上下限邊界、連續 debounce、下限與 `ReadOnly` | 一次補齊：N1–N3 加案例，新增 N4（`SilentSetValue` 與空白輸入）；規範第 5 節第 3 點同步寫明這些行為 |
+| R2-03 | 架構摘要仍列「標題」、檢查表缺 N1–N3；規範「任何值的變化都通知」沒排除 `SilentSetValue`；三處檔案數不同（347 / 348 / 351） | 同步文件；`SilentSetValue` 是有意的設計，改文句不改行為。5 章記最終一次的結果並註明版本；`9_ReviewRound1-reply.md` 保留當時的數字，在 Round 2 回覆說明差異 |
+| 紀錄 | 決議與回覆放哪裡 | 同 Round 1：決議寫在本節，另寫 `11_ReviewRound2-reply.md`，`10_ReviewRound2.md` 先單獨提交快照；完成後重新放 `review-reply-done.txt` 通知 Copilot 進行 Round 3 |
