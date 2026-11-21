@@ -128,7 +128,7 @@
 | # | 項目 | 狀態 |
 | --- | --- | --- |
 | 1 | Visual Studio Designer 開啟所有畫面，外觀與執行時一致（含泛型基底 `EditDialogBase<T>` 的對話框） | 2026-11-16 已確認 |
-| 2 | Designer 開啟第二輪之後改動的畫面：`DesignSupportBracketDlg`（X / Y 支架位置兩張卡片）、`CNCPanel`（加工鈕種類）；以及收官時 namespace 變動後的任一對話框與 CNC 面板（確認 Designer 仍能載入 `CommonUI`）；`StartupForm` 的區域分布與功能工具列區（2026-11-20 改為 `Panel` 後） | 待確認 |
+| 2 | 第一次確認之後改動過多個畫面（第二輪、收官的 namespace 變動、主視窗改為 `Panel`、第二批的 `ColorSwatch` 與圖示按鈕），以 Designer 開啟所有畫面（含 `StartupForm` 與三個 CNC 面板）全部重新確認：能正常開啟、外觀與執行時一致 | 待確認 |
 | 3 | 實機操作數值框取代 `TextBox` 的對話框（`AxisTransformDlg`、`AddPathDlg`、`PatternSettingDlg`、`ThreePtTransformDlg`、`AutoSortPathDlg`）的輸入與預覽 | 待確認 |
 | 4 | CNC 實際連線：`CNCPanel` / `CNCInfoPanel` / `CNCAlarmPanel` 的數值、燈號、警報清單；直式時 `CNCDlg`（VNC）定位到 CNC 區域 | 待確認 |
 
