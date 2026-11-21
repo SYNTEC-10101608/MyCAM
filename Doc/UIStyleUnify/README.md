@@ -22,6 +22,7 @@
 | [7_Compatibility.md](7_Compatibility.md) | 相容性異動：合併後對客製語系檔等既有檔案的影響與處理方式，合併時寫入 Merge Request 說明 | 最終版 |
 | [8_ReviewRound1.md](8_ReviewRound1.md) | Round 1 整體審查（VS Copilot）：問題、證據、驗證限制與待討論事項 | Review 快照，不修改 |
 | [9_ReviewRound1-reply.md](9_ReviewRound1-reply.md) | Round 1 review 的回覆：逐項決議、修正內容與驗證結果，供 Round 2 review | 回覆，Round 2 時對照 |
+| [10_ReviewRound2.md](10_ReviewRound2.md) | Round 2 審查：回覆確認、精度回復問題、比對防線、測試缺口與驗證結果 | Review 快照，待討論 |
 
 ## 測試程式
 
