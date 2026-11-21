@@ -3,18 +3,18 @@
 # check itself and are not listed here.
 
 # ---- data colors (section 2: data colors are named constants, only for swatches, legends and 3D objects)
-S20 DesignSupportBracketDlg X_POSITION_COLOR data color: X support position index and preview
-S20 DesignSupportBracketDlg Y_POSITION_COLOR data color: Y support position index and preview
-S20 CNCInfoPanel X_AXIS_COLOR data color: CNC axis dot
-S20 CNCInfoPanel Y_AXIS_COLOR data color: CNC axis dot
-S20 CNCInfoPanel Z_AXIS_COLOR data color: CNC axis dot
-S20 CNCInfoPanel B_AXIS_COLOR data color: CNC axis dot
-S20 CNCInfoPanel C_AXIS_COLOR data color: CNC axis dot
+S20 DesignSupportBracketDlg X_POSITION_COLOR data color: X support position index and preview (AUTO-23254 2026-11-16)
+S20 DesignSupportBracketDlg Y_POSITION_COLOR data color: Y support position index and preview (AUTO-23254 2026-11-16)
+S20 CNCInfoPanel X_AXIS_COLOR data color: CNC axis dot (AUTO-23254 2026-11-16)
+S20 CNCInfoPanel Y_AXIS_COLOR data color: CNC axis dot (AUTO-23254 2026-11-16)
+S20 CNCInfoPanel Z_AXIS_COLOR data color: CNC axis dot (AUTO-23254 2026-11-16)
+S20 CNCInfoPanel B_AXIS_COLOR data color: CNC axis dot (AUTO-23254 2026-11-16)
+S20 CNCInfoPanel C_AXIS_COLOR data color: CNC axis dot (AUTO-23254 2026-11-16)
 
 # ---- windows that only host one remote content (section 4.4)
-S11 CNCDlg line* the remote screen dialog takes the size of the remote VNC screen and is placed on the CNC area
-S11 VNCUserControl line* the VNC view takes the resolution of the remote screen
+S11 CNCDlg line* the remote screen dialog takes the size of the remote VNC screen and is placed on the CNC area (AUTO-23254 2026-11-16)
+S11 VNCUserControl line* the VNC view takes the resolution of the remote screen (AUTO-23254 2026-11-16)
 
-# ---- decided exceptions (issue AUTO-23254)
-S1 CNCThreePointDlg m_txtWorkpiece* an empty field means the point is not entered yet and a numeric box cannot stay empty (decision 2026-11-16; a nullable numeric box is a follow-up)
-S1 CNCThreePointDlg m_txtTolerance same empty-text semantics as the workpiece fields (decision 2026-11-16)
+# ---- decided exceptions
+S1 CNCThreePointDlg m_txtWorkpiece* an empty field means the point is not entered yet and a numeric box cannot stay empty (AUTO-23254 2026-11-16; a nullable numeric box is a follow-up)
+S1 CNCThreePointDlg m_txtTolerance same empty-text semantics as the workpiece fields (AUTO-23254 2026-11-16)

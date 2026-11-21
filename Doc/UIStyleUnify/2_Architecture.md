@@ -79,7 +79,7 @@ Form
 | 類別 | 職責 | 元件 |
 | --- | --- | --- |
 | `Theme` | 主題 token、文字角色、元件共用的繪製 | `ThemeColors`、`ThemeFonts`、`ThemeMetrics`、`TextRole`、`ThemeText`、`ThemedToolStripRenderer`、`RoundDrawing` |
-| `Controls` | 控制項與只用於控制項屬性的型別 | `SectionPanel`、`ThemedButton`、`ButtonKind`、`ButtonIndicator`、`CommonButtonText`、`ThemedLabel`、`DebouncedNumericUpDown`、`ValueRejectedEventArgs`、`MultiSelectTreeView`、`ThemedDataGridView`、`RemovableValueRow`、`LoadingBar`、`RoundedProgressBar` |
+| `Controls` | 控制項與只用於控制項屬性的型別 | `SectionPanel`、`ThemedButton`、`ButtonKind`、`ButtonIndicator`、`CommonButtonText`、`ThemedLabel`、`DebouncedNumericUpDown`、`ValueRejectedEventArgs`、`MultiSelectTreeView`、`ThemedDataGridView`、`RemovableValueRow`、`ColorSwatch`、`SwatchShape`、`LoadingBar`、`RoundedProgressBar` |
 | `Forms` | 三類畫面的外觀基底 | `DialogBase`、`PanelBase`、`MainWindowBase` |
 | `Layout` | 執行時的版面計算 | `SectionStack`、`DialogPlacement`、`ResponsiveLayout` |
 | `Language` | 語系文字的套用與共用文字 | `LanguageApplier`、`CommonTexts` |

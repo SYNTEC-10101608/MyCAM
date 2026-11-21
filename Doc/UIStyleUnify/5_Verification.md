@@ -1,6 +1,6 @@
 # 5. 測試驗證
 
-最後一次執行：2026-11-20，Debug 建置（`.\Build.bat Debug` 0 個錯誤），Designer 協作方式（3.24）之後。
+最後一次執行：2026-11-21，Debug 建置（`.\Build.bat Debug` 0 個錯誤），規範 review 第三批（3.27）與收尾盤點之後。
 
 | 類別 | 位置 | 入口 | 結果 |
 | --- | --- | --- | --- |
@@ -96,8 +96,8 @@
 
 | 腳本 | 規則 | 檢查什麼 | 結果 |
 | --- | --- | --- | --- |
-| `CompareBehavior.ps1`（+ `RenameMap.txt`、`BehaviorExceptions.txt`） | B1–B8 | 與分支起點 `a4b3826d` 比對：Designer 的事件訂閱、RadioButton 群組、非外觀屬性、表單行為屬性、程式使用的控制項仍存在、型別只做外觀替換、全 repo 的 `Show` / `ShowDialog` 呼叫點、改動過的 `.cs` 中事件訂閱與 `Enabled` / `Visible` / `ReadOnly` / `Checked` 賦值。控制項改名先以 `RenameMap.txt`（310 筆）換算 | 0 個差異 |
-| `CheckBranchRules.ps1` | I1–I9 | 本議題新增或改動的檔案符合通用與 C# 規範：編碼與 BOM、檔尾換行、行尾空白、C# 行長 120、tab 縮排、不用 `this.`、註解為英文且不用 `/* */`、產品專案一檔一個頂層型別；產品程式不提到檢查程式、建置輸出沒有殘留 runner | 346 個檔案，0 個問題 |
+| `CompareBehavior.ps1`（+ `RenameMap.txt`、`BehaviorExceptions.txt`） | B1–B8 | 與分支起點 `a4b3826d` 比對：Designer 的事件訂閱、RadioButton 群組、非外觀屬性、表單行為屬性、程式使用的控制項仍存在、型別只做外觀替換、全 repo 的 `Show` / `ShowDialog` 呼叫點、改動過的 `.cs` 中事件訂閱與 `Enabled` / `Visible` / `ReadOnly` / `Checked` 賦值。控制項改名先以 `RenameMap.txt`（309 筆）換算 | 0 個差異 |
+| `CheckBranchRules.ps1` | I1–I9 | 本議題新增或改動的檔案符合通用與 C# 規範：編碼與 BOM、檔尾換行、行尾空白、C# 行長 120、tab 縮排、不用 `this.`、註解為英文且不用 `/* */`、產品專案一檔一個頂層型別；產品程式不提到檢查程式、建置輸出沒有殘留 runner | 347 個檔案，0 個問題 |
 | `CompareMainLayout.ps1`（+ `MainLayoutBaseline.txt`） | — | 主視窗各承載區的座標與移除 `TableLayoutPanel` 前的基準逐像素相同：CAD / CAM / CNC 頁面 × 橫式 1920×1040、1366×768 × 直式 1080×1880、900×1600，共 12 個情境（zh-TW；需先建置 Debug） | 152 行，0 個差異 |
 | `RunIssueChecks.bat` | — | 依序執行上面三個腳本 | 全部通過 |
 
