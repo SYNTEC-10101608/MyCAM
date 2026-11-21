@@ -10,7 +10,9 @@
 #
 #   B1  event subscriptions in the designer file
 #   B2  radio button groups (which radio buttons are exclusive to each other)
-#   B3  non-appearance properties of controls (range, decimals, checked, enabled, visible, read-only, items ...)
+#   B3  non-appearance properties of controls (range, decimals, checked, enabled, visible, read-only, items ...);
+#       a control whose type changed is compared by effective values, the defaults read from new instances of both
+#       types, so the Debug build (CommonUI.dll) is needed
 #   B4  form properties with behavior (AcceptButton, CancelButton, ControlBox, KeyPreview, TopMost)
 #   B5  controls used by the code still exist
 #   B6  control types: only appearance replacements (Button -> ThemedButton, GroupBox -> SectionPanel ...)
@@ -22,7 +24,8 @@
 # compared after the same renames, so a rename alone is not a difference.
 # The tab order is not compared: it follows the layout and is checked by CheckStatic.ps1 (S10).
 #
-# Exceptions: "<rule> <class> <control> <reason>" in BehaviorExceptions.txt. Exit code 1 on a difference.
+# Exceptions: "<rule> <class> <control> <reason>" in BehaviorExceptions.txt; a B3 exception also names the property
+# ("B3 <class> <control> <property> <reason>"). Exit code 1 on a difference.
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $Root "Tools\UICheck\DesignerParser.ps1")
@@ -55,7 +58,11 @@ $exceptions = @{}
 $exceptionFile = Join-Path $PSScriptRoot "BehaviorExceptions.txt"
 if (Test-Path $exceptionFile) {
 	foreach ($line in Get-Content $exceptionFile -Encoding UTF8) {
-		if ($line -match "^\s*(B\d)\s+(\S+)\s+(\S+)") {
+		# a B3 exception also names the property, so other properties of the same control are still compared
+		if ($line -match "^\s*(B3)\s+(\S+)\s+(\S+)\s+(\S+)") {
+			$exceptions["$($Matches[1]) $($Matches[2]) $($Matches[3]) $($Matches[4])"] = $true
+		}
+		elseif ($line -match "^\s*(B\d)\s+(\S+)\s+(\S+)") {
 			$exceptions["$($Matches[1]) $($Matches[2]) $($Matches[3])"] = $true
 		}
 	}
@@ -92,9 +99,12 @@ function Rename-BaseText( [string]$szText, [string]$szClass ) {
 }
 
 $problems = New-Object System.Collections.Generic.List[string]
-function Report( [string]$szRule, [string]$szClass, [string]$szControl, [string]$szMessage ) {
+function Report( [string]$szRule, [string]$szClass, [string]$szControl, [string]$szMessage, [string]$szProperty = "" ) {
 	# an exception may use wildcards, e.g. "B6 CalibrationREFDlg m_tbxPnt*"
 	$key = "$szRule $szClass $szControl"
+	if ($szProperty) {
+		$key += " $szProperty"
+	}
 	if (@($exceptions.Keys | Where-Object { $key -like $_ }).Count -gt 0) {
 		return
 	}
@@ -128,6 +138,85 @@ function Get-ItemsProp( [string]$szText ) {
 		$items[$match.Groups[1].Value] = ($match.Groups["v"].Value -replace "\s+", " ").Trim()
 	}
 	return $items
+}
+
+# ---------------------------------------------------------------- default values
+# A designer file only writes the properties that differ from the default, so a control whose type changed is
+# compared by effective values: the written value, or the default of its type read from a new instance.
+Add-Type -AssemblyName System.Windows.Forms
+$commonUIPath = Join-Path $Root "MyCAM\bin\Debug\CommonUI.dll"
+if (-not (Test-Path $commonUIPath)) {
+	Write-Host "[CompareBehavior] $commonUIPath not found, build first (Build.bat Debug)."
+	exit 1
+}
+[void][Reflection.Assembly]::LoadFrom($commonUIPath)
+$defaultInstances = @{}
+
+# canonical text of a designer value or a property value: decimals without trailing zeros, enums by name
+function ConvertTo-Canonical( $value ) {
+	if ($value -is [bool]) {
+		return $value.ToString().ToLowerInvariant()
+	}
+	if ($value -is [decimal]) {
+		return $value.ToString("G29", [Globalization.CultureInfo]::InvariantCulture)
+	}
+	if ($value -is [enum]) {
+		return $value.ToString()
+	}
+	$szValue = "$value"
+	if ($szValue -match "^new decimal\(new int\[\] \{\s*(-?\d+), (-?\d+), (-?\d+), (-?\d+)\s*\}\)$") {
+		$bits = [int[]]@( [int]$Matches[1], [int]$Matches[2], [int]$Matches[3], [int]$Matches[4] )
+		return ConvertTo-Canonical (New-Object decimal (, $bits))
+	}
+	if ($szValue -match "^[A-Za-z_][\w\.]*\.(\w+)$") {
+		return $Matches[1]
+	}
+	return $szValue
+}
+
+# $null when the type cannot be created; otherwise Has tells whether the type has the property
+function Get-DefaultValue( [string]$szType, [string]$szProperty ) {
+	if (-not $defaultInstances.ContainsKey($szType)) {
+		$type = $szType -as [type]
+		$defaultInstances[$szType] = if ($null -eq $type) { $null } else { New-Object $type }
+	}
+	$instance = $defaultInstances[$szType]
+	if ($null -eq $instance) {
+		return $null
+	}
+	$info = $instance.GetType().GetProperty($szProperty, [Reflection.BindingFlags]"Public, Instance")
+	if ($null -eq $info) {
+		return [pscustomobject]@{ Has = $false; Value = "(none)" }
+	}
+	if ($szProperty -eq "Items") {
+		return [pscustomobject]@{ Has = $true; Value = "" }
+	}
+	return [pscustomobject]@{ Has = $true; Value = (ConvertTo-Canonical $info.GetValue($instance, $null)) }
+}
+
+# B3 of a control whose type changed: a property only the new type has is a new setting and not compared;
+# a property the old type has must keep its effective value, whether the old designer wrote it or not
+function Compare-EffectiveValue( [string]$szClass, [string]$name, [string]$prop, [string]$oldType, [string]$newType,
+	[string]$szOldValue, [string]$szNewValue ) {
+	$oldDefault = Get-DefaultValue $oldType $prop
+	$newDefault = Get-DefaultValue $newType $prop
+	if ($null -eq $oldDefault -or $null -eq $newDefault) {
+		Report "B3" $szClass $name "$prop cannot be compared: type $oldType or $newType cannot be created" $prop
+		return
+	}
+	if (-not $oldDefault.Has) {
+		return
+	}
+	$szOld = if ($szOldValue -ne "") { ConvertTo-Canonical $szOldValue } else { $oldDefault.Value }
+
+	# a feature the new type does not have is only lost when the old control changed it from the default
+	if (-not $newDefault.Has -and $szOld -eq $oldDefault.Value) {
+		return
+	}
+	$szNew = if (-not $newDefault.Has) { "(none)" } elseif ($szNewValue -ne "") { ConvertTo-Canonical $szNewValue } else { $newDefault.Value }
+	if ($szOld -ne $szNew) {
+		Report "B3" $szClass $name "$prop changed (effective): '$szOld' -> '$szNew'" $prop
+	}
 }
 
 # ---------------------------------------------------------------- designer files
@@ -199,11 +288,12 @@ foreach ($file in $designerFiles) {
 			}
 			$oldValue = if ($prop -eq "Items") { $oldItems[$name] } else { $oldProps[$prop] }
 			$newValue = if ($prop -eq "Items") { $newItems[$name] } else { $newProps[$prop] }
-			if ($isTypeChanged -and "$oldValue" -eq "") {
+			if ($isTypeChanged) {
+				Compare-EffectiveValue $szClass $name $prop $oldType $newType "$oldValue" "$newValue"
 				continue
 			}
 			if ("$oldValue" -ne "$newValue") {
-				Report "B3" $szClass $name "$prop changed: '$oldValue' -> '$newValue'"
+				Report "B3" $szClass $name "$prop changed: '$oldValue' -> '$newValue'" $prop
 			}
 		}
 	}

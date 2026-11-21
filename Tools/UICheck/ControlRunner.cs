@@ -11,9 +11,14 @@ namespace UICheck
 	// CheckControls.ps1 into the build output folder; the controls are used without a window.
 	//
 	//   N1  rejected input (unparseable or out of range) restores the latest valid value, even one that is not
-	//       notified yet, and the restore itself raises no ValueChanged
-	//   N2  a change of one step of the last decimal place raises DebouncedValueChanged once
-	//   N3  one notch of the mouse wheel changes the value by one Increment, clamped to the range
+	//       notified yet or is more precise than the shown decimals, and the restore itself raises no ValueChanged;
+	//       the range limits themselves are accepted
+	//   N2  a change of one step of the last decimal place raises DebouncedValueChanged once; changes within the
+	//       debounce interval are notified once, with the last value
+	//   N3  one notch of the mouse wheel changes the value by one Increment, clamped to the range;
+	//       ReadOnly blocks the wheel and the up / down buttons
+	//   N4  SilentSetValue cancels a pending notification without blocking later ones; an empty field restores the
+	//       latest valid value on Enter (the key is consumed) and on leaving, and leaving sends a pending notification
 	//
 	// Usage: UICheckControls.exe
 	internal static class ControlRunner
@@ -22,8 +27,12 @@ namespace UICheck
 		static int Main()
 		{
 			CheckRejectedInput();
+			CheckRangeLimits();
 			CheckLastDecimalStep();
+			CheckDebounceMerge();
 			CheckMouseWheel();
+			CheckSilentSetValue();
+			CheckEmptyInput();
 			Console.WriteLine( "[controls] " + m_nCaseCount + " cases, " + m_nProblemCount + " problems" );
 			return m_nProblemCount == 0 ? 0 : 1;
 		}
@@ -54,6 +63,34 @@ namespace UICheck
 			numeric.EnterText( "-5" );
 			Expect( "N1", "below minimum after notify", 30m, numeric.Value );
 			ExpectEvents( "N1", "below minimum after notify", new decimal[ 0 ], valueList );
+
+			// a loaded value more precise than the 3 shown decimals, then unparseable and out-of-range text
+			numeric = CreateNumeric( 1.23456m, -100m, 100m );
+			valueList = RecordValueChanged( numeric );
+			numeric.EnterText( "abc" );
+			Expect( "N1", "unparseable keeps full precision", 1.23456m, numeric.Value );
+			numeric.EnterText( "200" );
+			Expect( "N1", "above maximum keeps full precision", 1.23456m, numeric.Value );
+
+			// a later validation with nothing typed (e.g. another Enter) must not parse the shown, rounded text
+			numeric.Revalidate();
+			Expect( "N1", "validation without typing keeps full precision", 1.23456m, numeric.Value );
+			ExpectEvents( "N1", "rejected input on a precise value", new decimal[ 0 ], valueList );
+		}
+
+		static void CheckRangeLimits()
+		{
+			ProbeNumeric numeric = CreateNumeric( 20m, 0m, 1000m );
+			List<decimal> valueList = RecordValueChanged( numeric );
+			numeric.EnterText( "0" );
+			Expect( "N1", "minimum accepted", 0m, numeric.Value );
+			numeric.EnterText( "1000" );
+			Expect( "N1", "maximum accepted", 1000m, numeric.Value );
+			numeric.EnterText( "-0.001" );
+			Expect( "N1", "just below minimum rejected", 1000m, numeric.Value );
+			numeric.EnterText( "1000.001" );
+			Expect( "N1", "just above maximum rejected", 1000m, numeric.Value );
+			ExpectEvents( "N1", "range limits", new decimal[] { 0m, 1000m }, valueList );
 		}
 
 		static void CheckLastDecimalStep()
@@ -75,6 +112,20 @@ namespace UICheck
 			Expect( "N2", "notified value of one step", 1.001m, notifiedValue );
 		}
 
+		static void CheckDebounceMerge()
+		{
+			// a long interval keeps the gap between the two changes well inside it
+			ProbeNumeric numeric = CreateNumeric( 10m, 0m, 100m );
+			numeric.DebounceInterval = 300;
+			List<decimal> notifiedList = RecordDebounced( numeric );
+			numeric.Value = 20m;
+			PumpUntil( () => false, 50 );
+			numeric.Value = 21m;
+			PumpUntil( () => notifiedList.Count > 0, 1000 );
+			PumpUntil( () => false, 500 );
+			ExpectEvents( "N2", "two changes within the interval", new decimal[] { 21m }, notifiedList );
+		}
+
 		static void CheckMouseWheel()
 		{
 			ProbeNumeric numeric = CreateNumeric( 10m, 0m, 11m );
@@ -86,6 +137,59 @@ namespace UICheck
 			numeric.Value = 10.8m;
 			numeric.Wheel( 120 );
 			Expect( "N3", "notch up clamped to maximum", 11m, numeric.Value );
+
+			numeric = CreateNumeric( 0.2m, 0m, 11m );
+			numeric.Increment = 0.5m;
+			numeric.Wheel( -120 );
+			Expect( "N3", "notch down clamped to minimum", 0m, numeric.Value );
+
+			numeric = CreateNumeric( 5m, 0m, 11m );
+			numeric.ReadOnly = true;
+			numeric.Wheel( 120 );
+			numeric.UpButton();
+			numeric.DownButton();
+			numeric.DownButton();
+			Expect( "N3", "read-only blocks wheel and buttons", 5m, numeric.Value );
+		}
+
+		static void CheckSilentSetValue()
+		{
+			ProbeNumeric numeric = CreateNumeric( 10m, 0m, 100m );
+			List<decimal> notifiedList = RecordDebounced( numeric );
+			numeric.Value = 20m;
+			numeric.SilentSetValue = 30m;
+			PumpUntil( () => false, 300 );
+			ExpectEvents( "N4", "silent set cancels the pending notification", new decimal[ 0 ], notifiedList );
+			numeric.Value = 30.001m;
+			PumpUntil( () => notifiedList.Count > 0, 1000 );
+			PumpUntil( () => false, 300 );
+			ExpectEvents( "N4", "change after silent set is notified", new decimal[] { 30.001m }, notifiedList );
+		}
+
+		static void CheckEmptyInput()
+		{
+			// leaving an empty field while a change is pending
+			ProbeNumeric numeric = CreateNumeric( 10m, 0m, 100m );
+			List<decimal> valueList = RecordValueChanged( numeric );
+			List<decimal> notifiedList = RecordDebounced( numeric );
+			numeric.Value = 20m;
+			numeric.ClearText();
+			numeric.LeaveField();
+			Expect( "N4", "empty field on leave", 20m, numeric.Value );
+			ExpectEvents( "N4", "empty field on leave", new decimal[] { 20m }, valueList );
+			ExpectEvents( "N4", "leave sends the pending notification", new decimal[] { 20m }, notifiedList );
+
+			// Enter on an empty field after the value is notified
+			numeric = CreateNumeric( 10m, 0m, 100m );
+			numeric.Value = 20m;
+			PumpUntil( () => false, 300 );
+			valueList = RecordValueChanged( numeric );
+			numeric.ClearText();
+			KeyEventArgs keyArgs = numeric.PressEnter();
+			Expect( "N4", "empty field on Enter", 20m, numeric.Value );
+			ExpectEvents( "N4", "empty field on Enter", new decimal[ 0 ], valueList );
+			ExpectTrue( "N4", "Enter on an empty field is consumed", keyArgs.Handled && keyArgs.SuppressKeyPress );
+			ExpectTrue( "N4", "empty field shows the value again", numeric.Text.Length > 0 );
 		}
 
 		static ProbeNumeric CreateNumeric( decimal initialValue, decimal minimum, decimal maximum )
@@ -102,6 +206,13 @@ namespace UICheck
 			List<decimal> valueList = new List<decimal>();
 			numeric.ValueChanged += ( sender, e ) => valueList.Add( numeric.Value );
 			return valueList;
+		}
+
+		static List<decimal> RecordDebounced( DebouncedNumericUpDown numeric )
+		{
+			List<decimal> notifiedList = new List<decimal>();
+			numeric.DebouncedValueChanged += ( sender, e ) => notifiedList.Add( numeric.Value );
+			return notifiedList;
 		}
 
 		// the debounce timer is a WinForms timer, so messages are pumped while waiting
@@ -124,6 +235,16 @@ namespace UICheck
 			Console.WriteLine( "FAIL  " + szRule + " " + szCase + ": expected " + expected + ", got " + actual );
 		}
 
+		static void ExpectTrue( string szRule, string szCase, bool isPassed )
+		{
+			m_nCaseCount++;
+			if( isPassed ) {
+				return;
+			}
+			m_nProblemCount++;
+			Console.WriteLine( "FAIL  " + szRule + " " + szCase );
+		}
+
 		static void ExpectEvents( string szRule, string szCase, decimal[] expectedArray, List<decimal> actualList )
 		{
 			m_nCaseCount++;
@@ -143,15 +264,52 @@ namespace UICheck
 		// reaches the protected input paths of the control the way user input does
 		sealed class ProbeNumeric : DebouncedNumericUpDown
 		{
+			// type into the inner editor, then validate as Enter or leaving does
 			public void EnterText( string szText )
 			{
-				Text = szText;
+				TypeText( szText );
+				ValidateEditText();
+			}
+
+			public void Revalidate()
+			{
 				ValidateEditText();
 			}
 
 			public void Wheel( int nDelta )
 			{
 				OnMouseWheel( new HandledMouseEventArgs( MouseButtons.None, 0, 0, 0, nDelta ) );
+			}
+
+			// the user deletes the text; it is validated only on Enter or on leaving
+			public void ClearText()
+			{
+				TypeText( string.Empty );
+			}
+
+			// unlike setting Text of the control, typing into the editor does not validate at once
+			void TypeText( string szText )
+			{
+				foreach( Control child in Controls ) {
+					TextBox editor = child as TextBox;
+					if( editor != null ) {
+						editor.Text = szText;
+						return;
+					}
+				}
+				throw new InvalidOperationException( "No numeric editor found." );
+			}
+
+			public KeyEventArgs PressEnter()
+			{
+				KeyEventArgs keyArgs = new KeyEventArgs( Keys.Enter );
+				OnKeyDown( keyArgs );
+				return keyArgs;
+			}
+
+			public void LeaveField()
+			{
+				OnLostFocus( EventArgs.Empty );
 			}
 		}
 	}

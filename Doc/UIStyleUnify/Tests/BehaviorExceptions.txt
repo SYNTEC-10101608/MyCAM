@@ -1,4 +1,5 @@
 ﻿# Confirmed behavior differences of CompareBehavior.ps1: <rule> <class> <control|*> <reason>
+# A B3 exception also names the property: B3 <class> <control> <property> <reason>
 # Only items decided in Doc/UIStyleUnify/4_Discussion.md may be listed here.
 
 # numeric inputs become DebouncedNumericUpDown (decision 2026-11-15 "數值輸入")
@@ -28,8 +29,15 @@ B6 CNCThreePointDlg m_lbl*Title section title labels removed; the step title nam
 B6 ThreePtTransformDlg m_lblCAD*Value TextBox -> Label, confirmed display only (disabled, code only sets Text)
 # the text box settings of these read-only fields do not apply to a label, which never takes the focus or input
 B3 CalibrationREFDlg m_lblPnt*Value ReadOnly of the former text box; a label cannot be edited
-B3 CNCThreePointDlg m_lblDrawing*Value ReadOnly and TabStop false of the former text box; a label cannot be edited or focused
+B3 CalibrationREFDlg m_lblPnt*Value TabStop the former read-only text box took the focus; a label is skipped by Tab
+B3 CNCThreePointDlg m_lblDrawing*Value ReadOnly of the former text box; a label cannot be edited (TabStop false is kept)
 B3 ThreePtTransformDlg m_lblCAD*Value Enabled false of the former text box only made it read-only and grey; the label shows the value as text
+B3 ThreePtTransformDlg m_lblCAD*Value TabStop the former disabled text box could not take the focus either; a label is skipped by Tab
+# AxisTransformDlg sets the range and decimals of every box in the constructor, before and after the issue; only the
+# designer defaults of the two types differ (NumericUpDown 0 / 100 / 0 decimals, DebouncedNumericUpDown -99999 / 99999 / 3)
+B3 AxisTransformDlg m_num* Minimum designer default only, set in the constructor
+B3 AxisTransformDlg m_num* Maximum designer default only, set in the constructor
+B3 AxisTransformDlg m_num* DecimalPlaces designer default only, set in the constructor
 B6 ThreePtTransformDlg m_numMachine* TextBox -> DebouncedNumericUpDown (3 decimals, same default values); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
 B6 DesignSupportBracketDlg m_lblSection* section title labels moved to the m_pnl* section titles
 B6 CNCAlarmPanel m_lblTitle title moved to the m_pnlAlarm section title
