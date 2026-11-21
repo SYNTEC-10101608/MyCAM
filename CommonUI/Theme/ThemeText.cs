@@ -19,7 +19,6 @@ namespace CommonUI.Theme
 			switch( role ) {
 				case TextRole.Body:
 				case TextRole.Emphasis:
-				case TextRole.Title:
 				case TextRole.Value:
 					return ThemeColors.TEXT;
 				case TextRole.Secondary:

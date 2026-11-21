@@ -6,7 +6,7 @@
 | 分支 | `AUTO-23254_f_UIStyleUnify` |
 | 分支起點 | `a4b3826d`（`master`，2026-11-15） |
 | 期間 | 2026-11-15 ～ 2026-11-21 |
-| 狀態 | 施工與驗收完成，待人工確認與合併（見 [6_FollowUp.md](6_FollowUp.md)） |
+| 狀態 | 施工與自動檢查完成（含 Round 1 review 的修正）；人工驗收（5.3 第 2～4 項）未完成，三項都是合併前必做（見 [6_FollowUp.md](6_FollowUp.md)） |
 
 ## 文件
 
@@ -20,7 +20,8 @@
 | [5_Verification.md](5_Verification.md) | 測試驗證：兩類測試的內容、結果、涵蓋範圍與維護注意事項 | 最終版 |
 | [6_FollowUp.md](6_FollowUp.md) | 合併前的收尾、範圍外的後續議題與議題清單 | 隨進度更新 |
 | [7_Compatibility.md](7_Compatibility.md) | 相容性異動：合併後對客製語系檔等既有檔案的影響與處理方式，合併時寫入 Merge Request 說明 | 最終版 |
-| [8_ReviewRound1.md](8_ReviewRound1.md) | Round 1 整體審查：問題、證據、驗證限制與待討論事項 | Review 紀錄，待討論 |
+| [8_ReviewRound1.md](8_ReviewRound1.md) | Round 1 整體審查（VS Copilot）：問題、證據、驗證限制與待討論事項 | Review 快照，不修改 |
+| [9_ReviewRound1-reply.md](9_ReviewRound1-reply.md) | Round 1 review 的回覆：逐項決議、修正內容與驗證結果，供 Round 2 review | 回覆，Round 2 時對照 |
 
 ## 測試程式
 

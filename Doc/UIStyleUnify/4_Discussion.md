@@ -386,3 +386,23 @@ Designer 目前**不是**橫式，而是執行時不會出現的混合狀態：
 | --- | --- | --- |
 | 1 | 議題文件中與最終實作不一致的描述：README 期間、2.5 少列 `ColorSwatch` / `SwatchShape`、3.1 階段表未涵蓋 3.21 之後、3.3 / 3.14 / 3.15 仍寫已刪除的右鍵選單與 Designer 中的資料色、3.12 檢查檔案表缺 3 個檔、3.20 章數、`RenameMap.txt` 筆數（實為 309）、5 章的執行日期與檔案數 | 改為最終狀態 |
 | 2 | `StaticExceptions.txt` 的 S20、S11 沒寫決議出處，S1 只有日期，不符規範 8.2 第 6 點 | 每行補上「AUTO-23254 日期」 |
+
+## 4.15 Round 1 整體審查（2026-11-21，已定稿並施工，3.28）
+
+VS Copilot 的審查紀錄見 [8_ReviewRound1.md](8_ReviewRound1.md)（快照，不修改），逐項回覆見 [9_ReviewRound1-reply.md](9_ReviewRound1-reply.md)。
+查證後 8 個問題與 R1-C1 都屬實；使用者決議如下。
+
+| # | 問題 | 決議 |
+| --- | --- | --- |
+| R1-01 | `AxisTransformDlg` 只變動 0.001 之後輸入非法值，數值框退回舊值、模型反向移動 | 修正 `DebouncedNumericUpDown`：被拒的輸入回復「最新的合法值」，不再回復「上次通知的值」（`m_LastValue`），回復本身不送出 `ValueChanged`。查證時修正嚴重度：畫面與模型始終一致，觸發條件只有「只變動最後一位小數一步，接著打錯字」，屬於合法輸入被吃掉，而非資料錯亂 |
+| R1-01 延伸 | epsilon 門檻 `<= 0.001` 讓 3 位小數的數值框改 0.001 時永遠不送出 `DebouncedValueChanged`（10 個對話框 30 個數值框的預覽不更新；確定時重新讀 `Value`，存值正確） | 分支起點即有，但本議題把所有數值輸入都換成此控制項，在本議題一起修：改為 `decimal` 直接比較，刪除 `EPSILON`（`decimal` 沒有浮點誤差，epsilon 沒有存在的理由） |
+| R1-01 測試 | 回歸測試放哪裡 | 放在可持續使用的檢查：新增 `Tools/UICheck/CheckControls.ps1` + `ControlRunner.cs`（N1–N3），由 `UICheck.bat runtime` 執行；規範第 5 節寫明控制項的操作行為 |
+| R1-02 | B7 例外 `B7 repository *` 放行所有 `Show` / `ShowDialog` 差異；B3 在型別替換後被跳過 | B7 以檔案路徑為「控制項」欄，例外只放行 `CommonUI/Layout/SectionStack.cs`（拿掉例外實測只藏了這 1 筆）。型別替換後仍比對 B3，但只比對分支起點有設定的屬性；新型別才有的屬性是新設定，不比對（拿掉 `continue` 實測 79 筆，限縮後 36 筆，全部是唯讀座標改標籤，依「只顯示座標的欄位」逐畫面登錄） |
+| R1-03 | runner 編譯或準備失敗時可能留在建置輸出 | 三支腳本的刪除改寫在包住編譯、準備與執行全程的 `finally` |
+| R1-04 | 共用按鈕客製文字的遷移說明不足 | 相容性異動第 3 項補齊：改寫到 `CommonUI_<語系>.xml` 的共用 ID，同一 ID 全畫面一致 |
+| R1-05 | 規範的 `Title` 10.5pt 從未實作 | 從規範刪除 `Title`，並刪除未使用的 `TextRole.Title` / `ThemeFonts.Title`。若改成 10.5pt，選單高度、MainLayout 基準與 Designer 都要重驗，收尾階段風險偏高；需要時另開議題 |
+| R1-06 | `RemovableValueRow` 的刪除按鈕是 `Normal` | 統一為 `Danger`，不在規範加「尚未確定的輸入列」例外：例外不值得，畫面偏吵可以接受 |
+| R1-07 | 完成狀態與完成定義不一致 | README 狀態分開寫「自動檢查完成」與「人工驗收未完成」；5.3 第 2～4 項（Designer、數值框實機操作、CNC 連線）**三項都是合併前必做** |
+| R1-08 | 專案概觀仍列已刪除的 `GroupPanel`；逐檔紀錄漏列 `CommonUI.csproj` | 專案概觀改為現行 `CommonUI` 的內容；3.16 補 `CommonUI.csproj` |
+| R1-C1 | `AutoSortPathDlg` 的滾輪（原生一格 = 系統捲動行數 × `Increment`，現為一個 `Increment`）與超出範圍（原生夾到上限，現為回復合法值）未具體確認 | 正式接受：是全 App 數值框一致的行為，具體差異寫入 `BehaviorExceptions.txt` 的理由與規範第 5 節第 3 點，由 N1、N3 檢查 |
+| 紀錄 | 決議與回覆放哪裡 | 決議寫在本節；另寫 `9_ReviewRound1-reply.md` 回覆 Copilot，`8_ReviewRound1.md` 不動；處理完成後在議題資料夾放 `review-reply-done.txt` 通知 Copilot 進行 Round 2 |

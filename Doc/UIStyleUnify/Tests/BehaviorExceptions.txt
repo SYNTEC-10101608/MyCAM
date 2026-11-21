@@ -2,6 +2,8 @@
 # Only items decided in Doc/UIStyleUnify/4_Discussion.md may be listed here.
 
 # numeric inputs become DebouncedNumericUpDown (decision 2026-11-15 "數值輸入")
+# AutoSortPathDlg (decision 2026-11-21 "Round 1 review" R1-C1): one Increment per wheel notch instead of the system scroll
+# lines x Increment, and a value out of range restores the latest valid value instead of being clamped to the limit
 B6 AutoSortPathDlg m_numExtrusionBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
 B6 AutoSortPathDlg m_numRotationBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
 
@@ -24,6 +26,10 @@ B6 CNCThreePointDlg m_lblDrawing*Value TextBox -> Label, confirmed read-only (Re
 B6 CNCThreePointDlg m_lbl*Step step labels become the titles of their sections (Highlighted marks the current step)
 B6 CNCThreePointDlg m_lbl*Title section title labels removed; the step title names the section
 B6 ThreePtTransformDlg m_lblCAD*Value TextBox -> Label, confirmed display only (disabled, code only sets Text)
+# the text box settings of these read-only fields do not apply to a label, which never takes the focus or input
+B3 CalibrationREFDlg m_lblPnt*Value ReadOnly of the former text box; a label cannot be edited
+B3 CNCThreePointDlg m_lblDrawing*Value ReadOnly and TabStop false of the former text box; a label cannot be edited or focused
+B3 ThreePtTransformDlg m_lblCAD*Value Enabled false of the former text box only made it read-only and grey; the label shows the value as text
 B6 ThreePtTransformDlg m_numMachine* TextBox -> DebouncedNumericUpDown (3 decimals, same default values); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
 B6 DesignSupportBracketDlg m_lblSection* section title labels moved to the m_pnl* section titles
 B6 CNCAlarmPanel m_lblTitle title moved to the m_pnlAlarm section title
@@ -62,7 +68,7 @@ B8 StartupForm toolStrip the tool strip of the status is shown and the others hi
 B6 StartupForm m_tscLevel1Container replaced by the Panel m_pnlToolBar at the same place and size, holding the same tool strips
 
 # wizard pages switched by SectionStack.ShowPage (decision 2026-11-20 "精靈兩型"): the same steps moved into CommonUI
-B7 repository * SectionStack.ShowPage shows the form again after the switch, as DesignSupportBracketDlg.ShowPanel did
+B7 repository CommonUI/Layout/SectionStack.cs SectionStack.ShowPage shows the form again after the switch, as DesignSupportBracketDlg.ShowPanel did
 B8 DesignSupportBracketDlg m_pnl*Page ShowPage hides all pages before fitting the form, as ShowPanel did
 B8 DesignSupportBracketDlg activePanel ShowPage shows the page after the form is fitted, as ShowPanel did
 

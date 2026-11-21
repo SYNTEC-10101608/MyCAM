@@ -183,9 +183,11 @@ foreach ($file in $designerFiles) {
 		}
 		$newType = $new.Fields[$name]
 		$isSameKind = $oldType -eq $newType -or ($TYPE_REPLACEMENTS.ContainsKey($oldType) -and $TYPE_REPLACEMENTS[$oldType] -contains $newType)
-		if (-not $isSameKind) {
+		# a decided type change is still compared: the properties the base set must stay, the ones only the new
+		# type has are new settings and not compared
+		$isTypeChanged = -not $isSameKind
+		if ($isTypeChanged) {
 			Report "B6" $szClass $name "type changed: $oldType -> $newType"
-			continue
 		}
 		$oldProps = if ($old.Props.ContainsKey($name)) { $old.Props[$name] } else { @{} }
 		$newProps = if ($new.Props.ContainsKey($name)) { $new.Props[$name] } else { @{} }
@@ -197,6 +199,9 @@ foreach ($file in $designerFiles) {
 			}
 			$oldValue = if ($prop -eq "Items") { $oldItems[$name] } else { $oldProps[$prop] }
 			$newValue = if ($prop -eq "Items") { $newItems[$name] } else { $newProps[$prop] }
+			if ($isTypeChanged -and "$oldValue" -eq "") {
+				continue
+			}
 			if ("$oldValue" -ne "$newValue") {
 				Report "B3" $szClass $name "$prop changed: '$oldValue' -> '$newValue'"
 			}
@@ -236,17 +241,21 @@ function Get-ShowCalls( [string[]]$lines ) {
 	}
 	return $calls
 }
+# the file is the "control" of a B7 exception, so an exception covers the call sites of one file only
+function Get-CallFile( [string]$szKey ) {
+	return ($szKey -split ": ", 2)[ 0 ]
+}
 $pattern = "\.(Show|ShowDialog)\s*\("
 $oldCalls = Get-ShowCalls (& git -C $Root grep -I -E -e $pattern $Base -- "*.cs" | ForEach-Object { $_ -replace "^$($Base):", "" })
 $newCalls = Get-ShowCalls (& git -C $Root grep -I -E --untracked -e $pattern -- "*.cs" | Where-Object { $_ -notmatch "^Tools/" })
 foreach ($key in $oldCalls.Keys) {
 	if ($newCalls[$key] -ne $oldCalls[$key]) {
-		Report "B7" "repository" "*" "call site changed or removed: $key"
+		Report "B7" "repository" (Get-CallFile $key) "call site changed or removed: $key"
 	}
 }
 foreach ($key in $newCalls.Keys) {
 	if (-not $oldCalls.ContainsKey($key)) {
-		Report "B7" "repository" "*" "call site added: $key"
+		Report "B7" "repository" (Get-CallFile $key) "call site added: $key"
 	}
 }
 

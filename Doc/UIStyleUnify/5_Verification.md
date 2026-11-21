@@ -1,12 +1,12 @@
 # 5. 測試驗證
 
-最後一次執行：2026-11-21，Debug 建置（`.\Build.bat Debug` 0 個錯誤），規範 review 第三批（3.27）與收尾盤點之後。
+最後一次執行：2026-11-21，Debug 建置（`.\Build.bat Debug` 0 個錯誤），Round 1 整體審查的修正（3.28）之後。
 
 | 類別 | 位置 | 入口 | 結果 |
 | --- | --- | --- | --- |
 | A. 可持續使用：規範與風格檢查 | `Tools/UICheck/` | `Tools\UICheck\UICheck.bat runtime UICheckScreens` | 全部通過 |
 | B. 本議題限定：功能正確性與相容性 | `Doc/UIStyleUnify/Tests/` | `Doc\UIStyleUnify\Tests\RunIssueChecks.bat` | 全部通過 |
-| C. 人工確認 | — | — | 部分待確認（5.3） |
+| C. 人工確認 | — | — | 部分待確認（5.3），三項都是合併前必做 |
 
 兩類測試的分法：檢查「規範本身」、之後改畫面仍有意義的屬於 A，隨規範維護；檢查「本議題的改動」（與改動前比對、
 本議題寫入的程式碼）的屬於 B，基準固定在分支起點，合併後仍可重現，但不再隨開發更新。
@@ -19,6 +19,7 @@
 | --- | --- | --- | --- |
 | `CheckStatic.ps1`（+ `DesignerParser.ps1`、`StaticExceptions.txt`） | S1–S25 | 34 個 Designer 檔（31 個對話框、3 個 CNC 面板）與主視窗；畫面程式碼；`CommonUI`；所有語系 XML；規範第 9 節 | 0 個問題 |
 | `CheckRuntimeLayout.ps1`（+ `LayoutRunner.cs`） | T1–T7 | `MyCAM.exe`、`CncUI.dll` 中所有對話框與嵌入式面板，精靈與多狀態畫面逐一狀態；zh-TW、zh-CN | 各 42 個畫面狀態，0 個問題 |
+| `CheckControls.ps1`（+ `ControlRunner.cs`） | N1–N3 | `CommonUI.dll` 的 `DebouncedNumericUpDown`，不開視窗：被拒的輸入（無法解析、超出上限、低於下限）回復最新合法值且回復不送出 `ValueChanged`；最後一位小數的一步送出一次 `DebouncedValueChanged`；滾輪一格一個 `Increment`、停在上限 | 11 個案例，0 個問題 |
 | `CaptureMainWindow.ps1`（+ `MainWindowRunner.cs`） | P1–P6 | 主視窗 zh-TW / zh-CN × CAD / CAM / CNC 頁面 × 橫式 1920×1040 / 直式 1080×1880，共 12 組；置中檢查 `Show` 開啟的 3 個與 `ShowDialog` 開啟的 2 個對話框；另以 Designer 的客戶區 1920×1009 開加工頁，比對 10 個區域與 Designer（P6） | 13 組 0 個問題 |
 
 規則的內容見規範第 8 節與各腳本開頭的註解。輔助檔案：
@@ -42,6 +43,7 @@
 | 對話框置中 | `Show` 開啟的 `AddPathDlg`、`OverCutDlg`、`StartPointDlg`，`ShowDialog` 開啟的 `ConnectDlg`、`GlassDXFImportDlg`，橫式與直式 |
 | 語系 | 每個畫面呼叫 `ApplyLanguage`（S14）、控制項顯示語系檔文字（T7、P5）、各語系 ID 一致（S6）、沒有孤兒 ID（S13） |
 | `CommonUI` | 控制項類別只在 `CommonUI`（S15）；資料夾、namespace、元件目錄小節一致（S21） |
+| 共用數值框 | `DebouncedNumericUpDown` 的操作行為（N1–N3）；各畫面套用後的實機操作見 5.3 第 3 項 |
 | 產品程式 | 不含檢查用的程式（規範第 8 節；本議題另以 B 類 I9 檢查） |
 
 未由腳本開啟：`CNCDlg`（承載 VNC 遠端畫面，需連線）。
@@ -61,7 +63,7 @@
 
 確認規則真的能檢出問題：S14、S16、T7（2026-11-16）、S21 的資料夾與 namespace 一致（2026-11-17，把 `RoundDrawing`
 的 namespace 暫時改錯，S21 報錯，還原後通過）。S1、S9、S23 的原生 `Label`（2026-11-19，把 `OverCutDlg` 的標籤暫時改回原生 `Label`、在程式中加 `new Label()`，三條規則都報錯，還原後通過）。S19 與 P6（2026-11-19，把 `m_pnlBottom` 暫時改回 `TableLayoutPanel`、
-`m_pnlViewer` 的 Designer 寬度改為 1200，S19 與 P6 都報錯，P6 並列出應寫入的值，還原後通過）。S9、S19 的 `ToolStripContainer`（2026-11-20，把 `m_pnlToolBar` 暫時改回 `ToolStripContainer`，兩條規則都報錯，還原後通過）。S24（2026-11-20，在 `LeadDlg.Designer.cs` 的 `InitializeComponent` 暫時加入 `if` 區塊、lambda 事件、類別常數、`this.ApplyStyle()`、沒有 `this.` 的欄位、字串插補，六項都報錯，還原後通過）。S25（2026-11-21，在 `LeadDlg.Designer.cs` 暫時加入 `ComponentResourceManager`、在 `LeadDlg.resx` 與 `StartupForm.resx` 暫時加入 `<data>` 資源，三項都報錯，還原後通過）。
+`m_pnlViewer` 的 Designer 寬度改為 1200，S19 與 P6 都報錯，P6 並列出應寫入的值，還原後通過）。S9、S19 的 `ToolStripContainer`（2026-11-20，把 `m_pnlToolBar` 暫時改回 `ToolStripContainer`，兩條規則都報錯，還原後通過）。S24（2026-11-20，在 `LeadDlg.Designer.cs` 的 `InitializeComponent` 暫時加入 `if` 區塊、lambda 事件、類別常數、`this.ApplyStyle()`、沒有 `this.` 的欄位、字串插補，六項都報錯，還原後通過）。S25（2026-11-21，在 `LeadDlg.Designer.cs` 暫時加入 `ComponentResourceManager`、在 `LeadDlg.resx` 與 `StartupForm.resx` 暫時加入 `<data>` 資源，三項都報錯，還原後通過）。N1–N3（2026-11-21，把 `DebouncedNumericUpDown.cs` 暫時換回修正前的版本並建置，N1 報 4 筆、N2 報 2 筆，與 Round 1 review 的實驗結果相同：0.001 之後輸入 `abc` 變成 0.000、`ValueChanged` 為 `[0.001, 0.000]`；還原後通過）。runner 清理（2026-11-21，在腳本副本中讓 `HiddenDesktopRun.cs` 編譯失敗：修正前的 `CheckRuntimeLayout.ps1` 留下 `UICheckRunner.exe`，修正後的三支腳本都沒有留下）。
 
 ### 維護注意事項
 
@@ -83,8 +85,8 @@
 8. **元件目錄**：`CommonUI` 新增公開型別時，放進所屬類別的資料夾，並在規範第 9 節該類別的小節加一列（S21）；
    新增類別時，同時新增資料夾、namespace 與小節（小節標題寫 `` （`CommonUI.<類別>`） ``）。
 9. **語系檔**：執行時檢查讀的是建置輸出的語系檔；`SyncLanguage.ps1` 會先同步，平常開發改了 `Language/` 仍要跑 `CopyRef.bat`。
-10. **runner 的編譯**：兩個 `.ps1` 以 Visual Studio 的 Roslyn `csc` 把 runner 編譯到 `MyCAM\bin\<組態>`（才能以與 `MyCAM.exe`
-    相同的方式找到語系檔與相依組件），執行結束即刪除；runner 參考的組件改名或新增相依時，更新 `.ps1` 中的 `/r:` 清單。
+10. **runner 的編譯**：`CheckRuntimeLayout.ps1`、`CheckControls.ps1`、`CaptureMainWindow.ps1` 以 Visual Studio 的 Roslyn `csc` 把 runner 編譯到 `MyCAM\bin\<組態>`（才能以與 `MyCAM.exe`
+    相同的方式找到語系檔與相依組件），執行結束即刪除，刪除寫在包住編譯、準備與執行全程的 `finally`，失敗也不會留下；runner 參考的組件改名或新增相依時，更新 `.ps1` 中的 `/r:` 清單。
 11. **已知限制**：對話框截圖用 `DrawToBitmap`，執行時才填入的文字顯示的是 Designer 文字；隱藏桌面上 3D 檢視區（OpenGL）
     是空白的，執行時會出現 `wglMakeCurrent` 錯誤訊息，可忽略；疊在主視窗上的對話框外框是未啟用的樣子。
 12. **檢查涵蓋不到的部分**（列於 [6_FollowUp.md](6_FollowUp.md)）：面板卡片的靜態座標規則、執行時才填入的文字在 zh-CN 下的寬度、
@@ -100,6 +102,10 @@
 | `CheckBranchRules.ps1` | I1–I9 | 本議題新增或改動的檔案符合通用與 C# 規範：編碼與 BOM、檔尾換行、行尾空白、C# 行長 120、tab 縮排、不用 `this.`、註解為英文且不用 `/* */`、產品專案一檔一個頂層型別；產品程式不提到檢查程式、建置輸出沒有殘留 runner | 347 個檔案，0 個問題 |
 | `CompareMainLayout.ps1`（+ `MainLayoutBaseline.txt`） | — | 主視窗各承載區的座標與移除 `TableLayoutPanel` 前的基準逐像素相同：CAD / CAM / CNC 頁面 × 橫式 1920×1040、1366×768 × 直式 1080×1880、900×1600，共 12 個情境（zh-TW；需先建置 Debug） | 152 行，0 個差異 |
 | `RunIssueChecks.bat` | — | 依序執行上面三個腳本 | 全部通過 |
+
+比對範圍（Round 1 review 後）：B3 在型別替換（B6）後仍比對，只比對分支起點有設定的屬性，新型別才有的屬性不比對；B7 以呼叫點所在檔案登錄例外。
+本比對讀的是原始碼的屬性、事件與狀態賦值，不是操作結果的測試：「0 個差異」表示這些宣告沒有未決議的變化，不代表所有操作完全等價；
+共用控制項的操作行為由 A 類 N1–N3 檢查，各畫面的實機操作由 5.3 第 3 項確認。B8 不比對 `CommonUI`（元件是新寫或通用化的，行為由 A 類檢查）。
 
 `BehaviorExceptions.txt` 列出已決議的行為差異（數值框取代、唯讀座標改標籤、區塊標題 `Label` 併入卡片、步驟標籤改卡片標題、
 主視窗直式 CNC 承載區的 `SizeChanged` 處理移除、從不顯示的第二、三層工具列容器刪除、功能工具列容器改為 `Panel`、
@@ -124,6 +130,8 @@
    以本資料夾的腳本為範本，在該議題的資料夾另建一份並指定自己的基準。
 
 ## 5.3 C 類：人工確認
+
+合併門檻：第 2～4 項都完成才合併（2026-11-21 Round 1 review 決議）。第 3 項在 3.28 修正數值框之後執行。
 
 | # | 項目 | 狀態 |
 | --- | --- | --- |

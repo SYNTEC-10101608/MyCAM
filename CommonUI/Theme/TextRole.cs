@@ -11,9 +11,6 @@
 		/// <summary>Bold body text: axis names, fields that need emphasis.</summary>
 		Emphasis,
 
-		/// <summary>Larger text: mode tabs of the main window.</summary>
-		Title,
-
 		/// <summary>Monospaced text: machine values that change continuously.</summary>
 		Value,
 

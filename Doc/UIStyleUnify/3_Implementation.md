@@ -24,7 +24,8 @@
 | 主視窗與精靈 | `510f7a2b` | 功能工具列容器改為 `Panel`、精靈兩型與 `SectionStack.ShowPage`（3.23） |
 | Designer 協作 | `cee5aa26` | `DesignerDiff.ps1`、靜態檢查 S24（3.24） |
 | 規範 review | `c0e32b7a`、`1a18d8f0`、`019bcca3`、`cdeb98b0` | 第一～三批（3.25～3.27） |
-| 收尾盤點 | `d5f3c1df` ～ 最新 | 後續處理重整、相容性異動文件、自我 review 的文件修正 |
+| 收尾盤點 | `d5f3c1df` ～ `3d4b5ffd` | 後續處理重整、相容性異動文件、自我 review 的文件修正 |
+| Round 1 整體審查 | `e7825de8` ～ 最新 | 數值框回復與通知修正、新增 N1–N3、行為比對防線限縮、runner 清理、刪除 `Title`、刪除鈕改 `Danger`（3.28） |
 
 ## 3.2 外觀與行為分層（對應 2.2）
 
@@ -126,7 +127,7 @@
 
 | 位置 | 檔案 |
 | --- | --- |
-| `Tools/UICheck`（可持續使用） | `UICheck.bat`、`CheckStatic.ps1`、`DesignerParser.ps1`、`StaticExceptions.txt`、`CheckRuntimeLayout.ps1`、`LayoutRunner.cs`、`CaptureMainWindow.ps1`、`MainWindowRunner.cs`、`HiddenDesktopRun.cs`、`SyncLanguage.ps1`、`FixTabOrder.ps1`、`DesignerDiff.ps1`（3.24） |
+| `Tools/UICheck`（可持續使用） | `UICheck.bat`、`CheckStatic.ps1`、`DesignerParser.ps1`、`StaticExceptions.txt`、`CheckRuntimeLayout.ps1`、`LayoutRunner.cs`、`CaptureMainWindow.ps1`、`MainWindowRunner.cs`、`HiddenDesktopRun.cs`、`SyncLanguage.ps1`、`FixTabOrder.ps1`、`DesignerDiff.ps1`（3.24）、`CheckControls.ps1`、`ControlRunner.cs`（3.28） |
 | `Doc/UIStyleUnify/Tests`（本議題限定） | `RunIssueChecks.bat`、`CompareBehavior.ps1`、`RenameMap.txt`、`BehaviorExceptions.txt`、`CheckBranchRules.ps1`、`CompareMainLayout.ps1`、`MainLayoutBaseline.txt`（3.22） |
 
 1. 收官時把行為比對三個檔案從 `Tools/UICheck` 移到議題資料夾，比對基準由 `master` 改為固定的分支起點 `a4b3826d`；
@@ -220,6 +221,7 @@
 | `ManualOrderAction.cs`、`SelectPathAction.cs`、`SimuEditor.cs` | 只加 `using CommonUI.Controls`（`MultiSelectTreeView` 移入 `CommonUI`） |
 | `MyCAM/MyCAM.csproj` | 移除 `DebouncedNumericUpDown.cs`、`SupportPositionRow.cs`、`MultiSelectTreeView.cs` |
 | `CncUI/CncUI.csproj` | 移除 `Helper\ResponsiveLayout.cs` |
+| `CommonUI/CommonUI.csproj` | 編譯項目依五類資料夾重列（3.5）：新增 `Controls`、`Forms`、`Language`、`Layout`、`Theme` 的新檔與移入的 `DebouncedNumericUpDown`、`MultiSelectTreeView`、`RemovableValueRow`、`ResponsiveLayout`，`RoundDrawing` 由 `Controls` 改到 `Theme`，移除 `GroupPanel`、`PanelButton`；新增 `LanguageManager` 專案參考（`LanguageApplier`、`CommonTexts` 使用） |
 | `LanguageManager/LanguageManager.cs` | 新增 `HasString`（3.5） |
 
 ## 3.17 逐檔明細：移入 `CommonUI` 的既有元件
@@ -438,3 +440,30 @@
 3. 補齊前兩批遺漏的議題檢查（決議 4.12 第 5 項）：`RenameMap.txt` 加 `ToolVectorDlg` 圖例 `m_pnlColor*` → `m_swt*`
    5 筆；`BehaviorExceptions.txt` 登錄移除 `m_cmsMain`、圖例改為 `ColorSwatch`、`CNCInfoPanel` 不再自行繪製軸點；
    `ButtonKind.cs` 超過 120 字元的 XML 註解改為多行。
+
+## 3.28 Round 1 整體審查的修正（2026-11-21）
+
+決議見 4.15，逐項回覆見 [9_ReviewRound1-reply.md](9_ReviewRound1-reply.md)。
+
+1. `CommonUI/Controls/DebouncedNumericUpDown.cs`：
+   1. 新增 `m_LastValidValue`，在 `OnValueChanged` 記錄每個被接受的值（使用者或程式設定）；`RevertToLastValue` 改為回復它，
+      不再回復上次通知的值 `m_LastValue`，也不再設定 `Value`，所以回復不送出 `ValueChanged`。
+      不在回復時讀 `Value`：編輯中的文字尚未被接受時，讀 `Value` 會再次驗證而無限遞迴。
+   2. 是否啟動 debounce 改為 `Value == m_LastValue`（`decimal` 直接比較），刪除 `EPSILON`。
+2. `CommonUI/Controls/RemovableValueRow.cs`：刪除按鈕設 `Kind = ButtonKind.Danger`。
+3. `CommonUI/Theme`：刪除 `TextRole.Title`、`ThemeFonts.Title`（與 `TITLE_SIZE`）、`ThemeText.GetColor` 的 `Title` 分支；
+   畫面中沒有使用（Designer 以名稱序列化 `Role`，刪除列舉值不影響既有 Designer 檔）。
+4. 檢查（`Tools/UICheck`）：
+   1. 新增 `CheckControls.ps1` + `ControlRunner.cs`：不開視窗，以子類別走控制項的輸入路徑（`ValidateEditText`、`OnMouseWheel`），
+      檢查 N1（無法解析 / 超出上限 / 低於下限的輸入回復最新合法值、`ValueChanged` 只有原本的變化）、
+      N2（最後一位小數的一步送出一次 `DebouncedValueChanged`）、N3（滾輪一格一個 `Increment`、停在上限）。`UICheck.bat runtime` 執行它。
+   2. `CheckRuntimeLayout.ps1`、`CaptureMainWindow.ps1`：runner 的刪除改寫在包住編譯、準備與執行全程的 `finally`。
+5. 議題檢查（`Doc/UIStyleUnify/Tests`）：
+   1. `CompareBehavior.ps1`：B7 以呼叫點所在檔案為「控制項」欄；型別替換後不再跳過 B3，只比對分支起點有設定的屬性。
+   2. `BehaviorExceptions.txt`：B7 改為只放行 `CommonUI/Layout/SectionStack.cs`；新增唯讀座標改標籤的 B3 例外 3 行
+      （`CalibrationREFDlg`、`CNCThreePointDlg`、`ThreePtTransformDlg`）；`AutoSortPathDlg` 的 B6 加註接受的滾輪與超界差異。
+6. 指引：
+   1. UI 規範：2.2 刪除 `Title` 列；第 5 節新增第 3 點（數值框的操作行為）；第 8 節規則表新增 N1–N3、`runtime` 說明加 `CheckControls.ps1`；
+      8.2 檔案表新增兩個檔、第 1 點加 `ControlRunner.cs`、第 9 點改為三支腳本並寫明失敗也會清理。
+   2. 專案概觀：`CommonUI` 的說明改為現行內容（原本列已刪除的 `GroupPanel`）。
+7. 議題文件：README 狀態、5 章結果與合併門檻、6.1 第 1 項、相容性異動第 3 項、本節與 3.1、3.12、3.16。
