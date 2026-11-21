@@ -34,6 +34,8 @@
 #   S23 code creates no control outside the white list (section 3)
 #   S24 InitializeComponent contains only what the designer can read: no control flow, lambda, interpolated string,
 #       call of the screen's own methods, constant of the class, statement without "this."
+#   S25 a screen reads nothing from its own .resx: no ComponentResourceManager in the designer file, no <data> in
+#       the .resx (design time metadata only; images from Properties.Resources)
 #
 # Exceptions are listed in StaticExceptions.txt: "<rule> <class> <control> <reason>". Exit code 1 on a problem.
 
@@ -385,6 +387,24 @@ function Test-DesignerCode( [string]$szClass, [string]$szText ) {
 			$szShort = if ($s.Length -gt 100) { $s.Substring(0, 100) + " ..." } else { $s }
 			Report "S24" $szClass "InitializeComponent" "$szProblem : $szShort"
 		}
+	}
+}
+
+# S25 a screen reads nothing from its own .resx at run time: the .resx holds design time information only
+# (metadata such as TrayLocation). Images come from the project resources (Properties.Resources); Localizable is
+# not used. The data samples of the .resx template are inside a comment.
+function Test-DesignerResources( [string]$szClass, [string]$szDesignerPath ) {
+	$szText = Get-Content $szDesignerPath -Raw -Encoding UTF8
+	if ($szText -match "ComponentResourceManager|\bresources\.(GetObject|GetString|ApplyResources)\(") {
+		Report "S25" $szClass "InitializeComponent" "reads the .resx of the screen (use Properties.Resources, no Localizable)"
+	}
+	$szResxPath = $szDesignerPath -replace "\.Designer\.cs$", ".resx"
+	if (-not (Test-Path $szResxPath)) {
+		return
+	}
+	$szResx = (Get-Content $szResxPath -Raw -Encoding UTF8) -replace "(?s)<!--.*?-->", ""
+	foreach ($match in [regex]::Matches($szResx, '<data\s+name="([^"]*)"')) {
+		Report "S25" $szClass $match.Groups[1].Value "resource in the .resx of the screen (only design time metadata)"
 	}
 }
 
@@ -796,6 +816,9 @@ foreach ($file in $designerFiles) {
 
 	# S24 the designer can read InitializeComponent
 	Test-DesignerCode $szClass (Get-Content $file.FullName -Raw -Encoding UTF8)
+
+	# S25 nothing is read from the .resx of the screen
+	Test-DesignerResources $szClass $file.FullName
 }
 
 # S9 the main window follows the same naming; its layout is computed by MainLayout, so S10 does not apply
@@ -805,6 +828,7 @@ if (-not $Only -or $mainScreen.ClassName -like $Only) {
 	Test-OrphanIds $mainScreen (Join-Path $Root "MyCAM\StartupForm.cs")
 	$szMainText = Get-Content (Join-Path $Root "MyCAM\StartupForm.Designer.cs") -Raw -Encoding UTF8
 	Test-DesignerCode $mainScreen.ClassName $szMainText
+	Test-DesignerResources $mainScreen.ClassName (Join-Path $Root "MyCAM\StartupForm.Designer.cs")
 
 	# S19 types and appearance of the main window
 	foreach ($name in $mainScreen.Fields.Keys) {
