@@ -18,7 +18,7 @@
 | [3_Implementation.md](3_Implementation.md) | 實作紀錄：實際施工內容，與架構規劃逐項對應，並附逐檔異動明細 | 最終版 |
 | [4_Discussion.md](4_Discussion.md) | 討論紀錄：所有要求、待決問題、Review 發現與決議（依日期） | 歷史紀錄，只追加 |
 | [5_Verification.md](5_Verification.md) | 測試驗證：兩類測試的內容、結果、涵蓋範圍與維護注意事項 | 最終版 |
-| [6_FollowUp.md](6_FollowUp.md) | 合併前的收尾事項與範圍外的後續議題 | 隨進度更新 |
+| [6_FollowUp.md](6_FollowUp.md) | 合併前的收尾、相容性異動、範圍外的後續議題與議題清單 | 隨進度更新 |
 
 ## 測試程式
 
