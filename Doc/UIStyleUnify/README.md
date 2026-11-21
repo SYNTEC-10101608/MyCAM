@@ -20,6 +20,7 @@
 | [5_Verification.md](5_Verification.md) | 測試驗證：兩類測試的內容、結果、涵蓋範圍與維護注意事項 | 最終版 |
 | [6_FollowUp.md](6_FollowUp.md) | 合併前的收尾、範圍外的後續議題與議題清單 | 隨進度更新 |
 | [7_Compatibility.md](7_Compatibility.md) | 相容性異動：合併後對客製語系檔等既有檔案的影響與處理方式，合併時寫入 Merge Request 說明 | 最終版 |
+| [8_ReviewRound1.md](8_ReviewRound1.md) | Round 1 整體審查：問題、證據、驗證限制與待討論事項 | Review 紀錄，待討論 |
 
 ## 測試程式
 
