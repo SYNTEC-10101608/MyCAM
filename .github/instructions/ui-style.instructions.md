@@ -277,7 +277,7 @@ Form
 2. 按鈕種類依 3.1：結束這一步或完成精靈的動作用 `Primary`，每個容器最多一個。
 3. 版面變化只透過上兩表的 `SectionStack` 方法，對話框不自行計算座標、大小與位置。
 4. `Highlighted` 只用於展開式；切換式畫面上只有目前這一步，不另外標示。
-5. 新增或改動精靈時，把各步驟加到檢查程式的 `STATE_MAP`（8.1）。
+5. 新增或改動精靈時，把各步驟加到檢查程式的 `STATE_MAP`（8.2）。
 
 ## 5. 數值輸入
 
@@ -363,7 +363,7 @@ Form
 
 ## 8. 檢查腳本（`Tools/UICheck`）
 
-本節的檢查是規範的一部分，持續維護；維護方式見 8.1。
+本節的檢查是規範的一部分，持續維護；維護方式見 8.2。
 
 | 指令 | 內容 |
 | --- | --- |
@@ -391,6 +391,7 @@ Form
 | S22 | 卡片標題列內的控制項位置（4.5）：按鈕高 23、`y = 5`，`CheckBox` `y = 5`，標籤高 24、`y = 4`，最右者對齊內容右緣 |
 | S23 | 程式中建立的控制項在白名單內 |
 | S24 | `InitializeComponent` 中 Designer 讀不懂的寫法：流程控制、lambda、字串插補、呼叫畫面自己的方法、類別常數、不以 `this.` 開頭的陳述式 |
+| S25 | 畫面的 `.Designer.cs` 以 `ComponentResourceManager` 讀取資源，或畫面的 `.resx` 有 `<data>` 資源（8.1 第 3 點） |
 | T1–T7 | 文字截斷、超出容器、重疊等；T6 檢查 `Load` 前後版面與 Designer 相同；T7 檢查控制項顯示語系檔的文字。精靈與多狀態畫面依 `LayoutRunner.cs` 的 `STATE_MAP` 逐一檢查每個狀態 |
 | P1–P6 | 對話框置中（含 `ShowDialog` 開啟的）、CAM 區域、主視窗字族、主視窗中 CNC 面板以實際大小的文字與版面、選單與工具列項目顯示語系檔的文字；P6 以 Designer 的客戶區大小與加工頁執行時，主視窗各區的位置與大小等於 Designer 上的值（不符時列出應寫入的值） |
 
@@ -401,21 +402,46 @@ Form
 4. 產品程式（`MyCAM`、`CncUI`、`CommonUI` 等）不放為了檢查而寫的程式：不加只給檢查用的方法、屬性、旗標或分支。
    檢查需要的狀態，在檢查程式中呼叫產品本來就有的方法觸發（例：`STATE_MAP` 以 `SetCommandsEnabled` 呈現 CNC 連線後的按鈕），
    或建立實際的環境（例：連線 CNC 模擬器）。檢查程式只在執行期間放在建置輸出，結束即刪除。
-5. Designer 檔的格式不審查；review 以 `DesignerDiff.ps1` 的語意差異與本節的檢查結果為準
-   （專案概觀「WinForms Designer」）。
+5. Designer 檔的撰寫與 review 依 8.1。
 
-### 8.1 維護
+### 8.1 Designer 檔的撰寫與 review
+
+`*.Designer.cs`、`*.resx` 由 Visual Studio Designer 產生，也可以直接以程式碼修改（目前大多由 AI 撰寫）。
+Designer 存檔時會依各台電腦的 VS 設定重新產生整個 `InitializeComponent`（順序、縮排、換行、resx 的
+`TrayLocation` 都可能不同），因此正確性由本節的檢查保證，不規範各人的 VS 環境。
+
+| 階段 | 誰 | 做法 | 驗證 |
+| --- | --- | --- | --- |
+| 撰寫 / 修改 | AI 或人 | 直接改 `.Designer.cs`，寫法依 Designer 的輸出（`this.` 開頭的指派與呼叫）；沿用檔案現有的縮排與格式，不順手轉換 | `UICheck.bat`；改了版面時另跑 `UICheck.bat runtime` |
+| 檢視 | 人 | 開 Designer 確認能正常開啟、畫面符合預期；沒有要改就不存檔（即使標題出現 `*`，關閉時選 No） | — |
+| 微調 | 人 | 在 Designer 拖曳或改屬性後存檔；整份檔案被重新產生是預期的，不手動整理格式 | 必要時 `FixTabOrder.ps1`，再跑 `UICheck.bat` 與 `runtime` |
+| Review | 人 | 不看 `.Designer.cs` / `.resx` 的文字 diff，看 `DesignerDiff.ps1` 列出的語意差異 | 檢查全部通過 |
+
+1. Designer 檔的格式（縮排、宣告順序、續行、resx 的設計時資訊）不審查、不整理：Designer 存出什麼就是什麼。
+2. `InitializeComponent` 只能有 Designer 讀得懂的寫法：不寫流程控制、lambda、字串插補、呼叫畫面自己的方法、
+   引用類別常數（S24）。需要這些寫法的行為（例如以 lambda 繫結事件）寫在建構子的
+   `InitializeComponent()` 之後；外觀仍依本規範只寫在 Designer。
+3. 畫面的 `.resx` 只有 Designer 產生的設計時資訊（例如元件匣的 `TrayLocation`），執行時不讀取（S25）：
+   1. 不要求每個畫面都有 `.resx`，也不手動新增或刪除；Designer 存檔時需要就會自行建立並登錄到 `.csproj`。
+   2. 圖片一律引用專案資源檔（`Properties.Resources`，Designer 選「專案資源檔」），不使用區域資源。
+   3. 不設 `Localizable`；多語系依第 7 節。
+4. `DesignerDiff.ps1` 的用法：
+   1. 提交前：`DesignerDiff.ps1`（工作目錄對 `HEAD`）。
+   2. Review 分支：`DesignerDiff.ps1 -Base origin/master -Head HEAD`。
+   3. 輸出控制項、屬性、事件、其他陳述式與 resx 資源的增減；只有格式不同的檔案標示 `formatting only`。
+
+### 8.2 維護
 
 | 檔案 | 用途 |
 | --- | --- |
 | `UICheck.bat` | 入口。無參數：靜態檢查；`runtime [截圖資料夾]`：另跑執行時版面與主視窗（需先建置 Debug） |
-| `CheckStatic.ps1`、`DesignerParser.ps1` | 靜態檢查 S1–S24 與 Designer 檔解析（縮排不拘，tab 或空白皆可） |
+| `CheckStatic.ps1`、`DesignerParser.ps1` | 靜態檢查 S1–S25 與 Designer 檔解析（縮排不拘，tab 或空白皆可） |
 | `CheckRuntimeLayout.ps1`、`LayoutRunner.cs` | 執行時檢查 T1–T7 |
 | `CaptureMainWindow.ps1`、`MainWindowRunner.cs` | 主視窗截圖與 P1–P6；輸出各區座標（`[region]`） |
 | `HiddenDesktopRun.cs` | 讓 runner 在隱藏桌面執行；兩個 `.ps1` 加 `-Visible` 改回一般桌面 |
 | `SyncLanguage.ps1` | 執行時檢查前，把建置輸出中缺少或過期的語系檔從 `Language/` 複製過去 |
 | `FixTabOrder.ps1` | 依版面重編 `TabIndex`（修正 S10 的工具，不是檢查） |
-| `DesignerDiff.ps1` | Designer 檔（`.Designer.cs`、`.resx`）的語意差異，供提交前與 review 使用（報告，不是檢查；用法見專案概觀的「WinForms Designer」） |
+| `DesignerDiff.ps1` | Designer 檔（`.Designer.cs`、`.resx`）的語意差異，供提交前與 review 使用（報告，不是檢查；用法見 8.1） |
 | `StaticExceptions.txt` | 資料色登錄、承載單一遠端內容的視窗、已決議的例外 |
 
 1. **規則與規範同步**：本規範的規則改了，`CheckStatic.ps1` / `LayoutRunner.cs` / `MainWindowRunner.cs` 的對應規則要一起改，

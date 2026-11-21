@@ -17,7 +17,7 @@
 
 | 腳本 | 規則 | 檢查對象 | 結果 |
 | --- | --- | --- | --- |
-| `CheckStatic.ps1`（+ `DesignerParser.ps1`、`StaticExceptions.txt`） | S1–S24 | 34 個 Designer 檔（31 個對話框、3 個 CNC 面板）與主視窗；畫面程式碼；`CommonUI`；所有語系 XML；規範第 9 節 | 0 個問題 |
+| `CheckStatic.ps1`（+ `DesignerParser.ps1`、`StaticExceptions.txt`） | S1–S25 | 34 個 Designer 檔（31 個對話框、3 個 CNC 面板）與主視窗；畫面程式碼；`CommonUI`；所有語系 XML；規範第 9 節 | 0 個問題 |
 | `CheckRuntimeLayout.ps1`（+ `LayoutRunner.cs`） | T1–T7 | `MyCAM.exe`、`CncUI.dll` 中所有對話框與嵌入式面板，精靈與多狀態畫面逐一狀態；zh-TW、zh-CN | 各 42 個畫面狀態，0 個問題 |
 | `CaptureMainWindow.ps1`（+ `MainWindowRunner.cs`） | P1–P6 | 主視窗 zh-TW / zh-CN × CAD / CAM / CNC 頁面 × 橫式 1920×1040 / 直式 1080×1880，共 12 組；置中檢查 `Show` 開啟的 3 個與 `ShowDialog` 開啟的 2 個對話框；另以 Designer 的客戶區 1920×1009 開加工頁，比對 10 個區域與 Designer（P6） | 13 組 0 個問題 |
 
@@ -61,7 +61,7 @@
 
 確認規則真的能檢出問題：S14、S16、T7（2026-11-16）、S21 的資料夾與 namespace 一致（2026-11-17，把 `RoundDrawing`
 的 namespace 暫時改錯，S21 報錯，還原後通過）。S1、S9、S23 的原生 `Label`（2026-11-19，把 `OverCutDlg` 的標籤暫時改回原生 `Label`、在程式中加 `new Label()`，三條規則都報錯，還原後通過）。S19 與 P6（2026-11-19，把 `m_pnlBottom` 暫時改回 `TableLayoutPanel`、
-`m_pnlViewer` 的 Designer 寬度改為 1200，S19 與 P6 都報錯，P6 並列出應寫入的值，還原後通過）。S9、S19 的 `ToolStripContainer`（2026-11-20，把 `m_pnlToolBar` 暫時改回 `ToolStripContainer`，兩條規則都報錯，還原後通過）。S24（2026-11-20，在 `LeadDlg.Designer.cs` 的 `InitializeComponent` 暫時加入 `if` 區塊、lambda 事件、類別常數、`this.ApplyStyle()`、沒有 `this.` 的欄位、字串插補，六項都報錯，還原後通過）。
+`m_pnlViewer` 的 Designer 寬度改為 1200，S19 與 P6 都報錯，P6 並列出應寫入的值，還原後通過）。S9、S19 的 `ToolStripContainer`（2026-11-20，把 `m_pnlToolBar` 暫時改回 `ToolStripContainer`，兩條規則都報錯，還原後通過）。S24（2026-11-20，在 `LeadDlg.Designer.cs` 的 `InitializeComponent` 暫時加入 `if` 區塊、lambda 事件、類別常數、`this.ApplyStyle()`、沒有 `this.` 的欄位、字串插補，六項都報錯，還原後通過）。S25（2026-11-21，在 `LeadDlg.Designer.cs` 暫時加入 `ComponentResourceManager`、在 `LeadDlg.resx` 與 `StartupForm.resx` 暫時加入 `<data>` 資源，三項都報錯，還原後通過）。
 
 ### 維護注意事項
 

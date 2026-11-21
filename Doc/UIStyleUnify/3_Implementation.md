@@ -416,3 +416,17 @@
    `StaticExceptions.txt` 刪除 S2（`ToolVectorDlg` 圖例）與 S19（「加工 / 不加工」圖例）的例外。
 5. 規範：第 1 節總則、第 2 節開頭、第 3 節白名單（刪除「不可使用」、新增審查方式與 `ColorSwatch`）、3.2、4.2、4.4 開頭與
    第 4、11 點、6.2、6.3、6.6、嵌入式面板第 7 點、規則表 S19 / S23、9.2；圖示設計指引的文字規則改為正面寫法。
+
+## 3.27 規範 review 第三批（2026-11-21）
+
+決議見 4.12。
+
+1. 規範：
+   1. UI 規範新增 8.1「Designer 檔的撰寫與 review」：專案概觀的分工表、格式不審查、S24 寫法限制、`DesignerDiff.ps1`
+      用法移入，新增 `.resx` 的規則（第 3 點）；第 8 節第 5 點改為引用 8.1，原 8.1「維護」改為 8.2，
+      引用處（第 8 節開頭、4.7 第 5 點、8.2 的 `DesignerDiff.ps1` 列）同步修改；規則表新增 S25。
+   2. 專案概觀「WinForms Designer」只留一行，引用 UI 規範 8.1。
+   3. `copilot-instructions.md` 指引目錄的 UI 風格內容加「Designer 檔的撰寫與 review」。
+2. 檢查：`CheckStatic.ps1` 新增 S25（`Test-DesignerResources`），涵蓋畫面資料夾的 Designer 檔與主視窗：
+   `.Designer.cs` 不得使用 `ComponentResourceManager` / `resources.GetObject` / `GetString` / `ApplyResources`，
+   `.resx` 去除註解後不得有 `<data>`。

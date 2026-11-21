@@ -353,3 +353,12 @@ Designer 目前**不是**橫式，而是執行時不會出現的混合狀態：
 | 8 | CommonUI 的 API 是否有文件 | 不另寫文件；公開成員都有 XML 註解，至少說明用途：補 `ThemedButton.Kind` / `Indicator`、色票與尺寸常數、`ButtonKind` / `ButtonIndicator` / `CommonButtonText` / `TextRole` 的值 |
 | 9 | 黑名單寫法列不完、不好審查 | 全文改為規則與白名單（第 2 節開頭、4.2、4.4 開頭、6.3、嵌入式面板第 7 點、S19、S23、圖示設計） |
 | 10 | `ApplyLanguage` 能否放進 `DialogBase` | 維持由各對話框在建構子呼叫：基底建構子早於 `InitializeComponent()`，改在 `OnLoad` 已試過會讓 `Show` 前讀到 zh-TW、蓋掉建構子設定的文字；漏寫由 S14 檢出 |
+
+## 4.12 規範 review 第三批（2026-11-21，已定稿並施工，3.27）
+
+| # | 問題 | 決議 |
+| --- | --- | --- |
+| 1 | 專案概觀的「WinForms Designer」章節是否保留 | 移到 UI 規範新的 8.1「Designer 檔的撰寫與 review」（原 8.1「維護」改為 8.2），併入第 8 節第 5 點；專案概觀只留一行引用。理由：內容由本議題寫入、依賴 `Tools/UICheck`，且兩份指引原本互相引用 |
+| 2 | UI 規範的 `applyTo` 是否加 `*.resx` | 維持 `**/*.cs`：畫面的 `.resx` 只有 Designer 產生的設計時資訊，一定與 `.Designer.cs` 一起異動 |
+| 3 | `.resx` 的用途與是否要每個畫面都配對 | 查證：38 個 `.Designer.cs` 中 31 個有 `.resx`，其中 30 個只有範本標頭，`StartupForm.resx` 只有 `TrayLocation`（`<metadata>`，不編進組件）；沒有 `.Designer.cs` 使用 `ComponentResourceManager`。有沒有 `.resx` 只取決於建立方式（VS 範本或手寫）。決議：不要求配對、不手動新增或刪除；畫面的 `.resx` 執行時不讀取，圖片引用專案資源檔、不設 `Localizable`，寫入規範 8.1 第 3 點，並新增靜態檢查 S25 |
+| 4 | `STATE_MAP` 中 `CNCPanel` 以 `SetCommandsEnabled` 呈現連線後的狀態，是否應改為實際連線 | 維持：該方法就是連線成功時控制器呼叫的產品方法，版面檢查只需要按鈕啟用後的外觀，且必須在無機台的開發機上可重現。實際數值、燈號、警報與 zh-CN 長字串維持人工確認（5.3 第 4 項）；若有新代 PC 模擬器，再另開議題讓 runner 選用實際連線（6.2） |

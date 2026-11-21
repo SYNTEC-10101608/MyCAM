@@ -69,25 +69,8 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 
 ### WinForms Designer
 
-`*.Designer.cs`、`*.resx` 由 Visual Studio Designer 產生，也可以直接以程式碼修改（目前大多由 AI 撰寫）。
-Designer 存檔時會依各台電腦的 VS 設定重新產生整個 `InitializeComponent`（順序、縮排、換行、resx 的
-`TrayLocation` 都可能不同），因此正確性由檢查保證，不規範各人的 VS 環境。
-
-| 階段 | 誰 | 做法 | 驗證 |
-| --- | --- | --- | --- |
-| 撰寫 / 修改 | AI 或人 | 直接改 `.Designer.cs`，寫法依 Designer 的輸出（`this.` 開頭的指派與呼叫）；沿用檔案現有的縮排與格式，不順手轉換 | `Tools\UICheck\UICheck.bat`；改了版面時另跑 `UICheck.bat runtime` |
-| 檢視 | 人 | 開 Designer 確認能正常開啟、畫面符合預期；沒有要改就不存檔（即使標題出現 `*`，關閉時選 No） | — |
-| 微調 | 人 | 在 Designer 拖曳或改屬性後存檔；整份檔案被重新產生是預期的，不手動整理格式 | 必要時 `FixTabOrder.ps1`，再跑 `UICheck.bat` 與 `runtime` |
-| Review | 人 | 不看 `.Designer.cs` / `.resx` 的文字 diff，看 `Tools\UICheck\DesignerDiff.ps1` 列出的語意差異 | 檢查全部通過 |
-
-1. Designer 檔的格式（縮排、宣告順序、續行、resx 的設計時資訊）不審查、不整理：Designer 存出什麼就是什麼。
-2. `InitializeComponent` 只能有 Designer 讀得懂的寫法：不寫流程控制、lambda、字串插補、呼叫畫面自己的方法、
-   引用類別常數（靜態檢查 S24）。需要這些寫法的行為（例如以 lambda 繫結事件）寫在建構子的
-   `InitializeComponent()` 之後；外觀仍依 UI 規範只寫在 Designer。
-3. `DesignerDiff.ps1` 的用法：
-   1. 提交前：`DesignerDiff.ps1`（工作目錄對 `HEAD`）。
-   2. Review 分支：`DesignerDiff.ps1 -Base origin/master -Head HEAD`。
-   3. 輸出控制項、屬性、事件、其他陳述式與 resx 資源的增減；只有格式不同的檔案標示 `formatting only`。
+- `*.Designer.cs`、`*.resx` 由 Visual Studio Designer 產生，也可以直接以程式碼修改；撰寫、修改與 review 的方式見
+  [UI 風格](ui-style.instructions.md) 8.1。
 
 ## 建置與執行
 
