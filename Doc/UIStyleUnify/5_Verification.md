@@ -96,14 +96,14 @@
 
 | 腳本 | 規則 | 檢查什麼 | 結果 |
 | --- | --- | --- | --- |
-| `CompareBehavior.ps1`（+ `RenameMap.txt`、`BehaviorExceptions.txt`） | B1–B8 | 與分支起點 `a4b3826d` 比對：Designer 的事件訂閱、RadioButton 群組、非外觀屬性、表單行為屬性、程式使用的控制項仍存在、型別只做外觀替換、全 repo 的 `Show` / `ShowDialog` 呼叫點、改動過的 `.cs` 中事件訂閱與 `Enabled` / `Visible` / `ReadOnly` / `Checked` 賦值。控制項改名先以 `RenameMap.txt`（304 筆）換算 | 0 個差異 |
-| `CheckBranchRules.ps1` | I1–I9 | 本議題新增或改動的檔案符合通用與 C# 規範：編碼與 BOM、檔尾換行、行尾空白、C# 行長 120、tab 縮排、不用 `this.`、註解為英文且不用 `/* */`、產品專案一檔一個頂層型別；產品程式不提到檢查程式、建置輸出沒有殘留 runner | 335 個檔案，0 個問題 |
+| `CompareBehavior.ps1`（+ `RenameMap.txt`、`BehaviorExceptions.txt`） | B1–B8 | 與分支起點 `a4b3826d` 比對：Designer 的事件訂閱、RadioButton 群組、非外觀屬性、表單行為屬性、程式使用的控制項仍存在、型別只做外觀替換、全 repo 的 `Show` / `ShowDialog` 呼叫點、改動過的 `.cs` 中事件訂閱與 `Enabled` / `Visible` / `ReadOnly` / `Checked` 賦值。控制項改名先以 `RenameMap.txt`（310 筆）換算 | 0 個差異 |
+| `CheckBranchRules.ps1` | I1–I9 | 本議題新增或改動的檔案符合通用與 C# 規範：編碼與 BOM、檔尾換行、行尾空白、C# 行長 120、tab 縮排、不用 `this.`、註解為英文且不用 `/* */`、產品專案一檔一個頂層型別；產品程式不提到檢查程式、建置輸出沒有殘留 runner | 346 個檔案，0 個問題 |
 | `CompareMainLayout.ps1`（+ `MainLayoutBaseline.txt`） | — | 主視窗各承載區的座標與移除 `TableLayoutPanel` 前的基準逐像素相同：CAD / CAM / CNC 頁面 × 橫式 1920×1040、1366×768 × 直式 1080×1880、900×1600，共 12 個情境（zh-TW；需先建置 Debug） | 152 行，0 個差異 |
 | `RunIssueChecks.bat` | — | 依序執行上面三個腳本 | 全部通過 |
 
 `BehaviorExceptions.txt` 列出已決議的行為差異（數值框取代、唯讀座標改標籤、區塊標題 `Label` 併入卡片、步驟標籤改卡片標題、
 主視窗直式 CNC 承載區的 `SizeChanged` 處理移除、從不顯示的第二、三層工具列容器刪除、功能工具列容器改為 `Panel`、
-精靈換頁移入 `SectionStack.ShowPage`），每行附決議出處。
+精靈換頁移入 `SectionStack.ShowPage`、移除未使用的右鍵選單、圖例與軸點改用 `ColorSwatch`），每行附決議出處。
 
 ### 判斷原則
 

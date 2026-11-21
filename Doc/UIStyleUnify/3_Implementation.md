@@ -430,3 +430,6 @@
 2. 檢查：`CheckStatic.ps1` 新增 S25（`Test-DesignerResources`），涵蓋畫面資料夾的 Designer 檔與主視窗：
    `.Designer.cs` 不得使用 `ComponentResourceManager` / `resources.GetObject` / `GetString` / `ApplyResources`，
    `.resx` 去除註解後不得有 `<data>`。
+3. 補齊前兩批遺漏的議題檢查（決議 4.12 第 5 項）：`RenameMap.txt` 加 `ToolVectorDlg` 圖例 `m_pnlColor*` → `m_swt*`
+   5 筆；`BehaviorExceptions.txt` 登錄移除 `m_cmsMain`、圖例改為 `ColorSwatch`、`CNCInfoPanel` 不再自行繪製軸點；
+   `ButtonKind.cs` 超過 120 字元的 XML 註解改為多行。

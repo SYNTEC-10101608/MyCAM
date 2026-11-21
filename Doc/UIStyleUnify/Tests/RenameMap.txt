@@ -281,6 +281,11 @@ ThreePtTransformDlg tbxMachineZ2 m_numMachineZ2
 ThreePtTransformDlg tbxMachineZ3 m_numMachineZ3
 ToolVectorDlg m_cbxInterpolateType m_cmbInterpolateType
 ToolVectorDlg m_gbxIndexParam m_pnlIndexParam
+ToolVectorDlg m_pnlColorBevel m_swtBevel
+ToolVectorDlg m_pnlColorMaster m_swtMaster
+ToolVectorDlg m_pnlColorNormal m_swtNormal
+ToolVectorDlg m_pnlColorRotary m_swtRotary
+ToolVectorDlg m_pnlColorSlave m_swtSlave
 ToolVectorDlg m_secMovePnt m_pnlMovePnt
 ToolVectorDlg m_secQuickSet m_pnlQuickSet
 ToolVectorDlg m_secSetting m_pnlSetting

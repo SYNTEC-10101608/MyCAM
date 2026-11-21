@@ -65,3 +65,12 @@ B6 StartupForm m_tscLevel1Container replaced by the Panel m_pnlToolBar at the sa
 B7 repository * SectionStack.ShowPage shows the form again after the switch, as DesignSupportBracketDlg.ShowPanel did
 B8 DesignSupportBracketDlg m_pnl*Page ShowPage hides all pages before fitting the form, as ShowPanel did
 B8 DesignSupportBracketDlg activePanel ShowPage shows the page after the form is fitted, as ShowPanel did
+
+# unused context menu removed (decision 2026-11-20 "ContextMenuStrip"): m_cmsMain was empty and attached to no control
+B6 StartupForm m_cmsMain removed; it had no items and was never shown
+
+# legend swatches become ColorSwatch (decision 2026-11-20, second batch item 3): the color is set from ToolVecInterpolateColor
+B6 ToolVectorDlg m_swt* Panel -> ColorSwatch, same place and size; the data color is set in the constructor
+
+# axis points drawn by ColorSwatch (decision 2026-11-20, second batch item 3): the panel no longer paints them itself
+B8 CNCInfoPanel m_pnlCoordinates the Paint handler is replaced by the ColorSwatch axis points m_swtX to m_swtC

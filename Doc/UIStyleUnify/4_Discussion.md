@@ -362,3 +362,4 @@ Designer 目前**不是**橫式，而是執行時不會出現的混合狀態：
 | 2 | UI 規範的 `applyTo` 是否加 `*.resx` | 維持 `**/*.cs`：畫面的 `.resx` 只有 Designer 產生的設計時資訊，一定與 `.Designer.cs` 一起異動 |
 | 3 | `.resx` 的用途與是否要每個畫面都配對 | 查證：38 個 `.Designer.cs` 中 31 個有 `.resx`，其中 30 個只有範本標頭，`StartupForm.resx` 只有 `TrayLocation`（`<metadata>`，不編進組件）；沒有 `.Designer.cs` 使用 `ComponentResourceManager`。有沒有 `.resx` 只取決於建立方式（VS 範本或手寫）。決議：不要求配對、不手動新增或刪除；畫面的 `.resx` 執行時不讀取，圖片引用專案資源檔、不設 `Localizable`，寫入規範 8.1 第 3 點，並新增靜態檢查 S25 |
 | 4 | `STATE_MAP` 中 `CNCPanel` 以 `SetCommandsEnabled` 呈現連線後的狀態，是否應改為實際連線 | 維持：該方法就是連線成功時控制器呼叫的產品方法，版面檢查只需要按鈕啟用後的外觀，且必須在無機台的開發機上可重現。實際數值、燈號、警報與 zh-CN 長字串維持人工確認（5.3 第 4 項）；若有新代 PC 模擬器，再另開議題讓 runner 選用實際連線（6.2） |
+| 5 | 前兩批提交時未同步議題檢查，`RunIssueChecks.bat` 有 9 個失敗（B6 `m_cmsMain`、B8 `ToolVectorDlg` 圖例改名、B8 `CNCInfoPanel` 的 `Paint`、I4 `ButtonKind.cs` 行長） | 照已決議的改動補登錄：改名對照、行為例外（含圖例 `Panel` → `ColorSwatch` 的型別替換），行長拆行；重跑全部通過 |
