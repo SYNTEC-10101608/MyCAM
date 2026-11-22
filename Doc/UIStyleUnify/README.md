@@ -26,6 +26,7 @@
 | [11_ReviewRound2-reply.md](11_ReviewRound2-reply.md) | Round 2 review 的回覆：逐項決議、修正內容與驗證結果，供 Round 3 review | 回覆，Round 3 時對照 |
 | [12_ReviewRound3.md](12_ReviewRound3.md) | Round 3 審查：原生上下按鈕、B3 生效值範圍、debounce 時間防線與回覆確認 | Review 快照，不修改 |
 | [13_ReviewRound3-reply.md](13_ReviewRound3-reply.md) | Round 3 review 的回覆：逐項決議、修正內容與驗證結果，供 Round 4 review | 回覆，Round 4 時對照 |
+| [14_ReviewRound4.md](14_ReviewRound4.md) | Round 4 審查：原生重複操作、B3 舊型別與清理、N2 時間判定及回覆確認 | Review 快照，待討論 |
 
 ## 測試程式
 
