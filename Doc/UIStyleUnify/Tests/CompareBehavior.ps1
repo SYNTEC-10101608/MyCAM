@@ -11,8 +11,9 @@
 #   B1  event subscriptions in the designer file
 #   B2  radio button groups (which radio buttons are exclusive to each other)
 #   B3  non-appearance properties of controls (range, decimals, checked, enabled, visible, read-only, items ...);
-#       a control whose type changed is compared by effective values, the defaults read from new instances of both
-#       types, so the Debug build (CommonUI.dll) is needed
+#       a control whose type changed (also a replacement allowed by B6) is compared by effective values, the
+#       defaults read from new instances of both types: the Debug build (CommonUI.dll) is needed, and the controls
+#       deleted by the issue are compiled from the base source
 #   B4  form properties with behavior (AcceptButton, CancelButton, ControlBox, KeyPreview, TopMost)
 #   B5  controls used by the code still exist
 #   B6  control types: only appearance replacements (Button -> ThemedButton, GroupBox -> SectionPanel ...)
@@ -152,6 +153,40 @@ if (-not (Test-Path $commonUIPath)) {
 [void][Reflection.Assembly]::LoadFrom($commonUIPath)
 $defaultInstances = @{}
 
+# controls deleted by the issue: their defaults come from the base source, compiled to a temporary folder and
+# loaded from memory, so the folder can be removed at once; designer files of the base wrote the numeric box
+# of MyCAM.Editor without its namespace
+$BASE_TYPE_SOURCES = @( "CommonUI/Controls/GroupPanel.cs", "CommonUI/Controls/PanelButton.cs",
+	"CommonUI/Controls/RoundDrawing.cs", "MyCAM/Editor/Dialog/DebouncedNumericUpDown.cs" )
+$TYPE_ALIASES = @{ "DebouncedNumericUpDown" = "MyCAM.Editor.DebouncedNumericUpDown" }
+$baseTypeDir = Join-Path ([IO.Path]::GetTempPath()) ("CompareBehavior_" + [guid]::NewGuid().ToString("N"))
+try {
+	[void](New-Item -ItemType Directory $baseTypeDir)
+	$baseSources = foreach ($szSource in $BASE_TYPE_SOURCES) {
+		$szPath = Join-Path $baseTypeDir (Split-Path $szSource -Leaf)
+		$text = & git -C $Root show "$($Base):$szSource"
+		if ($LASTEXITCODE -ne 0) {
+			throw "[CompareBehavior] $szSource not found in $Base"
+		}
+		[IO.File]::WriteAllText($szPath, ($text -join "`r`n"), (New-Object Text.UTF8Encoding $true))
+		$szPath
+	}
+	$vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+	$msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" |
+		Select-Object -First 1
+	$csc = Join-Path (Split-Path $msbuild) "Roslyn\csc.exe"
+	$baseTypeDll = Join-Path $baseTypeDir "BaseTypes.dll"
+	& $csc /nologo /target:library /out:$baseTypeDll /r:System.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll `
+		@baseSources
+	if ($LASTEXITCODE -ne 0) {
+		throw "[CompareBehavior] the deleted base controls cannot be compiled"
+	}
+	[void][Reflection.Assembly]::Load([IO.File]::ReadAllBytes($baseTypeDll))
+}
+finally {
+	Remove-Item $baseTypeDir -Recurse -Force -ErrorAction SilentlyContinue
+}
+
 # canonical text of a designer value or a property value: decimals without trailing zeros, enums by name
 function ConvertTo-Canonical( $value ) {
 	if ($value -is [bool]) {
@@ -176,6 +211,9 @@ function ConvertTo-Canonical( $value ) {
 
 # $null when the type cannot be created; otherwise Has tells whether the type has the property
 function Get-DefaultValue( [string]$szType, [string]$szProperty ) {
+	if ($TYPE_ALIASES.ContainsKey($szType)) {
+		$szType = $TYPE_ALIASES[$szType]
+	}
 	if (-not $defaultInstances.ContainsKey($szType)) {
 		$type = $szType -as [type]
 		$defaultInstances[$szType] = if ($null -eq $type) { $null } else { New-Object $type }
@@ -194,28 +232,59 @@ function Get-DefaultValue( [string]$szType, [string]$szProperty ) {
 	return [pscustomobject]@{ Has = $true; Value = (ConvertTo-Canonical $info.GetValue($instance, $null)) }
 }
 
-# B3 of a control whose type changed: a property only the new type has is a new setting and not compared;
-# a property the old type has must keep its effective value, whether the old designer wrote it or not
-function Compare-EffectiveValue( [string]$szClass, [string]$name, [string]$prop, [string]$oldType, [string]$newType,
-	[string]$szOldValue, [string]$szNewValue ) {
+# B3 of a control whose type changed (also a replacement allowed by B6): a property only the new type has is a new
+# setting and not compared; a property the old type has must keep its effective value, whether the old designer
+# wrote it or not. Returns the difference, or $null.
+function Get-EffectiveDifference( [string]$prop, [string]$oldType, [string]$newType, [string]$szOldValue,
+	[string]$szNewValue ) {
 	$oldDefault = Get-DefaultValue $oldType $prop
 	$newDefault = Get-DefaultValue $newType $prop
 	if ($null -eq $oldDefault -or $null -eq $newDefault) {
-		Report "B3" $szClass $name "$prop cannot be compared: type $oldType or $newType cannot be created" $prop
-		return
+		return "$prop cannot be compared: type $oldType or $newType cannot be created"
 	}
 	if (-not $oldDefault.Has) {
-		return
+		return $null
 	}
 	$szOld = if ($szOldValue -ne "") { ConvertTo-Canonical $szOldValue } else { $oldDefault.Value }
 
 	# a feature the new type does not have is only lost when the old control changed it from the default
 	if (-not $newDefault.Has -and $szOld -eq $oldDefault.Value) {
-		return
+		return $null
 	}
 	$szNew = if (-not $newDefault.Has) { "(none)" } elseif ($szNewValue -ne "") { ConvertTo-Canonical $szNewValue } else { $newDefault.Value }
-	if ($szOld -ne $szNew) {
-		Report "B3" $szClass $name "$prop changed (effective): '$szOld' -> '$szNew'" $prop
+	if ($szOld -eq $szNew) {
+		return $null
+	}
+	return "$prop changed (effective): '$szOld' -> '$szNew'"
+}
+
+function Compare-EffectiveValue( [string]$szClass, [string]$name, [string]$prop, [string]$oldType, [string]$newType,
+	[string]$szOldValue, [string]$szNewValue ) {
+	$szDifference = Get-EffectiveDifference $prop $oldType $newType $szOldValue $szNewValue
+	if ($null -ne $szDifference) {
+		Report "B3" $szClass $name $szDifference $prop
+	}
+}
+
+# fixtures of the effective comparison: equal defaults across an allowed replacement, different defaults, a value
+# written on one side only, and deleted base controls (created from the base source); a wrong result is a problem
+$EFFECTIVE_FIXTURES = @(
+	@( "System.Windows.Forms.Button", "CommonUI.Controls.ThemedButton", "Enabled", "", "", $false ),
+	@( "System.Windows.Forms.Label", "CommonUI.Controls.ThemedLabel", "TabStop", "", "", $false ),
+	@( "System.Windows.Forms.NumericUpDown", "CommonUI.Controls.DebouncedNumericUpDown", "DecimalPlaces", "", "", $true ),
+	@( "System.Windows.Forms.Button", "CommonUI.Controls.ThemedButton", "Enabled", "", "false", $true ),
+	@( "CommonUI.Controls.PanelButton", "CommonUI.Controls.ThemedButton", "Enabled", "false", "false", $false ),
+	@( "CommonUI.Controls.PanelButton", "CommonUI.Controls.ThemedButton", "Visible", "", "false", $true ),
+	@( "DebouncedNumericUpDown", "CommonUI.Controls.DebouncedNumericUpDown", "DecimalPlaces", "", "", $false ),
+	@( "MyCAM.Editor.DebouncedNumericUpDown", "CommonUI.Controls.DebouncedNumericUpDown", "ReadOnly", "", "true", $true ),
+	@( "CommonUI.Controls.GroupPanel", "CommonUI.Controls.SectionPanel", "Enabled", "", "", $false )
+)
+foreach ($fixture in $EFFECTIVE_FIXTURES) {
+	$szDifference = Get-EffectiveDifference $fixture[2] $fixture[0] $fixture[1] $fixture[3] $fixture[4]
+	$isReported = $null -ne $szDifference -and $szDifference -notmatch "cannot be compared"
+	if ($isReported -ne $fixture[5] -or "$szDifference" -match "cannot be compared") {
+		$problems.Add("FIXTURE $($fixture[0]) -> $($fixture[1]) $($fixture[2]) '$($fixture[3])' / '$($fixture[4])':" +
+			" expected reported = $($fixture[5]), got '$szDifference'")
 	}
 }
 
@@ -272,12 +341,13 @@ foreach ($file in $designerFiles) {
 		}
 		$newType = $new.Fields[$name]
 		$isSameKind = $oldType -eq $newType -or ($TYPE_REPLACEMENTS.ContainsKey($oldType) -and $TYPE_REPLACEMENTS[$oldType] -contains $newType)
-		# a decided type change is still compared: the properties the base set must stay, the ones only the new
-		# type has are new settings and not compared
-		$isTypeChanged = -not $isSameKind
-		if ($isTypeChanged) {
+		if (-not $isSameKind) {
 			Report "B6" $szClass $name "type changed: $oldType -> $newType"
 		}
+
+		# B6 decides whether a replacement is allowed; B3 of any real type change, allowed or not, compares the
+		# effective values, since the two types may have different defaults
+		$isTypeChanged = $oldType -ne $newType
 		$oldProps = if ($old.Props.ContainsKey($name)) { $old.Props[$name] } else { @{} }
 		$newProps = if ($new.Props.ContainsKey($name)) { $new.Props[$name] } else { @{} }
 		$isContainer = $oldType -match "(GroupBox|GroupPanel|\.Panel|TableLayoutPanel|FlowLayoutPanel)$"

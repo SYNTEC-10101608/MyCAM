@@ -26,7 +26,8 @@
 | 規範 review | `c0e32b7a`、`1a18d8f0`、`019bcca3`、`cdeb98b0` | 第一～三批（3.25～3.27） |
 | 收尾盤點 | `d5f3c1df` ～ `3d4b5ffd` | 後續處理重整、相容性異動文件、自我 review 的文件修正 |
 | Round 1 整體審查 | `e7825de8` ～ `1afaf20d` | 數值框回復與通知修正、新增 N1–N3、行為比對防線限縮、runner 清理、刪除 `Title`、刪除鈕改 `Danger`（3.28） |
-| Round 2 整體審查 | `6086614e` ～ 最新 | 數值框回復保留完整精度、N1–N4 補案例、B3 改比對生效值、文件同步（3.29） |
+| Round 2 整體審查 | `6086614e` ～ `b75f03dd` | 數值框回復保留完整精度、N1–N4 補案例、B3 改比對生效值、文件同步（3.29） |
+| Round 3 整體審查 | `88f71649` ～ 最新 | 上下鍵先處理尚未驗證的輸入、B3 生效值涵蓋所有型別替換、debounce 時間門檻（3.30） |
 
 ## 3.2 外觀與行為分層（對應 2.2）
 
@@ -496,3 +497,24 @@
 5. 指引：UI 規範第 5 節第 3 點改寫並新增第 4 小點（精度、上下限、`SilentSetValue`、連續變化、`ReadOnly`、空白輸入），
    第 8 節規則表與 8.2 檔案表改為 N1–N4。
 6. 議題文件：2.3 的 `TextRole` 摘要刪除「標題」、2.12 檢查表加 N1–N4；5 章結果、反向測試與比對範圍；README；本節與 3.1、3.28。
+
+## 3.30 Round 3 整體審查的修正（2026-11-22）
+
+決議見 4.17，逐項回覆見 [13_ReviewRound3-reply.md](13_ReviewRound3-reply.md)。
+
+1. `CommonUI/Controls/DebouncedNumericUpDown.cs`：`UpButton` / `DownButton`（含鍵盤上下鍵）在原生加減之前先呼叫 `ValidateEditText`：
+   尚未驗證的超界或無法解析的文字依拒絕流程回復，合法的文字先被接受，再從最新的合法值加減一步。
+   原本原生流程自行解析並夾到上下限（20 輸入 `2000` 後按上鍵變 1000）。沒有使用者輸入時 `ValidateEditText` 直接返回（3.29）。
+2. `Tools/UICheck/ControlRunner.cs`：
+   1. N3 新增 `CheckUpDownButtons`：未驗證的 `2000` / `-1` 後直接按上 / 下鍵為 21 / 19、1.23456 輸入 `2000` 後按下鍵為 0.23456，
+      各只有一次 `ValueChanged`；合法的 `30` 後按上鍵為 `[30, 31]`。輸入只寫入編輯框（`TypeText` 改為公開）。
+   2. N2 的連續變化改為間隔 500 ms、兩次變化相隔約 200 ms，斷言最後一次變化後 400 ms 內沒有通知，之後只通知一次 21。
+   3. 事件序列不符時，訊息寫出實際的事件名稱（`ValueChanged` / `DebouncedValueChanged`）。
+3. `Doc/UIStyleUnify/Tests/CompareBehavior.ps1`：
+   1. 只要 CLR 型別不同就比對 B3 生效值，包括 B6 已允許的外觀替換；B6 是否允許另外判斷。
+   2. 本議題刪除的 `GroupPanel`、`PanelButton`、`MyCAM.Editor.DebouncedNumericUpDown`（連同依賴的 `RoundDrawing`）從分支起點的原始碼
+      以 Roslyn `csc` 編譯到暫存資料夾、從記憶體載入後立即刪除資料夾；Designer 未寫命名空間的 `DebouncedNumericUpDown` 對應 `MyCAM.Editor`。
+   3. 新增 9 個 fixture（預設值相同 / 不同、只有一邊有寫、已刪除的舊型別），結果不符時列為問題。
+   4. 判斷拆成 `Get-EffectiveDifference`（回傳差異）與 `Compare-EffectiveValue`（報告）。
+4. 指引：UI 規範第 5 節第 3 點的通知時間與上下鍵、第 8 節規則表。
+5. 議題文件：5 章結果、驗證版本、反向測試與比對範圍；README；本節與 3.1。

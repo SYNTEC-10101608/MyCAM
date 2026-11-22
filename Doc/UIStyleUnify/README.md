@@ -6,7 +6,7 @@
 | 分支 | `AUTO-23254_f_UIStyleUnify` |
 | 分支起點 | `a4b3826d`（`master`，2026-11-15） |
 | 期間 | 2026-11-15 ～ 2026-11-21 |
-| 狀態 | 施工與自動檢查完成（含 Round 1、Round 2 review 的修正）；人工驗收（5.3 第 2～4 項）未完成，三項都是合併前必做（見 [6_FollowUp.md](6_FollowUp.md)） |
+| 狀態 | 施工與自動檢查完成（含 Round 1～3 review 的修正）；人工驗收（5.3 第 2～4 項）未完成，三項都是合併前必做（見 [6_FollowUp.md](6_FollowUp.md)） |
 
 ## 文件
 
@@ -24,7 +24,8 @@
 | [9_ReviewRound1-reply.md](9_ReviewRound1-reply.md) | Round 1 review 的回覆：逐項決議、修正內容與驗證結果，供 Round 2 review | 回覆，Round 2 時對照 |
 | [10_ReviewRound2.md](10_ReviewRound2.md) | Round 2 審查：回覆確認、精度回復問題、比對防線、測試缺口與驗證結果 | Review 快照，不修改 |
 | [11_ReviewRound2-reply.md](11_ReviewRound2-reply.md) | Round 2 review 的回覆：逐項決議、修正內容與驗證結果，供 Round 3 review | 回覆，Round 3 時對照 |
-| [12_ReviewRound3.md](12_ReviewRound3.md) | Round 3 審查：原生上下按鈕、B3 生效值範圍、debounce 時間防線與回覆確認 | Review 快照，待討論 |
+| [12_ReviewRound3.md](12_ReviewRound3.md) | Round 3 審查：原生上下按鈕、B3 生效值範圍、debounce 時間防線與回覆確認 | Review 快照，不修改 |
+| [13_ReviewRound3-reply.md](13_ReviewRound3-reply.md) | Round 3 review 的回覆：逐項決議、修正內容與驗證結果，供 Round 4 review | 回覆，Round 4 時對照 |
 
 ## 測試程式
 

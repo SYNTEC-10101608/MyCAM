@@ -14,9 +14,10 @@ namespace UICheck
 	//       notified yet or is more precise than the shown decimals, and the restore itself raises no ValueChanged;
 	//       the range limits themselves are accepted
 	//   N2  a change of one step of the last decimal place raises DebouncedValueChanged once; changes within the
-	//       debounce interval are notified once, with the last value
+	//       debounce interval are notified once, with the last value, not before the interval after the last change
 	//   N3  one notch of the mouse wheel changes the value by one Increment, clamped to the range;
-	//       ReadOnly blocks the wheel and the up / down buttons
+	//       ReadOnly blocks the wheel and the up / down buttons; the up / down buttons first reject typed text that
+	//       is not validated yet, then step from the latest valid value
 	//   N4  SilentSetValue cancels a pending notification without blocking later ones; an empty field restores the
 	//       latest valid value on Enter (the key is consumed) and on leaving, and leaving sends a pending notification
 	//
@@ -31,6 +32,7 @@ namespace UICheck
 			CheckLastDecimalStep();
 			CheckDebounceMerge();
 			CheckMouseWheel();
+			CheckUpDownButtons();
 			CheckSilentSetValue();
 			CheckEmptyInput();
 			Console.WriteLine( "[controls] " + m_nCaseCount + " cases, " + m_nProblemCount + " problems" );
@@ -114,16 +116,21 @@ namespace UICheck
 
 		static void CheckDebounceMerge()
 		{
-			// a long interval keeps the gap between the two changes well inside it
+			// interval 500 ms, the second change about 200 ms after the first: a timer that is not restarted by the
+			// second change fires about 300 ms after it, inside the window that must stay silent
 			ProbeNumeric numeric = CreateNumeric( 10m, 0m, 100m );
-			numeric.DebounceInterval = 300;
+			numeric.DebounceInterval = 500;
 			List<decimal> notifiedList = RecordDebounced( numeric );
 			numeric.Value = 20m;
-			PumpUntil( () => false, 50 );
+			PumpUntil( () => false, 200 );
 			numeric.Value = 21m;
-			PumpUntil( () => notifiedList.Count > 0, 1000 );
-			PumpUntil( () => false, 500 );
-			ExpectEvents( "N2", "two changes within the interval", new decimal[] { 21m }, notifiedList );
+			PumpUntil( () => notifiedList.Count > 0, 400 );
+			ExpectEvents( "N2", "no notification within the interval after the last change", new decimal[ 0 ],
+				notifiedList, "DebouncedValueChanged" );
+			PumpUntil( () => notifiedList.Count > 0, 2000 );
+			PumpUntil( () => false, 600 );
+			ExpectEvents( "N2", "two changes within the interval", new decimal[] { 21m },
+				notifiedList, "DebouncedValueChanged" );
 		}
 
 		static void CheckMouseWheel()
@@ -152,6 +159,39 @@ namespace UICheck
 			Expect( "N3", "read-only blocks wheel and buttons", 5m, numeric.Value );
 		}
 
+		static void CheckUpDownButtons()
+		{
+			// typed text that is not validated yet, then a button at once; the step starts from the latest valid value
+			CheckButtonAfterTyping( 20m, "2000", true, 21m );
+			CheckButtonAfterTyping( 20m, "2000", false, 19m );
+			CheckButtonAfterTyping( 20m, "-1", true, 21m );
+			CheckButtonAfterTyping( 20m, "-1", false, 19m );
+			CheckButtonAfterTyping( 1.23456m, "2000", false, 0.23456m );
+
+			// valid typed text is accepted first, then stepped
+			ProbeNumeric numeric = CreateNumeric( 20m, 0m, 1000m );
+			List<decimal> valueList = RecordValueChanged( numeric );
+			numeric.TypeText( "30" );
+			numeric.UpButton();
+			ExpectEvents( "N3", "valid text then up button", new decimal[] { 30m, 31m }, valueList );
+		}
+
+		static void CheckButtonAfterTyping( decimal startValue, string szText, bool isUp, decimal expected )
+		{
+			ProbeNumeric numeric = CreateNumeric( startValue, 0m, 1000m );
+			List<decimal> valueList = RecordValueChanged( numeric );
+			numeric.TypeText( szText );
+			if( isUp ) {
+				numeric.UpButton();
+			}
+			else {
+				numeric.DownButton();
+			}
+			string szCase = "'" + szText + "' then " + ( isUp ? "up" : "down" ) + " button from " + startValue;
+			Expect( "N3", szCase, expected, numeric.Value );
+			ExpectEvents( "N3", szCase, new decimal[] { expected }, valueList );
+		}
+
 		static void CheckSilentSetValue()
 		{
 			ProbeNumeric numeric = CreateNumeric( 10m, 0m, 100m );
@@ -159,11 +199,13 @@ namespace UICheck
 			numeric.Value = 20m;
 			numeric.SilentSetValue = 30m;
 			PumpUntil( () => false, 300 );
-			ExpectEvents( "N4", "silent set cancels the pending notification", new decimal[ 0 ], notifiedList );
+			ExpectEvents( "N4", "silent set cancels the pending notification", new decimal[ 0 ],
+				notifiedList, "DebouncedValueChanged" );
 			numeric.Value = 30.001m;
 			PumpUntil( () => notifiedList.Count > 0, 1000 );
 			PumpUntil( () => false, 300 );
-			ExpectEvents( "N4", "change after silent set is notified", new decimal[] { 30.001m }, notifiedList );
+			ExpectEvents( "N4", "change after silent set is notified", new decimal[] { 30.001m },
+				notifiedList, "DebouncedValueChanged" );
 		}
 
 		static void CheckEmptyInput()
@@ -177,7 +219,8 @@ namespace UICheck
 			numeric.LeaveField();
 			Expect( "N4", "empty field on leave", 20m, numeric.Value );
 			ExpectEvents( "N4", "empty field on leave", new decimal[] { 20m }, valueList );
-			ExpectEvents( "N4", "leave sends the pending notification", new decimal[] { 20m }, notifiedList );
+			ExpectEvents( "N4", "leave sends the pending notification", new decimal[] { 20m },
+				notifiedList, "DebouncedValueChanged" );
 
 			// Enter on an empty field after the value is notified
 			numeric = CreateNumeric( 10m, 0m, 100m );
@@ -245,7 +288,8 @@ namespace UICheck
 			Console.WriteLine( "FAIL  " + szRule + " " + szCase );
 		}
 
-		static void ExpectEvents( string szRule, string szCase, decimal[] expectedArray, List<decimal> actualList )
+		static void ExpectEvents( string szRule, string szCase, decimal[] expectedArray, List<decimal> actualList,
+			string szEventName = "ValueChanged" )
 		{
 			m_nCaseCount++;
 			string szExpected = string.Join( ", ", expectedArray );
@@ -254,8 +298,8 @@ namespace UICheck
 				return;
 			}
 			m_nProblemCount++;
-			Console.WriteLine( "FAIL  " + szRule + " " + szCase + ": ValueChanged expected [" + szExpected + "], got ["
-				+ szActual + "]" );
+			Console.WriteLine( "FAIL  " + szRule + " " + szCase + ": " + szEventName + " expected [" + szExpected
+				+ "], got [" + szActual + "]" );
 		}
 
 		static int m_nCaseCount;
@@ -288,7 +332,7 @@ namespace UICheck
 			}
 
 			// unlike setting Text of the control, typing into the editor does not validate at once
-			void TypeText( string szText )
+			public void TypeText( string szText )
 			{
 				foreach( Control child in Controls ) {
 					TextBox editor = child as TextBox;
