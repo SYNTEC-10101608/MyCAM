@@ -47,7 +47,8 @@ namespace CncUI
 				UpdateMainProgram();
 				for( int id = 1; id <= m_CoordinateFields.Length; id++ ) {
 					AddSubscription( m_Resources.SystemVarPool.Subscribe( CncConstants.SYSTEM_VAR_PROGRAM_BASE + id, OnCoordinateChanged ) );
-					AddSubscription( m_Resources.QVarPool.Subscribe( CncConstants.Q_VAR_MACHINE_BASE + id, value => PostToUI( UpdateCoordinates ) ) );
+					AddSubscription( m_Resources.RPool.Subscribe( CncConstants.R_MACHINE_COORDINATE_BASE + id,
+						value => PostToUI( UpdateCoordinates ) ) );
 				}
 				OnAxesChanged();
 				SubscribeR( CncConstants.R_CAPACITANCE, CNCInfoField.Capacitance, 1m, "F0" );
@@ -160,10 +161,10 @@ namespace CncUI
 			}
 		}
 
-		double? GetMachineCoordinate( int axisID )
+		private double? GetMachineCoordinate( int axisID )
 		{
-			ResourceValue<int?> value;
-			return m_Resources.QVarPool.TryGetValue( CncConstants.Q_VAR_MACHINE_BASE + axisID, out value ) && value.IsValid && value.Value.HasValue
+			return m_Resources.RPool.TryGetValue( CncConstants.R_MACHINE_COORDINATE_BASE + axisID, out ResourceValue<int?> value )
+				&& value.IsValid && value.Value.HasValue
 				? value.Value.Value / MACHINE_COORDINATE_DIVISOR : (double?)null;
 		}
 

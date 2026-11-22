@@ -220,7 +220,7 @@ namespace CncManager.Definition
 		public const int PR_HEAD_AXIS = 3005;
 		public const int COORDINATE_AXIS_COUNT = 6;
 		public const int SYSTEM_VAR_MACHINE_BASE = 1320;
-		public const int Q_VAR_MACHINE_BASE = 120;
+		public const int R_MACHINE_COORDINATE_BASE = 740;
 		public const int SYSTEM_VAR_PROGRAM_BASE = 1340;
 		public const int SYSTEM_VAR_PROGRAM_OFFSET_BASE = 20020;
 		public const int R_CAPACITANCE = 17600;
