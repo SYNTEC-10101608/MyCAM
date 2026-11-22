@@ -172,7 +172,7 @@ namespace MyCAM.Editor
 			if( m_IsUpdatingMSAngleUI ) {
 				return;
 			}
-			if( m_chkLockMaster.Checked ) {
+			if( m_chkLockSlave.Checked ) {
 				SlaveChanged?.Invoke( (double)m_dbtnSlave.Value );
 				return;
 			}
@@ -180,6 +180,9 @@ namespace MyCAM.Editor
 
 		void m_rbtnMasterAuto_CheckedChanged( object sender, EventArgs e )
 		{
+			if( !m_rbtnMasterAuto.Checked ) {
+				return;
+			}
 			NoticeMNeedBeSetAsAUTO();
 		}
 
@@ -197,7 +200,7 @@ namespace MyCAM.Editor
 			}
 
 			// set assignMS
-			if( m_chkLockSlave.Checked ) {
+			if( m_chkLockMaster.Checked ) {
 				MasterChanged?.Invoke( (double)m_dbtnMaster.Value );
 				return;
 			}

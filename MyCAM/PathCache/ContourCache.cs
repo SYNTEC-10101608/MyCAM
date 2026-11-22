@@ -664,9 +664,13 @@ namespace MyCAM.PathCache
 				case ToolVecMode.AssignMS:
 				case ToolVecMode.LockMasterWithAssign:
 				case ToolVecMode.LockSlaveWithAssign:
-				case ToolVecMode.LockMasterWithoutAssignButAssignSlave:
-				case ToolVecMode.LockSlaveWithoutAssignButAssignMaster:
 					ToolVecHelper.SetToolVecByAssignedMS( ref toolVecPointList, specialToolVecData.MasterAngle_deg, specialToolVecData.SlaveAngle_deg );
+					break;
+				case ToolVecMode.LockMasterWithoutAssignButAssignSlave:
+					ToolVecHelper.SetToolVecByAssignedMS( ref toolVecPointList, m_DefaultLockABAngle_deg.Item1, specialToolVecData.SlaveAngle_deg );
+					break;
+				case ToolVecMode.LockSlaveWithoutAssignButAssignMaster:
+					ToolVecHelper.SetToolVecByAssignedMS( ref toolVecPointList, specialToolVecData.MasterAngle_deg, m_DefaultLockABAngle_deg.Item2 );
 					break;
 				case ToolVecMode.Interpolate:
 				default:
