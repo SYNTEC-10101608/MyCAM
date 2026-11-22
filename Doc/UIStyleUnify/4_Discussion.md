@@ -419,3 +419,16 @@ VS Copilot 的審查紀錄見 [10_ReviewRound2.md](10_ReviewRound2.md)（快照�
 | 測試缺口 | N1–N3 沒有涵蓋精度、`SilentSetValue`、空白 Enter / 離焦、上下限邊界、連續 debounce、下限與 `ReadOnly` | 一次補齊：N1–N3 加案例，新增 N4（`SilentSetValue` 與空白輸入）；規範第 5 節第 3 點同步寫明這些行為 |
 | R2-03 | 架構摘要仍列「標題」、檢查表缺 N1–N3；規範「任何值的變化都通知」沒排除 `SilentSetValue`；三處檔案數不同（347 / 348 / 351） | 同步文件；`SilentSetValue` 是有意的設計，改文句不改行為。5 章記最終一次的結果並註明版本；`9_ReviewRound1-reply.md` 保留當時的數字，在 Round 2 回覆說明差異 |
 | 紀錄 | 決議與回覆放哪裡 | 同 Round 1：決議寫在本節，另寫 `11_ReviewRound2-reply.md`，`10_ReviewRound2.md` 先單獨提交快照；完成後重新放 `review-reply-done.txt` 通知 Copilot 進行 Round 3 |
+
+## 4.17 Round 3 整體審查（2026-11-22，已定稿並施工，3.30）
+
+VS Copilot 的審查紀錄見 [12_ReviewRound3.md](12_ReviewRound3.md)（快照，不修改），逐項回覆見 [13_ReviewRound3-reply.md](13_ReviewRound3-reply.md)。
+查證後 3 個問題都屬實；使用者決議照建議處理。
+
+| # | 問題 | 決議 |
+| --- | --- | --- |
+| R3-01 | 輸入超界文字後不先驗證、直接按上下鍵，原生流程把文字夾到上下限再加減（20 輸入 `2000` 按上鍵變 1000，`ValueChanged` 為 `[1000]`） | 上下鍵先走 `ValidateEditText`，被拒就回復，再從最新的合法值加減一步（21 / 19），與滾輪、先按 Enter 再按鍵一致。另一個選項「被拒時只回復、不加減」與滾輪不一致，不採用 |
+| R3-02 | B3 生效值只用在 B6 不允許的替換；允許的外觀替換（`Button` → `ThemedButton` 等）仍比對 Designer 文字 | 只要型別不同就比對生效值。實驗：現存型別之間的替換改後 0 個差異；無法比對的全部是本議題刪除的 4 種舊型別，改為從分支起點的原始碼編譯取得預設值（有依據，不手寫預設值表）。補 fixture |
+| R3-03 | 連續變化只驗證最後的值與次數，拿掉計時器的 `Stop()` 仍會通過 | 間隔 500 ms、兩次變化相隔約 200 ms，斷言最後一次變化後 400 ms 內沒有通知；不加「距離最後一次變化 ≥ 間隔」的下限斷言，避免計時精度造成不穩定 |
+| 文件 | 5 章首段仍寫 3.28、結果沒有對應版本 | 5 章首段與結果表寫明驗證的版本 |
+| 紀錄 | 決議與回覆放哪裡 | 同前兩輪：決議寫在本節，另寫 `13_ReviewRound3-reply.md`，`12_ReviewRound3.md` 先單獨提交快照；完成後重新放 `review-reply-done.txt` 通知 Copilot 進行 Round 4 |

@@ -94,6 +94,10 @@ namespace CommonUI.Controls
 			if( ReadOnly ) {
 				return;
 			}
+
+			// the native step parses and clamps typed text by itself; validate it first (rejected text is restored),
+			// so the step starts from a valid value as with the mouse wheel
+			ValidateEditText();
 			base.UpButton();
 		}
 
@@ -103,6 +107,10 @@ namespace CommonUI.Controls
 			if( ReadOnly ) {
 				return;
 			}
+
+			// the native step parses and clamps typed text by itself; validate it first (rejected text is restored),
+			// so the step starts from a valid value as with the mouse wheel
+			ValidateEditText();
 			base.DownButton();
 		}
 
