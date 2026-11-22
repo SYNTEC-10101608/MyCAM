@@ -28,6 +28,7 @@
 | [13_ReviewRound3-reply.md](13_ReviewRound3-reply.md) | Round 3 review 的回覆：逐項決議、修正內容與驗證結果，供 Round 4 review | 回覆，Round 4 時對照 |
 | [14_ReviewRound4.md](14_ReviewRound4.md) | Round 4 審查：原生重複操作、B3 舊型別與清理、N2 時間判定及回覆確認 | Review 快照，不修改 |
 | [15_ReviewRound4-reply.md](15_ReviewRound4-reply.md) | Round 4 review 的回覆：N2 時間判定的修正與驗證結果，供 Round 5 review | 回覆，Round 5 時對照 |
+| [16_ReviewRound5.md](16_ReviewRound5.md) | Round 5 審查：N2 時間判定收尾、解析度容差、忙碌情境及人工驗收門檻 | Review 快照，不修改 |
 
 ## 測試程式
 
