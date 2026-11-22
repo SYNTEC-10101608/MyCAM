@@ -28,7 +28,9 @@
 | Round 1 整體審查 | `e7825de8` ～ `1afaf20d` | 數值框回復與通知修正、新增 N1–N3、行為比對防線限縮、runner 清理、刪除 `Title`、刪除鈕改 `Danger`（3.28） |
 | Round 2 整體審查 | `6086614e` ～ `b75f03dd` | 數值框回復保留完整精度、N1–N4 補案例、B3 改比對生效值、文件同步（3.29） |
 | Round 3 整體審查 | `88f71649` ～ `0afd7cf0` | 上下鍵先處理尚未驗證的輸入、B3 生效值涵蓋所有型別替換、debounce 時間門檻（3.30） |
-| Round 4 整體審查 | `ae7cd098` ～ 最新 | N2 改以通知的時間點判斷不提早，新增畫面執行緒忙碌的案例（3.31） |
+| Round 4 整體審查 | `ae7cd098` ～ `498c9bb9` | N2 改以通知的時間點判斷不提早，新增畫面執行緒忙碌的案例（3.31） |
+| Round 5 整體審查 | `accfabeb` | 審查快照；review 收斂（4.19） |
+| 人工確認的修正 | 最新 | 新增類圖示補「+」、主視窗與 CNC 面板的間距統一、橫式警報左右並排（3.32） |
 
 ## 3.2 外觀與行為分層（對應 2.2）
 
@@ -532,3 +534,23 @@
    2. 容許一個週期的依據：WinForms 計時器以系統時鐘週期（約 15.6 ms）觸發，25 次量測最早為 496.9 ms。
    3. 新增畫面執行緒忙碌的案例：最後一次變化後約 360 ms 讓執行緒停 250 ms，通知晚到仍通過。
 2. 議題文件：5 章結果與反向測試、README；本節與 3.1。
+
+## 3.32 人工確認的修正（2026-11-22）
+
+決議見 4.20。
+
+1. 圖示（`MyCAM/Resource/IconSource/IconDefinitions.ps1`，以 `RenderIcons.ps1 -Only` 重新產生 PNG）：
+   `Revolution`、`SupportBracket` 加 `$BadgePlus`，圖形縮小並移到左上，與右下角徽章的白邊不重疊。
+2. `CommonUI/Layout/ResponsiveLayout.cs`：子控制項全是卡片（`SectionPanel`）的容器，把卡片在 Designer 上涵蓋的範圍合併成
+   區段，只有區段縮放，區段以外（面板邊距、卡片間距）維持 Designer 的長度；其他容器的整個範圍就是一個區段，
+   結果與原本的等比縮放相同。影響 `CNCInfoPanel`（橫、直式）與 `CNCPanel` 的命令區。
+3. `MyCAM/Layout/MainLayout.cs`、`MainLayoutRegions.cs`：
+   1. `HOST_MARGIN` 3 → `SECTION_GAP / 2`（4），區域之間相距 8；刪除右側為 0 的 `InsetMonitor`。
+   2. CNC 面板的承載區（操作、監控、直式警報）為區域向外多 `PANEL_MARGIN`；以偏好尺寸算格的大小時扣掉面板邊距。
+   3. 直式 CNC 承載區不再內縮，其中的三個區域各自留邊距，邊緣與樹、訊息對齊。
+   4. 橫式加工頁的訊息欄寬度加上視角列寬度（建構子新增 `viewerBar` 參數，`Calculate` 新增 `viewerBarWidth`）。
+   5. 新增 `MainLayoutRegions.IsMessagesColumn`；`UpdateMessages` 依它決定日誌與警報上下分割（欄）或左右各半（橫跨底部），
+      兩者相距 8，警報面板向外多 `PANEL_MARGIN`。
+4. `StartupForm.cs` 傳入 `m_tsViewerToolBar`；`StartupForm.Designer.cs` 的 7 個區域依 P6 列出的值更新。
+5. 規範第 6 節：主視窗間距、訊息欄寬度、警報位置；嵌入式面板的縮放方式；9.4 `ResponsiveLayout` 說明。
+6. 本議題限定的檢查：`CompareMainLayout.ps1 -Update` 重新記錄基準（腳本開頭的說明同步修改）。

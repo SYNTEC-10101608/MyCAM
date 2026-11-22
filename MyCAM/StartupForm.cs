@@ -50,8 +50,8 @@ namespace MyCAM
 
 			// need to init befor myapp because myapp will use LogPanel
 			InitializeComponent();
-			m_MainLayout = new MainLayout( m_pnlBackGround, m_pnlTreeView, m_pnlViewer, m_pnlBottom, m_pnlCNC,
-				m_pnlCNCInfo, m_pnlMessages, m_pnlLog, m_pnlCNCVertical, m_pnlVerticalAlarm, m_tsmiCNC,
+			m_MainLayout = new MainLayout( m_pnlBackGround, m_pnlTreeView, m_pnlViewer, m_tsViewerToolBar, m_pnlBottom,
+				m_pnlCNC, m_pnlCNCInfo, m_pnlMessages, m_pnlLog, m_pnlCNCVertical, m_pnlVerticalAlarm, m_tsmiCNC,
 				m_tsmiController );
 			m_pnlBackGround.SizeChanged += OnMainLayoutSizeChanged;
 			DialogPlacement.AreaProvider = () => m_MainLayout.GetDialogArea( this );

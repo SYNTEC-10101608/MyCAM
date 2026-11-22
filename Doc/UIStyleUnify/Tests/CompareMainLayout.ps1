@@ -2,10 +2,12 @@
 	[string]$Root = "",
 	[switch]$Update
 )
-# Issue-only check (Doc/UIStyleUnify/5_Verification.md): the main window regions are placed the same as before
-# the TableLayoutPanel was removed. MainWindowRunner prints each host panel ("[region]" lines) for every page and
-# window size below; the result must equal MainLayoutBaseline.txt pixel for pixel.
-# -Update writes the baseline (only done once, with the TableLayoutPanel layout, before the change).
+# Issue-only check (Doc/UIStyleUnify/5_Verification.md): the main window regions are placed where the baseline
+# says. MainWindowRunner prints each host panel ("[region]" lines) for every page and window size below; the result
+# must equal MainLayoutBaseline.txt pixel for pixel.
+# -Update writes the baseline. It was first written with the TableLayoutPanel layout (the MainLayout rewrite kept every
+# region), and rewritten once when the region spacing was unified (5_Verification.md 5.2); only rewrite it for an
+# intended layout change.
 # Needs the Debug build. The language does not change the regions, so zh-TW is enough.
 
 $ErrorActionPreference = "Stop"
