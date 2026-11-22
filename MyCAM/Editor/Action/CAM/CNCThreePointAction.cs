@@ -24,11 +24,13 @@ namespace MyCAM.Editor
 	internal sealed class CNCThreePointAction : EditActionBase, IDisposable
 	{
 		public CNCThreePointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
-			CncClient client, Form owner, params Control[] editingControls ) : base( dataManager )
+			CncClient client, Form owner, params Control[] editingControls )
+			: base( dataManager )
 		{
 			m_Viewer = viewer;
 			m_TreeView = treeView;
 			m_ViewManager = viewManager;
+			m_PointRenderer = new REFPointRenderer( m_Viewer, m_DataManager, bPointsSelectable: false );
 			m_Client = client;
 			m_Owner = owner;
 			m_EditingControls = editingControls;
@@ -94,6 +96,18 @@ namespace MyCAM.Editor
 			m_CalculationCompleted = data.CalculationCompleted;
 			m_CalculationSucceeded = data.CalculationSucceeded;
 			RefreshDisplay();
+			ShowDrawingPoints();
+		}
+
+		void ShowDrawingPoints()
+		{
+			string szDrawingPoints = Text( "DrawingPoints", DRAWING_POINTS );
+			if( !TryReadPoints( m_Dialog.DrawingInput, szDrawingPoints, out gp_Pnt[] drawing, out _ ) ) {
+				m_PointRenderer.Remove( true );
+				return;
+			}
+
+			m_PointRenderer.Show( new CalibrationData( drawing[ 0 ], drawing[ 1 ], drawing[ 2 ] ), true );
 		}
 
 		void RefreshDisplay()
@@ -169,7 +183,8 @@ namespace MyCAM.Editor
 			string[] values = drawing.Cast<string>().Concat( workpiece.Cast<string>() ).Concat( new[] { m_Dialog.ToleranceText } ).ToArray();
 			for( int index = 0; index < values.Length; index++ ) {
 				values[ index ] = TryReadNumber( values[ index ], out double value )
-					? CalibrationData.Round( value ).ToString( "R", CultureInfo.InvariantCulture ) : values[ index ].Trim();
+					? CalibrationData.Round( value ).ToString( "R", CultureInfo.InvariantCulture )
+					: ( values[ index ] ?? string.Empty ).Trim();
 			}
 			return values;
 		}
@@ -177,7 +192,8 @@ namespace MyCAM.Editor
 		bool TryGetDraft( out CalibrationData data, out string error, bool drawingOnly = false )
 		{
 			data = null;
-			if( !TryReadPoints( m_Dialog.DrawingInput, Text( "DrawingPoints", DRAWING_POINTS ), out gp_Pnt[] drawing, out error ) ) {
+			if( !TryReadPoints( m_Dialog.DrawingInput, Text( "DrawingPoints", DRAWING_POINTS ),
+				out gp_Pnt[] drawing, out error ) ) {
 				return false;
 			}
 
@@ -208,7 +224,8 @@ namespace MyCAM.Editor
 				error = Text( "Validation_Tolerance", INVALID_TOLERANCE );
 				return false;
 			}
-			data = new CalibrationData( drawing[ 0 ], drawing[ 1 ], drawing[ 2 ] ) { DrawingOnly = m_DrawingOnly };
+			data = new CalibrationData( drawing[ 0 ], drawing[ 1 ], drawing[ 2 ] );
+			data.DrawingOnly = m_DrawingOnly;
 			data.SetWorkpieceData( workpiece[ 0 ], workpiece[ 1 ], workpiece[ 2 ], hasTolerance ? (double?)tolerance : null );
 			data.SetCalibrationError( m_CalibrationError, m_CalculationCompleted, m_CalculationSucceeded );
 			if( m_Accepted.HasTransmitted ) {
@@ -358,6 +375,7 @@ namespace MyCAM.Editor
 			m_PickIndex = point;
 			RefreshDisplay();
 			try {
+				ShowDrawingPoints();
 				if( m_DataManager.PartIDList.Count == 0 ) {
 					throw new InvalidOperationException( Text( "Error_DrawingUnavailable", DRAWING_UNAVAILABLE ) );
 				}
@@ -370,8 +388,6 @@ namespace MyCAM.Editor
 				m_TreeEnabled = m_TreeView.Enabled;
 				m_PickingStarted = true;
 				m_TreeView.Enabled = false;
-				m_PickDraft = new CalibrationData();
-				m_PointRenderer = new REFPointRenderer( m_Viewer, m_DataManager );
 				m_Viewer.MouseClick += OnDrawingMouseClick;
 				m_Viewer.KeyDown += OnDrawingKeyDown;
 				m_Viewer.GetAISContext().ClearSelected( false );
@@ -397,7 +413,6 @@ namespace MyCAM.Editor
 				if( m_PickingStarted ) {
 					m_Viewer.GetAISContext().ClearSelected( false );
 					SetVertexSelection( false );
-					m_PointRenderer?.Remove();
 					m_Viewer.UpdateView();
 				}
 			}
@@ -408,8 +423,6 @@ namespace MyCAM.Editor
 					m_TreeView.Enabled = m_TreeEnabled;
 					m_PickingStarted = false;
 				}
-				m_PointRenderer = null;
-				m_PickDraft = null;
 				if( m_EditingStates != null ) {
 					for( int index = 0; index < m_EditingControls.Length; index++ ) {
 						if( !m_EditingControls[ index ].IsDisposed ) {
@@ -450,18 +463,8 @@ namespace MyCAM.Editor
 			}
 
 			int index = m_PickIndex == ALL_POINTS ? m_PickCount : m_PickIndex;
-			if( index == 0 ) {
-				m_PickDraft.Ref_Pnt1 = point;
-			}
-			else if( index == 1 ) {
-				m_PickDraft.Ref_Pnt2 = point;
-			}
-			else {
-				m_PickDraft.Ref_Pnt3 = point;
-			}
-
-			m_PointRenderer?.Show( m_PickDraft, true );
 			m_Dialog.SetDrawingPoint( index, PointText( point ) );
+			ShowDrawingPoints();
 			m_PickCount++;
 			if( m_PickCount == ( m_PickIndex == ALL_POINTS ? POINT_COUNT : 1 ) ) {
 				EndPicking();
@@ -687,6 +690,7 @@ namespace MyCAM.Editor
 				dialog.Dispose();
 			}
 			if( m_Started ) {
+				m_PointRenderer.Remove( true );
 				base.End();
 			}
 		}
@@ -697,6 +701,7 @@ namespace MyCAM.Editor
 		readonly Viewer m_Viewer;
 		readonly TreeView m_TreeView;
 		readonly ViewManager m_ViewManager;
+		readonly REFPointRenderer m_PointRenderer;
 		readonly Form m_Owner;
 		readonly Control[] m_EditingControls;
 		CNCThreePointDlg m_Dialog;
@@ -704,10 +709,8 @@ namespace MyCAM.Editor
 		CalibrationData m_OriginalSnapshot;
 		CalibrationData m_Accepted;
 		CalibrationData m_PendingSave;
-		CalibrationData m_PickDraft;
 		string[] m_Baseline;
 		bool[] m_EditingStates;
-		REFPointRenderer m_PointRenderer;
 		SynchronizationContext m_Context;
 		CancellationTokenSource m_Operation;
 		double? m_CalibrationError;

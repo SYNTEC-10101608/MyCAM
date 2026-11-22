@@ -18,11 +18,13 @@ namespace MyCAM.Editor.Renderer
 		AIS_TextLabel m_REFText1 = null;
 		AIS_TextLabel m_REFText2 = null;
 		AIS_TextLabel m_REFText3 = null;
+		readonly bool m_bPointsSelectable;
 
 
-		public REFPointRenderer( Viewer viewer, DataManager dataManager )
+		public REFPointRenderer( Viewer viewer, DataManager dataManager, bool bPointsSelectable = true )
 			: base( viewer, dataManager )
 		{
+			m_bPointsSelectable = bPointsSelectable;
 		}
 
 		public override void Show( bool bUpdate = false )
@@ -133,6 +135,9 @@ namespace MyCAM.Editor.Renderer
 			TopoDS_Vertex vertex = mkVertex.Vertex();
 			AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( vertex, color );
 			m_Viewer.GetAISContext().Display( aisShape, false );
+			if( !m_bPointsSelectable ) {
+				m_Viewer.GetAISContext().Deactivate( aisShape );
+			}
 			return aisShape;
 		}
 

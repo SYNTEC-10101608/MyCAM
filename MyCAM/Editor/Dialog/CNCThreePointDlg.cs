@@ -44,10 +44,6 @@ namespace MyCAM.Editor.Dialog
 				field.TextChanged += OnInputChanged;
 			}
 
-			foreach( TextBox field in m_DrawingFields ) {
-				field.TextChanged += OnInputChanged;
-			}
-
 			m_txtTolerance.TextChanged += OnInputChanged;
 			WireInput( m_txtTolerance, () => ToleranceCommitRequested?.Invoke() );
 			m_btnCalculate.Click += ( sender, e ) => CalculateRequested?.Invoke();
@@ -93,8 +89,18 @@ namespace MyCAM.Editor.Dialog
 			finally { m_Loading = false; }
 		}
 
-		internal void SetDrawingPoint( int point, string[] coordinates ) => WritePoint( m_DrawingFields, point, coordinates );
-		internal void SetWorkpiecePoint( int point, string[] coordinates ) => WritePoint( m_WorkpieceFields, point, coordinates );
+		internal void SetDrawingPoint( int point, string[] coordinates )
+		{
+			WritePoint( m_DrawingFields, point, coordinates );
+			InputChanged?.Invoke();
+		}
+
+		internal void SetWorkpiecePoint( int point, string[] coordinates )
+		{
+			WritePoint( m_WorkpieceFields, point, coordinates );
+			InputChanged?.Invoke();
+		}
+
 		internal void SetWorkpieceInput( int point, int axis, string value ) => m_WorkpieceFields[ point, axis ].Text = value;
 
 		static string[,] ReadFields( TextBox[,] fields )
@@ -116,8 +122,9 @@ namespace MyCAM.Editor.Dialog
 					fields[ point, axis ].Text = coordinates[ axis ];
 				}
 			}
-			finally { m_Loading = false; }
-			InputChanged?.Invoke();
+			finally {
+				m_Loading = false;
+			}
 		}
 
 		void OnInputChanged( object sender, EventArgs e )
