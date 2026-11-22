@@ -540,7 +540,8 @@
 決議見 4.20。
 
 1. 圖示（`MyCAM/Resource/IconSource/IconDefinitions.ps1`，以 `RenderIcons.ps1 -Only` 重新產生 PNG）：
-   `Revolution`、`SupportBracket` 加 `$BadgePlus`，圖形縮小並移到左上，與右下角徽章的白邊不重疊。
+   `Revolution`、`SupportBracket` 加 `$BadgePlus`；圖形維持與 `Import3DFile`、`AddTube`
+   相近的大小（約原尺寸的 0.9），徽章直接覆蓋在右下角。
 2. `CommonUI/Layout/ResponsiveLayout.cs`：子控制項全是卡片（`SectionPanel`）的容器，把卡片在 Designer 上涵蓋的範圍合併成
    區段，只有區段縮放，區段以外（面板邊距、卡片間距）維持 Designer 的長度；其他容器的整個範圍就是一個區段，
    結果與原本的等比縮放相同。影響 `CNCInfoPanel`（橫、直式）與 `CNCPanel` 的命令區。
