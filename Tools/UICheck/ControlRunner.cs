@@ -15,6 +15,7 @@ namespace UICheck
 	//       the range limits themselves are accepted
 	//   N2  a change of one step of the last decimal place raises DebouncedValueChanged once; changes within the
 	//       debounce interval are notified once, with the last value, not before the interval after the last change
+	//       (a late notification, e.g. while the UI thread is busy, is accepted)
 	//   N3  one notch of the mouse wheel changes the value by one Increment, clamped to the range;
 	//       ReadOnly blocks the wheel and the up / down buttons; the up / down buttons first reject typed text that
 	//       is not validated yet, then step from the latest valid value
@@ -116,21 +117,46 @@ namespace UICheck
 
 		static void CheckDebounceMerge()
 		{
-			// interval 500 ms, the second change about 200 ms after the first: a timer that is not restarted by the
-			// second change fires about 300 ms after it, inside the window that must stay silent
+			CheckDebounceMergeTiming( false );
+
+			// the UI thread is busy around the end of the interval; the late notification is still correct
+			CheckDebounceMergeTiming( true );
+		}
+
+		static void CheckDebounceMergeTiming( bool isUIDelayed )
+		{
+			// interval 500 ms, the second change about 200 ms after the first; the notification time is measured
+			// from just before the last change, so a timer that is not restarted (about 300 ms) or a shorter
+			// interval is early, while a late notification is accepted
 			ProbeNumeric numeric = CreateNumeric( 10m, 0m, 100m );
-			numeric.DebounceInterval = 500;
-			List<decimal> notifiedList = RecordDebounced( numeric );
+			numeric.DebounceInterval = DEBOUNCE_INTERVAL_MS;
+			Stopwatch watch = new Stopwatch();
+			List<decimal> notifiedList = new List<decimal>();
+			double dFirstNotifyMs = -1;
+			numeric.DebouncedValueChanged += ( sender, e ) =>
+			{
+				if( notifiedList.Count == 0 ) {
+					dFirstNotifyMs = watch.Elapsed.TotalMilliseconds;
+				}
+				notifiedList.Add( numeric.Value );
+			};
 			numeric.Value = 20m;
 			PumpUntil( () => false, 200 );
+			watch.Start();
 			numeric.Value = 21m;
-			PumpUntil( () => notifiedList.Count > 0, 400 );
-			ExpectEvents( "N2", "no notification within the interval after the last change", new decimal[ 0 ],
-				notifiedList, "DebouncedValueChanged" );
+			if( isUIDelayed ) {
+				PumpUntil( () => false, 360 );
+				Thread.Sleep( 250 );
+			}
 			PumpUntil( () => notifiedList.Count > 0, 2000 );
 			PumpUntil( () => false, 600 );
-			ExpectEvents( "N2", "two changes within the interval", new decimal[] { 21m },
+
+			string szSuffix = isUIDelayed ? " (UI thread busy)" : string.Empty;
+			ExpectEvents( "N2", "two changes within the interval" + szSuffix, new decimal[] { 21m },
 				notifiedList, "DebouncedValueChanged" );
+			bool isNotEarly = dFirstNotifyMs >= DEBOUNCE_INTERVAL_MS - TIMER_TICK_TOLERANCE_MS;
+			ExpectTrue( "N2", "not notified before the interval after the last change" + szSuffix + ", notified at "
+				+ dFirstNotifyMs.ToString( "F0" ) + " ms", isNotEarly );
 		}
 
 		static void CheckMouseWheel()
@@ -301,6 +327,12 @@ namespace UICheck
 			Console.WriteLine( "FAIL  " + szRule + " " + szCase + ": " + szEventName + " expected [" + szExpected
 				+ "], got [" + szActual + "]" );
 		}
+
+		const int DEBOUNCE_INTERVAL_MS = 500;
+
+		// the WinForms timer fires on system clock ticks (about 15.6 ms), so it may come a few ms before the interval
+		// (measured down to 496.9 ms of 500); one tick is allowed, which still catches a 50 ms shorter interval
+		const int TIMER_TICK_TOLERANCE_MS = 16;
 
 		static int m_nCaseCount;
 		static int m_nProblemCount;
