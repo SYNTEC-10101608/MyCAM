@@ -70,5 +70,14 @@ namespace MyCAM.Layout
 		{
 			get; set;
 		}
+
+		/// <summary>
+		/// Landscape messages are a column beside the CNC monitor area (the log above the alarms); otherwise they
+		/// span the bottom (the log left of the alarms). Always false in portrait.
+		/// </summary>
+		public bool IsMessagesColumn
+		{
+			get; set;
+		}
 	}
 }

@@ -231,7 +231,7 @@ Form
    充當標題的粗體標籤。
 3. 標題列右側可放只作用於該卡片的動作控制項（按鈕、`CheckBox`、狀態文字）：按鈕高 23、`y = 5`，`CheckBox` `y = 5`，
    標籤高 24、`y = 4`，皆垂直置中於 32 高的標題列；右緣對齊卡片內容的右緣。
-4. 嵌入式面板以 `ResponsiveLayout` 等比縮放時，有標題的卡片保持標題列高度與標題列內的控制項不縮放，只縮放
+4. 嵌入式面板以 `ResponsiveLayout` 縮放時，有標題的卡片保持標題列高度與標題列內的控制項不縮放，只縮放
    標題列下方的內容；卡片內容第一列同樣從 `y = 36` 起。
 5. 只是需要強調的文字（軸名、欄位）用 `ThemedLabel` 的 `Emphasis`；持續變動的機台數值用 `Value`。
 
@@ -309,7 +309,12 @@ Form
    4. Designer 呈現橫式加工頁（CNC 操作欄與資訊區都顯示）：客戶區 1920×1009（1920×1080 螢幕扣掉 Windows 工作列 48
       與標題列 23），各區寫成 `Calculate` 在這個狀態下的結果。直式才有的 CNC 承載區（`m_pnlCNCVertical`、
       `m_pnlVerticalAlarm`）在 Designer 大小為 0。
-   5. 改了比例、CNC 面板的偏好尺寸或工具列高度時，依 P6（第 8 節）列出的值更新 Designer。
+   5. 改了比例、間距、CNC 面板的偏好尺寸或工具列高度時，依 P6（第 8 節）列出的值更新 Designer。
+   6. 間距：相鄰區域相距 `SECTION_GAP`（8），每個區域在所屬的格內各留一半（`HOST_MARGIN` 4），主視窗邊緣同樣留 4。
+      CNC 面板的卡片就是所在區域的可見邊緣：面板的承載區比區域向外多 `PANEL_MARGIN`，面板自己的邊距不疊加到間距上；
+      面板的偏好尺寸含邊距，`MainLayout` 計算格的大小時扣除。
+   7. 橫式加工頁的訊息欄延伸到 3D 檢視左側視角列的右緣，下方監控卡片的左右緣因此與 3D 畫布對齊。
+   8. 橫式的 CNC 警報：訊息區是一欄時（加工頁或顯示 CNC 面板）放在日誌下方；訊息區橫跨底部時放在日誌右側，各佔一半。
 4. 選單與工具列使用 `ThemedToolStripRenderer`（由 `MainWindowBase` 設為 `ToolStripManager.Renderer`）；
    工具列「執行中」的底色取自 `ACCENT_TINT_STRONG`，結束時設回 `Color.Empty`。
 5. 樹與日誌的文字色：一般 `TEXT`、隱藏 / 不加工 `TEXT_DISABLED`、錯誤 `ERROR`、警告 `WARNING`
@@ -341,8 +346,10 @@ Form
    可輸入的列仍用 `ROW_PITCH`。
 4. Designer 尺寸就是面板的偏好尺寸（`GetPreferredSize` 回傳 Designer 尺寸）；欄寬須讓 zh-TW、zh-CN 文字在
    這個尺寸下完整顯示。
-5. 面板的大小由主視窗決定，內容以 `ResponsiveLayout` 依 Designer 座標等比縮放，或以 `Anchor` / `Dock` 延展
-   （對話框仍不可）；卡片標題列的高度與其中的控制項不縮放，固定靠右。
+5. 面板的大小由主視窗決定，內容以 `ResponsiveLayout` 依 Designer 座標縮放，或以 `Anchor` / `Dock` 延展
+   （對話框仍不可）：
+   1. 只放卡片的容器（面板本身、`CNCPanel` 的命令區）保持面板邊距與卡片間距的 token 大小，只縮放卡片。
+   2. 卡片內的內容依 Designer 座標等比縮放；卡片標題列的高度與其中的控制項不縮放，固定靠右。
 6. 直式時 `CNCInfoPanel` 的卡片垂直排列，排列只用本節與 2.3 的 token 計算。
 7. 版面以 96 DPI 的像素計算（第 1 節的規格）。
 
@@ -533,7 +540,7 @@ Designer 存檔時會依各台電腦的 VS 設定重新產生整個 `InitializeC
 | --- | --- | --- |
 | `SectionStack` | 對話框執行時的版面變化：`Arrange`（隱藏區塊後補位）、`PlaceButtonBar`、`ShowPage`（精靈換頁，含重新置中） | 對話框內不手算座標 |
 | `DialogPlacement` | 對話框置中（4.3）；`MoveToCenter` 重新置中，`AreaProvider` 由主視窗註冊 | 不自行計算位置 |
-| `ResponsiveLayout` | 嵌入式面板依 Designer 座標等比縮放，標題列不縮放 | 只用於嵌入式面板 |
+| `ResponsiveLayout` | 嵌入式面板依 Designer 座標縮放：卡片之間與面板邊距不縮放，卡片內等比縮放，標題列不縮放 | 只用於嵌入式面板 |
 
 ### 9.5 語系（`CommonUI.Language`）
 
