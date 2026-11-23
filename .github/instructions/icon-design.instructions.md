@@ -4,8 +4,9 @@ applyTo: "MyCAM/Resource/IconSource/**"
 
 # 圖示設計
 
-適用於主視窗選單與工具列的圖示（`MyCAM/Resource/IconSource`）。圖示在畫面上的尺寸與使用方式見
-[UI 風格](ui-style.instructions.md) 第 6 節。本規範由議題 AUTO-23254（UI 風格統一）制定。
+適用於主視窗選單與工具列的圖示（`MyCAM/Resource/IconSource`）。圖示一律是 40×40 透明背景 PNG：
+功能工具列以原尺寸顯示，選單、圖層列、視角列由 `ImageScalingSize` 縮小為 20×20。
+本規範由議題 AUTO-23254（UI 風格統一）制定。
 
 ## 1. 產生方式
 
