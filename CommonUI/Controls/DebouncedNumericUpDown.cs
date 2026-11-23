@@ -5,8 +5,21 @@ using System.Windows.Forms;
 namespace CommonUI.Controls
 {
 	/// <summary>
-	/// NumericUpDown with configurable increment and debounced ValueChanged event.
-	/// Supports manual input, scroll wheel, and up/down buttons.
+	/// The numeric input of every screen: the field's limits are Minimum / Maximum / DecimalPlaces / Increment,
+	/// and DebouncedValueChanged notifies a value once the user stops changing it.
+	/// <list type="number">
+	/// <item>Input that cannot be parsed or is out of range is rejected: the field returns to the latest valid
+	/// value (not clamped to a limit; a value more precise than the shown decimals is kept as it is) without raising
+	/// ValueChanged, and ValueRejected is raised. The limits themselves can be entered.</item>
+	/// <item>Every change, also one step of the last decimal place or a Value set by code, raises
+	/// DebouncedValueChanged once after the changes stop; changes within DebounceInterval are notified once with the
+	/// last value, never earlier than the interval after the last change. SilentSetValue raises nothing and cancels a
+	/// pending notification.</item>
+	/// <item>The mouse wheel and the up / down keys change the value by one Increment and stop at the limits;
+	/// ReadOnly blocks them. Typed text that is not validated yet is accepted or rejected first, then stepped.</item>
+	/// <item>Enter or leaving an empty field restores the latest valid value (that Enter is consumed); leaving the
+	/// field sends a pending notification at once.</item>
+	/// </list>
 	/// </summary>
 	public class DebouncedNumericUpDown : NumericUpDown
 	{

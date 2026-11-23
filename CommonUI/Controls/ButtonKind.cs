@@ -1,7 +1,8 @@
 ﻿namespace CommonUI.Controls
 {
 	/// <summary>
-	/// Look of a ThemedButton (ui-style.instructions.md, section 3.1).
+	/// Look of a ThemedButton. Dialogs and CNC panels grade severity differently, so each has its own kinds;
+	/// a disabled button is gray whatever its kind.
 	/// </summary>
 	public enum ButtonKind
 	{
@@ -9,7 +10,8 @@
 		Normal,
 
 		/// <summary>
-		/// Filled accent: the action that completes the dialog or the step (confirm, generate, next).
+		/// Filled accent: the action that completes the dialog or the step (confirm, generate, next);
+		/// at most one in a container.
 		/// </summary>
 		Primary,
 

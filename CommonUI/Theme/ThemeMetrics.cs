@@ -1,7 +1,7 @@
 ﻿namespace CommonUI.Theme
 {
 	/// <summary>
-	/// Layout sizes in pixels at 96 DPI (see ui-style.instructions.md, section 2.3).
+	/// Layout sizes in pixels at 96 DPI; dialogs and embedded panels place their controls on these values.
 	/// </summary>
 	public static class ThemeMetrics
 	{

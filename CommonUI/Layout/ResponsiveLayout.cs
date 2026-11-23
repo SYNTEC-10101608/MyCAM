@@ -8,7 +8,7 @@ using CommonUI.Theme;
 namespace CommonUI.Layout
 {
 	/// <summary>
-	/// Proportional layout of an embedded panel (ui-style.instructions.md, section 6): remembers the designer
+	/// Proportional layout of an embedded panel: remembers the designer
 	/// bounds of the children and scales them to the size the main window gives. A titled card keeps its title bar
 	/// height and the title bar controls keep their size at the right edge. A container of cards keeps the margin and
 	/// the gaps around its cards; only the cards are scaled. Dialogs do not use it.

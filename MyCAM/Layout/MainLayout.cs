@@ -5,7 +5,7 @@ using CommonUI.Theme;
 
 namespace MyCAM.Layout
 {
-	// The only place that sizes the regions of the main window (ui-style.instructions.md, section 6).
+	// The only place that sizes the regions of the main window.
 	// Calculate works on sizes only; Update places the host panels with its result.
 	// Neighboring regions are SECTION_GAP apart. The cards of the CNC panels are the visible edge of their region:
 	// a panel host reaches PANEL_MARGIN beyond its region, so the margin of the panel is not added to the gap.

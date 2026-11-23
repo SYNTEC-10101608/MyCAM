@@ -5,7 +5,8 @@ using CommonUI.Forms;
 namespace CommonUI.Language
 {
 	/// <summary>
-	/// Apply language texts by control name (see ui-style.instructions.md, section 7).
+	/// Apply language texts by control name: the ID is the control name, the form title's ID is the class name.
+	/// A missing ID keeps the designer text.
 	/// Only controls whose Text is a caption are changed; input controls keep their content.
 	/// </summary>
 	public static class LanguageApplier
