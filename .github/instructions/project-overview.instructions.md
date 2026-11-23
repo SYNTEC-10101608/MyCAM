@@ -70,7 +70,7 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 ### WinForms Designer
 
 - `*.Designer.cs`、`*.resx` 由 Visual Studio Designer 產生，也可以直接以程式碼修改；撰寫、修改與 review 的方式見
-  [UI 風格](ui-style.instructions.md) 8.1。
+  [UI 風格](ui-style.instructions.md) 的「Designer 檔」。
 
 ## 建置與執行
 
