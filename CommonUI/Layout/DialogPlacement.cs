@@ -5,7 +5,8 @@ using System.Windows.Forms;
 namespace CommonUI.Layout
 {
 	/// <summary>
-	/// The only place that calculates where a dialog is centered (see ui-style.instructions.md, section 4.3).
+	/// The only place that calculates where a dialog is centered: the whole main window in landscape, the CAM area
+	/// registered by the main window in portrait, kept inside the working area of the screen.
 	/// </summary>
 	public static class DialogPlacement
 	{
