@@ -3,30 +3,30 @@
 	[string]$Base = "a4b3826d",
 	[string]$Only = ""
 )
-# Issue-only check of the UI style unification (Doc/UIStyleUnify/5_Verification.md): behavior comparison against
+# Issue-only check of the UI style unification (AUTO-23254): behavior comparison against
 # the version before the issue. The base is fixed to the commit the branch started from, so the result can be
 # reproduced after the merge. Appearance may change; everything below must stay the same unless listed in
 # BehaviorExceptions.txt.
 #
-#   B1  event subscriptions in the designer file
-#   B2  radio button groups (which radio buttons are exclusive to each other)
-#   B3  non-appearance properties of controls (range, decimals, checked, enabled, visible, read-only, items ...);
-#       a control whose type changed (also a replacement allowed by B6) is compared by effective values, the
+#   SameEvents  event subscriptions in the designer file
+#   SameRadioGroups  radio button groups (which radio buttons are exclusive to each other)
+#   SameProperties  non-appearance properties of controls (range, decimals, checked, enabled, visible, read-only, items ...);
+#       a control whose type changed (also a replacement allowed by TypeReplace) is compared by effective values, the
 #       defaults read from new instances of both types: the Debug build (CommonUI.dll) is needed, and the controls
 #       deleted by the issue are compiled from the base source
-#   B4  form properties with behavior (AcceptButton, CancelButton, ControlBox, KeyPreview, TopMost)
-#   B5  controls used by the code still exist
-#   B6  control types: only appearance replacements (Button -> ThemedButton, GroupBox -> SectionPanel ...)
-#   B7  Show / ShowDialog call sites in the whole repository
-#   B8  event subscriptions and Enabled / Visible / ReadOnly / Checked assignments in the code files changed since
+#   SameFormProps  form properties with behavior (AcceptButton, CancelButton, ControlBox, KeyPreview, TopMost)
+#   UsedControls  controls used by the code still exist
+#   TypeReplace  control types: only appearance replacements (Button -> ThemedButton, GroupBox -> SectionPanel ...)
+#   ShowCalls  Show / ShowDialog call sites in the whole repository
+#   CodeState  event subscriptions and Enabled / Visible / ReadOnly / Checked assignments in the code files changed since
 #       the base (screens, main window, CNC panels, helpers)
 #
 # Controls renamed for the naming rule are listed in RenameMap.txt ("<class> <old name> <new name>"); the base is
 # compared after the same renames, so a rename alone is not a difference.
-# The tab order is not compared: it follows the layout and is checked by CheckStatic.ps1 (S10).
+# The tab order is not compared: it follows the layout and is checked by CheckStatic.ps1 (TabOrder).
 #
-# Exceptions: "<rule> <class> <control> <reason>" in BehaviorExceptions.txt; a B3 exception also names the property
-# ("B3 <class> <control> <property> <reason>"). Exit code 1 on a difference.
+# Exceptions: "<rule> <class> <control> <reason>" in BehaviorExceptions.txt; a SameProperties exception also names the property
+# ("SameProperties <class> <control> <property> <reason>"). Exit code 1 on a difference.
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $Root "Tools\UICheck\DesignerParser.ps1")
@@ -59,11 +59,11 @@ $exceptions = @{}
 $exceptionFile = Join-Path $PSScriptRoot "BehaviorExceptions.txt"
 if (Test-Path $exceptionFile) {
 	foreach ($line in Get-Content $exceptionFile -Encoding UTF8) {
-		# a B3 exception also names the property, so other properties of the same control are still compared
-		if ($line -match "^\s*(B3)\s+(\S+)\s+(\S+)\s+(\S+)") {
+		# a SameProperties exception also names the property, so other properties of the same control are still compared
+		if ($line -match "^\s*(SameProperties)\s+(\S+)\s+(\S+)\s+(\S+)") {
 			$exceptions["$($Matches[1]) $($Matches[2]) $($Matches[3]) $($Matches[4])"] = $true
 		}
-		elseif ($line -match "^\s*(B\d)\s+(\S+)\s+(\S+)") {
+		elseif ($line -match "^\s*(\w+)\s+(\S+)\s+(\S+)") {
 			$exceptions["$($Matches[1]) $($Matches[2]) $($Matches[3])"] = $true
 		}
 	}
@@ -101,7 +101,7 @@ function Rename-BaseText( [string]$szText, [string]$szClass ) {
 
 $problems = New-Object System.Collections.Generic.List[string]
 function Report( [string]$szRule, [string]$szClass, [string]$szControl, [string]$szMessage, [string]$szProperty = "" ) {
-	# an exception may use wildcards, e.g. "B6 CalibrationREFDlg m_tbxPnt*"
+	# an exception may use wildcards, e.g. "TypeReplace CalibrationREFDlg m_tbxPnt*"
 	$key = "$szRule $szClass $szControl"
 	if ($szProperty) {
 		$key += " $szProperty"
@@ -232,7 +232,7 @@ function Get-DefaultValue( [string]$szType, [string]$szProperty ) {
 	return [pscustomobject]@{ Has = $true; Value = (ConvertTo-Canonical $info.GetValue($instance, $null)) }
 }
 
-# B3 of a control whose type changed (also a replacement allowed by B6): a property only the new type has is a new
+# SameProperties of a control whose type changed (also a replacement allowed by TypeReplace): a property only the new type has is a new
 # setting and not compared; a property the old type has must keep its effective value, whether the old designer
 # wrote it or not. Returns the difference, or $null.
 function Get-EffectiveDifference( [string]$prop, [string]$oldType, [string]$newType, [string]$szOldValue,
@@ -262,7 +262,7 @@ function Compare-EffectiveValue( [string]$szClass, [string]$name, [string]$prop,
 	[string]$szOldValue, [string]$szNewValue ) {
 	$szDifference = Get-EffectiveDifference $prop $oldType $newType $szOldValue $szNewValue
 	if ($null -ne $szDifference) {
-		Report "B3" $szClass $name $szDifference $prop
+		Report "SameProperties" $szClass $name $szDifference $prop
 	}
 }
 
@@ -308,26 +308,26 @@ foreach ($file in $designerFiles) {
 		continue
 	}
 
-	# B1 events
+	# SameEvents events
 	foreach ($event in $old.Events) {
 		if (-not $new.Events.Contains($event)) {
-			Report "B1" $szClass ($event -split "\.")[0] "event removed: $event"
+			Report "SameEvents" $szClass ($event -split "\.")[0] "event removed: $event"
 		}
 	}
 	foreach ($event in $new.Events) {
 		if (-not $old.Events.Contains($event)) {
-			Report "B1" $szClass ($event -split "\.")[0] "event added: $event"
+			Report "SameEvents" $szClass ($event -split "\.")[0] "event added: $event"
 		}
 	}
 
-	# B2 radio groups
+	# SameRadioGroups radio groups
 	$oldGroups = Get-RadioGroups $old
 	$newGroups = Get-RadioGroups $new
 	if (($oldGroups -join " | ") -ne ($newGroups -join " | ")) {
-		Report "B2" $szClass "*" "radio groups changed: [$($oldGroups -join ' | ')] -> [$($newGroups -join ' | ')]"
+		Report "SameRadioGroups" $szClass "*" "radio groups changed: [$($oldGroups -join ' | ')] -> [$($newGroups -join ' | ')]"
 	}
 
-	# B3 / B6 controls
+	# SameProperties / TypeReplace controls
 	$oldItems = Get-ItemsProp $baseText
 	$newItems = Get-ItemsProp (Get-Content $file.FullName -Raw -Encoding UTF8)
 	foreach ($name in $old.Fields.Keys) {
@@ -335,17 +335,17 @@ foreach ($file in $designerFiles) {
 		if (-not $new.Fields.ContainsKey($name)) {
 			$isLayoutOnly = $oldType -match "(TableLayoutPanel|FlowLayoutPanel|GroupBox|GroupPanel|\.Panel)$"
 			if (-not $isLayoutOnly) {
-				Report "B6" $szClass $name "control removed ($oldType)"
+				Report "TypeReplace" $szClass $name "control removed ($oldType)"
 			}
 			continue
 		}
 		$newType = $new.Fields[$name]
 		$isSameKind = $oldType -eq $newType -or ($TYPE_REPLACEMENTS.ContainsKey($oldType) -and $TYPE_REPLACEMENTS[$oldType] -contains $newType)
 		if (-not $isSameKind) {
-			Report "B6" $szClass $name "type changed: $oldType -> $newType"
+			Report "TypeReplace" $szClass $name "type changed: $oldType -> $newType"
 		}
 
-		# B6 decides whether a replacement is allowed; B3 of any real type change, allowed or not, compares the
+		# TypeReplace decides whether a replacement is allowed; SameProperties of any real type change, allowed or not, compares the
 		# effective values, since the two types may have different defaults
 		$isTypeChanged = $oldType -ne $newType
 		$oldProps = if ($old.Props.ContainsKey($name)) { $old.Props[$name] } else { @{} }
@@ -363,19 +363,19 @@ foreach ($file in $designerFiles) {
 				continue
 			}
 			if ("$oldValue" -ne "$newValue") {
-				Report "B3" $szClass $name "$prop changed: '$oldValue' -> '$newValue'" $prop
+				Report "SameProperties" $szClass $name "$prop changed: '$oldValue' -> '$newValue'" $prop
 			}
 		}
 	}
 
-	# B4 form properties
+	# SameFormProps form properties
 	foreach ($prop in $FORM_BEHAVIOR_PROPS) {
 		if ("$($old.FormProps[$prop])" -ne "$($new.FormProps[$prop])") {
-			Report "B4" $szClass "(form)" "$prop changed: '$($old.FormProps[$prop])' -> '$($new.FormProps[$prop])'"
+			Report "SameFormProps" $szClass "(form)" "$prop changed: '$($old.FormProps[$prop])' -> '$($new.FormProps[$prop])'"
 		}
 	}
 
-	# B5 controls used by the code
+	# UsedControls controls used by the code
 	$codePath = $file.FullName -replace "\.Designer\.cs$", ".cs"
 	if (Test-Path $codePath) {
 		$code = Get-Content $codePath -Raw -Encoding UTF8
@@ -384,13 +384,13 @@ foreach ($file in $designerFiles) {
 				continue
 			}
 			if ($code -notmatch "\b\w+\s+$name\s*[;=]") {
-				Report "B5" $szClass $name "used by the code but no longer exists"
+				Report "UsedControls" $szClass $name "used by the code but no longer exists"
 			}
 		}
 	}
 }
 
-# ---------------------------------------------------------------- B7 Show / ShowDialog
+# ---------------------------------------------------------------- ShowCalls Show / ShowDialog
 function Get-ShowCalls( [string[]]$lines ) {
 	$calls = @{}
 	foreach ($line in $lines) {
@@ -401,7 +401,7 @@ function Get-ShowCalls( [string[]]$lines ) {
 	}
 	return $calls
 }
-# the file is the "control" of a B7 exception, so an exception covers the call sites of one file only
+# the file is the "control" of a ShowCalls exception, so an exception covers the call sites of one file only
 function Get-CallFile( [string]$szKey ) {
 	return ($szKey -split ": ", 2)[ 0 ]
 }
@@ -410,16 +410,16 @@ $oldCalls = Get-ShowCalls (& git -C $Root grep -I -E -e $pattern $Base -- "*.cs"
 $newCalls = Get-ShowCalls (& git -C $Root grep -I -E --untracked -e $pattern -- "*.cs" | Where-Object { $_ -notmatch "^Tools/" })
 foreach ($key in $oldCalls.Keys) {
 	if ($newCalls[$key] -ne $oldCalls[$key]) {
-		Report "B7" "repository" (Get-CallFile $key) "call site changed or removed: $key"
+		Report "ShowCalls" "repository" (Get-CallFile $key) "call site changed or removed: $key"
 	}
 }
 foreach ($key in $newCalls.Keys) {
 	if (-not $oldCalls.ContainsKey($key)) {
-		Report "B7" "repository" (Get-CallFile $key) "call site added: $key"
+		Report "ShowCalls" "repository" (Get-CallFile $key) "call site added: $key"
 	}
 }
 
-# ---------------------------------------------------------------- B8 behavior statements in the code
+# ---------------------------------------------------------------- CodeState behavior statements in the code
 # one statement per line is the coding style, so a line is a statement; whitespace is normalized
 function Get-BehaviorStatements( [string]$szText ) {
 	$statements = @{}
@@ -450,13 +450,13 @@ foreach ($szGitPath in $changedFiles) {
 	foreach ($szLine in $oldStatements.Keys) {
 		if ($newStatements[$szLine] -ne $oldStatements[$szLine]) {
 			$szTarget = ($szLine -split "[ \.]")[0]
-			Report "B8" $szClass $szTarget "statement removed or count changed: $szLine"
+			Report "CodeState" $szClass $szTarget "statement removed or count changed: $szLine"
 		}
 	}
 	foreach ($szLine in $newStatements.Keys) {
 		if (-not $oldStatements.ContainsKey($szLine)) {
 			$szTarget = ($szLine -split "[ \.]")[0]
-			Report "B8" $szClass $szTarget "statement added: $szLine"
+			Report "CodeState" $szClass $szTarget "statement added: $szLine"
 		}
 	}
 }

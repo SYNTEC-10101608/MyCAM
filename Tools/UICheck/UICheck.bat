@@ -1,5 +1,5 @@
 @echo off
-REM UI checks of .github/instructions/ui-style.instructions.md, section 8.
+REM UI style checks.
 REM   UICheck.bat            static check
 REM   UICheck.bat runtime    also opens every dialog / CNC panel in zh-TW and zh-CN, checks the numeric input, and
 REM                          the main window landscape / portrait with dialog placement (build Debug first)
@@ -38,7 +38,7 @@ for %%L in (zh-TW zh-CN) do (
 	)
 )
 
-REM P6: the regions at the client size and page of the designer are where the designer shows them
+REM MainDesignerRegion: the regions at the client size and page of the designer are where the designer shows them
 echo ## main window: designer layout
 powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Mode CNC -DesignerLayout -OutFile "%SHOTS%\MainWindow_Designer.png"
 if errorlevel 1 set "RESULT=1"

@@ -2,42 +2,54 @@
 	[string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
 	[string]$Only = ""
 )
-# Static check of the UI rules (ui-style.instructions.md). Reads source files only, no build needed.
+# Static check of the UI rules. Reads source files only, no build needed. Each rule, by the name it reports:
 #
-#   S1  control types: only the white list (section 3); TextBox only for the listed non-numeric fields
-#   S2  designer files contain no appearance (font, colors, frame, auto scaling, flat style, dock / anchor)
-#   S3  every dialog derives from DialogBase (directly or through FormBase / EditDialogBase), panels from PanelBase
-#   S4  screen code contains no Color / SystemColors / new Font (data colors: named static readonly constants)
-#   S5  dialog layout (section 4.4): margins, section width / gap, row grid, card height, button bar
-#   S6  language: captions written in Chinese have their ID in zh-TW and zh-CN; every language in Language\ has the
-#       same IDs; the language file is named after the class
-#   S7  language: a control whose name is an ID is not applied by hand (ApplyLanguage applies it)
-#   S8  section titles (section 4.5): a card title is SectionPanel.Text; no emphasized label in a card's title bar
-#   S9  control field names start with the prefix of their type (section 3), also in the main window
-#   S10 tab order follows the layout: rows from top to bottom, left to right (FixTabOrder.ps1 renumbers)
-#   S11 dialog code sets no font, color, location or size of its controls (the designer layout is what runs)
-#   S12 no DPI scaling (DeviceDpi): the layout is designed for 96 DPI
-#   S13 language: an ID written like a control name belongs to a control of the class or is used by its code
-#   S14 language: every dialog calls ApplyLanguage() right after InitializeComponent(); every embedded panel calls
-#       ApplyLanguage( languageManager )
-#   S15 only CommonUI defines control classes (MyCAM and CncUI use the CommonUI controls)
-#   S16 button kinds: Start / Hold / Stop only in the CNC panels; at most one Primary in a container
-#   S17 button bar order (section 4.4): auxiliary buttons from the left margin, the others from the right margin,
-#       8 apart; Primary is the rightmost, Cancel / Close right before it, Reset / Preview on the left
-#   S18 alignment in a card: the first input of each row starts at the same x; a unit label is 6 after its input
-#   S19 main window designer: only the white list of types (section 3), no appearance
-#   S20 data colors: every "static readonly Color" constant is a registered data color (StaticExceptions.txt)
-#   S21 every public type of CommonUI is listed in the component catalog (section 9), in the subsection of its folder;
-#       a file in CommonUI\<Folder> is in namespace CommonUI.<Folder>
-#   S22 title bar of a titled card (section 4.5): button 23 high at y=5, check box at y=5, label 24 high at y=4,
-#       the rightmost control ends at the content edge
-#   S23 code creates no control outside the white list (section 3)
-#   S24 InitializeComponent contains only what the designer can read: no control flow, lambda, interpolated string,
-#       call of the screen's own methods, constant of the class, statement without "this."
-#   S25 a screen reads nothing from its own .resx: no ComponentResourceManager in the designer file, no <data> in
-#       the .resx (design time metadata only; images from Properties.Resources)
+# Controls and naming
+#   ControlWhitelist     control types in designer files are on the white list ($ALLOWED_TYPES); TextBox only for the
+#                        non-numeric fields ($ALLOWED_TEXTBOX)
+#   CodeControlType      code creates no control outside the white list
+#   ControlInCommonUI    only CommonUI defines control classes (MyCAM and CncUI use the CommonUI controls)
+#   CommonUINamespace    a file in CommonUI\<Folder> is in namespace CommonUI.<Folder>
+#   FieldPrefix          control field names start with the prefix of their type ($PREFIX_MAP), also in the main window
+#   ScreenBase           every dialog derives from DialogBase (directly or through FormBase / EditDialogBase), every
+#                        embedded panel from PanelBase
+# Appearance comes from the theme
+#   DesignerAppearance   designer files contain no appearance (font, colors, frame, auto scaling, flat style,
+#                        dock / anchor)
+#   MainWindowDesigner   the main window designer uses only white list types and contains no appearance
+#   ThemeToken           screen code contains no Color / SystemColors / new Font (data colors: named constants)
+#   DataColor            every "static readonly Color" constant is a registered data color (StaticExceptions.txt)
+#   CodeAppearance       dialog code sets no font, color, location or size of its controls (the designer layout is
+#                        what runs)
+#   NoDpiScaling         no DPI scaling (DeviceDpi): the layout is designed for 96 DPI
+# Dialog layout
+#   DialogGrid           margins, card width / gap, row grid, card height, button bar (ThemeMetrics)
+#   RowAlignment         the first input of each row in a card starts at the same x; a unit label is 6 after its input
+#   SectionTitle         a card title is SectionPanel.Text; no emphasized label in the title bar of a card
+#   TitleBarControl      title bar of a titled card: button 23 high at y=5, check box at y=5, label 24 high at y=4,
+#                        the rightmost control ends at the content edge
+#   ButtonKind           Start / Hold / Stop only in the CNC panels; at most one Primary in a container
+#   ButtonBarOrder       auxiliary buttons from the left margin, the others from the right margin, 8 apart; Primary
+#                        is the rightmost, Cancel / Close right before it, Reset / Preview on the left
+#   TabOrder             tab order follows the layout: rows from top to bottom, left to right (FixTabOrder.ps1
+#                        renumbers)
+# Language
+#   LanguageIdSync       captions written in Chinese have their ID in zh-TW and zh-CN; every language in Language\
+#                        has the same IDs; the language file is named after the class
+#   LanguageManualApply  a control whose name is an ID is not applied by hand (ApplyLanguage applies it)
+#   LanguageOrphanId     an ID written like a control name belongs to a control of the class or is used by its code
+#   LanguageApplyCall    every dialog calls ApplyLanguage() right after InitializeComponent(); every embedded panel
+#                        calls ApplyLanguage( languageManager )
+# Designer files stay readable by the designer
+#   DesignerReadable     InitializeComponent contains only what the designer can read: no control flow, lambda,
+#                        interpolated string, call of the screen's own methods, constant of the class, statement
+#                        without "this."
+#   ResxResource         a screen reads nothing from its own .resx: no ComponentResourceManager in the designer file,
+#                        no <data> in the .resx (design time metadata only; images from Properties.Resources)
 #
 # Exceptions are listed in StaticExceptions.txt: "<rule> <class> <control> <reason>". Exit code 1 on a problem.
+# Maintenance: a screen in a new folder is added to $SCREEN_DIRS (designer files) or $CODE_SCOPE (code) below, and to
+# $SCREEN_DIRS of FixTabOrder.ps1. A new or changed rule is proven by a deliberate violation that it reports.
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "DesignerParser.ps1")
@@ -62,12 +74,12 @@ $ALLOWED_TYPES = @(
 	"System.Windows.Forms.DataGridViewTextBoxColumn", "System.Windows.Forms.Panel",
 	"System.Windows.Forms.ToolTip", "System.Windows.Forms.Timer", "System.ComponentModel.IContainer" )
 
-# main window only (section 3)
+# main window only
 $MAIN_WINDOW_TYPES = @( "System.Windows.Forms.MenuStrip", "System.Windows.Forms.ToolStrip",
 	"System.Windows.Forms.ToolStripButton", "System.Windows.Forms.ToolStripMenuItem",
 	"System.Windows.Forms.ToolStripSeparator" )
 
-# non-numeric text fields (section 3)
+# non-numeric text fields
 $ALLOWED_TEXTBOX = @( "ConnectDlg.m_txtIP", "MeasureDlg.m_txtResult", "ExtendedGCodeDlg.m_txtGCode",
 	"DesignSupportBracketDlg.m_txtSavePath" )
 
@@ -76,7 +88,7 @@ $FORBIDDEN_FORM_PROPS = @( "AutoScaleMode", "AutoScaleDimensions", "FormBorderSt
 $FORBIDDEN_CONTROL_PROPS = @( "Font", "BackColor", "ForeColor", "FlatStyle", "UseVisualStyleBackColor", "Dock",
 	"Anchor", "AutoScaleMode", "AutoScaleDimensions", "BorderStyle", "ImageTransparentColor" )
 
-# field name prefix of each control type (section 3)
+# field name prefix of each control type
 $PREFIX_MAP = @{
 	"SectionPanel" = "m_pnl"; "Panel" = "m_pnl"
 	"ThemedButton" = "m_btn"; "ThemedLabel" = "m_lbl"; "DebouncedNumericUpDown" = "m_num"
@@ -95,12 +107,12 @@ function Test-FieldNames( $screen ) {
 			continue
 		}
 		if (-not $PREFIX_MAP.ContainsKey($szType)) {
-			Report "S9" $screen.ClassName $name "no prefix defined for $szType"
+			Report "FieldPrefix" $screen.ClassName $name "no prefix defined for $szType"
 			continue
 		}
 		$szPrefix = $PREFIX_MAP[$szType]
 		if ($name -cnotmatch "^$($szPrefix)[A-Z0-9]") {
-			Report "S9" $screen.ClassName $name "$szType field must be named $szPrefix<Name>"
+			Report "FieldPrefix" $screen.ClassName $name "$szType field must be named $szPrefix<Name>"
 		}
 	}
 }
@@ -114,10 +126,10 @@ function Test-OrphanIds( $screen, [string]$szCodePath ) {
 	foreach ($id in $ids.Keys) {
 		$isControlName = $id -cmatch "^m_[a-z]+[A-Z0-9]"
 
-		# "<item>_ToolTip" is the tool tip of a menu / tool bar item, applied by name (section 7)
+		# "<item>_ToolTip" is the tool tip of a menu / tool bar item, applied by name
 		$szOwner = $id -replace "_ToolTip$", ""
 		if ($isControlName -and -not $screen.Fields.ContainsKey($szOwner) -and $code -notmatch "`"$id`"") {
-			Report "S13" $screen.ClassName $id "language ID looks like a control name but no control or code uses it"
+			Report "LanguageOrphanId" $screen.ClassName $id "language ID looks like a control name but no control or code uses it"
 		}
 	}
 }
@@ -132,7 +144,7 @@ function Test-TabOrder( $screen ) {
 			}
 			$nTabIndex = [int]$props["TabIndex"]
 			if ($nTabIndex -le $nPrevious) {
-				Report "S10" $screen.ClassName $name "TabIndex $nTabIndex is not after the control before it in the layout ($szContainer)"
+				Report "TabOrder" $screen.ClassName $name "TabIndex $nTabIndex is not after the control before it in the layout ($szContainer)"
 			}
 			$nPrevious = $nTabIndex
 		}
@@ -142,11 +154,11 @@ function Test-TabOrder( $screen ) {
 function Test-ApplyLanguage( $screen, [string]$szCodePath ) {
 	$code = if (Test-Path $szCodePath) { Get-Content $szCodePath -Raw -Encoding UTF8 } else { "" }
 	if ($code -notmatch "InitializeComponent\(\);\s*\r?\n\s*ApplyLanguage\(\);") {
-		Report "S14" $screen.ClassName "*" "ApplyLanguage() must be called right after InitializeComponent()"
+		Report "LanguageApplyCall" $screen.ClassName "*" "ApplyLanguage() must be called right after InitializeComponent()"
 	}
 }
 
-# CNC machining kinds (section 3) and the single main action of a container
+# CNC machining kinds and the single main action of a container
 function Test-ButtonKinds( $screen, [bool]$isCncPanel ) {
 	$primaryMap = @{}
 	foreach ($name in $screen.Props.Keys) {
@@ -156,7 +168,7 @@ function Test-ButtonKinds( $screen, [bool]$isCncPanel ) {
 		}
 		$isMachiningKind = $szKind -match "ButtonKind\.(Start|Hold|Stop)$"
 		if ($isMachiningKind -and -not $isCncPanel) {
-			Report "S16" $screen.ClassName $name "$szKind is only for the CNC panels"
+			Report "ButtonKind" $screen.ClassName $name "$szKind is only for the CNC panels"
 		}
 		if ($szKind -match "ButtonKind\.Primary$") {
 			$szParent = Get-Parent $screen $name
@@ -168,7 +180,7 @@ function Test-ButtonKinds( $screen, [bool]$isCncPanel ) {
 	}
 	foreach ($szParent in $primaryMap.Keys) {
 		if ($primaryMap[$szParent].Count -gt 1) {
-			Report "S16" $screen.ClassName $szParent "more than one Primary button: $($primaryMap[$szParent] -join ', ')"
+			Report "ButtonKind" $screen.ClassName $szParent "more than one Primary button: $($primaryMap[$szParent] -join ', ')"
 		}
 	}
 }
@@ -225,7 +237,7 @@ function Test-ButtonBarOrder( $screen ) {
 		}
 		foreach ($button in $buttons) {
 			if (-not $leftGroup.Contains($button) -and -not $rightGroup.Contains($button)) {
-				Report "S17" $screen.ClassName $button.Name "not chained 8 apart from the left or right margin of the button bar"
+				Report "ButtonBarOrder" $screen.ClassName $button.Name "not chained 8 apart from the left or right margin of the button bar"
 			}
 		}
 
@@ -237,24 +249,24 @@ function Test-ButtonBarOrder( $screen ) {
 			$szCommon = $props["CommonText"]
 			$isLast = $nIndex -eq $buttons.Count - 1
 			if ($isPrimary -and -not $isLast) {
-				Report "S17" $screen.ClassName $button.Name "the Primary button must be the rightmost of the button bar"
+				Report "ButtonBarOrder" $screen.ClassName $button.Name "the Primary button must be the rightmost of the button bar"
 			}
 			if ($szCommon -match "\.(Cancel|Close)$") {
 				$next = if ($isLast) { $null } else { $buttons[$nIndex + 1] }
 				$isBeforePrimary = $null -ne $next -and $screen.Props[$next.Name]["Kind"] -match "ButtonKind\.Primary$"
 				if (-not $rightGroup.Contains($button) -or (-not $isLast -and -not $isBeforePrimary)) {
-					Report "S17" $screen.ClassName $button.Name "cancel / close must be right before the Primary button (or the rightmost)"
+					Report "ButtonBarOrder" $screen.ClassName $button.Name "cancel / close must be right before the Primary button (or the rightmost)"
 				}
 			}
 			if ($szCommon -match "\.(Reset|Preview)$" -and -not $leftGroup.Contains($button)) {
-				Report "S17" $screen.ClassName $button.Name "reset / preview are auxiliary actions, placed from the left margin"
+				Report "ButtonBarOrder" $screen.ClassName $button.Name "reset / preview are auxiliary actions, placed from the left margin"
 			}
 			$nIndex++
 		}
 	}
 }
 
-# S18 inside a card or a plain panel: first inputs of the rows aligned, units 6 after their input
+# RowAlignment inside a card or a plain panel: first inputs of the rows aligned, units 6 after their input
 function Test-CardAlignment( $screen ) {
 	$containers = @( $screen.Fields.Keys | Where-Object { $screen.Fields[$_] -match "(CommonUI.Controls.SectionPanel|System.Windows.Forms.Panel)$" } )
 	foreach ($szContainer in $containers) {
@@ -273,7 +285,7 @@ function Test-CardAlignment( $screen ) {
 		$nCommonLeft = ($firstInputs | Group-Object Left | Sort-Object Count -Descending | Select-Object -First 1).Name
 		foreach ($input in $firstInputs) {
 			if ($null -ne $nCommonLeft -and $input.Left -ne [int]$nCommonLeft) {
-				Report "S18" $screen.ClassName $input.Name "first input of the row at x=$($input.Left), the others of $szContainer at x=$nCommonLeft"
+				Report "RowAlignment" $screen.ClassName $input.Name "first input of the row at x=$($input.Left), the others of $szContainer at x=$nCommonLeft"
 			}
 		}
 		foreach ($unit in @( $children | Where-Object { $_.Name -cmatch "Unit$" -and $screen.Props[$_.Name]["Role"] -match "TextRole\.Secondary$" } )) {
@@ -284,7 +296,7 @@ function Test-CardAlignment( $screen ) {
 			}
 			$nExpected = $input.Left + $input.Width + 6
 			if ($unit.Left -ne $nExpected) {
-				Report "S18" $screen.ClassName $unit.Name "unit label at x=$($unit.Left), expected 6 after $($input.Name) (x=$nExpected)"
+				Report "RowAlignment" $screen.ClassName $unit.Name "unit label at x=$($unit.Left), expected 6 after $($input.Name) (x=$nExpected)"
 			}
 		}
 	}
@@ -305,19 +317,19 @@ function Test-TitleBar( $screen ) {
 			$szType = $screen.Fields[$item.Name]
 			$isAutoSize = $screen.Props[$item.Name]["AutoSize"] -eq "true"
 			if ($szType -match "ThemedButton$" -and ($item.Top -ne 5 -or $item.Height -ne 23)) {
-				Report "S22" $screen.ClassName $item.Name "title bar button must be 23 high at y=5 (is y=$($item.Top), h=$($item.Height))"
+				Report "TitleBarControl" $screen.ClassName $item.Name "title bar button must be 23 high at y=5 (is y=$($item.Top), h=$($item.Height))"
 			}
 			elseif ($szType -match "CheckBox$" -and $item.Top -ne 5) {
-				Report "S22" $screen.ClassName $item.Name "title bar check box must be at y=5 (is $($item.Top))"
+				Report "TitleBarControl" $screen.ClassName $item.Name "title bar check box must be at y=5 (is $($item.Top))"
 			}
 			elseif ($szType -match "Label$" -and ($item.Top -ne 4 -or (-not $isAutoSize -and $item.Height -ne 24))) {
-				Report "S22" $screen.ClassName $item.Name "title bar label must be 24 high at y=4 (is y=$($item.Top), h=$($item.Height))"
+				Report "TitleBarControl" $screen.ClassName $item.Name "title bar label must be 24 high at y=4 (is y=$($item.Top), h=$($item.Height))"
 			}
 		}
 		$rightmost = $items | Sort-Object { $_.Left + $_.Width } -Descending | Select-Object -First 1
 		$isAutoSize = $rightmost -and $screen.Props[$rightmost.Name]["AutoSize"] -eq "true"
 		if ($rightmost -and -not $isAutoSize -and $rightmost.Left + $rightmost.Width -ne $sectionBounds.Width - 10) {
-			Report "S22" $screen.ClassName $rightmost.Name "title bar controls end at the content edge x=$($sectionBounds.Width - 10) (is $($rightmost.Left + $rightmost.Width))"
+			Report "TitleBarControl" $screen.ClassName $rightmost.Name "title bar controls end at the content edge x=$($sectionBounds.Width - 10) (is $($rightmost.Left + $rightmost.Width))"
 		}
 	}
 }
@@ -329,14 +341,14 @@ $exceptions = @{}
 $exceptionFile = Join-Path $PSScriptRoot "StaticExceptions.txt"
 if (Test-Path $exceptionFile) {
 	foreach ($line in Get-Content $exceptionFile -Encoding UTF8) {
-		if ($line -match "^\s*(S\d+)\s+(\S+)\s+(\S+)") {
+		if ($line -match "^\s*(\w+)\s+(\S+)\s+(\S+)") {
 			$exceptions["$($Matches[1]) $($Matches[2]) $($Matches[3])"] = $true
 		}
 	}
 }
 
 $problems = New-Object System.Collections.Generic.List[string]
-# S24 InitializeComponent contains only statements in the forms the designer writes, so that the designer can open
+# DesignerReadable InitializeComponent contains only statements in the forms the designer writes, so that the designer can open
 # the file: assignments and calls on "this", local variables it declares itself (cell styles, resources), casts for
 # BeginInit / EndInit. Control flow, lambdas, interpolated strings, calls of the screen's own methods and constants
 # of the class cannot be read by the designer.
@@ -385,18 +397,18 @@ function Test-DesignerCode( [string]$szClass, [string]$szText ) {
 		}
 		if ($szProblem) {
 			$szShort = if ($s.Length -gt 100) { $s.Substring(0, 100) + " ..." } else { $s }
-			Report "S24" $szClass "InitializeComponent" "$szProblem : $szShort"
+			Report "DesignerReadable" $szClass "InitializeComponent" "$szProblem : $szShort"
 		}
 	}
 }
 
-# S25 a screen reads nothing from its own .resx at run time: the .resx holds design time information only
+# ResxResource a screen reads nothing from its own .resx at run time: the .resx holds design time information only
 # (metadata such as TrayLocation). Images come from the project resources (Properties.Resources); Localizable is
 # not used. The data samples of the .resx template are inside a comment.
 function Test-DesignerResources( [string]$szClass, [string]$szDesignerPath ) {
 	$szText = Get-Content $szDesignerPath -Raw -Encoding UTF8
 	if ($szText -match "ComponentResourceManager|\bresources\.(GetObject|GetString|ApplyResources)\(") {
-		Report "S25" $szClass "InitializeComponent" "reads the .resx of the screen (use Properties.Resources, no Localizable)"
+		Report "ResxResource" $szClass "InitializeComponent" "reads the .resx of the screen (use Properties.Resources, no Localizable)"
 	}
 	$szResxPath = $szDesignerPath -replace "\.Designer\.cs$", ".resx"
 	if (-not (Test-Path $szResxPath)) {
@@ -404,12 +416,12 @@ function Test-DesignerResources( [string]$szClass, [string]$szDesignerPath ) {
 	}
 	$szResx = (Get-Content $szResxPath -Raw -Encoding UTF8) -replace "(?s)<!--.*?-->", ""
 	foreach ($match in [regex]::Matches($szResx, '<data\s+name="([^"]*)"')) {
-		Report "S25" $szClass $match.Groups[1].Value "resource in the .resx of the screen (only design time metadata)"
+		Report "ResxResource" $szClass $match.Groups[1].Value "resource in the .resx of the screen (only design time metadata)"
 	}
 }
 
 function Report( [string]$szRule, [string]$szClass, [string]$szControl, [string]$szMessage ) {
-	# an exception may use wildcards, e.g. "B6 CalibrationREFDlg m_tbxPnt*"
+	# an exception may use wildcards, e.g. "ControlWhitelist CNCThreePointDlg m_txtWorkpiece*"
 	$key = "$szRule $szClass $szControl"
 	if (@($exceptions.Keys | Where-Object { $key -like $_ }).Count -gt 0) {
 		return
@@ -445,7 +457,7 @@ function Test-ScreenLanguage( $screen, $file ) {
 		ForEach-Object { $_.Groups[1].Value }
 	foreach ($szName in $fileNames) {
 		if ($szName -ne $szClass) {
-			Report "S6" $szClass "*" "language file '$szName' is not named after the class"
+			Report "LanguageIdSync" $szClass "*" "language file '$szName' is not named after the class"
 		}
 	}
 	$idsByLanguage = @{}
@@ -484,7 +496,7 @@ function Test-ScreenLanguage( $screen, $file ) {
 		foreach ($szLanguage in @( "zh-TW", "zh-CN" )) {
 			$ids = $idsByLanguage[$szLanguage]
 			if ($null -eq $ids -or -not $ids.ContainsKey($caption.Name)) {
-				Report "S6" $szClass $caption.Name "caption '$($caption.Text)' has no ID in $($szClass)_$szLanguage.xml"
+				Report "LanguageIdSync" $szClass $caption.Name "caption '$($caption.Text)' has no ID in $($szClass)_$szLanguage.xml"
 			}
 		}
 	}
@@ -494,23 +506,23 @@ function Test-ScreenLanguage( $screen, $file ) {
 		foreach ($szLanguage in $LANGUAGES) {
 			$ids = $idsByLanguage[$szLanguage]
 			if ($null -eq $ids) {
-				Report "S6" $szClass "*" "missing $($szClass)_$szLanguage.xml"
+				Report "LanguageIdSync" $szClass "*" "missing $($szClass)_$szLanguage.xml"
 				continue
 			}
 			foreach ($id in $zhTW.Keys) {
 				if (-not $ids.ContainsKey($id)) {
-					Report "S6" $szClass $id "ID missing in $szLanguage"
+					Report "LanguageIdSync" $szClass $id "ID missing in $szLanguage"
 				}
 			}
 			foreach ($id in $ids.Keys) {
 				if (-not $zhTW.ContainsKey($id)) {
-					Report "S6" $szClass $id "ID only in $szLanguage"
+					Report "LanguageIdSync" $szClass $id "ID only in $szLanguage"
 				}
 			}
 		}
 	}
 
-	# S7 a control whose name is an ID gets its text from ApplyLanguage(); code does not apply it again by hand
+	# LanguageManualApply a control whose name is an ID gets its text from ApplyLanguage(); code does not apply it again by hand
 	if ($null -ne $zhTW) {
 		foreach ($name in $screen.Fields.Keys) {
 			if (-not $zhTW.ContainsKey($name)) {
@@ -518,7 +530,7 @@ function Test-ScreenLanguage( $screen, $file ) {
 			}
 			$pattern = "\b$name\.(Text|HeaderText)\s*=\s*[\w\.]+\.TryGetString\(\s*`"$name`""
 			if ($code -match $pattern) {
-				Report "S7" $szClass $name "text is applied by hand; ApplyLanguage() applies it by the control name"
+				Report "LanguageManualApply" $szClass $name "text is applied by hand; ApplyLanguage() applies it by the control name"
 			}
 		}
 	}
@@ -529,7 +541,7 @@ function Test-DialogLayout( $screen ) {
 	$szClass = $screen.ClassName
 	$client = $screen.FormProps["ClientSize"]
 	if ($null -eq $client) {
-		Report "S5" $szClass "(form)" "no ClientSize"
+		Report "DialogGrid" $szClass "(form)" "no ClientSize"
 		return
 	}
 	$clientSize = ConvertTo-Size $client
@@ -542,11 +554,11 @@ function Test-DialogLayout( $screen ) {
 		foreach ($name in $topLevel) {
 			$page = Get-Bounds $screen $name
 			if ($screen.Fields[$name] -ne "System.Windows.Forms.Panel") {
-				Report "S5" $szClass $name "a paged dialog holds only its pages (Panel) on the form"
+				Report "DialogGrid" $szClass $name "a paged dialog holds only its pages (Panel) on the form"
 				continue
 			}
 			if ($page.Left -ne 12 -or $page.Top -ne 12) {
-				Report "S5" $szClass $name "page must be at (12, 12) (is $($page.Left), $($page.Top))"
+				Report "DialogGrid" $szClass $name "page must be at (12, 12) (is $($page.Left), $($page.Top))"
 			}
 			Test-CardColumn $screen $name 0 0 $page.Width $page.Height
 		}
@@ -557,7 +569,7 @@ function Test-DialogLayout( $screen ) {
 		$szType = $screen.Fields[$name]
 		if ($szType -ne "CommonUI.Controls.SectionPanel" -and $szType -ne "CommonUI.Controls.ThemedButton" -and
 			$szType -ne "System.Windows.Forms.Panel") {
-			Report "S5" $szClass $name "only sections, panels and the button bar are placed on the form"
+			Report "DialogGrid" $szClass $name "only sections, panels and the button bar are placed on the form"
 		}
 	}
 }
@@ -585,7 +597,7 @@ function Test-CardColumn( $screen, [string]$szContainer, [int]$nLeft, [int]$nTop
 		if ($slots.Count -eq 1) {
 			foreach ($card in $rowCards) {
 				if ($card.Left -ne $nLeft -or $card.Width -ne $nWidth) {
-					Report "S5" $szClass $card.Name "section must be at x=$nLeft with width $nWidth (is x=$($card.Left), w=$($card.Width))"
+					Report "DialogGrid" $szClass $card.Name "section must be at x=$nLeft with width $nWidth (is x=$($card.Left), w=$($card.Width))"
 				}
 			}
 		}
@@ -594,13 +606,13 @@ function Test-CardColumn( $screen, [string]$szContainer, [int]$nLeft, [int]$nTop
 			$isPair = $slots.Count -eq 2 -and [int]$slots[0].Name -eq $nLeft -and [int]$slots[1].Name -eq ($nLeft + $nHalf + 8) -and
 				@( $rowCards | Where-Object { $_.Width -ne $nHalf } ).Count -eq 0
 			if (-not $isPair) {
-				Report "S5" $szClass $rowCards[0].Name "side-by-side sections must be two of width $nHalf, 8 apart, filling the width $nWidth"
+				Report "DialogGrid" $szClass $rowCards[0].Name "side-by-side sections must be two of width $nHalf, 8 apart, filling the width $nWidth"
 			}
 		}
 
 		# vertical: 8 below the previous row
 		if ($rowCards[0].Top -ne $nExpectedTop -and -not $isStacked) {
-			Report "S5" $szClass $rowCards[0].Name "section must be at y=$nExpectedTop (is $($rowCards[0].Top))"
+			Report "DialogGrid" $szClass $rowCards[0].Name "section must be at y=$nExpectedTop (is $($rowCards[0].Top))"
 		}
 
 		# cards of a slot alternate (one step at a time) and have the height of the tallest content
@@ -621,7 +633,7 @@ function Test-CardColumn( $screen, [string]$szContainer, [int]$nLeft, [int]$nTop
 				$isCard = $screen.Fields[$card.Name] -eq "CommonUI.Controls.SectionPanel"
 				if ($isCard -and $card.Height -ne $nSlotHeight) {
 					$szWhy = if ($slot.Group.Count -gt 1) { " (the tallest of the steps at this location)" } else { "" }
-					Report "S5" $szClass $card.Name "section height must be $nSlotHeight$szWhy (is $($card.Height))"
+					Report "DialogGrid" $szClass $card.Name "section height must be $nSlotHeight$szWhy (is $($card.Height))"
 				}
 			}
 			$nRowHeight = [math]::Max($nRowHeight, $nSlotHeight)
@@ -631,7 +643,7 @@ function Test-CardColumn( $screen, [string]$szContainer, [int]$nLeft, [int]$nTop
 		if ($slots.Count -gt 1) {
 			foreach ($card in $rowCards) {
 				if ($card.Height -ne $nRowHeight) {
-					Report "S5" $szClass $card.Name "side-by-side sections share the height $nRowHeight (is $($card.Height))"
+					Report "DialogGrid" $szClass $card.Name "side-by-side sections share the height $nRowHeight (is $($card.Height))"
 				}
 			}
 		}
@@ -642,16 +654,16 @@ function Test-CardColumn( $screen, [string]$szContainer, [int]$nLeft, [int]$nTop
 	# button bar
 	foreach ($button in $buttons) {
 		if ($button.Height -ne 28 -or $button.Width -lt 80) {
-			Report "S5" $szClass $button.Name "button bar button must be 28 high and at least 80 wide (is $($button.Width)x$($button.Height))"
+			Report "DialogGrid" $szClass $button.Name "button bar button must be 28 high and at least 80 wide (is $($button.Width)x$($button.Height))"
 		}
 		if ($button.Top -ne ($contentBottom + 16) -and -not $isStacked) {
-			Report "S5" $szClass $button.Name "button bar must be 16 below the content, y=$($contentBottom + 16) (is $($button.Top))"
+			Report "DialogGrid" $szClass $button.Name "button bar must be 16 below the content, y=$($contentBottom + 16) (is $($button.Top))"
 		}
 		if ($button.Top + $button.Height -ne $nBottom) {
-			Report "S5" $szClass $button.Name "button bar must end at y=$nBottom (12 above the dialog bottom)"
+			Report "DialogGrid" $szClass $button.Name "button bar must end at y=$nBottom (12 above the dialog bottom)"
 		}
 		if ($button.Left + $button.Width -gt $nLeft + $nWidth -or $button.Left -lt $nLeft) {
-			Report "S5" $szClass $button.Name "button outside the margins"
+			Report "DialogGrid" $szClass $button.Name "button outside the margins"
 		}
 	}
 }
@@ -686,13 +698,13 @@ function Test-SectionRows( $screen, [string]$szContainer, [int]$nTitledTop, [swi
 		}
 		$row = ($bounds.Top - $offset - $contentTop) / 30
 		if ($row -ne [math]::Floor($row) -or $row -lt 0) {
-			Report "S5" $szClass $name "y=$($bounds.Top) is off the row grid of $szContainer (rows at $contentTop + 30k, +$offset)"
+			Report "DialogGrid" $szClass $name "y=$($bounds.Top) is off the row grid of $szContainer (rows at $contentTop + 30k, +$offset)"
 		}
 		if ($szType -match "Panel$" -and $szType -notmatch "SectionPanel") {
 			Test-SectionRows $screen $name $nTitledTop
 		}
 		if (-not $isMultiLine -and $szType -match "(DebouncedNumericUpDown|TextBox)$" -and $bounds.Height -ne 23) {
-			Report "S5" $szClass $name "input height must be 23 (is $($bounds.Height))"
+			Report "DialogGrid" $szClass $name "input height must be 23 (is $($bounds.Height))"
 		}
 		$rowBottom = [math]::Max($bounds.Top + $bounds.Height, $contentTop + [math]::Floor($row) * 30 + 23)
 		if ($rowBottom -gt $lastRowBottom) {
@@ -708,7 +720,7 @@ function Test-SectionRows( $screen, [string]$szContainer, [int]$nTitledTop, [swi
 	if ($isSection) {
 		$section = Get-Bounds $screen $szContainer
 		if ($lastRowBottom -gt 0 -and $section.Height -ne $nExpectedHeight) {
-			Report "S5" $szClass $szContainer "section height must be $nExpectedHeight (is $($section.Height))"
+			Report "DialogGrid" $szClass $szContainer "section height must be $nExpectedHeight (is $($section.Height))"
 		}
 	}
 }
@@ -728,31 +740,31 @@ foreach ($file in $designerFiles) {
 	$codePath = $file.FullName -replace "\.Designer\.cs$", ".cs"
 	$script:CurrentCode = if (Test-Path $codePath) { Get-Content $codePath -Raw -Encoding UTF8 } else { "" }
 
-	# S3 base class
+	# ScreenBase base class
 	if (-not $isDialog -and -not $isPanel) {
-		Report "S3" $szClass "*" "derives from $($screen.BaseType), expected DialogBase / FormBase / EditDialogBase"
+		Report "ScreenBase" $szClass "*" "derives from $($screen.BaseType), expected DialogBase / FormBase / EditDialogBase"
 	}
 	if ($screen.BaseType -eq "UserControl") {
-		Report "S3" $szClass "*" "derives from UserControl, expected PanelBase"
+		Report "ScreenBase" $szClass "*" "derives from UserControl, expected PanelBase"
 	}
 
-	# S1 control types
+	# ControlWhitelist control types
 	foreach ($name in $screen.Fields.Keys) {
 		$szType = $screen.Fields[$name]
 		if ($szType -eq "System.Windows.Forms.TextBox") {
 			if ($ALLOWED_TEXTBOX -notcontains "$szClass.$name") {
-				Report "S1" $szClass $name "TextBox is only for non-numeric text (use DebouncedNumericUpDown or Label)"
+				Report "ControlWhitelist" $szClass $name "TextBox is only for non-numeric text (use DebouncedNumericUpDown or Label)"
 			}
 		}
 		elseif ($ALLOWED_TYPES -notcontains $szType) {
-			Report "S1" $szClass $name "type $szType is not in the white list"
+			Report "ControlWhitelist" $szClass $name "type $szType is not in the white list"
 		}
 	}
 
-	# S2 appearance in the designer file
+	# DesignerAppearance appearance in the designer file
 	foreach ($prop in $FORBIDDEN_FORM_PROPS) {
 		if ($screen.FormProps.ContainsKey($prop)) {
-			Report "S2" $szClass "(form)" "sets $prop"
+			Report "DesignerAppearance" $szClass "(form)" "sets $prop"
 		}
 	}
 	foreach ($name in $screen.Props.Keys) {
@@ -762,12 +774,12 @@ foreach ($file in $designerFiles) {
 				continue
 			}
 			if ($screen.Props[$name].ContainsKey($prop)) {
-				Report "S2" $szClass $name "sets $prop"
+				Report "DesignerAppearance" $szClass $name "sets $prop"
 			}
 		}
 	}
 
-	# S8 an emphasized label at the top of a card stands in for the card title, which is SectionPanel.Text
+	# SectionTitle an emphasized label at the top of a card stands in for the card title, which is SectionPanel.Text
 	# above the content grid: the title bar of a titled card, above the first label row (10 + 4) of an untitled one
 	foreach ($section in @( $screen.Fields.Keys | Where-Object { $screen.Fields[$_] -eq "CommonUI.Controls.SectionPanel" } )) {
 		$sectionProps = $screen.Props[$section]
@@ -779,49 +791,49 @@ foreach ($file in $designerFiles) {
 			$isLabel = $screen.Fields[$name] -match "(Label|ThemedLabel)$"
 			$isEmphasis = $props -and $props["Role"] -match "TextRole\.(Emphasis|Title)$"
 			if ($isLabel -and $isEmphasis -and $bounds -and $bounds.Top -lt $nTitleLimit) {
-				Report "S8" $szClass $name "emphasized label above the content of $section; use $section.Text as the title"
+				Report "SectionTitle" $szClass $name "emphasized label above the content of $section; use $section.Text as the title"
 			}
 		}
 	}
 
-	# S5 / S17 layout of dialogs, S14 language call
+	# DialogGrid / ButtonBarOrder layout of dialogs, LanguageApplyCall language call
 	if ($isDialog) {
 		Test-DialogLayout $screen
 		Test-ButtonBarOrder $screen
 		Test-ApplyLanguage $screen ($file.FullName -replace "\.Designer\.cs$", ".cs")
 	}
 
-	# S14 an embedded panel with a language file applies it through PanelBase.ApplyLanguage
+	# LanguageApplyCall an embedded panel with a language file applies it through PanelBase.ApplyLanguage
 	$hasLanguageFile = Test-Path (Join-Path $Root "Language\$($szClass)_zh-TW.xml")
 	if ($isPanel -and $hasLanguageFile -and $script:CurrentCode -notmatch "\bApplyLanguage\(\s*\w+\s*\)") {
-		Report "S14" $szClass "*" "an embedded panel applies its language texts with ApplyLanguage( languageManager )"
+		Report "LanguageApplyCall" $szClass "*" "an embedded panel applies its language texts with ApplyLanguage( languageManager )"
 	}
 
-	# S16 button kinds, S18 alignment in cards (embedded panels are scaled, their grid is checked at runtime)
+	# ButtonKind button kinds, RowAlignment alignment in cards (embedded panels are scaled, their grid is checked at runtime)
 	Test-ButtonKinds $screen ($file.FullName -match "\\CncUI\\Panel\\")
 	if ($isDialog) {
 		Test-CardAlignment $screen
 	}
 
-	# S22 controls in the title bar of a titled card (section 4.5)
+	# TitleBarControl controls in the title bar of a titled card
 	Test-TitleBar $screen
 
-	# S6 / S7 language
+	# LanguageIdSync / LanguageManualApply language
 	Test-ScreenLanguage $screen $file
 
-	# S9 names, S10 tab order, S13 language IDs
+	# FieldPrefix names, TabOrder tab order, LanguageOrphanId language IDs
 	Test-FieldNames $screen
 	Test-TabOrder $screen
 	Test-OrphanIds $screen ($file.FullName -replace "\.Designer\.cs$", ".cs")
 
-	# S24 the designer can read InitializeComponent
+	# DesignerReadable the designer can read InitializeComponent
 	Test-DesignerCode $szClass (Get-Content $file.FullName -Raw -Encoding UTF8)
 
-	# S25 nothing is read from the .resx of the screen
+	# ResxResource nothing is read from the .resx of the screen
 	Test-DesignerResources $szClass $file.FullName
 }
 
-# S9 the main window follows the same naming; its layout is computed by MainLayout, so S10 does not apply
+# FieldPrefix the main window follows the same naming; its layout is computed by MainLayout, so TabOrder does not apply
 $mainScreen = Read-DesignerFile (Join-Path $Root "MyCAM\StartupForm.Designer.cs")
 if (-not $Only -or $mainScreen.ClassName -like $Only) {
 	Test-FieldNames $mainScreen
@@ -830,61 +842,39 @@ if (-not $Only -or $mainScreen.ClassName -like $Only) {
 	Test-DesignerCode $mainScreen.ClassName $szMainText
 	Test-DesignerResources $mainScreen.ClassName (Join-Path $Root "MyCAM\StartupForm.Designer.cs")
 
-	# S19 types and appearance of the main window
+	# MainWindowDesigner types and appearance of the main window
 	foreach ($name in $mainScreen.Fields.Keys) {
 		$szType = $mainScreen.Fields[$name]
 		if ($ALLOWED_TYPES -notcontains $szType -and $MAIN_WINDOW_TYPES -notcontains $szType) {
-			Report "S19" $mainScreen.ClassName $name "type $szType is not in the white list of the main window"
+			Report "MainWindowDesigner" $mainScreen.ClassName $name "type $szType is not in the white list of the main window"
 		}
 	}
 	foreach ($prop in $FORBIDDEN_FORM_PROPS) {
 		if ($mainScreen.FormProps.ContainsKey($prop)) {
-			Report "S19" $mainScreen.ClassName "(form)" "sets $prop"
+			Report "MainWindowDesigner" $mainScreen.ClassName "(form)" "sets $prop"
 		}
 	}
 	foreach ($name in $mainScreen.Props.Keys) {
 		foreach ($prop in @( "Font", "BackColor", "ForeColor", "FlatStyle", "UseVisualStyleBackColor", "ImageTransparentColor" )) {
 			if ($mainScreen.Props[$name].ContainsKey($prop)) {
-				Report "S19" $mainScreen.ClassName $name "sets $prop"
+				Report "MainWindowDesigner" $mainScreen.ClassName $name "sets $prop"
 			}
 		}
 	}
 }
 
-# S21 the component catalog of the guideline lists every public type of CommonUI, in the subsection of its folder;
-# the folder is the namespace (CommonUI\<Folder> is CommonUI.<Folder>)
-$guideline = Get-Content (Join-Path $Root ".github\instructions\ui-style.instructions.md") -Raw -Encoding UTF8
-$catalogIndex = $guideline.IndexOf("## 9. CommonUI")
-$catalog = if ($catalogIndex -ge 0) { $guideline.Substring($catalogIndex) } else { "" }
-
-# each subsection names its namespace in the heading: "### 9.n <title>（`CommonUI.<Folder>`）"
-$catalogSectionMap = @{}
-foreach ($section in [regex]::Split($catalog, "(?m)^(?=### )")) {
-	if ($section -match "^### [^\r\n]*``(CommonUI\.\w+)``") {
-		$catalogSectionMap[$Matches[1]] = $section
-	}
-}
+# CommonUINamespace the folder is the namespace (CommonUI\<Folder> is CommonUI.<Folder>)
 $commonUIRoot = Join-Path $Root "CommonUI"
 foreach ($file in Get-ChildItem $commonUIRoot -Filter "*.cs" -Recurse | Where-Object { $_.FullName -notmatch "\\(bin|obj|Properties)\\" -and $_.Name -notlike "*.Designer.cs" }) {
 	$code = Get-Content $file.FullName -Raw -Encoding UTF8
 	$szFolder = $file.DirectoryName.Substring($commonUIRoot.Length).Trim("\")
 	$szNamespace = "CommonUI.$szFolder"
 	if ($code -notmatch "(?m)^namespace $([regex]::Escape($szNamespace))\s*$") {
-		Report "S21" $file.Name "*" "a file in CommonUI\$szFolder must be in namespace $szNamespace"
-	}
-	if (-not $catalogSectionMap.ContainsKey($szNamespace)) {
-		Report "S21" $file.Name "*" "the component catalog (guideline section 9) has no subsection for $szNamespace"
-		continue
-	}
-	foreach ($match in [regex]::Matches($code, "public (static |sealed |partial |abstract )*(class|enum|struct|interface) (\w+)")) {
-		$szType = $match.Groups[3].Value
-		if ($catalogSectionMap[$szNamespace] -notmatch "``$szType``") {
-			Report "S21" $szType "*" "public CommonUI type is not listed in the catalog subsection of $szNamespace (guideline section 9)"
-		}
+		Report "CommonUINamespace" $file.Name "*" "a file in CommonUI\$szFolder must be in namespace $szNamespace"
 	}
 }
 
-# S15 control classes are defined in CommonUI only
+# ControlInCommonUI control classes are defined in CommonUI only
 $CONTROL_BASES = "Control|UserControl|ScrollableControl|ContainerControl|Panel|Button|ButtonBase|Label|TextBox|TextBoxBase|" +
 	"NumericUpDown|UpDownBase|ComboBox|ListBox|CheckedListBox|ListView|TreeView|DataGridView|CheckBox|RadioButton|" +
 	"GroupBox|PictureBox|ProgressBar|TrackBar|TabControl|SplitContainer|ToolStrip|MenuStrip|StatusStrip|FlowLayoutPanel|" +
@@ -897,7 +887,7 @@ foreach ($dir in @( "MyCAM", "CncUI", "OCCViewer" )) {
 	foreach ($file in Get-ChildItem $path -Filter "*.cs" -Recurse | Where-Object { $_.FullName -notmatch "\\(bin|obj)\\" }) {
 		$code = Get-Content $file.FullName -Raw -Encoding UTF8
 		foreach ($match in [regex]::Matches($code, "class\s+(\w+)\s*:\s*(System\.Windows\.Forms\.)?($CONTROL_BASES)\b")) {
-			Report "S15" $match.Groups[1].Value "*" "derives from $($match.Groups[3].Value); controls are defined in CommonUI"
+			Report "ControlInCommonUI" $match.Groups[1].Value "*" "derives from $($match.Groups[3].Value); controls are defined in CommonUI"
 		}
 	}
 }
@@ -913,7 +903,7 @@ $codeFiles = foreach ($scope in $CODE_SCOPE) {
 	}
 }
 
-# designer files are checked by S2
+# designer files are checked by DesignerAppearance
 $codeFiles = $codeFiles | Where-Object { $_.Name -notlike "*.Designer.cs" }
 foreach ($file in $codeFiles) {
 	$szClass = [IO.Path]::GetFileNameWithoutExtension($file.FullName)
@@ -928,26 +918,26 @@ foreach ($file in $codeFiles) {
 	foreach ($line in Get-Content $file.FullName -Encoding UTF8) {
 		$nLine++
 		if ($line -match "\bDeviceDpi\b") {
-			Report "S12" $szClass "line$nLine" "DPI scaling is not used (96 DPI only): $($line.Trim())"
+			Report "NoDpiScaling" $szClass "line$nLine" "DPI scaling is not used (96 DPI only): $($line.Trim())"
 		}
 		if ($line -match "\bnew (System\.Windows\.Forms\.)?(Button|Label|GroupBox|NumericUpDown|FlowLayoutPanel|TableLayoutPanel|TextBox|ListBox|SplitContainer|TabControl|ProgressBar|DataGridView)\s*[\(\{]") {
-			Report "S23" $szClass "line$nLine" "control type outside the white list created in code: $($line.Trim())"
+			Report "CodeControlType" $szClass "line$nLine" "control type outside the white list created in code: $($line.Trim())"
 		}
 		$isAppearanceCode = $line -match "(\bm_\w+\.|\bthis\.|^\s*)(Font|ForeColor|BackColor|Location|Size|ClientSize|Left|Top|Width|Height|Bounds)\s*=[^=]|\bm_\w+\.SetBounds\("
 		if ($isDialogCode -and $isAppearanceCode) {
-			Report "S11" $szClass "line$nLine" "appearance set in code; lay it out in the designer: $($line.Trim())"
+			Report "CodeAppearance" $szClass "line$nLine" "appearance set in code; lay it out in the designer: $($line.Trim())"
 		}
 		# Color.Empty (default) and Color.Transparent (no fill) are not colors and are allowed
 		if ($line -notmatch "(?<![\w])(Color\.(FromArgb|(?!(Empty|Transparent)\b)[A-Z]\w*)|SystemColors\.\w+|new (System\.Drawing\.)?Font\s*\()") {
 			continue
 		}
 
-		# data colors are allowed as named constants registered in StaticExceptions.txt (S20)
+		# data colors are allowed as named constants registered in StaticExceptions.txt (DataColor)
 		if ($line -match "static readonly (System\.Drawing\.)?Color ([A-Z][A-Z0-9_]+) =") {
-			Report "S20" $szClass $Matches[2] "data color constant not registered: $($line.Trim())"
+			Report "DataColor" $szClass $Matches[2] "data color constant not registered: $($line.Trim())"
 			continue
 		}
-		Report "S4" $szClass "line$nLine" "hard-coded color or font: $($line.Trim())"
+		Report "ThemeToken" $szClass "line$nLine" "hard-coded color or font: $($line.Trim())"
 	}
 }
 

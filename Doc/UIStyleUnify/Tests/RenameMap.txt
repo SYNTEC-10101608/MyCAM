@@ -1,4 +1,4 @@
-﻿# Controls renamed for the naming rule (ui-style.instructions.md, section 3): <class> <old name> <new name>
+﻿# Controls renamed for the control field naming rule (prefix of the type + name): <class> <old name> <new name>
 # CompareBehavior.ps1 applies these renames to the base version before comparing, so a rename alone is not a difference.
 AddPathDlg m_grpAdvanced m_pnlAdvanced
 AddPathDlg m_grpStep1 m_pnlStep1

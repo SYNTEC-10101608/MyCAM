@@ -10,20 +10,22 @@ using CommonUI.Layout;
 
 namespace UICheck
 {
-	// Main window screenshot and dialog placement check (ui-style.instructions.md, sections 4.3 and 6).
+	// Main window screenshot, dialog placement and main window layout check.
 	// Compiled by CaptureMainWindow.ps1 into the build output folder together with LayoutRunner.cs.
 	//
 	// Landscape / portrait only depends on the main window's aspect ratio, so a portrait window larger than a
 	// landscape screen is checked by sizing the window beyond the screen (the part outside is still rendered).
 	//
-	//   P1  dialog not centered in DialogPlacement's area (whole window in landscape, CAM area in portrait);
-	//       "modal:<name>" opens the dialog with ShowDialog, as the program does for it
-	//   P2  portrait CAM area is not the part above the CNC host
-	//   P3  main window or a control in it does not use the font family of the UI language
-	//   P4  a visible CNC panel at the size the main window gives it fails the T1 / T2 / T4 checks of LayoutRunner
-	//   P5  a menu / tool bar item whose name is a language ID does not show its text (tool tip: "<name>_ToolTip")
-	//   P6  with "designer:<StartupForm.Designer.cs>", the window gets the client size of the designer and a region
-	//       (REGION_NAME_LIST) is not placed where the designer shows it
+	//   DialogCenter        dialog not centered in DialogPlacement's area (whole window in landscape, CAM area in
+	//                       portrait); "modal:<name>" opens the dialog with ShowDialog, as the program does for it
+	//   PortraitCamArea     portrait CAM area is not the part above the CNC host
+	//   MainFontFamily      main window or a control in it does not use the font family of the UI language
+	//   PanelInWindow       a visible CNC panel at the size the main window gives it fails the TextClipped /
+	//                       TextOverflow / ControlOverlap checks of LayoutRunner
+	//   MenuLanguageText    a menu / tool bar item whose name is a language ID does not show its text (tool tip:
+	//                       "<name>_ToolTip")
+	//   MainDesignerRegion  with "designer:<StartupForm.Designer.cs>", the window gets the client size of the designer
+	//                       and a region (REGION_NAME_LIST) is not placed where the designer shows it
 	//   a dialog that cannot be opened is a problem, not a skip
 	//
 	// Usage: UICheckMainWindow.exe <language> <mode> <width> <height> <png> [dialog type name ...]
@@ -89,7 +91,7 @@ namespace UICheck
 			// Form clamps its size to the screen; raising MaximumSize lets the native resize go beyond it
 			mainForm.WindowState = FormWindowState.Normal;
 
-			// P6 runs with the client size of the designer, so the frame is added to it
+			// MainDesignerRegion runs with the client size of the designer, so the frame is added to it
 			Dictionary<string, Rectangle> designerMap = null;
 			if( m_szDesignerFile != null ) {
 				Size designerClient;
@@ -169,28 +171,28 @@ namespace UICheck
 				bounds.Height );
 		}
 
-		// P6: with the client size and page of the designer, MainLayout places each region where the designer shows it,
-		// so the designer is what the user sees (ui-style.instructions.md, section 6)
+		// MainDesignerRegion: with the client size and page of the designer, MainLayout places each region where the
+		// designer shows it, so the designer is what the user sees
 		static int CheckDesignerRegions( Form mainForm, Dictionary<string, Rectangle> designerMap )
 		{
 			int nProblemCount = 0;
 			foreach( string szName in REGION_NAME_LIST ) {
 				Rectangle designerBounds;
 				if( designerMap.TryGetValue( szName, out designerBounds ) == false ) {
-					Console.WriteLine( "FAIL  P6 {0} has no Location / Size in the designer", szName );
+					Console.WriteLine( "FAIL  MainDesignerRegion {0} has no Location / Size in the designer", szName );
 					nProblemCount++;
 					continue;
 				}
 				Rectangle bounds = FindControl( mainForm, szName ).Bounds;
 				if( bounds != designerBounds ) {
-					Console.WriteLine( "FAIL  P6 {0} is placed at {1}, the designer has {2}; " +
+					Console.WriteLine( "FAIL  MainDesignerRegion {0} is placed at {1}, the designer has {2}; " +
 						"write Location ( {3}, {4} ) Size ( {5}, {6} )", szName, bounds, designerBounds, bounds.X,
 						bounds.Y, bounds.Width, bounds.Height );
 					nProblemCount++;
 				}
 			}
-			Console.WriteLine( "P6 {0} regions compared with the designer, {1} problems", REGION_NAME_LIST.Length,
-				nProblemCount );
+			Console.WriteLine( "MainDesignerRegion {0} regions compared with the designer, {1} problems",
+				REGION_NAME_LIST.Length, nProblemCount );
 			return nProblemCount;
 		}
 
@@ -244,7 +246,7 @@ namespace UICheck
 		{
 			if( isVertical == false ) {
 				if( area != mainForm.Bounds ) {
-					Console.WriteLine( "FAIL  P2 landscape dialog area {0} is not the window {1}", area,
+					Console.WriteLine( "FAIL  PortraitCamArea landscape dialog area {0} is not the window {1}", area,
 						mainForm.Bounds );
 					return 1;
 				}
@@ -254,7 +256,7 @@ namespace UICheck
 			int nHostTop = verticalHost.Parent.PointToScreen( verticalHost.Location ).Y;
 			bool isCAMArea = area.Top == mainForm.Top && area.Bottom == nHostTop && area.Width == mainForm.Width;
 			if( isCAMArea == false ) {
-				Console.WriteLine( "FAIL  P2 portrait dialog area {0}, CNC host top {1}", area, nHostTop );
+				Console.WriteLine( "FAIL  PortraitCamArea portrait dialog area {0}, CNC host top {1}", area, nHostTop );
 				return 1;
 			}
 			return 0;
@@ -284,7 +286,8 @@ namespace UICheck
 				bool isInsideScreen = workingArea.Contains( expectedBounds );
 				int nProblem = 0;
 				if( isInsideScreen && dialog.Location != expected ) {
-					Console.WriteLine( "FAIL  P1 {0} at {1}, expected {2}", szName, dialog.Location, expected );
+					Console.WriteLine( "FAIL  DialogCenter {0} at {1}, expected {2}",
+						szName, dialog.Location, expected );
 					nProblem = 1;
 				}
 				else {
@@ -317,7 +320,8 @@ namespace UICheck
 			}
 		}
 
-		// P1 for a dialog the program opens with ShowDialog: the location is read when it is shown, then it is closed
+		// DialogCenter for a dialog the program opens with ShowDialog: the location is read when it is shown, then it
+		// is closed
 		static int CheckModalDialog( Form mainForm, string szName, Rectangle area )
 		{
 			Type type = FindType( szName );
@@ -341,8 +345,8 @@ namespace UICheck
 				Rectangle workingArea = Screen.FromControl( mainForm ).WorkingArea;
 				bool isInsideScreen = workingArea.Contains( new Rectangle( expected, dialog.Size ) );
 				if( isInsideScreen && shownLocation != expected ) {
-					Console.WriteLine( "FAIL  P1 {0} (ShowDialog) at {1}, expected {2}", szName, shownLocation,
-						expected );
+					Console.WriteLine( "FAIL  DialogCenter {0} (ShowDialog) at {1}, expected {2}",
+						szName, shownLocation, expected );
 					return 1;
 				}
 				Console.WriteLine( "OK    {0} (ShowDialog) at {1}{2}", szName, shownLocation,
@@ -364,12 +368,13 @@ namespace UICheck
 
 		const string MODAL_PREFIX = "modal:";
 
-		// P3: every control of the main window uses the family of the UI language (the value font is Consolas)
+		// MainFontFamily: every control of the main window uses the family of the UI language (the value font is
+		// Consolas)
 		static int CheckFontFamily( Form mainForm )
 		{
 			int nProblemCount = 0;
 			if( mainForm.Font.Name != m_szExpectedFamily ) {
-				Console.WriteLine( "FAIL  P3 main window font {0}, expected {1}", mainForm.Font.Name,
+				Console.WriteLine( "FAIL  MainFontFamily main window font {0}, expected {1}", mainForm.Font.Name,
 					m_szExpectedFamily );
 				nProblemCount++;
 			}
@@ -384,8 +389,8 @@ namespace UICheck
 				string szFamily = child.Font.Name;
 				bool isExpected = szFamily == m_szExpectedFamily || szFamily == VALUE_FAMILY;
 				if( isExpected == false ) {
-					Console.WriteLine( "FAIL  P3 {0} ({1}) font {2}, expected {3}", child.Name, child.GetType().Name,
-						szFamily, m_szExpectedFamily );
+					Console.WriteLine( "FAIL  MainFontFamily {0} ({1}) font {2}, expected {3}",
+						child.Name, child.GetType().Name, szFamily, m_szExpectedFamily );
 					nProblemCount++;
 
 					// the children inherit the same font, report the topmost one only
@@ -396,14 +401,14 @@ namespace UICheck
 			return nProblemCount;
 		}
 
-		// P5: each menu / tool bar item whose name is an ID shows the text of the language file, its tool tip the
-		// "<name>_ToolTip" text (the main window applies them by name like the dialogs)
+		// MenuLanguageText: each menu / tool bar item whose name is an ID shows the text of the language file, its tool
+		// tip the "<name>_ToolTip" text (the main window applies them by name like the dialogs)
 		static int CheckItemTexts( Form mainForm )
 		{
 			string szPath = Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "Resource", "Language",
 				"StartupForm_" + m_szLanguage + ".xml" );
 			if( File.Exists( szPath ) == false ) {
-				Console.WriteLine( "FAIL  P5 language file not found: {0}", szPath );
+				Console.WriteLine( "FAIL  MenuLanguageText language file not found: {0}", szPath );
 				return 1;
 			}
 			Dictionary<string, string> textMap = new Dictionary<string, string>();
@@ -418,12 +423,12 @@ namespace UICheck
 			foreach( ToolStripItem item in itemList ) {
 				string szText;
 				if( textMap.TryGetValue( item.Name, out szText ) && item.Text != szText ) {
-					Console.WriteLine( "FAIL  P5 {0} shows '{1}', language file has '{2}'", item.Name, item.Text,
-						szText );
+					Console.WriteLine( "FAIL  MenuLanguageText {0} shows '{1}', language file has '{2}'",
+						item.Name, item.Text, szText );
 					nProblemCount++;
 				}
 				if( textMap.TryGetValue( item.Name + "_ToolTip", out szText ) && item.ToolTipText != szText ) {
-					Console.WriteLine( "FAIL  P5 {0} tool tip '{1}', language file has '{2}'", item.Name,
+					Console.WriteLine( "FAIL  MenuLanguageText {0} tool tip '{1}', language file has '{2}'", item.Name,
 						item.ToolTipText, szText );
 					nProblemCount++;
 				}
@@ -454,7 +459,8 @@ namespace UICheck
 			}
 		}
 
-		// P4: the embedded panels at the size the main window gives them, not the design size LayoutRunner uses
+		// PanelInWindow: the embedded panels at the size the main window gives them, not the design size LayoutRunner
+		// uses
 		static int CheckPanels( Form mainForm )
 		{
 			List<Control> panelList = new List<Control>();
@@ -466,7 +472,7 @@ namespace UICheck
 				Console.WriteLine( "panel {0} {1}x{2}, {3} problems", panel.GetType().Name, panel.Width, panel.Height,
 					problemList.Count );
 				foreach( string szProblem in problemList ) {
-					Console.WriteLine( "FAIL  P4 {0}: {1}", panel.GetType().Name, szProblem );
+					Console.WriteLine( "FAIL  PanelInWindow {0}: {1}", panel.GetType().Name, szProblem );
 				}
 				nProblemCount += problemList.Count;
 			}
