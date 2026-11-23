@@ -3,5 +3,4 @@
 	<Message ID="NotContourPath" Content="路径 {0} 不是轮廓路径，无法编辑" />
 	<Message ID="CannotGetPathCraftInfo" Content="无法获取路径 {0} 的加工信息" />
 	<Message ID="CannotBuildFlyCut" Content="无法产生飞切" />
-	<Message ID="FourAxisNotSupportFlycut" Content="四轴机构不支持飞切" />
 </ResMap>
