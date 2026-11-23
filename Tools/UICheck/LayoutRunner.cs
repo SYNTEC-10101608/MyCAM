@@ -12,16 +12,17 @@ using CommonUI.Theme;
 
 namespace UICheck
 {
-	// Runtime layout check (ui-style.instructions.md, section 8). Compiled by CheckRuntimeLayout.ps1 into the
-	// build output folder, so language files and dependencies are found exactly as by MyCAM.exe.
+	// Runtime layout check. Compiled by CheckRuntimeLayout.ps1 into the build output folder, so language files and
+	// dependencies are found exactly as by MyCAM.exe.
 	//
-	//   T1  text wider than its fixed-size control (button, label, check box, radio button)
-	//   T2  auto-sized text that runs past its container
-	//   T3  section title wider than its card
-	//   T4  visible sibling controls that overlap
-	//   T5  visible control outside its container (scrolling containers are skipped)
-	//   T6  dialog layout after Load differs from the designer layout
-	//   T7  a caption whose name is a language ID does not show the text of the language file after construction
+	//   TextClipped     text wider than its fixed-size control (button, label, check box, radio button)
+	//   TextOverflow    auto-sized text that runs past its container
+	//   TitleOverflow   section title wider than its card
+	//   ControlOverlap  visible sibling controls that overlap
+	//   ControlOutside  visible control outside its container (scrolling containers are skipped)
+	//   LoadLayout      dialog layout after Load differs from the designer layout
+	//   LanguageText    a caption whose name is a language ID does not show the text of the language file after
+	//                   construction
 	//   a screen that cannot be opened is a problem, not a skip; wizards are checked in each state (STATE_MAP)
 	//
 	// Usage: UICheckRunner.exe <language> <screenshot folder|-> [type name filter]
@@ -200,8 +201,8 @@ namespace UICheck
 			method.Invoke( instance, argArray );
 		}
 
-		// T7: each caption control whose name is an ID shows the text of the language file (catches a dialog that
-		// does not call ApplyLanguage and a stale copy of the language files)
+		// LanguageText: each caption control whose name is an ID shows the text of the language file (catches a dialog
+		// that does not call ApplyLanguage and a stale copy of the language files)
 		static void CheckLanguageTexts( Control root, string szClass, string szLanguage, List<string> problemList )
 		{
 			string szPath = Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "Resource", "Language",
@@ -217,7 +218,8 @@ namespace UICheck
 			}
 			string szTitle;
 			if( root is Form && textMap.TryGetValue( szClass, out szTitle ) && root.Text != szTitle ) {
-				problemList.Add( string.Format( "T7 title '{0}', language file has '{1}'", root.Text, szTitle ) );
+				problemList.Add( string.Format( "LanguageText title '{0}', language file has '{1}'",
+					root.Text, szTitle ) );
 			}
 			Stack<Control> stack = new Stack<Control>();
 			stack.Push( root );
@@ -237,8 +239,8 @@ namespace UICheck
 				string szText;
 				if( isCaption && isCommon == false && textMap.TryGetValue( control.Name, out szText ) &&
 					control.Text != szText ) {
-					problemList.Add( string.Format( "T7 {0} shows '{1}', language file has '{2}'", Describe( control ),
-						control.Text, szText ) );
+					problemList.Add( string.Format( "LanguageText {0} shows '{1}', language file has '{2}'",
+						Describe( control ), control.Text, szText ) );
 				}
 			}
 		}
@@ -349,7 +351,7 @@ namespace UICheck
 					Rectangle overlap = Rectangle.Intersect( visibleList[ i ].Bounds, visibleList[ j ].Bounds );
 					if( overlap.Width > 0 && overlap.Height > 0 && visibleList[ i ].Dock == DockStyle.None &&
 						visibleList[ j ].Dock == DockStyle.None ) {
-						problemList.Add( string.Format( "T4 {0} overlaps {1}", Describe( visibleList[ i ] ),
+						problemList.Add( string.Format( "ControlOverlap {0} overlaps {1}", Describe( visibleList[ i ] ),
 							Describe( visibleList[ j ] ) ) );
 					}
 				}
@@ -373,7 +375,8 @@ namespace UICheck
 				int nTitleWidth = TextRenderer.MeasureText( szText, ThemeFonts.Emphasis ).Width + TITLE_INDENT +
 					ThemeMetrics.SECTION_PADDING;
 				if( nTitleWidth > section.Width ) {
-					problemList.Add( string.Format( "T3 title of {0} needs {1}px", Describe( control ), nTitleWidth ) );
+					problemList.Add( string.Format( "TitleOverflow title of {0} needs {1}px",
+						Describe( control ), nTitleWidth ) );
 				}
 				return;
 			}
@@ -390,8 +393,8 @@ namespace UICheck
 				// an auto-sized control grows; it must stay inside its parent
 				int nRight = control.Left + textSize.Width + nPadding;
 				if( control.Parent != null && nRight > control.Parent.ClientSize.Width ) {
-					problemList.Add( string.Format( "T2 {0} reaches x={1}, container width {2}", Describe( control ),
-						nRight, control.Parent.ClientSize.Width ) );
+					problemList.Add( string.Format( "TextOverflow {0} reaches x={1}, container width {2}",
+						Describe( control ), nRight, control.Parent.ClientSize.Width ) );
 				}
 				return;
 			}
@@ -401,7 +404,7 @@ namespace UICheck
 			bool isWrapping = isLabel && nLineCount > 1;
 			int nAvailable = control.Width - nPadding;
 			if( isWrapping == false && textSize.Width > nAvailable ) {
-				problemList.Add( string.Format( "T1 {0} text needs {1}px, has {2}px", Describe( control ),
+				problemList.Add( string.Format( "TextClipped {0} text needs {1}px, has {2}px", Describe( control ),
 					textSize.Width, nAvailable ) );
 			}
 		}
@@ -411,7 +414,7 @@ namespace UICheck
 			Rectangle client = parent.ClientRectangle;
 			Rectangle bounds = control.Bounds;
 			if( client.Contains( bounds ) == false ) {
-				problemList.Add( string.Format( "T5 {0} {1} outside {2} {3}", Describe( control ), bounds,
+				problemList.Add( string.Format( "ControlOutside {0} {1} outside {2} {3}", Describe( control ), bounds,
 					Describe( parent ), client.Size ) );
 			}
 		}
@@ -431,13 +434,13 @@ namespace UICheck
 			return boundsMap;
 		}
 
-		// T6: the layout after Load is the designer layout ("what the designer shows is what runs");
+		// LoadLayout: the layout after Load is the designer layout ("what the designer shows is what runs");
 		// auto-sized controls may differ from the designer because they size to the language text
 		static void CheckDesignLayout( Form form, Size designClientSize, Dictionary<Control, Rectangle> designBoundsMap,
 			List<string> problemList )
 		{
 			if( form.ClientSize != designClientSize ) {
-				problemList.Add( string.Format( "T6 client size {0} after Load, designer {1}", form.ClientSize,
+				problemList.Add( string.Format( "LoadLayout client size {0} after Load, designer {1}", form.ClientSize,
 					designClientSize ) );
 			}
 			foreach( KeyValuePair<Control, Rectangle> pair in designBoundsMap ) {
@@ -452,7 +455,7 @@ namespace UICheck
 				bool isMoved = control.Location != design.Location;
 				bool isResized = control.AutoSize == false && isSizeByHandle == false && control.Size != design.Size;
 				if( isMoved || isResized ) {
-					problemList.Add( string.Format( "T6 {0} {1} after Load, designer {2}", Describe( control ),
+					problemList.Add( string.Format( "LoadLayout {0} {1} after Load, designer {2}", Describe( control ),
 						control.Bounds, design ) );
 				}
 			}

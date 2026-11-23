@@ -1,90 +1,90 @@
 ﻿# Confirmed behavior differences of CompareBehavior.ps1: <rule> <class> <control|*> <reason>
-# A B3 exception also names the property: B3 <class> <control> <property> <reason>
-# Only items decided in Doc/UIStyleUnify/4_Discussion.md may be listed here.
+# A SameProperties exception also names the property: SameProperties <class> <control> <property> <reason>
+# Only behavior differences decided in AUTO-23254 may be listed here, each with its decision date.
 
 # numeric inputs become DebouncedNumericUpDown (decision 2026-11-15 "數值輸入")
-# AutoSortPathDlg (decision 2026-11-21 "Round 1 review" R1-C1): one Increment per wheel notch instead of the system scroll
+# AutoSortPathDlg (decision 2026-11-21 "數值框操作"): one Increment per wheel notch instead of the system scroll
 # lines x Increment, and a value out of range restores the latest valid value instead of being clamped to the limit
-B6 AutoSortPathDlg m_numExtrusionBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
-B6 AutoSortPathDlg m_numRotationBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
+TypeReplace AutoSortPathDlg m_numExtrusionBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
+TypeReplace AutoSortPathDlg m_numRotationBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
 
 # read-only coordinate fields become labels (decision 2026-11-15 "只顯示座標的欄位"); confirmed read-only: always ReadOnly, code only sets / reads Text
-B6 CalibrationREFDlg m_lblPnt*Value TextBox -> Label, the value can no longer be selected or copied
-B6 AxisTransformDlg m_num* NumericUpDown -> DebouncedNumericUpDown; ranges are set in code, one increment per wheel notch as before (the custom MouseWheel handler is no longer needed)
-B6 AxisTransformDlg m_numStep* TextBox -> DebouncedNumericUpDown (0.001 to 99999, 3 decimals); the Leave / Enter handlers still parse the text
-B6 AddPathDlg m_num* TextBox -> DebouncedNumericUpDown (D1 0.001 to 90 / 3 decimals, chord error 0.0001 to 99999 / 4 decimals, line length 0.001 to 99999 / 3 decimals); the Validating / Enter / TextChanged handlers still parse the text
+TypeReplace CalibrationREFDlg m_lblPnt*Value TextBox -> Label, the value can no longer be selected or copied
+TypeReplace AxisTransformDlg m_num* NumericUpDown -> DebouncedNumericUpDown; ranges are set in code, one increment per wheel notch as before (the custom MouseWheel handler is no longer needed)
+TypeReplace AxisTransformDlg m_numStep* TextBox -> DebouncedNumericUpDown (0.001 to 99999, 3 decimals); the Leave / Enter handlers still parse the text
+TypeReplace AddPathDlg m_num* TextBox -> DebouncedNumericUpDown (D1 0.001 to 90 / 3 decimals, chord error 0.0001 to 99999 / 4 decimals, line length 0.001 to 99999 / 3 decimals); the Validating / Enter / TextChanged handlers still parse the text
 
 # section title labels become SectionPanel titles (decision 2026-11-15 "區塊標題")
-B6 LeadDlg m_lblLeadIn title moved to m_pnlLeadIn
-B6 LeadDlg label3 title moved to m_pnlLeadOut
-B6 PatternSettingDlg label1 renamed to m_lblPathType (its language ID)
-B6 PatternSettingDlg m_num* TextBox -> DebouncedNumericUpDown (default range, 3 decimals); the Leave / Enter handlers still validate the text
-B6 ToolVectorDlg m_lblOnePntToolVecAdjust title moved to m_pnlToolVecInfo
-B6 ToolVectorDlg m_lblToolDirQuickSetBtn title moved to m_pnlQuickSet
-B6 ToolVectorDlg m_lblSetBtn title moved to m_pnlSetting
-B6 ToolVectorDlg m renamed to m_lblInterpolateType (its language ID)
-B6 CNCThreePointDlg m_lblDrawing*Value TextBox -> Label, confirmed read-only (ReadOnly, TabStop false, code only sets Text / Enabled)
-B6 CNCThreePointDlg m_lbl*Step step labels become the titles of their sections (Highlighted marks the current step)
-B6 CNCThreePointDlg m_lbl*Title section title labels removed; the step title names the section
-B6 ThreePtTransformDlg m_lblCAD*Value TextBox -> Label, confirmed display only (disabled, code only sets Text)
+TypeReplace LeadDlg m_lblLeadIn title moved to m_pnlLeadIn
+TypeReplace LeadDlg label3 title moved to m_pnlLeadOut
+TypeReplace PatternSettingDlg label1 renamed to m_lblPathType (its language ID)
+TypeReplace PatternSettingDlg m_num* TextBox -> DebouncedNumericUpDown (default range, 3 decimals); the Leave / Enter handlers still validate the text
+TypeReplace ToolVectorDlg m_lblOnePntToolVecAdjust title moved to m_pnlToolVecInfo
+TypeReplace ToolVectorDlg m_lblToolDirQuickSetBtn title moved to m_pnlQuickSet
+TypeReplace ToolVectorDlg m_lblSetBtn title moved to m_pnlSetting
+TypeReplace ToolVectorDlg m renamed to m_lblInterpolateType (its language ID)
+TypeReplace CNCThreePointDlg m_lblDrawing*Value TextBox -> Label, confirmed read-only (ReadOnly, TabStop false, code only sets Text / Enabled)
+TypeReplace CNCThreePointDlg m_lbl*Step step labels become the titles of their sections (Highlighted marks the current step)
+TypeReplace CNCThreePointDlg m_lbl*Title section title labels removed; the step title names the section
+TypeReplace ThreePtTransformDlg m_lblCAD*Value TextBox -> Label, confirmed display only (disabled, code only sets Text)
 # the text box settings of these read-only fields do not apply to a label, which never takes the focus or input
-B3 CalibrationREFDlg m_lblPnt*Value ReadOnly of the former text box; a label cannot be edited
-B3 CalibrationREFDlg m_lblPnt*Value TabStop the former read-only text box took the focus; a label is skipped by Tab
-B3 CNCThreePointDlg m_lblDrawing*Value ReadOnly of the former text box; a label cannot be edited (TabStop false is kept)
-B3 ThreePtTransformDlg m_lblCAD*Value Enabled false of the former text box only made it read-only and grey; the label shows the value as text
-B3 ThreePtTransformDlg m_lblCAD*Value TabStop the former disabled text box could not take the focus either; a label is skipped by Tab
+SameProperties CalibrationREFDlg m_lblPnt*Value ReadOnly of the former text box; a label cannot be edited
+SameProperties CalibrationREFDlg m_lblPnt*Value TabStop the former read-only text box took the focus; a label is skipped by Tab
+SameProperties CNCThreePointDlg m_lblDrawing*Value ReadOnly of the former text box; a label cannot be edited (TabStop false is kept)
+SameProperties ThreePtTransformDlg m_lblCAD*Value Enabled false of the former text box only made it read-only and grey; the label shows the value as text
+SameProperties ThreePtTransformDlg m_lblCAD*Value TabStop the former disabled text box could not take the focus either; a label is skipped by Tab
 # AxisTransformDlg sets the range and decimals of every box in the constructor, before and after the issue; only the
 # designer defaults of the two types differ (NumericUpDown 0 / 100 / 0 decimals, DebouncedNumericUpDown -99999 / 99999 / 3)
-B3 AxisTransformDlg m_num* Minimum designer default only, set in the constructor
-B3 AxisTransformDlg m_num* Maximum designer default only, set in the constructor
-B3 AxisTransformDlg m_num* DecimalPlaces designer default only, set in the constructor
-B6 ThreePtTransformDlg m_numMachine* TextBox -> DebouncedNumericUpDown (3 decimals, same default values); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
-B6 DesignSupportBracketDlg m_lblSection* section title labels moved to the m_pnl* section titles
-B6 CNCAlarmPanel m_lblTitle title moved to the m_pnlAlarm section title
+SameProperties AxisTransformDlg m_num* Minimum designer default only, set in the constructor
+SameProperties AxisTransformDlg m_num* Maximum designer default only, set in the constructor
+SameProperties AxisTransformDlg m_num* DecimalPlaces designer default only, set in the constructor
+TypeReplace ThreePtTransformDlg m_numMachine* TextBox -> DebouncedNumericUpDown (3 decimals, same default values); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
+TypeReplace DesignSupportBracketDlg m_lblSection* section title labels moved to the m_pnl* section titles
+TypeReplace CNCAlarmPanel m_lblTitle title moved to the m_pnlAlarm section title
 
 # CNC panel titles become card titles (decision 2026-11-16 "卡片規格不因所在 UI 類別而分裂"); no code referenced them
-B6 CNCPanel m_lblAuxiliaryTitle title moved to m_pnlAuxiliary
-B6 CNCPanel m_lblJogTitle title moved to m_pnlJog
-B6 CNCPanel m_lblHomeTitle title moved to m_pnlHome
-B6 CNCPanel m_lblStrategyTitle title moved to m_pnlStrategy
-B6 CNCPanel m_lblMachiningTitle title moved to m_pnlMachining
-B6 CNCInfoPanel m_lblHeightGroupTitle title moved to m_pnlHeight
-B6 CNCInfoPanel m_lblMachiningTitle title moved to m_pnlMachining
+TypeReplace CNCPanel m_lblAuxiliaryTitle title moved to m_pnlAuxiliary
+TypeReplace CNCPanel m_lblJogTitle title moved to m_pnlJog
+TypeReplace CNCPanel m_lblHomeTitle title moved to m_pnlHome
+TypeReplace CNCPanel m_lblStrategyTitle title moved to m_pnlStrategy
+TypeReplace CNCPanel m_lblMachiningTitle title moved to m_pnlMachining
+TypeReplace CNCInfoPanel m_lblHeightGroupTitle title moved to m_pnlHeight
+TypeReplace CNCInfoPanel m_lblMachiningTitle title moved to m_pnlMachining
 
-# code statements that follow the step labels / sections above (B8)
-B8 AddPathDlg m_pnlStepHint the step hint labels moved into the m_pnlStepHint card, which is shown at the same time as the labels
-B8 CNCThreePointDlg m_lblWorkpieceStep step labels became section titles; m_pnlCalculation is shown / hidden instead of m_lblCalculationStep, the hand-sized ClientSize is replaced by SectionStack
-B8 CNCThreePointDlg m_pnlWorkpiece same statement as above, written without the removed step labels
-B8 ToolVectorDlg m_pnlStartEndSwitch the start / end switch row left m_pnlIndexParam; its panel is enabled at the same time (decision 2026-11-16 ToolVectorDlg)
-B6 DesignSupportBracketDlg m_lblXPositionsTitle title moved to the card m_pnlXBracket (2026-11-16: no sub-titles inside a card)
-B6 DesignSupportBracketDlg m_lblYPositionsTitle title moved to the card m_pnlYBracket (2026-11-16: no sub-titles inside a card)
+# code statements that follow the step labels / sections above (CodeState)
+CodeState AddPathDlg m_pnlStepHint the step hint labels moved into the m_pnlStepHint card, which is shown at the same time as the labels
+CodeState CNCThreePointDlg m_lblWorkpieceStep step labels became section titles; m_pnlCalculation is shown / hidden instead of m_lblCalculationStep, the hand-sized ClientSize is replaced by SectionStack
+CodeState CNCThreePointDlg m_pnlWorkpiece same statement as above, written without the removed step labels
+CodeState ToolVectorDlg m_pnlStartEndSwitch the start / end switch row left m_pnlIndexParam; its panel is enabled at the same time (decision 2026-11-16 ToolVectorDlg)
+TypeReplace DesignSupportBracketDlg m_lblXPositionsTitle title moved to the card m_pnlXBracket (2026-11-16: no sub-titles inside a card)
+TypeReplace DesignSupportBracketDlg m_lblYPositionsTitle title moved to the card m_pnlYBracket (2026-11-16: no sub-titles inside a card)
 
 # main window regions are placed by MainLayout instead of TableLayoutPanel (decision 2026-11-19 "主視窗的 TableLayoutPanel")
-B8 MainLayout m_VerticalHost the SizeChanged handler is removed: only MainLayout.Update sizes the vertical CNC host and places its panels in the same call
+CodeState MainLayout m_VerticalHost the SizeChanged handler is removed: only MainLayout.Update sizes the vertical CNC host and places its panels in the same call
 
 # unused second / third tool bar containers removed (decision 2026-11-19 "第二、三層工具列容器"): every page shows one tool strip, so they were never shown
-B6 StartupForm m_tscLevel2Container empty container that was never shown, removed
-B6 StartupForm m_tscLevel3Container empty container that was never shown, removed
-B8 StartupForm m_tscLevel2Container hiding the removed container is no longer needed
-B8 StartupForm m_tscLevel3Container hiding the removed container is no longer needed
-B8 StartupForm m_ToolStripLevelList* the per-level loop only ever showed the first container, which is always shown
-B8 StartupForm m_tscLevel1Container the first container was never hidden; it is now m_pnlToolBar (see below)
-B8 StartupForm toolStrip the tool strip of the status is shown and the others hidden, in one assignment instead of two
+TypeReplace StartupForm m_tscLevel2Container empty container that was never shown, removed
+TypeReplace StartupForm m_tscLevel3Container empty container that was never shown, removed
+CodeState StartupForm m_tscLevel2Container hiding the removed container is no longer needed
+CodeState StartupForm m_tscLevel3Container hiding the removed container is no longer needed
+CodeState StartupForm m_ToolStripLevelList* the per-level loop only ever showed the first container, which is always shown
+CodeState StartupForm m_tscLevel1Container the first container was never hidden; it is now m_pnlToolBar (see below)
+CodeState StartupForm toolStrip the tool strip of the status is shown and the others hidden, in one assignment instead of two
 
 # function tool bar container ToolStripContainer -> Panel m_pnlToolBar (decision 2026-11-20 "功能工具列容器"): no tool strip
 # was ever docked in its tool strip panels, so it only held the tool strips like a panel
-B6 StartupForm m_tscLevel1Container replaced by the Panel m_pnlToolBar at the same place and size, holding the same tool strips
+TypeReplace StartupForm m_tscLevel1Container replaced by the Panel m_pnlToolBar at the same place and size, holding the same tool strips
 
 # wizard pages switched by SectionStack.ShowPage (decision 2026-11-20 "精靈兩型"): the same steps moved into CommonUI
-B7 repository CommonUI/Layout/SectionStack.cs SectionStack.ShowPage shows the form again after the switch, as DesignSupportBracketDlg.ShowPanel did
-B8 DesignSupportBracketDlg m_pnl*Page ShowPage hides all pages before fitting the form, as ShowPanel did
-B8 DesignSupportBracketDlg activePanel ShowPage shows the page after the form is fitted, as ShowPanel did
+ShowCalls repository CommonUI/Layout/SectionStack.cs SectionStack.ShowPage shows the form again after the switch, as DesignSupportBracketDlg.ShowPanel did
+CodeState DesignSupportBracketDlg m_pnl*Page ShowPage hides all pages before fitting the form, as ShowPanel did
+CodeState DesignSupportBracketDlg activePanel ShowPage shows the page after the form is fitted, as ShowPanel did
 
 # unused context menu removed (decision 2026-11-20 "ContextMenuStrip"): m_cmsMain was empty and attached to no control
-B6 StartupForm m_cmsMain removed; it had no items and was never shown
+TypeReplace StartupForm m_cmsMain removed; it had no items and was never shown
 
-# legend swatches become ColorSwatch (decision 2026-11-20, second batch item 3): the color is set from ToolVecInterpolateColor
-B6 ToolVectorDlg m_swt* Panel -> ColorSwatch, same place and size; the data color is set in the constructor
+# legend swatches become ColorSwatch (decision 2026-11-20 "資料色色塊"): the color is set from ToolVecInterpolateColor
+TypeReplace ToolVectorDlg m_swt* Panel -> ColorSwatch, same place and size; the data color is set in the constructor
 
-# axis points drawn by ColorSwatch (decision 2026-11-20, second batch item 3): the panel no longer paints them itself
-B8 CNCInfoPanel m_pnlCoordinates the Paint handler is replaced by the ColorSwatch axis points m_swtX to m_swtC
+# axis points drawn by ColorSwatch (decision 2026-11-20 "資料色色塊"): the panel no longer paints them itself
+CodeState CNCInfoPanel m_pnlCoordinates the Paint handler is replaced by the ColorSwatch axis points m_swtX to m_swtC

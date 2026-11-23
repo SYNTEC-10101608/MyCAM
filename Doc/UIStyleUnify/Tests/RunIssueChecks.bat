@@ -1,5 +1,5 @@
 @echo off
-REM Issue-only checks of the UI style unification (Doc/UIStyleUnify/5_Verification.md):
+REM Issue-only checks of the UI style unification (AUTO-23254):
 REM   behavior comparison with the commit the branch started from, the coding style of what the issue wrote, and the
 REM   main window regions against the TableLayoutPanel layout (needs the Debug build).
 REM The reusable UI checks are Tools\UICheck\UICheck.bat.

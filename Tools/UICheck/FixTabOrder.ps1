@@ -2,7 +2,7 @@
 	[string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
 	[string]$Only = ""
 )
-# Renumbers TabIndex in the designer files so the tab order follows the layout (ui-style.instructions.md, S10 of
+# Renumbers TabIndex in the designer files so the tab order follows the layout (rule TabOrder of
 # CheckStatic.ps1): in each container, rows from top to bottom and left to right within a row, numbered from 0.
 # Only the TabIndex lines change; open the dialog in the Visual Studio designer afterwards if in doubt.
 

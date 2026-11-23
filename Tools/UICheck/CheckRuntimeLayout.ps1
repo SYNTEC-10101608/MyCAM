@@ -6,8 +6,8 @@
 	[string]$Only = "",
 	[switch]$Visible
 )
-# Runtime layout check (ui-style.instructions.md, section 8).
-# Opens every dialog and CNC panel of the built MyCAM in each language and reports T1-T5 (see LayoutRunner.cs).
+# Runtime layout check. Opens every dialog and CNC panel of the built MyCAM in each language and reports the rules
+# listed in LayoutRunner.cs.
 # Build first (Build.bat Debug). Exit code 1 when a problem is found.
 # The runner works on a hidden desktop (HiddenDesktopRun.cs) so it does not take the screen; -Visible shows it.
 

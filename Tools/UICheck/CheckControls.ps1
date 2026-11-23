@@ -2,7 +2,7 @@
 	[string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
 	[string]$Configuration = "Debug"
 )
-# Behavior check of the shared numeric input (ui-style.instructions.md, section 8): N1-N4 (see ControlRunner.cs).
+# Behavior check of the shared numeric input DebouncedNumericUpDown; the rules are listed in ControlRunner.cs.
 # Build first (Build.bat Debug). Exit code 1 when a problem is found.
 
 $ErrorActionPreference = "Stop"
