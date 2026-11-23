@@ -3,5 +3,4 @@
 	<Message ID="NotContourPath" Content="Инструментальный путь {0} не является контурным и не может быть отредактирован" />
 	<Message ID="CannotGetPathCraftInfo" Content="Не удалось получить информацию о обработке для инструментального пути {0}" />
 	<Message ID="CannotBuildFlyCut" Content="Не удалось сгенерировать летящую резку" />
-	<Message ID="FourAxisNotSupportFlycut" Content="Четырёхосевая структура не поддерживает летящую резку" />
 </ResMap>

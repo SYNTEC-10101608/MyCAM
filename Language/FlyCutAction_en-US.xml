@@ -3,5 +3,4 @@
 	<Message ID="NotContourPath" Content="Toolpath {0} is not a contour path and cannot be edited" />
 	<Message ID="CannotGetPathCraftInfo" Content="Cannot get machining information for toolpath {0}" />
 	<Message ID="CannotBuildFlyCut" Content="Cannot generate fly cut" />
-	<Message ID="FourAxisNotSupportFlycut" Content="Four-axis mechanism does not support fly cut" />
 </ResMap>

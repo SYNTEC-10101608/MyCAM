@@ -42,16 +42,6 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 
-			// SingleSpindle or SingleTable
-			if( m_DataManager.MachineData is MixTypeMachineData mixData ) {
-				if( mixData.MixTypeVariant == MixTypeVariant.MasterOnly
-					|| mixData.MixTypeVariant == MixTypeVariant.SlaveOnly ) {
-					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "FourAxisNotSupportFlycut", FOUR_AXIS_NOT_SUPPORT_FLYCUT ), MyApp.NoticeType.Warning );
-					End();
-					return;
-				}
-			}
-
 			// setup initial path
 			if( !TryChangePath( m_PathIDList ) ) {
 				End();
@@ -526,6 +516,5 @@ namespace MyCAM.Editor
 		const string NOT_CONTOUR_PATH = "路徑 {0} 不是輪廓路徑，無法編輯";
 		const string CANNOT_GET_PATH_CRAFT_INFO = "無法獲取路徑 {0} 的加工資訊";
 		const string CANNOT_BUILD_FLYCUT = "無法產生飛切";
-		const string FOUR_AXIS_NOT_SUPPORT_FLYCUT = "四軸機構不支援飛切";
 	}
 }
