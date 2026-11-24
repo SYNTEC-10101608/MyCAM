@@ -40,3 +40,11 @@
 | 機構參數 | `Machine/MachineData_<機型>Type.mac`（`Spindle` / `Table` / `Mix`） | `Custom/MachineData.mac` |
 | 機構模型 | `Machine/<機型>/*.stl` | `Custom/<機型>/`（程式依 `MachineData.mac` 的機型讀取對應資料夾） |
 | 客製後處理 | `PostConfig/CustPost.cpf` | `Custom/CustPost.cpf` |
+
+## worktree 準備
+
+worktree 的通用規則見 [git-workflow.md](../process/git-workflow.md) 第 5 節；本專案另需：
+
+1. 需要的未追蹤檔案列在 repo 根目錄的 `.worktreeinclude`，建立時由主 checkout 複製：`.claude/settings.local.json`、`FCLTool.dll`、`PostTool.dll`、`bin/<組態>/Custom/`。
+2. `CLAUDE.local.md` 不需複製：worktree 位於 repo 底下，Claude Code 會從上層的主 checkout 載入。也因此不要在 repo 的上層目錄放 `CLAUDE.md` / `CLAUDE.local.md` 的備份，否則會被重複載入。
+3. 第一次建置前執行 `CopyRef.bat`；以 Visual Studio 開啟前先卸載 `FCLTool`（見本文件 FCLTool 一節）。
