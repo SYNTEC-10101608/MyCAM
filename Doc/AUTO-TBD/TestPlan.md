@@ -235,8 +235,16 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 1. TEST-8：位置如 5.2，待人抽查。
 2. TEST-13：`FollowUp.md` 含 SPEC-18.2 六項（TODO-1～TODO-6），每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 3. TEST-10：於 STEP-13 review 文件段執行。
-4. TEST-14、TEST-15：待在 worktree 開新的 Claude Code session 執行。
-5. TEST-16：待使用者在 VS 2026 執行。
+4. TEST-14：在 worktree 開新 session，讀任何檔案前列出已載入的指引，載入 `CLAUDE.md`、`copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general`，沒有載入 `process/`、`project/`、`coding-style-csharp`、`coding-style-cpp`（另有個人層 `~/.claude/CLAUDE.md` 與主 checkout 的 `CLAUDE.local.md`）。通過；`/context` 待人確認。
+5. TEST-15：在 worktree 各開新 session 演練，產出放在 scratchpad，未提交。
+   1. 三個 skill 都在清單中，執行後讀取 SPEC-2 的必讀文件。通過。
+   2. `/issue-start` 產出的 S 級 `README.md` 有議題資訊表、各節、DoD 五項，編號使用 REQ、SPEC、TEST、STEP；AI 在盤點後提出分級建議並停下。通過。
+   3. `/release-note` 產出 9 條，皆以 `新增` 或 `修改` 開頭；merge log 為 `Merge branch 'AUTO-TBD_f_DevProcess' into ''` 加 `by <名字>`。通過。
+   4. `/review` 依六段進行，表頭五欄、發現表六欄。通過。
+   5. 只輸入「開議題」：經 `issue-start` skill 讀取 `issue-workflow.md` 與 `issue-docs.md`，停下詢問議題內容與編號，未建立檔案。通過。
+   6. 要求修改 `.cs` 方法：動手前經流程索引讀取 `coding-style-csharp.instructions.md`，修改符合 C# 規範；修改已還原。通過。
+6. TEST-16：待使用者在 VS 2026 執行。
+7. 演練中發現的規範問題於 STEP-13 review 處理：議題編號是否含 `AUTO-` 前綴的寫法不一致、S 級範本缺「現況盤點」與「待討論」、`review.md` 報告標題層級放入 S 級 `README.md` 時衝突、`issue-start` 必讀清單未含 `git-workflow.md`、`Check.ps1` 不檢查未知參數。
 
 ## 6. 待討論
 
