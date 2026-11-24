@@ -48,7 +48,7 @@
 
 #### TEST-2 團隊通用層不含專案內容
 
-1. 方法：在 `collaboration.instructions.md` 與 `.github/process/*.md` 搜尋專案專屬字詞：`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`。
+1. 方法：在 `collaboration.instructions.md`、`coding-style-general.instructions.md` 與 `.github/process/*.md` 搜尋專案專屬字詞：`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`、`AUTO-`（DEC-16）。
 2. 通過條件：零筆；需要專案資訊處寫「見專案指引」。
 3. 本檢查列入 `FollowUp.md` 自動化門檻的候選項目（DEC-4.5）。
 
@@ -100,7 +100,7 @@
 
 1. 方法：搜尋 `project-overview.instructions.md`、`.github/project/build.md`、`.github/project/claude-worktree.md` 與 `coding-style-general.instructions.md`。
 2. 通過條件：
-   1. `project-overview` 沒有「Git 流程」章節與建置細節（`FakeDebug`、`vswhere`、`MachineData`）；「建置與執行」只有指向 `project/build.md` 與 `project/claude-worktree.md` 的索引；有「專案固定檢查項目」（五項，SPEC-14.4）。
+   1. `project-overview` 沒有「Git 流程」章節與建置細節（`FakeDebug`、`vswhere`、`MachineData`）；「建置與執行」只有指向 `project/build.md` 與 `project/claude-worktree.md` 的索引；有「專案固定檢查項目」（五項，SPEC-14.4）；「議題編號」含 `AUTO-TBD`（SPEC-14.7）。
    2. `build.md` 有 FCLTool、命令列建置、執行期檔案三節，沒有 worktree 相關內容；`claude-worktree.md` 有 Session 交接、Worktree 兩節，含 `SESSION.md` 與 `.worktreeinclude` 的說明（SPEC-14.6）。
    3. 四語系同步、Designer 可開、不修改 `reference/` 三項規則在 `project-overview` 只出現在「專案固定檢查項目」（SPEC-14.5）。
    4. `coding-style-general` 不再有「維持該方法內既有的命名方式」；有 SPEC-10.1 三項與 SPEC-10.2 註解規則。
@@ -198,7 +198,7 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 ### 5.1 自動（`Check.ps1`，2026-11-25，比對基準 `24c7276d`）
 
 1. TEST-1～TEST-7、TEST-9、TEST-12：通過。
-2. TEST-1 常駐 194 行（基準 193，差異 +1，理由見 Review 第 3 回合）：入口 47 行、`collaboration` 34 行、`project-overview` 81 行、`coding-style-general` 32 行。
+2. TEST-1 常駐 198 行（基準 193，差異 +5，理由見 Review 第 3、4 回合）：入口 47 行、`collaboration` 34 行、`project-overview` 85 行、`coding-style-general` 32 行。
 3. TEST-11：收官後只剩 DoD 第 9、10 項與 REV 的「待人確認」，待人工全域 review 後通過。
 
 ### 5.2 TEST-8 規格內容落地

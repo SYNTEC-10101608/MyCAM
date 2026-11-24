@@ -95,9 +95,9 @@
 | 工具與模型 | Claude Code、Claude Opus 5.5；收官前全域自我 review（子 session），範圍為整個分支的最終結果 |
 | 日期 | 2026-11-25 |
 
-1. 門檻：`Check.ps1` 9 PASS、1 FAIL；TEST-11 只缺 DoD 第 9、10 項與待人確認的處置。常駐 194 行（基準 193，差異 +1，理由同第 3 回合），本回合未改常駐檔案。本議題只改文件，不需建置。
+1. 門檻：`Check.ps1` 9 PASS、1 FAIL；TEST-11 只缺 DoD 第 9、10 項與待人決定或待人確認的處置。常駐 198 行（基準 193，差異 +5）：第 3 回合 +1；本回合 `project-overview` 新增「議題編號」+4（REV-43），開分支、commit、寫註解時都要用到前綴格式。本議題只改文件，不需建置。
 2. 需求與範圍：REQ-1～REQ-11 皆有 SPEC，SPEC-1～SPEC-19 皆有 TEST 與 STEP；被刪除的 SPEC-3.8、SPEC-5.8 只在討論與 review 記錄中以「刪除」出現。DEC-14、DEC-15 已落實於 `claude-worktree.md`、`build.md`、`git-workflow.md` 第 5 節、`issue-workflow.md`、`issue-docs.md`、流程索引、指引目錄與 `project-overview` 索引，沒有殘留的 session 或 worktree 說明。
-3. 本回合沒有「必修」。
+3. REV-43 依使用者回覆改為「必修」並回溯修正。
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
@@ -111,5 +111,5 @@
 | REV-40 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:18` | 規格未同步後續 review 的修正：SPEC-1.1 表格仍寫「Copilot 依 `applyTo` 載入；Claude 依流程索引」（REV-19 後指引目錄改為兩者皆依流程索引）；SPEC-8.6 仍寫「Push 與送 MR 由人決定」（REV-23 後 push 的決定權只寫在協作原則） | 待人決定（規格措辭） |
 | REV-41 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:85` | SPEC-6.4「刪除即跳號」與 Markdown 顯示衝突：有序清單只採用第一項的號碼，SPEC-3 的「9.」、SPEC-5 的「9.」在 GitLab / GitHub 顯示為「8.」，引用 SPEC-3.9 的讀者對不上。建議刪除的項目保留一行「8. （刪除，見 DEC-n）」 | 待人決定（規則變更，涉及 `issue-docs.md:44`） |
 | REV-42 | 4 | 建議 | `.github/process/review.md:12` | 功能正確性段寫「專案指引的領域檢查項目」，`project-overview` 沒有此名稱，對應的是「專案固定檢查項目」第 5 項；SPEC-7.1 同文。建議改為「專案指引的專案固定檢查項目」 | 待人決定（規格措辭） |
-| REV-43 | 2 | 提問 | `.github/instructions/coding-style-general.instructions.md:26` | 團隊通用層含 `AUTO-` 前綴：`coding-style-general` 的 `// AUTO-<編號>`、`issue-docs.md:8` 的 `AUTO-TBD`、`git-workflow.md:14` 的範例 `AUTO-23201`。`AUTO-` 是團隊共用的議題系統前綴，還是 MyCAM 專屬？若為專屬，違反 SPEC-1.2，應改為「`<議題編號>`，前綴見專案指引」 | 待回覆 |
+| REV-43 | 2 | 必修 | `.github/instructions/coding-style-general.instructions.md:26` | 團隊通用層含 `AUTO-` 前綴：`coding-style-general` 的 `// AUTO-<編號>`、`issue-docs.md:8` 的 `AUTO-TBD`、`git-workflow.md:14` 的範例 `AUTO-23201`。`AUTO-` 是團隊共用的議題系統前綴，還是 MyCAM 專屬？若為專屬，違反 SPEC-1.2，應改為「`<議題編號>`，前綴見專案指引」。使用者回覆：`AUTO-` 只有 MyCAM 使用，改為必修 | 已修正（回溯至 REQ-1.2、SPEC-5.2、SPEC-8.3.1、SPEC-10.2、SPEC-14.7，DEC-16） |
 | REV-44 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:649` | TEST-11 只擋空白、「待處置」與「待人確認」，其他文字（如「待人決定」、「待回覆」）都通過，與 `review.md` 第 2 節第 2 項「處置只有三種」不符；改為處置須以已修正、不修正或列後續開頭 | 已修正（待人確認） |

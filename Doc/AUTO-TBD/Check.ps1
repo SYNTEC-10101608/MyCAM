@@ -210,8 +210,9 @@ function Test-2()
 {
 	$failList = @()
 	$termArray = @( 'MyCAM', 'Build.bat', 'CopyRef', 'FCLTool', 'PostTool', 'OCC', 'LanguageManager',
-		'Designer', 'reference/', '.worktreeinclude', 'CustPost', 'zh-TW' )
-	$fileList = @( '.github/instructions/collaboration.instructions.md' ) + @( Get-Files '.github/process' '*.md' )
+		'Designer', 'reference/', '.worktreeinclude', 'CustPost', 'zh-TW', 'AUTO-' )
+	$fileList = @( '.github/instructions/collaboration.instructions.md',
+		'.github/instructions/coding-style-general.instructions.md' ) + @( Get-Files '.github/process' '*.md' )
 	foreach( $szFile in $fileList ) {
 		$lineArray = Read-Lines $szFile
 		if( $null -eq $lineArray ) {
@@ -531,6 +532,12 @@ function Test-9()
 		}
 	}
 
+	# 9.1 議題編號前綴只寫在專案指引
+	$issueId = $sectionList | Where-Object { $_.Title -match '議題編號' } | Select-Object -First 1
+	if( $null -eq $issueId -or -not ( ( $issueId.Lines -join "`n" ).Contains( 'AUTO-TBD' ) ) ) {
+		$failList += "$szOverview 沒有含 AUTO-TBD 的「議題編號」章節"
+	}
+
 	# 9.2
 	$szBuild = Read-Text '.github/project/build.md'
 	if( $null -eq $szBuild ) {
@@ -583,7 +590,7 @@ function Test-9()
 	if( $szGeneral.Contains( '維持該方法內既有的命名方式' ) ) {
 		$failList += 'coding-style-general 仍有「維持該方法內既有的命名方式」'
 	}
-	foreach( $szNeed in @( '採新規範', '整個方法', '獨立 commit', '沒有動到的方法', 'AUTO-<編號>' ) ) {
+	foreach( $szNeed in @( '採新規範', '整個方法', '獨立 commit', '沒有動到的方法', '<議題編號>:' ) ) {
 		if( -not $szGeneral.Contains( $szNeed ) ) {
 			$failList += "coding-style-general 缺少 '$szNeed'"
 		}

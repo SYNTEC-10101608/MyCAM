@@ -69,7 +69,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 2. 新增 `.github/project/claude-worktree.md`：Session 交接、Worktree 兩節（SPEC-14.6，REV-30）。
 3. `project-overview.instructions.md`：
    1. 刪除「Git 流程」章節與建置細節，「建置與執行」只留指向 `project/build.md` 與 `project/claude-worktree.md` 的索引。
-   2. 新增「專案固定檢查項目」五項，刪除「慣例」與「技術棧」中重複的三句。
+   2. 新增「專案固定檢查項目」五項，刪除「慣例」與「技術棧」中重複的三句；「慣例」新增「議題編號」（SPEC-14.7）。
    3. 數字條列轉換另一個 commit。
 4. SPEC：SPEC-14、SPEC-1.7。TEST：TEST-1、TEST-2（專案內容不外流到通用層）、TEST-4.2、TEST-6、TEST-7、TEST-9。
 

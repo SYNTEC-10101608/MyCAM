@@ -65,6 +65,10 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 
 1. 顯示給使用者的訊息使用 `MyApp.Logger.ShowOnLogPanel( szMessage, MyApp.NoticeType.Warning )`（`Hint` / `Warning` / `Error`）。
 
+### 議題編號
+
+1. 格式 `AUTO-<數字>`，尚未取得時以 `AUTO-TBD` 暫代；分支例：`AUTO-23201_b_CannotOutputFrogLeapMacro`。
+
 ## 專案固定檢查項目
 
 Review 門檻段、功能正確性段與規範段的專案項目（見 [review.md](../process/review.md)）：

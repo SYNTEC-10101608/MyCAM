@@ -25,7 +25,7 @@
 3. 延後原因：本議題以成文化現有機制為主；議題限定的檢查已在 `Doc/AUTO-TBD/Check.ps1`，長期維護版需要另行設計與團隊同意。
 4. 建議做法：
    1. 以 `Doc/AUTO-TBD/Check.ps1` 為起點，抽出長期維護的檢查。
-   2. 第一個候選：團隊通用層（`collaboration.instructions.md`、`.github/process/*.md`）不得含專案專屬字詞（`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`），對應本議題 TEST-2。
+   2. 第一個候選：團隊通用層（`collaboration.instructions.md`、`coding-style-general.instructions.md`、`.github/process/*.md`）不得含專案專屬字詞（`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`、`AUTO-`），對應本議題 TEST-2。
    3. 每建立一項自動檢查，就把規範中對應的文字規則縮為一行指引。
 
 ### TODO-3 GitLab MR 建立自動化
