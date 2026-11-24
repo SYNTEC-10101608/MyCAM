@@ -9,7 +9,6 @@
 3. 建議做法：
    1. 在 Visual Studio 中將 `FCLTool` **卸載（Unload Project）**。卸載狀態只存在個人的 `.vs/`，不影響其他人。
    2. 各開發機保留一份已建置的 `FCLTool.dll` 於 `MyCAM/bin/Debug/` 與 `MyCAM/bin/Release/`；修改 `FCLTool` 時才重新載入並建置。
-   3. 新的 git worktree 沒有 `.vs/`，`FCLTool` 會回到載入狀態；在新 worktree 開啟方案後需再卸載一次，或只用 `Build.bat` 建置。
 
 ## 命令列建置
 
@@ -40,10 +39,3 @@
 | 機構參數 | `Machine/MachineData_<機型>Type.mac`（`Spindle` / `Table` / `Mix`） | `Custom/MachineData.mac` |
 | 機構模型 | `Machine/<機型>/*.stl` | `Custom/<機型>/`（程式依 `MachineData.mac` 的機型讀取對應資料夾） |
 | 客製後處理 | `PostConfig/CustPost.cpf` | `Custom/CustPost.cpf` |
-
-## worktree 準備
-
-使用 worktree 時讀本節，通用規則見 [git-workflow.md](../process/git-workflow.md) 第 5 節；本專案另需：
-
-1. 從主 checkout 複製未追蹤的檔案：`MyCAM/bin/<組態>/` 下的 `FCLTool.dll`、`PostTool.dll` 與 `Custom/`。
-2. 第一次建置後執行 `CopyRef.bat`；以 Visual Studio 開啟方案後卸載 `FCLTool`（見本文件 FCLTool 一節）。

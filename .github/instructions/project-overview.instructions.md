@@ -77,4 +77,5 @@ Review 門檻段、功能正確性段與規範段的專案項目（見 [review.m
 
 ## 建置與執行
 
-建置、準備執行環境或 worktree 時，讀 [`.github/project/build.md`](../project/build.md)。
+1. 建置、準備執行環境時，讀 [`.github/project/build.md`](../project/build.md)。
+2. 切換 session、建立或使用 worktree、以 Claude Code 處理議題時，讀 [`.github/project/claude-worktree.md`](../project/claude-worktree.md)。

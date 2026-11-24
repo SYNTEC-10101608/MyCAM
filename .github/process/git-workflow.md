@@ -58,4 +58,4 @@ Release note 範例：
 ## 5. Worktree
 
 1. 一個議題一個 branch。Worktree 為選用，同時處理多個議題時使用；單線開發直接在主 checkout 切分支。
-2. 未追蹤的檔案不會出現在新 worktree；需要複製的檔案與初次建置步驟見專案指引。
+2. 建立與準備 worktree 的做法見專案指引。

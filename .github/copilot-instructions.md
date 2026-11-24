@@ -26,7 +26,8 @@
 | [議題文件](process/issue-docs.md) | 文件組合、編號與追溯、範本 | 依時機讀取 |
 | [Review](process/review.md) | 六段、報告格式、處置規則 | 依時機讀取 |
 | [Git 流程](process/git-workflow.md) | 版本、分支、commit、release note、worktree | 依時機讀取 |
-| [建置與環境](project/build.md) | FCLTool、命令列建置、執行期檔案、worktree 準備 | 依時機讀取 |
+| [建置與環境](project/build.md) | FCLTool、命令列建置、執行期檔案 | 依時機讀取 |
+| [Claude 與 worktree](project/claude-worktree.md) | Session 交接、worktree 建立與準備、`.worktreeinclude` | 依時機讀取 |
 
 格式類規則同時寫在 repo 根目錄的 `.editorconfig`，衝突時以 `.editorconfig` 為準。
 

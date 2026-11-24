@@ -76,10 +76,10 @@
 | 工具與模型 | Claude Code、Claude Opus 5.5；發現來自使用者的人工 review |
 | 日期 | 2026-11-25 |
 
-1. 門檻：`Check.ps1` 9 PASS、1 FAIL；TEST-11 只缺 DoD 第 9、10 項與待人確認的處置。常駐 192 行（基準 193，差異 -1），未增加。本議題只改文件，不需建置。
-2. 移出的 Claude 做法已寫入使用者的全域 `~/.claude/CLAUDE.md`「Claude Code 工作方式」（不進版控）。
+1. 門檻：`Check.ps1` 9 PASS、1 FAIL；TEST-11 只缺 DoD 第 9、10 項與待人確認的處置。常駐 194 行（基準 193，差異 +1）。本議題只改文件，不需建置。
+2. 常駐增加的理由（REV-30）：指引目錄與 `project-overview` 索引各多一列指向 `claude-worktree.md`（+2），切換 session、使用 worktree 時才找得到該文件；`CLAUDE.md` 精簡 -2（REV-31）；`project-overview` 索引改為兩項條列 +1。
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
-| REV-30 | 2 | 必修 | `.github/process/issue-workflow.md:45` | Session 交接、`SESSION.md`、Claude Code 的 worktree 位置與分支更名、`.worktreeinclude` 自動複製、`CLAUDE.local.md` 上層載入屬於使用 Claude 時的機制，Copilot 不同、成員也未必有此習慣，不應寫在團隊規範 | 已修正（回溯至 REQ-5.1、SPEC-3.8、SPEC-5.8、SPEC-14.2，DEC-14） |
+| REV-30 | 2 | 必修 | `.github/process/issue-workflow.md:45` | Session 交接、`SESSION.md`、Claude Code 的 worktree 位置與分支更名、`.worktreeinclude` 自動複製、`CLAUDE.local.md` 上層載入屬於使用 Claude 或 worktree 時的做法，散在通用流程與 `build.md`；Copilot 不同、成員也未必有此習慣 | 已修正（回溯至 REQ-5.1、SPEC-3.8、SPEC-5.8、SPEC-14，DEC-14：集中到 `claude-worktree.md`） |
 | REV-31 | 6 | 建議 | `CLAUDE.md:3` | 3 行說明可併為 1 行；`@` 引用 4 行保留 | 已修正（待人確認） |
