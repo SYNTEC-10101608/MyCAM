@@ -11,7 +11,7 @@
 
 ## 2. 分支
 
-1. 命名 `AUTO-<議題編號>_<類型>_<簡述>`；類型 `f` 為功能、`b` 為 bug；簡述為英文 PascalCase（例：`AUTO-23201_b_CannotOutputFrogLeapMacro`）。
+1. 命名 `<議題編號>_<類型>_<簡述>`；議題編號含前綴（`AUTO-23201`）；類型 `f` 為功能、`b` 為 bug；簡述為英文 PascalCase（例：`AUTO-23201_b_CannotOutputFrogLeapMacro`）。
 2. 後綴：
    1. 同一議題合併後的後續 MR：原名加 `_2nd`、`_3rd`…。
    2. 並存比較的另一種實作：原名加 `_Alt2`、`_Alt3`…。
@@ -57,6 +57,6 @@ Release note 範例：
 
 ## 5. Worktree
 
-1. 一個議題一個 branch 與一個 worktree。
+1. 一個議題一個 branch。Worktree 為選用，同時處理多個議題時使用；單線開發直接在主 checkout 切分支。
 2. 未追蹤的檔案不會出現在新 worktree；需要複製的檔案與初次建置步驟見專案指引。
 3. Claude Code 建立的 worktree 位於 `.claude/worktrees/<名稱>/`（已列入 `.gitignore`），分支名稱為 `worktree-<名稱>`，建立後以 `git branch -m` 改為第 2 節的命名。

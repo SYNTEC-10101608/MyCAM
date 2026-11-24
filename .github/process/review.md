@@ -20,7 +20,7 @@
 
 ## 2. 報告格式
 
-報告寫入議題的 `Review.md`（S 級寫在 `README.md`），每回合一節：
+報告寫入議題的 `Review.md`，每回合一節；S 級寫在 `README.md` 的 Review 章節，回合標題降一層（`###`）：
 
 ```markdown
 ## 第 <n> 回合
