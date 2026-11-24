@@ -60,7 +60,7 @@
 | REV-22 | 6 | 建議 | `.github/project/build.md:50` | 與同檔第 30 行矛盾：第 30 行寫 `CopyRef.bat`「首次建置後執行一次」，第 50 行寫「第一次建置前執行」（腳本會自建目錄，兩者皆可）；同句「以 Visual Studio 開啟前先卸載 `FCLTool`」順序不可行，應為開啟後卸載（第 12 行已寫） | 已修正（待人確認） |
 | REV-23 | 6 | 建議 | `.github/process/git-workflow.md:10` | 「Push 與送 MR 由人決定」與常駐的 `collaboration` 協作原則第 2.1 項（合併、push 先由人決定）重複；建議只留本處的具體做法「AI push 前先詢問 remote 與分支」 | 已修正（待人確認） |
 | REV-24 | 6 | 建議 | `.github/process/review.md:11` | 門檻段要求計算常駐行數，但常駐的範圍（入口與 `applyTo: "**"`）定義在 `copilot-instructions.md` 維護方式第 3 項，`review.md` 沒有連結，reviewer 無法判斷要算哪些檔案 | 已修正（待人確認） |
-| REV-25 | 6 | 建議 | `.claude/skills/issue-start/SKILL.md:6` | 三個 skill 的本文句子與「必讀文件」清單列出相同文件，同一檔內重複；`review` skill 另重述流程索引已有的「加上專案固定檢查項目」。此格式來自 SPEC-16.2，精簡須改規格 | 待處置 |
+| REV-25 | 6 | 建議 | `.claude/skills/issue-start/SKILL.md:6` | 三個 skill 的本文句子與「必讀文件」清單列出相同文件，同一檔內重複；`review` skill 另重述流程索引已有的「加上專案固定檢查項目」。此格式來自 SPEC-16.2，精簡須改規格 | 不修正（本文說明各文件的用途，清單供 AI 依序讀檔；每檔只多兩三行，TEST-16 證明此格式有效） |
 | REV-26 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:134` | TEST-13 通過條件寫「含 SPEC-18.2 六項」，實際為五項（第 5 項依 TEST-16 結果結案），執行結果判定通過但條件字面不成立；建議改為「第 5 項依 TEST-16 結果決定」 | 已修正（待人確認） |
 | REV-27 | 6 | 建議 | `Doc/AUTO-TBD/README.md:19` | 文件索引沒有 `Review.md`，`Review.md` 已存在；STEP-13 第 2 項列為收官工作，可於收官一併補上 | 待處置 |
 | REV-28 | 6 | 建議 | `Doc/AUTO-TBD/TestPlan.md:202` | 執行結果 TEST-11 仍寫「缺 `Review.md`、STEP-12、STEP-13 的 commit」，與目前狀態不符（現僅缺 DoD 與 Release Note）；`753ee71d` 更新了行數但未同步此項 | 待處置 |
