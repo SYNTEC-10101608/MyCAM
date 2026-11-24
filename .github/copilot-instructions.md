@@ -20,7 +20,7 @@
 | [協作規範](instructions/collaboration.instructions.md) | 協作原則、文件通則、流程索引 | 常駐 |
 | [專案概觀](instructions/project-overview.instructions.md) | 產品、方案結構、主程式架構、慣例、專案固定檢查項目 | 常駐 |
 | [Coding Style：通用規則](instructions/coding-style-general.instructions.md) | 編碼、縮排、檔名、註解、修改既有程式碼的原則 | 常駐 |
-| [Coding Style：C#](instructions/coding-style-csharp.instructions.md) | C# 格式、命名、程式結構、語言用法 | `*.cs`：Copilot 依 `applyTo`，Claude 依流程索引 |
+| [Coding Style：C#](instructions/coding-style-csharp.instructions.md) | C# 格式、命名、程式結構、語言用法 | `*.cs`：依流程索引讀取，Copilot 另依 `applyTo` |
 | [Coding Style：C / C++](instructions/coding-style-cpp.instructions.md) | C / C++ 格式、命名、語言用法 | `*.c` `*.cpp` `*.h` `*.hpp`：同上 |
 | [議題處理流程](process/issue-workflow.md) | 階段、分級與確認點、DoD | 依時機讀取 |
 | [議題文件](process/issue-docs.md) | 文件組合、編號與追溯、範本 | 依時機讀取 |

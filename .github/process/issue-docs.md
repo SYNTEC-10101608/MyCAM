@@ -26,7 +26,7 @@
 | 後續處理（TODO） | README | README | `FollowUp.md` |
 
 1. 文件只保留最終結果；例外是 `Discussion.md` 可增量描述並凸顯最終決策，`Review.md` 依 review 回合分節保留。
-2. 確認點文件的最後一節為「待討論」，格式見 [issue-workflow.md](issue-workflow.md) 第 2 節；沒有待決問題時寫「無」。
+2. 確認點文件在確認點內容之後列「待討論」一節，格式見 [issue-workflow.md](issue-workflow.md) 第 2 節；沒有待決問題時寫「無」。
 
 ## 3. 編號與追溯
 
@@ -135,6 +135,8 @@ M、L 級骨架（其餘內容放各檔，見第 2 節）：
 ## 現況、目標與需求（M 級；L 級寫在 Goal.md）
 
 ## 後續處理（M 級；L 級寫在 FollowUp.md）
+
+## 待討論（M 級確認點 1–2；L 級寫在 Goal.md）
 
 ## DoD
 

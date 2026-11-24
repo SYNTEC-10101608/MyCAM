@@ -47,4 +47,4 @@
 
 1. 需要的未追蹤檔案列在 repo 根目錄的 `.worktreeinclude`：`.claude/settings.local.json`、`FCLTool.dll`、`PostTool.dll`、`bin/<組態>/Custom/`。Claude Code 建立 worktree 時自動由主 checkout 複製；以其他工具建立時手動複製。
 2. `CLAUDE.local.md` 不需複製：worktree 位於 repo 底下，Claude Code 會從上層的主 checkout 載入。也因此不要在 repo 的上層目錄放 `CLAUDE.md` / `CLAUDE.local.md` 的備份，否則會被重複載入。
-3. 第一次建置前執行 `CopyRef.bat`；以 Visual Studio 開啟前先卸載 `FCLTool`（見本文件 FCLTool 一節）。
+3. 第一次建置後執行 `CopyRef.bat`；以 Visual Studio 開啟方案後卸載 `FCLTool`（見本文件 FCLTool 一節）。
