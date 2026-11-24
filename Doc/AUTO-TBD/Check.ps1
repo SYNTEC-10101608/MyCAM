@@ -4,13 +4,23 @@
 
 [CmdletBinding()]
 param(
-	[string]$Base = '24c7276d'
+	[string]$Base = '24c7276d',
+
+	# 個人設定只存在實作者的電腦，其他成員執行時略過 TEST-12
+	[switch]$SkipPersonal
 )
 
 $ErrorActionPreference = 'Stop'
 $Root = (git rev-parse --show-toplevel).Trim()
 Set-Location $Root
 $Results = New-Object System.Collections.Generic.List[object]
+
+# 比對基準不存在時 git diff 只會回傳空清單，各 TEST 會誤判通過
+git rev-parse --verify --quiet "$Base^{commit}" | Out-Null
+if( $LASTEXITCODE -ne 0 ) {
+	Write-Output "比對基準 $Base 不是有效的 commit"
+	exit 100
+}
 
 # ============================================================
 # 共用函式
@@ -146,6 +156,23 @@ function Get-Sections( [string[]]$LineArray )
 # TEST-1 常駐行數
 # ============================================================
 
+function Get-BaseResidentLineCount()
+{
+	# 比對基準的常駐內容：入口文件與當時 applyTo: "**" 的指引
+	$fileList = @( '.github/copilot-instructions.md', 'CLAUDE.md' )
+	$fileList += @( git ls-tree --name-only "$Base" '.github/instructions/' ) | Where-Object { $_ -like '*.md' }
+	$nTotal = 0
+	foreach( $szFile in ( $fileList | Sort-Object -Unique ) ) {
+		$lineArray = @( git show "${Base}:$szFile" )
+		$isEntry = ( $szFile -eq 'CLAUDE.md' ) -or ( $szFile -eq '.github/copilot-instructions.md' )
+		$isResident = ( $lineArray -join "`n" ) -match '(?s)\A---\s*\n.*?applyTo:\s*"\*\*".*?\n---'
+		if( $isEntry -or $isResident ) {
+			$nTotal += $lineArray.Count
+		}
+	}
+	return $nTotal
+}
+
 function Test-1()
 {
 	$failList = @()
@@ -160,8 +187,9 @@ function Test-1()
 		$noteList += "$szFile = $nLines"
 	}
 	# 行數只是觀察指標（DEC-11）：輸出與基準的差異，增加時由人在 Review.md 確認理由
-	$nDiff = $nTotal - 193
-	$noteList += "總計 = $nTotal（基準 193，差異 $nDiff）"
+	$nBaseTotal = Get-BaseResidentLineCount
+	$nDiff = $nTotal - $nBaseTotal
+	$noteList += "總計 = $nTotal（基準 $nBaseTotal，差異 $nDiff）"
 	if( $nDiff -gt 0 ) {
 		$noteList += '常駐總行數增加，Review.md 須寫明增加量與理由'
 	}
@@ -332,6 +360,13 @@ function Test-5()
 		$isAllowed = ( $allowArray -contains $szFile ) -or $szFile.StartsWith( 'Doc/AUTO-TBD/' )
 		if( -not $isAllowed ) {
 			$failList += "清單外的異動：$szFile"
+		}
+	}
+
+	# 反向：清單內的檔案都要有異動
+	foreach( $szFile in $allowArray ) {
+		if( $changedList -notcontains $szFile ) {
+			$failList += "清單內的檔案沒有異動：$szFile"
 		}
 	}
 	Add-Result 'TEST-5' $failList
@@ -588,8 +623,11 @@ function Test-11()
 			$cellArray = $match.Value.Trim( '|' ) -split '\|' | ForEach-Object { $_.Trim() }
 			$szSeverity = $cellArray[ 2 ]
 			$szAction = $cellArray[ -1 ]
-			if( $szAction -eq '' ) {
+			if( $szAction -eq '' -or $szAction -eq '待處置' ) {
 				$failList += "$( $cellArray[ 0 ] ) 沒有處置"
+			}
+			elseif( $szAction.Contains( '待人確認' ) ) {
+				$failList += "$( $cellArray[ 0 ] ) 的處置待人確認"
 			}
 			elseif( $szSeverity -eq '必修' -and -not $szAction.StartsWith( '已修正' ) ) {
 				$failList += "$( $cellArray[ 0 ] ) 為必修但處置不是已修正"
@@ -632,6 +670,10 @@ function Test-12()
 {
 	$failList = @()
 	$szHomeClaude = Join-Path $env:USERPROFILE '.claude'
+	if( $SkipPersonal ) {
+		Add-Result 'TEST-12' @() @( '略過：-SkipPersonal（個人設定只在實作者的電腦檢查）' )
+		return
+	}
 
 	# 12.1
 	if( Test-Path -LiteralPath ( Join-Path $szHomeClaude 'issue-workflow.md' ) ) {
