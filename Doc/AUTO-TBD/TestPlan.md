@@ -195,7 +195,48 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 
 ## 5. 執行結果
 
-施工完成後填入。
+### 5.1 自動（`Check.ps1`，2026-11-24，比對基準 `24c7276d`）
+
+1. TEST-1～TEST-7、TEST-9、TEST-12：通過。
+2. TEST-1 常駐 190 行（基準 193，差異 -3）：入口 48 行、`collaboration` 31 行、`project-overview` 79 行、`coding-style-general` 32 行。
+3. TEST-11：待 STEP-13（缺 `Review.md`、DoD 與 Release Note、STEP-12、STEP-13 的 commit）。
+
+### 5.2 TEST-8 規格內容落地
+
+AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-docs.md`、`RV` 為 `review.md`、`GW` 為 `git-workflow.md`（皆在 `.github/process/`）。
+
+| SPEC | 位置 |
+| --- | --- |
+| SPEC-3.1 階段（含 3.6 預料外先停） | `IW:5-19` |
+| SPEC-3.2～3.5 分級、確認點、待討論格式 | `IW:21-34` |
+| SPEC-3.7、3.9 重新分級、回溯 | `IW:36-42` |
+| SPEC-3.8 Session 切換 | `IW:44-46` |
+| SPEC-4 各級 DoD | `IW:48-70` |
+| SPEC-5.1～5.3、5.8、5.9 存放 | `ID:5-11` |
+| SPEC-5.4、5.7 檔案組合、例外 | `ID:13-28` |
+| SPEC-5.5 議題資訊表 | `ID:70-75`（範本） |
+| SPEC-5.6 文件通則 | `ID:3`（連結 `collaboration`） |
+| SPEC-6 編號與追溯 | `ID:31-45` |
+| SPEC-13.2.1 各文件內容規範 | `ID:47-61` |
+| SPEC-13.2.2 S 級完整範本；M、L 骨架 | `ID:63-139` |
+| SPEC-7.1 六段與分工 | `RV:5-19` |
+| SPEC-7.2 不限工具與執行者 | `RV:3` |
+| SPEC-7.3 報告格式 | `RV:21-42` |
+| SPEC-7.4、7.5 處置規則、回到門檻段 | `RV:44-49` |
+| SPEC-13.3 專案固定檢查項目只寫「見專案指引」 | `RV:11` |
+| SPEC-8.1、8.2、8.6 版本、合併、push | `GW:5-10` |
+| SPEC-8.3、8.4 分支命名、後綴、fetch | `GW:12-20` |
+| SPEC-8.5 Commit | `GW:22-28` |
+| SPEC-9 Release note 與 merge log | `GW:30-56` |
+| SPEC-8.7、SPEC-13.4 Worktree 通用規則 | `GW:58-62` |
+
+### 5.3 人工
+
+1. TEST-8：位置如 5.2，待人抽查。
+2. TEST-13：`FollowUp.md` 含 SPEC-18.2 六項（TODO-1～TODO-6），每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
+3. TEST-10：於 STEP-13 review 文件段執行。
+4. TEST-14、TEST-15：待在 worktree 開新的 Claude Code session 執行。
+5. TEST-16：待使用者在 VS 2026 執行。
 
 ## 6. 待討論
 
