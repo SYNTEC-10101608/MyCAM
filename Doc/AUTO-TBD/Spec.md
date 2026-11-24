@@ -17,7 +17,7 @@
    | 團隊通用 | `.github/instructions/coding-style-general.instructions.md` | Coding Style 通用規則 | 常駐（`applyTo: "**"`） |
    | 團隊通用 | `.github/instructions/coding-style-<語言>.instructions.md` | 各語言 Coding Style | Copilot 依 `applyTo` 載入；Claude 依流程索引讀取 |
    | MyCAM 專案 | `.github/instructions/project-overview.instructions.md` | 架構、慣例、專案固定檢查項目 | 常駐 |
-   | MyCAM 專案 | `.github/project/*.md` | 建置、執行環境、worktree 準備 | 依專案指引的索引讀取 |
+   | MyCAM 專案 | `.github/project/*.md` | 建置、執行環境；Claude 與 worktree 工作方式 | 依專案指引的索引讀取 |
    | 個人 | `~/.claude/CLAUDE.md`、`CLAUDE.local.md` 等 | 個人偏好 | 各工具自行載入，不進版控 |
 
 2. 團隊通用層不出現 MyCAM 專屬的檔名、專案名稱、建置指令；需要專案資訊時寫「見專案指引」。
@@ -240,6 +240,7 @@
 | `.github/process/git-workflow.md` | 新增 | SPEC-13 |
 | `.github/instructions/project-overview.instructions.md` | 修改 | SPEC-14 |
 | `.github/project/build.md` | 新增 | SPEC-14 |
+| `.github/project/claude-worktree.md` | 新增 | SPEC-14.6 |
 | `.github/instructions/coding-style-general.instructions.md` | 修改 | SPEC-10 |
 | `.github/copilot-instructions.md` | 修改 | SPEC-15 |
 | `CLAUDE.md` | 修改 | SPEC-15 |
@@ -271,14 +272,14 @@
    1. 各文件的內容規範（Goal、Spec、TestPlan、Implementation、Review、Discussion、FollowUp）。
    2. 精簡範本：S 級 `README.md` 完整範本；M、L 的 `README.md` 骨架與各檔章節骨架。
 3. `review.md`：SPEC-7；專案固定檢查項目只寫「見專案指引」，不列內容。
-4. `git-workflow.md`：SPEC-8、SPEC-9；worktree 只寫通用規則（SPEC-8 第 7 項），專案要複製的檔案與初次建置步驟留在專案指引；個別工具建立 worktree 的細節不寫（DEC-14）。
+4. `git-workflow.md`：SPEC-8、SPEC-9；worktree 只寫通用規則（SPEC-8 第 7 項），建立與準備 worktree 的做法寫「見專案指引」（SPEC-14.6，DEC-14）。
 5. 各文件開頭一句說明適用時機，內容不重複；需要其他文件的規則時以連結引用。
 
 ### SPEC-14 `project-overview.instructions.md`（REQ-1.2；DEC-2.6）
 
 1. 刪除「Git 流程」章節：分支命名、commit 規則、Claude Code worktree 的通用說明移到 `process/git-workflow.md`。
-2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`，並在該檔新增「worktree 準備」：需要從主 checkout 複製的未追蹤檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/`）、第一次建置後執行 `CopyRef.bat`；個別工具的自動複製與設定檔載入方式不寫（DEC-14）。
-3. `project-overview` 的「建置與執行」只留一行索引：建置、執行環境、worktree 準備時讀 `.github/project/build.md`。
+2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`；與 worktree 相關的內容不放在此檔（SPEC-14.6）。
+3. `project-overview` 的「建置與執行」只留索引：建置、執行環境時讀 `.github/project/build.md`；切換 session、使用 worktree 或 Claude Code 時讀 `.github/project/claude-worktree.md`。
 4. 新增「專案固定檢查項目」章節，作為 review 門檻段、功能正確性段與規範段的專案項目：
    1. `Build.bat Debug` 建置成功。
    2. 使用者可見文字的四語系 XML（`zh-TW`、`zh-CN`、`en-US`、`ru-RU`）同步。
@@ -286,6 +287,9 @@
    4. 未修改 `reference/` 內的檔案（除非議題明確要求）。
    5. 功能正確性的領域項目：UI 執行緒、角度單位（rad / deg）、座標系（由團隊通用的 review 移入）。
 5. 第 4 項的規則只寫在「專案固定檢查項目」：「慣例」與「技術棧」中重複的句子（四語系同步、Designer 可開、不修改 `reference/`）刪除，保留做法說明。
+6. 新增 `.github/project/claude-worktree.md`，集中使用 Claude 或 worktree 時才需要的做法，不使用的成員不需讀（DEC-14）：
+   1. Session 交接：只在確認點切換 session，切換前更新工作目錄根目錄的 `SESSION.md`（`.gitignore` 排除，只放交接 prompt 與暫時筆記）；主 session 可開子 session 做驗證或獨立 review 再整合。
+   2. Worktree：Claude Code 的 worktree 位置與分支更名；`.worktreeinclude` 列出需複製的未追蹤檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/`、`.claude/settings.local.json`），Claude Code 自動複製、其他工具手動複製；`CLAUDE.local.md` 由上層載入；第一次建置後執行 `CopyRef.bat`；開啟方案後再卸載 `FCLTool`。
 
 ### SPEC-15 入口文件（REQ-1.3、REQ-2.1；DEC-2.1、DEC-2.2）
 
@@ -363,4 +367,4 @@
 
 ## 5. 待討論
 
-無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11；worktree 改為選用、開議題時開分支見 DEC-12；先做後確認見 DEC-13；Claude 專屬機制移出團隊規範見 DEC-14。
+無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11；worktree 改為選用、開議題時開分支見 DEC-12；先做後確認見 DEC-13；Claude 與 worktree 的做法獨立成檔見 DEC-14。

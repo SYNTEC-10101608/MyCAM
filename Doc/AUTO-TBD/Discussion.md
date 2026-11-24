@@ -33,7 +33,7 @@
    M 也獨立 `Implementation.md`，因為 STEP 與 commit 的對應同樣需要追溯。
 4. 「沒有獨立檔」不等於「不用寫」：S 的目標、修正方式、測試、review、後續、決策寫在 `README.md` 各節；M 的盤點、目標、REQ、後續寫在 `README.md`。
 5. **後續處理任何級別都可能有**，因為它的定義就是範圍外的項目；S、M 寫在 `README.md`，L 獨立成檔。
-6. **`SESSION.md` 保留但只放交接 prompt 與暫時筆記**；狀態與決策寫在提交的文件，不重複（由 DEC-14 移出團隊規範，改為個人設定）。
+6. **`SESSION.md` 保留但只放交接 prompt 與暫時筆記**；狀態與決策寫在提交的文件，不重複（由 DEC-14 移到 `.github/project/claude-worktree.md`）。
 7. 考量：單一字母編號（`R`）無法分辨是需求還是 review。**改用 `REQ`、`SPEC`、`TEST`、`STEP`、`TODO`、`DEC`、`REV`**，寫法 `REQ-1`。
 8. **不納入 GitLab MR 範本**：MR 描述會成為 merge log，勾選清單會混入主線歷史；DoD 留在 `README.md`。
 
@@ -105,7 +105,7 @@
 ## DEC-12 Worktree 改為選用、開議題時開分支（2026-11-24）
 
 1. 考量：團隊多數成員單線開發，直接在主 checkout 切分支；「一個議題一個 worktree」寫成硬性規定會卡住不用 worktree 的人，且建立與準備步驟只適用 Claude Code（`.worktreeinclude` 只有 Claude Code 會自動複製）。
-   **一個議題一個 branch，worktree 為選用**，同時處理多個議題時使用；專案的 worktree 準備註明其他工具需手動複製未追蹤檔案（取代 SPEC-8.7 原本的硬性規定；工具差異的說明由 DEC-14 移出）。
+   **一個議題一個 branch，worktree 為選用**，同時處理多個議題時使用；專案的 worktree 準備註明其他工具需手動複製未追蹤檔案（取代 SPEC-8.7 原本的硬性規定；worktree 準備由 DEC-14 移到 `claude-worktree.md`）。
 2. 考量：TEST-15、TEST-16 演練中，開議題的流程沒有規定何時開分支，AI 要靠流程索引自行補讀 Git 流程文件。
    **分級確認後開分支**，議題文件提交在該分支；`issue-start` 的必讀文件加入 `git-workflow.md`。
 
@@ -116,9 +116,11 @@
 3. **小事先處理再請人確認**：措辭、格式、補漏、明顯錯誤；在該階段結束時列出清單，人可逐項否決。無法判斷時視為重要事項。
 4. Review 的處置同步調整：「必修」與涉及需求、規格的發現先決定再修；其他可先修正，處置標示「已修正（待人確認）」。
 
-## DEC-14 Claude 專屬機制移出團隊規範（2026-11-25）
+## DEC-14 Claude 與 worktree 的做法獨立成檔（2026-11-25）
 
-1. 考量：session 交接（`SESSION.md`）、Claude Code 建立 worktree 的位置與分支更名、`.worktreeinclude` 自動複製、`CLAUDE.local.md` 由上層載入，都是使用 Claude 時的機制；Copilot 機制不同，團隊成員也未必有這種習慣。
-2. **移出團隊規範，改寫在使用者的全域個人設定**：`issue-workflow.md` 的 session 切換、流程索引的「切換 session」、`issue-docs.md` 的 `SESSION.md`、`git-workflow.md` 的 Claude Code worktree 細節、`build.md` 的自動複製與上層載入說明。
-3. **保留**：`.gitignore` 的 `/SESSION.md`（防誤提交）、`copilot-instructions.md` 提到 `CLAUDE.md` 的維護規則、`.claude/skills/`（Copilot 也讀得到）、`build.md` 的 `.\Build.bat` 寫法、repo 根目錄的 `.worktreeinclude`（只是設定檔，不需說明）。
-4. 回溯修改 REQ-5.1、SPEC-1.5、SPEC-3.8（刪除）、SPEC-5.8（刪除）、SPEC-11、SPEC-13.1、SPEC-13.4、SPEC-14.2 與 TEST-4、TEST-8 對照。
+1. 考量：session 交接（`SESSION.md`）、Claude Code 建立 worktree 的位置與分支更名、`.worktreeinclude` 自動複製、`CLAUDE.local.md` 由上層載入，都是使用 Claude 或 worktree 時的做法；Copilot 機制不同，團隊成員也未必有這種習慣，混在通用流程與建置說明中不乾淨。
+2. 原先決定移到使用者的全域個人設定；但 `build.md` 仍留有 worktree 準備，拆得不完整，且這些做法對其他使用 Claude 的成員也有用。
+3. **集中到進版控的 `.github/project/claude-worktree.md`**，只在切換 session、使用 worktree 或 Claude Code 時讀取；由 `project-overview` 的索引導向（常駐 +1 行）。內容包含 `.worktreeinclude` 與需複製的檔案清單、開啟方案後再卸載 `FCLTool`。
+4. **從通用流程與建置說明移除**：`issue-workflow.md` 的 session 切換、流程索引的「切換 session」、`issue-docs.md` 的 `SESSION.md`、`git-workflow.md` 的 Claude Code worktree 細節（只留「worktree 為選用，做法見專案指引」）、`build.md` 的 worktree 準備與 worktree 的 `FCLTool` 卸載。
+5. **保留**：`.gitignore` 的 `/SESSION.md`、`copilot-instructions.md` 提到 `CLAUDE.md` 的維護規則、`.claude/skills/`（Copilot 也讀得到）、`build.md` 的 `.\Build.bat` 寫法。
+6. 回溯修改 REQ-5.1、SPEC-1.1、SPEC-1.5、SPEC-3.8（刪除）、SPEC-5.8（刪除）、SPEC-11、SPEC-13.1、SPEC-13.4、SPEC-14.2、SPEC-14.3，新增 SPEC-14.6；TEST-4、TEST-8、TEST-9 與 `Check.ps1` 同步。

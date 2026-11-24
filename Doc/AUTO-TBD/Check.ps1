@@ -107,7 +107,8 @@ function Get-GuideFiles()
 		'.github/instructions/collaboration.instructions.md',
 		'.github/instructions/project-overview.instructions.md',
 		'.github/instructions/coding-style-general.instructions.md',
-		'.github/project/build.md'
+		'.github/project/build.md',
+		'.github/project/claude-worktree.md'
 	)
 	$fileList += Get-Files '.github/process' '*.md'
 	$fileList += Get-Files '.claude/skills' 'SKILL.md' -Recurse
@@ -282,7 +283,7 @@ function Test-4()
 	}
 
 	# 4.2
-	$onDemandList = @( Get-Files '.github/process' '*.md' ) + @( '.github/project/build.md' )
+	$onDemandList = @( Get-Files '.github/process' '*.md' ) + @( '.github/project/build.md', '.github/project/claude-worktree.md' )
 	foreach( $szFile in $onDemandList ) {
 		if( -not ( Test-Path -LiteralPath ( Join-Path $Root $szFile ) ) ) {
 			$failList += "缺少 $szFile"
@@ -307,7 +308,7 @@ function Test-4()
 	# 4.4
 	$szCopilot = Read-Text '.github/copilot-instructions.md'
 	$needArray = @( 'collaboration.instructions.md', 'issue-workflow.md', 'issue-docs.md', 'review.md',
-		'git-workflow.md', 'project/build.md', '常駐', '依時機讀取' )
+		'git-workflow.md', 'project/build.md', 'project/claude-worktree.md', '常駐', '依時機讀取' )
 	foreach( $szNeed in $needArray ) {
 		if( -not $szCopilot.Contains( $szNeed ) ) {
 			$failList += "copilot-instructions.md 缺少 '$szNeed'"
@@ -343,6 +344,7 @@ function Test-5()
 		'.github/process/git-workflow.md',
 		'.github/instructions/project-overview.instructions.md',
 		'.github/project/build.md',
+		'.github/project/claude-worktree.md',
 		'.github/instructions/coding-style-general.instructions.md',
 		'.github/copilot-instructions.md',
 		'CLAUDE.md',
@@ -535,9 +537,30 @@ function Test-9()
 		$failList += '缺少 .github/project/build.md'
 	}
 	else {
-		foreach( $szHead in @( 'FCLTool', '命令列建置', '執行期檔案', 'worktree 準備' ) ) {
+		foreach( $szHead in @( 'FCLTool', '命令列建置', '執行期檔案' ) ) {
 			if( $szBuild -notmatch "(?m)^#+\s.*$( [regex]::Escape( $szHead ) )" ) {
 				$failList += "build.md 缺少「$szHead」章節"
+			}
+		}
+		if( $szBuild -match '(?i)worktree' ) {
+			$failList += 'build.md 仍有 worktree 相關內容'
+		}
+	}
+
+	# 9.2 worktree 與 session 的做法集中在 claude-worktree.md
+	$szWorktree = Read-Text '.github/project/claude-worktree.md'
+	if( $null -eq $szWorktree ) {
+		$failList += '缺少 .github/project/claude-worktree.md'
+	}
+	else {
+		foreach( $szHead in @( 'Session 交接', 'Worktree' ) ) {
+			if( $szWorktree -notmatch "(?m)^#+\s.*$( [regex]::Escape( $szHead ) )" ) {
+				$failList += "claude-worktree.md 缺少「$szHead」章節"
+			}
+		}
+		foreach( $szNeed in @( 'SESSION.md', '.worktreeinclude' ) ) {
+			if( -not $szWorktree.Contains( $szNeed ) ) {
+				$failList += "claude-worktree.md 缺少 '$szNeed' 的說明"
 			}
 		}
 	}

@@ -10,7 +10,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 | 檢查腳本 | `Doc/AUTO-TBD/Check.ps1`、`.editorconfig` | TestPlan 第 1 節（DEC-7.1、DEC-10.3） |
 | 流程本文 | `.github/process/issue-workflow.md`、`issue-docs.md`、`review.md`、`git-workflow.md` | SPEC-3～SPEC-9、SPEC-13 |
 | 常駐與入口 | `collaboration.instructions.md`、`copilot-instructions.md`、`CLAUDE.md` | SPEC-1、SPEC-12、SPEC-15 |
-| 專案層與 Coding Style | `project-overview.instructions.md`、`.github/project/build.md`、`coding-style-general.instructions.md` | SPEC-10、SPEC-14 |
+| 專案層與 Coding Style | `project-overview.instructions.md`、`.github/project/build.md`、`.github/project/claude-worktree.md`、`coding-style-general.instructions.md` | SPEC-10、SPEC-14 |
 | 觸發入口 | `.claude/skills/{issue-start,review,release-note}/SKILL.md` | SPEC-2、SPEC-16 |
 | 版控設定 | `.gitignore` | SPEC-11 |
 | 個人設定（不進版控） | `~/.claude/CLAUDE.md`、`~/.claude/issue-workflow.md`、主 checkout 的 `CLAUDE.local.md` | SPEC-17 |
@@ -133,4 +133,4 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 
 ## 4. 待討論
 
-無。確認點 5 的決議與對 SPEC、TEST 的回溯修改見 DEC-10；取消行數上限見 DEC-11；Claude 專屬機制移出團隊規範見 DEC-14。
+無。確認點 5 的決議與對 SPEC、TEST 的回溯修改見 DEC-10；取消行數上限見 DEC-11；Claude 與 worktree 的做法獨立成檔見 DEC-14。
