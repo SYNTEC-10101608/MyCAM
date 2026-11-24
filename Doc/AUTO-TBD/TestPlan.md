@@ -232,7 +232,7 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 
 ### 5.3 人工
 
-1. TEST-8：位置如 5.2，待人抽查。
+1. TEST-8：AI 逐條比對，位置如 5.2；差異只有措辭（`issue-docs.md:23` 寫「STEP」未寫「與 commit 對應」，對應方式在 `git-workflow.md`）。使用者接受 AI 對照結果，免抽查。通過。
 2. TEST-13：`FollowUp.md` 含 SPEC-18.2 六項（TODO-1～TODO-6），每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 3. TEST-10：於 STEP-13 review 文件段執行。
 4. TEST-14：在 worktree 開新 session，讀任何檔案前列出已載入的指引，載入 `CLAUDE.md`、`copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general`，沒有載入 `process/`、`project/`、`coding-style-csharp`、`coding-style-cpp`（另有個人層 `~/.claude/CLAUDE.md` 與主 checkout 的 `CLAUDE.local.md`）。使用者以 `/context` 確認記憶檔 8 份（上述 5 份、2 份個人層、空的 auto memory 索引）。通過。
