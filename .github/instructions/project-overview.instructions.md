@@ -8,10 +8,10 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 
 ## 技術棧
 
-- C# WinForms，.NET Framework 4.8 / 4.8.1，C# 7.3，Windows x64。
-- 幾何核心：OpenCASCADE (OCCT) 7.6.0 官方 .NET wrapper（`reference/OCCCSharp.dll`，namespace `OCC.*`）。
-- 兩個 C++ 專案（`PostTool`、`FCLTool`）以 P/Invoke 供 C# 呼叫，屬底層、很少修改。
-- 第三方二進位放在 `reference/`，以 `HintPath` 參考。
+1. C# WinForms，.NET Framework 4.8 / 4.8.1，C# 7.3，Windows x64。
+2. 幾何核心：OpenCASCADE (OCCT) 7.6.0 官方 .NET wrapper（`reference/OCCCSharp.dll`，namespace `OCC.*`）。
+3. 兩個 C++ 專案（`PostTool`、`FCLTool`）以 P/Invoke 供 C# 呼叫，屬底層、很少修改。
+4. 第三方二進位放在 `reference/`，以 `HintPath` 參考。
 
 ## 方案結構（`MyCAM.sln`）
 
@@ -51,32 +51,32 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 
 ### 新增使用者操作
 
-- 新功能通常是「Action + Dialog」：在 `Editor/Action/CAD` 或 `CAM` 新增 Action 類別，必要時在 `Editor/Dialog` 新增對應的 `*Dlg`。
-- 參考同目錄既有 Action 的寫法（啟動 / 結束流程、選取處理、與 Dialog 的互動），保持一致。
+1. 新功能通常是「Action + Dialog」：在 `Editor/Action/CAD` 或 `CAM` 新增 Action 類別，必要時在 `Editor/Dialog` 新增對應的 `*Dlg`。
+2. 參考同目錄既有 Action 的寫法（啟動 / 結束流程、選取處理、與 Dialog 的互動），保持一致。
 
 ### 多語系
 
-- 每個 Form / Dialog / Action 以自己的類別名稱建立 `new LanguageManager.LanguageManager( "AddPathDlg" )`。
-- 字串檔位於 `Language/<類別名稱>_<語系>.xml`，支援 `zh-TW`、`zh-CN`、`en-US`、`ru-RU` 四種語系。
-- 控制項文字以控制項欄位名稱為 `ID`（`<Message ID="m_rdoManual" Content="..." />`）。
-- 程式中取字串使用 `m_LanguageManager.TryGetString( "Id", DEFAULT_TEXT )`，`DEFAULT_TEXT` 為類別內的 `const string`。
+1. 每個 Form / Dialog / Action 以自己的類別名稱建立 `new LanguageManager.LanguageManager( "AddPathDlg" )`。
+2. 字串檔位於 `Language/<類別名稱>_<語系>.xml`，支援 `zh-TW`、`zh-CN`、`en-US`、`ru-RU` 四種語系。
+3. 控制項文字以控制項欄位名稱為 `ID`（`<Message ID="m_rdoManual" Content="..." />`）。
+4. 程式中取字串使用 `m_LanguageManager.TryGetString( "Id", DEFAULT_TEXT )`，`DEFAULT_TEXT` 為類別內的 `const string`。
 
 ### 日誌與訊息
 
-- 顯示給使用者的訊息使用 `MyApp.Logger.ShowOnLogPanel( szMessage, MyApp.NoticeType.Warning )`（`Hint` / `Warning` / `Error`）。
+1. 顯示給使用者的訊息使用 `MyApp.Logger.ShowOnLogPanel( szMessage, MyApp.NoticeType.Warning )`（`Hint` / `Warning` / `Error`）。
 
 ### WinForms Designer
 
-- `*.Designer.cs` 由 Visual Studio Designer 產生。
+1. `*.Designer.cs` 由 Visual Studio Designer 產生。
 
 ## 專案固定檢查項目
 
 Review 門檻段與規範段的專案項目（見 [review.md](../process/review.md)）：
 
-- `Build.bat Debug` 建置成功。
-- 使用者可見文字的四語系 XML 同步新增 / 修改（語系見「多語系」）。
-- 修改過的 `*.Designer.cs` 仍可在 Designer 中開啟。
-- 未修改 `reference/` 內的檔案，除非議題明確要求。
+1. `Build.bat Debug` 建置成功。
+2. 使用者可見文字的四語系 XML 同步新增 / 修改（語系見「多語系」）。
+3. 修改過的 `*.Designer.cs` 仍可在 Designer 中開啟。
+4. 未修改 `reference/` 內的檔案，除非議題明確要求。
 
 ## 建置與執行
 
