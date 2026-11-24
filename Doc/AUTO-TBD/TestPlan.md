@@ -243,7 +243,10 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
    4. `/review` 依六段進行，表頭五欄、發現表六欄。通過。
    5. 只輸入「開議題」：經 `issue-start` skill 讀取 `issue-workflow.md` 與 `issue-docs.md`，停下詢問議題內容與編號，未建立檔案。通過。
    6. 要求修改 `.cs` 方法：動手前經流程索引讀取 `coding-style-csharp.instructions.md`，修改符合 C# 規範；修改已還原。通過。
-6. TEST-16：待使用者在 VS 2026 執行。
+6. TEST-16：使用者在 VS 2026 Copilot Chat（GPT-6.1）於 worktree 方案執行，每項開新對話。
+   1. 一般提問：附加 `.cs` 檔提問，回應引用 `coding-style-general`、使用 `project-overview` 內容，未讀檔；另以未附檔的提問「哪些決策一定要由人做」，未讀檔即依 `collaboration.instructions.md` 答出五項。`coding-style-csharp` 未依 `applyTo` 自動載入，由 Copilot 主動讀取。通過。
+   2. 輸入「開議題」：自動觸發 `issue-start` skill，讀取 `issue-workflow.md` 與 `issue-docs.md` 後停下詢問議題內容與編號。通過。
+   3. 輸入 `/issue-start`：辨識為 skill 並讀取相同兩份文件。VS 2026 Copilot 可讀取 `.claude/skills/`。
 7. 演練中發現的規範問題於 STEP-13 review 處理：議題編號是否含 `AUTO-` 前綴的寫法不一致、S 級範本缺「現況盤點」與「待討論」、`review.md` 報告標題層級放入 S 級 `README.md` 時衝突、`issue-start` 必讀清單未含 `git-workflow.md`、`Check.ps1` 不檢查未知參數。
 
 ## 6. 待討論
