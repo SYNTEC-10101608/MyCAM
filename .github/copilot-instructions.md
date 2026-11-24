@@ -34,7 +34,7 @@
 
 ## 維護方式
 
-- 常駐或依副檔名適用的指引放在 `.github/instructions/`，檔名為 `<主題>.instructions.md`，開頭以 `applyTo` 指定適用檔案；依時機讀取的文件放在 `.github/process/`（團隊通用）或 `.github/project/`（專案），不加 `applyTo`。
-- 新增指引時，同步在上方「指引目錄」表格加一列；常駐的指引另在根目錄 `CLAUDE.md` 加一行 `@` 引用（`@` 會常駐載入，其他文件不加）。
-- 常駐內容（入口與 `applyTo: "**"` 的指引）每次互動都付成本：`collaboration.instructions.md` 不超過 60 行；常駐總行數增加時，依 review 規範寫明理由。只在特定時機需要的內容不常駐。
-- 本檔只放目錄與分類說明，具體規則寫在各自的指引檔。
+1. 常駐或依副檔名適用的指引放在 `.github/instructions/`，檔名為 `<主題>.instructions.md`，開頭以 `applyTo` 指定適用檔案；依時機讀取的文件放在 `.github/process/`（團隊通用）或 `.github/project/`（專案），不加 `applyTo`。
+2. 新增指引時，同步在上方「指引目錄」表格加一列；常駐的指引另在根目錄 `CLAUDE.md` 加一行 `@` 引用（`@` 會常駐載入，其他文件不加）。
+3. 常駐內容（入口與 `applyTo: "**"` 的指引）每次互動都付成本：`collaboration.instructions.md` 不超過 60 行；常駐總行數增加時，依 review 規範寫明理由。只在特定時機需要的內容不常駐。
+4. 本檔只放目錄與分類說明，具體規則寫在各自的指引檔。
