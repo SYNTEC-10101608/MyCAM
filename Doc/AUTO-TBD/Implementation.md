@@ -12,7 +12,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 | 常駐與入口 | `collaboration.instructions.md`、`copilot-instructions.md`、`CLAUDE.md` | SPEC-1、SPEC-12、SPEC-15 |
 | 專案層與 Coding Style | `project-overview.instructions.md`、`.github/project/build.md`、`coding-style-general.instructions.md` | SPEC-10、SPEC-14 |
 | 觸發入口 | `.claude/skills/{issue-start,review,release-note}/SKILL.md` | SPEC-2、SPEC-16 |
-| 版控設定 | `.gitignore` | SPEC-5.8 |
+| 版控設定 | `.gitignore` | SPEC-11 |
 | 個人設定（不進版控） | `~/.claude/CLAUDE.md`、`~/.claude/issue-workflow.md`、主 checkout 的 `CLAUDE.local.md` | SPEC-17 |
 | 議題文件 | `Doc/AUTO-TBD/*` | SPEC-18、SPEC-19 |
 
@@ -35,7 +35,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 
 ### STEP-2 `process/issue-workflow.md`
 
-1. 內容：SPEC-3（階段、分級與確認點、待討論格式、重新分級、session 切換、回溯）、SPEC-4（各級 DoD）。
+1. 內容：SPEC-3（階段、分級與確認點、待討論格式、重新分級、回溯）、SPEC-4（各級 DoD）。
 2. 開頭一句說明適用時機；文件規範以連結指向 `issue-docs.md`。
 3. SPEC：SPEC-3、SPEC-4、SPEC-13.1、SPEC-13.5。TEST：TEST-2、TEST-3、TEST-6、TEST-7、TEST-8。
 
@@ -53,7 +53,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 ### STEP-5 `process/git-workflow.md`
 
 1. 內容：SPEC-8（版本、合併、分支命名、fetch、commit、push、worktree 通用規則）、SPEC-9（release note、merge log）。
-2. Worktree 只寫通用規則與 Claude Code 的 worktree 位置、分支更名；專案要複製的檔案寫「見專案指引」。
+2. Worktree 只寫通用規則；專案要複製的檔案寫「見專案指引」。
 3. SPEC：SPEC-8、SPEC-9、SPEC-13.4、SPEC-13.5。TEST：TEST-2、TEST-3、TEST-6、TEST-7、TEST-8。
 
 ### STEP-6 常駐與入口文件
@@ -133,4 +133,4 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 
 ## 4. 待討論
 
-無。確認點 5 的決議與對 SPEC、TEST 的回溯修改見 DEC-10；取消行數上限見 DEC-11。
+無。確認點 5 的決議與對 SPEC、TEST 的回溯修改見 DEC-10；取消行數上限見 DEC-11；Claude 專屬機制移出團隊規範見 DEC-14。

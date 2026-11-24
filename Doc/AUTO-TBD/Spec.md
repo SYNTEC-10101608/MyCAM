@@ -27,7 +27,7 @@
 
    | 時機 | 必讀文件 |
    | --- | --- |
-   | 開始議題、分級、進入下一階段、切換 session | `process/issue-workflow.md` |
+   | 開始議題、分級、進入下一階段 | `process/issue-workflow.md` |
    | 撰寫或修改議題文件 | `process/issue-docs.md` |
    | 執行或回應 review | `process/review.md`，加上專案指引的專案固定檢查項目；review 程式碼時加讀對應語言的 Coding Style |
    | 開分支、commit、送 MR、產出 release note、建立 worktree | `process/git-workflow.md` |
@@ -82,7 +82,6 @@
    3. 另一可行選項：做法與取捨。
 6. 施工中遇到預料外的狀況，先停下來討論，不自行擴大範圍。
 7. 重新分級：發現範圍超出原級別時先停下提出；升級後補齊新級別要求的檔案與 DoD 項目，已完成的內容搬入對應檔案，不重做已確認的確認點。
-8. Session 切換只在確認點進行；切換前更新 `SESSION.md` 的交接 prompt。
 9. 回溯：後段（含 review）發現前段內容要修改時：
    1. 原範圍內的修正：修改最早受影響的文件，依級別重做該段確認點，往下更新 TEST、STEP、程式與測試，review 從門檻段重來。
    2. 新需求或擴大範圍：列 `TODO`，以後續 MR 處理；必須在本 MR 處理時，走重新分級。
@@ -132,7 +131,6 @@
 5. `README.md` 開頭為議題資訊表：分支、分支起點（commit 與版本）、級別、狀態。
 6. 議題文件遵守 SPEC-1 第 6 項的文件通則。
 7. 例外：`Discussion.md` 可增量描述，凸顯最終決策；`Review.md` 依 review 回合分節保留。
-8. `SESSION.md` 放在工作目錄（主 checkout 或 worktree）的根目錄，以 `.gitignore` 的 `/SESSION.md` 排除提交，只放交接 prompt 與暫時筆記；狀態與決策寫在提交的文件。
 9. 收官時把議題結束後仍長期有效的結論（規則、慣例、架構說明）寫入指引規範，議題文件保留追溯用的記錄。
 
 ### SPEC-6 項目編號與追溯（REQ-5.3；DEC-3.7）
@@ -245,7 +243,7 @@
 | `.github/instructions/coding-style-general.instructions.md` | 修改 | SPEC-10 |
 | `.github/copilot-instructions.md` | 修改 | SPEC-15 |
 | `CLAUDE.md` | 修改 | SPEC-15 |
-| `.gitignore` | 修改：加入 `/SESSION.md` | SPEC-5 |
+| `.gitignore` | 修改：加入 `/SESSION.md`，防止個人交接檔誤提交 | DEC-9.2、DEC-14 |
 | `.editorconfig` | 修改：加入 `[*.ps1] charset = utf-8-bom` | DEC-10.3 |
 | `.claude/skills/issue-start/SKILL.md` | 新增 | SPEC-16 |
 | `.claude/skills/review/SKILL.md` | 新增 | SPEC-16 |
@@ -268,18 +266,18 @@
 
 ### SPEC-13 `process/` 文件（REQ-4～REQ-7）
 
-1. `issue-workflow.md`：SPEC-3（分級、階段、確認點、重新分級、session 切換）與 SPEC-4（各級 DoD）。
+1. `issue-workflow.md`：SPEC-3（分級、階段、確認點、重新分級、回溯）與 SPEC-4（各級 DoD）。
 2. `issue-docs.md`：SPEC-5、SPEC-6，另含：
    1. 各文件的內容規範（Goal、Spec、TestPlan、Implementation、Review、Discussion、FollowUp）。
    2. 精簡範本：S 級 `README.md` 完整範本；M、L 的 `README.md` 骨架與各檔章節骨架。
 3. `review.md`：SPEC-7；專案固定檢查項目只寫「見專案指引」，不列內容。
-4. `git-workflow.md`：SPEC-8、SPEC-9；worktree 只寫通用規則（SPEC-8 第 7 項、Claude Code 建立的 worktree 位置與分支更名），專案要複製的檔案與初次建置步驟留在專案指引。
+4. `git-workflow.md`：SPEC-8、SPEC-9；worktree 只寫通用規則（SPEC-8 第 7 項），專案要複製的檔案與初次建置步驟留在專案指引；個別工具建立 worktree 的細節不寫（DEC-14）。
 5. 各文件開頭一句說明適用時機，內容不重複；需要其他文件的規則時以連結引用。
 
 ### SPEC-14 `project-overview.instructions.md`（REQ-1.2；DEC-2.6）
 
 1. 刪除「Git 流程」章節：分支命名、commit 規則、Claude Code worktree 的通用說明移到 `process/git-workflow.md`。
-2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`，並在該檔新增「worktree 準備」：需要複製的未追蹤檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/` 等；Claude Code 依 `.worktreeinclude` 自動複製，其他工具手動複製）、`CLAUDE.local.md` 由上層載入、第一次建置後執行 `CopyRef.bat`。
+2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`，並在該檔新增「worktree 準備」：需要從主 checkout 複製的未追蹤檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/`）、第一次建置後執行 `CopyRef.bat`；個別工具的自動複製與設定檔載入方式不寫（DEC-14）。
 3. `project-overview` 的「建置與執行」只留一行索引：建置、執行環境、worktree 準備時讀 `.github/project/build.md`。
 4. 新增「專案固定檢查項目」章節，作為 review 門檻段、功能正確性段與規範段的專案項目：
    1. `Build.bat Debug` 建置成功。
@@ -365,4 +363,4 @@
 
 ## 5. 待討論
 
-無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11；worktree 改為選用、開議題時開分支見 DEC-12；先做後確認見 DEC-13。
+無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11；worktree 改為選用、開議題時開分支見 DEC-12；先做後確認見 DEC-13；Claude 專屬機制移出團隊規範見 DEC-14。

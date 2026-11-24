@@ -20,7 +20,7 @@
 | TEST-1 | 常駐行數 | SPEC-1.7、SPEC-12.3、相容性 3.2.2 | 長期維護 | 靜態 | 自動 |
 | TEST-2 | 團隊通用層不含專案內容 | SPEC-1.2、SPEC-13.3、SPEC-13.4 | 議題限定 | 靜態 | 自動 |
 | TEST-3 | 規則只寫一處 | SPEC-1.6.1、SPEC-2.2、SPEC-13.5、SPEC-16.2 | 議題限定 | 靜態 | 自動 |
-| TEST-4 | 載入設定與檔案位置 | SPEC-1.1、SPEC-1.4、SPEC-5.8、SPEC-11.3、SPEC-12.1、SPEC-15 | 議題限定 | 靜態 | 自動 |
+| TEST-4 | 載入設定與檔案位置 | SPEC-1.1、SPEC-1.4、SPEC-11、SPEC-12.1、SPEC-15 | 議題限定 | 靜態 | 自動 |
 | TEST-5 | 異動範圍符合清單 | SPEC-11、相容性 3.2.3 | 議題限定 | 靜態 | 自動 |
 | TEST-6 | 格式與數字條列 | SPEC-1.6.3、SPEC-1.6.4、SPEC-11.1、SPEC-11.2 | 議題限定 | 靜態 | 自動 |
 | TEST-7 | 連結與引用有效 | SPEC-1.6.1、SPEC-12.2.3、SPEC-13.5、SPEC-16.2 | 議題限定 | 靜態 | 自動 |
@@ -68,7 +68,7 @@
    3. `CLAUDE.md` 的 `@` 引用恰為 `copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general` 四份。
    4. `copilot-instructions.md` 的指引目錄列出 `collaboration`、`process/` 四份文件與 `project/build.md`，並標示載入方式。
    5. `collaboration.instructions.md` 的流程索引有「新增或修改程式碼」一列。
-   6. `git check-ignore SESSION.md` 回報由 `.gitignore` 的 `/SESSION.md` 排除。
+   6. `git check-ignore SESSION.md` 回報由 `.gitignore` 的 `/SESSION.md` 排除（SPEC-11；`SESSION.md` 的用法已移出團隊規範，排除規則保留防誤提交，DEC-14）。
 
 #### TEST-5 異動範圍符合清單
 
@@ -195,10 +195,10 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 
 ## 5. 執行結果
 
-### 5.1 自動（`Check.ps1`，2026-11-24，比對基準 `24c7276d`）
+### 5.1 自動（`Check.ps1`，2026-11-25，比對基準 `24c7276d`）
 
 1. TEST-1～TEST-7、TEST-9、TEST-12：通過。
-2. TEST-1 常駐 193 行（基準 193，差異 0）：入口 48 行、`collaboration` 34 行、`project-overview` 79 行、`coding-style-general` 32 行。
+2. TEST-1 常駐 192 行（基準 193，差異 -1）：入口 46 行、`collaboration` 34 行、`project-overview` 80 行、`coding-style-general` 32 行。
 3. TEST-11：收官後只剩 DoD 第 9、10 項與 REV 的「待人確認」，待人工全域 review 後通過。
 
 ### 5.2 TEST-8 規格內容落地
@@ -209,16 +209,15 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 | --- | --- |
 | SPEC-3.1 階段（含 3.6 預料外先停） | `IW:5-19` |
 | SPEC-3.2～3.5 分級、確認點、待討論格式 | `IW:21-34` |
-| SPEC-3.7、3.9 重新分級、回溯 | `IW:36-42` |
-| SPEC-3.8 Session 切換 | `IW:44-46` |
-| SPEC-4 各級 DoD | `IW:48-70` |
-| SPEC-5.1～5.3、5.8、5.9 存放 | `ID:5-11` |
-| SPEC-5.4、5.7 檔案組合、例外 | `ID:13-28` |
-| SPEC-5.5 議題資訊表 | `ID:70-75`（範本） |
+| SPEC-3.7、3.9 重新分級、回溯 | `IW:37-43` |
+| SPEC-4 各級 DoD | `IW:45-67` |
+| SPEC-5.1～5.3、5.9 存放 | `ID:5-10` |
+| SPEC-5.4、5.7 檔案組合、例外 | `ID:12-28` |
+| SPEC-5.5 議題資訊表 | `ID:69-74`（範本） |
 | SPEC-5.6 文件通則 | `ID:3`（連結 `collaboration`） |
-| SPEC-6 編號與追溯 | `ID:31-45` |
-| SPEC-13.2.1 各文件內容規範 | `ID:47-61` |
-| SPEC-13.2.2 S 級完整範本；M、L 骨架 | `ID:63-139` |
+| SPEC-6 編號與追溯 | `ID:30-44` |
+| SPEC-13.2.1 各文件內容規範 | `ID:46-60` |
+| SPEC-13.2.2 S 級完整範本；M、L 骨架 | `ID:62-145` |
 | SPEC-7.1 六段與分工 | `RV:5-19` |
 | SPEC-7.2 不限工具與執行者 | `RV:3` |
 | SPEC-7.3 報告格式 | `RV:21-42` |
@@ -228,7 +227,7 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 | SPEC-8.3、8.4 分支命名、後綴、fetch | `GW:12-20` |
 | SPEC-8.5 Commit | `GW:22-28` |
 | SPEC-9 Release note 與 merge log | `GW:30-56` |
-| SPEC-8.7、SPEC-13.4 Worktree 通用規則 | `GW:58-62` |
+| SPEC-8.7、SPEC-13.4 Worktree 通用規則 | `GW:58-61` |
 
 ### 5.3 人工
 
