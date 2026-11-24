@@ -81,6 +81,35 @@
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
-| REV-30 | 2 | 必修 | `.github/process/issue-workflow.md:45` | Session 交接、`SESSION.md`、Claude Code 的 worktree 位置與分支更名、`.worktreeinclude` 自動複製、`CLAUDE.local.md` 上層載入屬於使用 Claude 或 worktree 時的做法，散在通用流程與 `build.md`；Copilot 不同、成員也未必有此習慣 | 已修正（回溯至 REQ-5.1、SPEC-3.8、SPEC-5.8、SPEC-14，DEC-14：集中到 `claude-worktree.md`） |
+| REV-30 | 2 | 必修 | `.github/process/issue-workflow.md:45` | Session 交接、`SESSION.md`、Claude Code 的 worktree 位置與分支更名、`.worktreeinclude` 自動複製、`CLAUDE.local.md` 上層載入屬於使用 Claude 或 worktree 時的做法，散在通用流程與 `build.md`；Copilot 不同、成員也未必有此習慣 | 已修正（回溯至 REQ-5.1、SPEC-14，刪除 SPEC-3.8、SPEC-5.8，DEC-14：集中到 `claude-worktree.md`） |
 | REV-31 | 6 | 建議 | `CLAUDE.md:3` | 3 行說明可併為 1 行；`@` 引用 4 行保留 | 已修正（待人確認） |
 | REV-32 | 5 | 建議 | `.github/process/review.md:14` | 規範段只列 Coding Style，流程索引的 review 列也另寫 Coding Style；之後新增 UI 等規範時兩處都要改，容易漏 | 已修正（回溯至 SPEC-1.5、SPEC-7.1，DEC-15） |
+
+## 第 4 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `24c7276d` |
+| 工具與模型 | Claude Code、Claude Opus 5.5；收官前全域自我 review（子 session），範圍為整個分支的最終結果 |
+| 日期 | 2026-11-25 |
+
+1. 門檻：`Check.ps1` 9 PASS、1 FAIL；TEST-11 只缺 DoD 第 9、10 項與待人確認的處置。常駐 194 行（基準 193，差異 +1，理由同第 3 回合），本回合未改常駐檔案。本議題只改文件，不需建置。
+2. 需求與範圍：REQ-1～REQ-11 皆有 SPEC，SPEC-1～SPEC-19 皆有 TEST 與 STEP；被刪除的 SPEC-3.8、SPEC-5.8 只在討論與 review 記錄中以「刪除」出現。DEC-14、DEC-15 已落實於 `claude-worktree.md`、`build.md`、`git-workflow.md` 第 5 節、`issue-workflow.md`、`issue-docs.md`、流程索引、指引目錄與 `project-overview` 索引，沒有殘留的 session 或 worktree 說明。
+3. 本回合沒有「必修」。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-33 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:165` | DEC-15 的說明句插在 SPEC-7.1 表格第 4、5 列之間，第 5、6 段兩列脫離表格，無法正確顯示 | 已修正（待人確認） |
+| REV-34 | 6 | 建議 | `Doc/AUTO-TBD/TestPlan.md:211` | TEST-8 位置對照與目前檔案不符：`IW:21-34` 應為 `21-35`（待討論三部分在 33～35 行）、`RV:44-49` 應為 `44-50`（第 5 項回到門檻段）、5.3 的 `issue-docs.md:23` 應為 `:22` | 已修正（待人確認） |
+| REV-35 | 2 | 建議 | `Doc/AUTO-TBD/Implementation.md:68` | DEC-14 回溯未完整同步 STEP：STEP-7 沒有新增 `claude-worktree.md` 一項、索引只寫 `build.md`、專案固定檢查項目仍寫「四項」（REV-15 後為五項）；STEP-6.2 指引目錄漏列 `claude-worktree.md`；STEP-3 對應的 `.gitignore` 檢查應為 TEST-4.6 而非 4.5 | 已修正（待人確認） |
+| REV-36 | 6 | 建議 | `.claude/skills/review/SKILL.md:6` | 寫「門檻段與規範段加上專案固定檢查項目」，但專案固定檢查項目也涵蓋功能正確性段（第 5 項），讀者會漏看；改為不指定段，段的對應由 `project-overview` 說明 | 已修正（待人確認） |
+| REV-37 | 6 | 建議 | `Doc/AUTO-TBD/Review.md:84` | REV-30 處置寫「回溯至 SPEC-3.8、SPEC-5.8」，兩者已刪除，讀者找不到；改寫為「刪除 SPEC-3.8、SPEC-5.8」 | 已修正（待人確認） |
+| REV-38 | 6 | 建議 | `Doc/AUTO-TBD/Discussion.md:85` | DEC-9.6 的「硬上限」已由 DEC-11 取消，DEC-9.6 本身未標示；DEC-9.1 已有同類標示（REV-29） | 已修正（待人確認） |
+| REV-39 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:126` | SPEC-5.4 表格寫「STEP 與 commit 對應」，與 SPEC-8.5.4「`Implementation.md` 不記 commit hash」及 `issue-docs.md:22` 的「STEP」不一致；TEST-8 以措辭差異接受，但規格本身前後矛盾。建議改為「STEP」 | 待人決定（規格措辭） |
+| REV-40 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:18` | 規格未同步後續 review 的修正：SPEC-1.1 表格仍寫「Copilot 依 `applyTo` 載入；Claude 依流程索引」（REV-19 後指引目錄改為兩者皆依流程索引）；SPEC-8.6 仍寫「Push 與送 MR 由人決定」（REV-23 後 push 的決定權只寫在協作原則） | 待人決定（規格措辭） |
+| REV-41 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:85` | SPEC-6.4「刪除即跳號」與 Markdown 顯示衝突：有序清單只採用第一項的號碼，SPEC-3 的「9.」、SPEC-5 的「9.」在 GitLab / GitHub 顯示為「8.」，引用 SPEC-3.9 的讀者對不上。建議刪除的項目保留一行「8. （刪除，見 DEC-n）」 | 待人決定（規則變更，涉及 `issue-docs.md:44`） |
+| REV-42 | 4 | 建議 | `.github/process/review.md:12` | 功能正確性段寫「專案指引的領域檢查項目」，`project-overview` 沒有此名稱，對應的是「專案固定檢查項目」第 5 項；SPEC-7.1 同文。建議改為「專案指引的專案固定檢查項目」 | 待人決定（規格措辭） |
+| REV-43 | 2 | 提問 | `.github/instructions/coding-style-general.instructions.md:26` | 團隊通用層含 `AUTO-` 前綴：`coding-style-general` 的 `// AUTO-<編號>`、`issue-docs.md:8` 的 `AUTO-TBD`、`git-workflow.md:14` 的範例 `AUTO-23201`。`AUTO-` 是團隊共用的議題系統前綴，還是 MyCAM 專屬？若為專屬，違反 SPEC-1.2，應改為「`<議題編號>`，前綴見專案指引」 | 待回覆 |
+| REV-44 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:649` | TEST-11 只擋空白、「待處置」與「待人確認」，其他文字（如「待人決定」、「待回覆」）都通過，與 `review.md` 第 2 節第 2 項「處置只有三種」不符；改為處置須以已修正、不修正或列後續開頭 | 已修正（待人確認） |

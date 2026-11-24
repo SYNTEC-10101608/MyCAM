@@ -652,6 +652,11 @@ function Test-11()
 			elseif( $szAction.Contains( '待人確認' ) ) {
 				$failList += "$( $cellArray[ 0 ] ) 的處置待人確認"
 			}
+
+			# review.md 的處置只有三種，其他文字視為尚未處置
+			elseif( -not ( $szAction.StartsWith( '已修正' ) -or $szAction.StartsWith( '不修正' ) -or $szAction.StartsWith( '列後續' ) ) ) {
+				$failList += "$( $cellArray[ 0 ] ) 的處置不是已修正、不修正或列後續（$szAction）"
+			}
 			elseif( $szSeverity -eq '必修' -and -not $szAction.StartsWith( '已修正' ) ) {
 				$failList += "$( $cellArray[ 0 ] ) 為必修但處置不是已修正"
 			}

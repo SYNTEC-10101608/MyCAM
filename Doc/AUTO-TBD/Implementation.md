@@ -43,7 +43,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 
 1. `issue-docs.md` 內容：SPEC-5、SPEC-6、各文件內容規範、精簡範本（S 級 `README.md` 完整範本；M、L 骨架）。
 2. `.gitignore` 加入 `/SESSION.md`，與 `issue-docs.md` 分開 commit。
-3. SPEC：SPEC-5、SPEC-6、SPEC-13.2、SPEC-13.5。TEST：TEST-2、TEST-3、TEST-4.5、TEST-6、TEST-7、TEST-8。
+3. SPEC：SPEC-5、SPEC-6、SPEC-13.2、SPEC-13.5。TEST：TEST-2、TEST-3、TEST-4.6、TEST-6、TEST-7、TEST-8。
 
 ### STEP-4 `process/review.md`
 
@@ -59,18 +59,19 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 ### STEP-6 常駐與入口文件
 
 1. 新增 `collaboration.instructions.md`：frontmatter `applyTo: "**"`；協作原則、文件通則、流程索引（完整路徑，含「新增或修改程式碼」一列）。
-2. `copilot-instructions.md`：四層分類精簡說明、指引目錄加入 `collaboration`、`process/` 與 `project/build.md`（標示載入方式）、改為「本檔只放目錄與分類說明」、維護方式加入常駐內容的原則；數字條列轉換另一個 commit。
+2. `copilot-instructions.md`：四層分類精簡說明、指引目錄加入 `collaboration`、`process/`、`project/build.md` 與 `project/claude-worktree.md`（標示載入方式）、改為「本檔只放目錄與分類說明」、維護方式加入常駐內容的原則；數字條列轉換另一個 commit。
 3. `CLAUDE.md`：`@` 引用加入 `collaboration.instructions.md`，移除 `coding-style-csharp`、`coding-style-cpp`。
 4. SPEC：SPEC-1、SPEC-12、SPEC-15。TEST：TEST-1、TEST-3、TEST-4、TEST-6、TEST-7。
 
 ### STEP-7 專案指引
 
-1. 新增 `.github/project/build.md`：由 `project-overview` 搬入 FCLTool、命令列建置、執行期檔案（原新增的 worktree 準備由 REV-30 移到 `claude-worktree.md`）；搬移與新增分開 commit，搬移的 commit 只做搬移與條列轉換，方便比對。
-2. `project-overview.instructions.md`：
-   1. 刪除「Git 流程」章節與建置細節，「建置與執行」只留指向 `project/build.md` 的索引。
-   2. 新增「專案固定檢查項目」四項，刪除「慣例」與「技術棧」中重複的三句。
+1. 新增 `.github/project/build.md`：由 `project-overview` 搬入 FCLTool、命令列建置、執行期檔案；搬移與新增分開 commit，搬移的 commit 只做搬移與條列轉換，方便比對。
+2. 新增 `.github/project/claude-worktree.md`：Session 交接、Worktree 兩節（SPEC-14.6，REV-30）。
+3. `project-overview.instructions.md`：
+   1. 刪除「Git 流程」章節與建置細節，「建置與執行」只留指向 `project/build.md` 與 `project/claude-worktree.md` 的索引。
+   2. 新增「專案固定檢查項目」五項，刪除「慣例」與「技術棧」中重複的三句。
    3. 數字條列轉換另一個 commit。
-3. SPEC：SPEC-14、SPEC-1.7。TEST：TEST-1、TEST-2（專案內容不外流到通用層）、TEST-4.2、TEST-6、TEST-7、TEST-9。
+4. SPEC：SPEC-14、SPEC-1.7。TEST：TEST-1、TEST-2（專案內容不外流到通用層）、TEST-4.2、TEST-6、TEST-7、TEST-9。
 
 ### STEP-8 Coding Style 修訂
 

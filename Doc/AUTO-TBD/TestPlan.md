@@ -208,7 +208,7 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 | SPEC | 位置 |
 | --- | --- |
 | SPEC-3.1 階段（含 3.6 預料外先停） | `IW:5-19` |
-| SPEC-3.2～3.5 分級、確認點、待討論格式 | `IW:21-34` |
+| SPEC-3.2～3.5 分級、確認點、待討論格式 | `IW:21-35` |
 | SPEC-3.7、3.9 重新分級、回溯 | `IW:37-43` |
 | SPEC-4 各級 DoD | `IW:45-67` |
 | SPEC-5.1～5.3、5.9 存放 | `ID:5-10` |
@@ -221,7 +221,7 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 | SPEC-7.1 六段與分工 | `RV:5-19` |
 | SPEC-7.2 不限工具與執行者 | `RV:3` |
 | SPEC-7.3 報告格式 | `RV:21-42` |
-| SPEC-7.4、7.5 處置規則、回到門檻段 | `RV:44-49` |
+| SPEC-7.4、7.5 處置規則、回到門檻段 | `RV:44-50` |
 | SPEC-13.3 專案固定檢查項目只寫「見專案指引」 | `RV:11` |
 | SPEC-8.1、8.2、8.6 版本、合併、push | `GW:5-10` |
 | SPEC-8.3、8.4 分支命名、後綴、fetch | `GW:12-20` |
@@ -231,7 +231,7 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 
 ### 5.3 人工
 
-1. TEST-8：AI 逐條比對，位置如 5.2；差異只有措辭（`issue-docs.md:23` 寫「STEP」未寫「與 commit 對應」，對應方式在 `git-workflow.md`）。使用者接受 AI 對照結果，免抽查。通過。
+1. TEST-8：AI 逐條比對，位置如 5.2；差異只有措辭（`issue-docs.md:22` 寫「STEP」未寫「與 commit 對應」，對應方式在 `git-workflow.md`）。使用者接受 AI 對照結果，免抽查。通過。
 2. TEST-13：`FollowUp.md` 含 SPEC-18.2 第 1～4、6 項（TODO-1～TODO-5）；第 5 項以 TEST-16 讀不到 skill 為條件，實測讀得到，TODO-6 結案刪除（REV-7）。每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 3. TEST-10：於 Review 第 2 回合文件段執行（獨立 session），發現列為 REV-20～REV-29，全部有處置。通過。
 4. TEST-14：在 worktree 開新 session，讀任何檔案前列出已載入的指引，載入 `CLAUDE.md`、`copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general`，沒有載入 `process/`、`project/`、`coding-style-csharp`、`coding-style-cpp`（另有個人層 `~/.claude/CLAUDE.md` 與主 checkout 的 `CLAUDE.local.md`）。使用者以 `/context` 確認記憶檔 8 份（上述 5 份、2 份個人層、空的 auto memory 索引）。通過。
