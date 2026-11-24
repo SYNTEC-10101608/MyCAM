@@ -5,7 +5,7 @@
 | 分支 | `AUTO-TBD_f_DevProcess` |
 | 分支起點 | `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23） |
 | 級別 | L |
-| 狀態 | 確認點 3（規格）完成；下一步確認點 4（測試規劃） |
+| 狀態 | 確認點 4（測試規劃）完成；下一步確認點 5（實作架構與步驟） |
 
 ## 文件
 
@@ -13,6 +13,7 @@
 | --- | --- |
 | [Goal.md](Goal.md) | 現況盤點、目標、範圍、需求（REQ） |
 | [Spec.md](Spec.md) | 操作規格、實作規格、相容性異動（SPEC） |
+| [TestPlan.md](TestPlan.md) | 測試規劃與執行結果（TEST） |
 | [Discussion.md](Discussion.md) | 討論記錄：依主題整理的共識與決策（DEC） |
 
 ## 完成清單（DoD）
