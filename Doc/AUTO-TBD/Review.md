@@ -83,3 +83,4 @@
 | --- | --- | --- | --- | --- | --- |
 | REV-30 | 2 | 必修 | `.github/process/issue-workflow.md:45` | Session 交接、`SESSION.md`、Claude Code 的 worktree 位置與分支更名、`.worktreeinclude` 自動複製、`CLAUDE.local.md` 上層載入屬於使用 Claude 或 worktree 時的做法，散在通用流程與 `build.md`；Copilot 不同、成員也未必有此習慣 | 已修正（回溯至 REQ-5.1、SPEC-3.8、SPEC-5.8、SPEC-14，DEC-14：集中到 `claude-worktree.md`） |
 | REV-31 | 6 | 建議 | `CLAUDE.md:3` | 3 行說明可併為 1 行；`@` 引用 4 行保留 | 已修正（待人確認） |
+| REV-32 | 5 | 建議 | `.github/process/review.md:14` | 規範段只列 Coding Style，流程索引的 review 列也另寫 Coding Style；之後新增 UI 等規範時兩處都要改，容易漏 | 已修正（回溯至 SPEC-1.5、SPEC-7.1，DEC-15） |
