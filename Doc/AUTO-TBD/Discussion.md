@@ -75,7 +75,7 @@
 
 ## DEC-9 規格確認點的決議（2026-11-24）
 
-1. 考量：worktree 說明混有 MyCAM 專屬內容（DLL 清單、`CopyRef.bat`）。**拆分**：通用規則移到 `git-workflow.md`，專案準備步驟留在 `project-overview`。
+1. 考量：worktree 說明混有 MyCAM 專屬內容（DLL 清單、`CopyRef.bat`）。**拆分**：通用規則移到 `git-workflow.md`，專案準備步驟留在專案指引（位置由 DEC-10.1 改為 `project/build.md`）。
 2. 考量：`.git/info/exclude` 不進版控，其他成員會誤提交。**`SESSION.md` 改由 `.gitignore` 的 `/SESSION.md` 排除**。
 3. 考量：commit hash 要 commit 後才知道，記在文件需要事後補，rebase 後也會變。
    **commit 訊息結尾標示 `(STEP-n)` 或 `(REV-n)`**，`Implementation.md` 不記 hash；一個 STEP 可對應多個 commit。

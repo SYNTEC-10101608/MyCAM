@@ -58,7 +58,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 
 ### STEP-6 常駐與入口文件
 
-1. 新增 `collaboration.instructions.md`：frontmatter `applyTo: "**"`；協作原則、文件通則、流程索引（完整路徑，含「新增或修改程式碼」一列）；目標 40 行內。
+1. 新增 `collaboration.instructions.md`：frontmatter `applyTo: "**"`；協作原則、文件通則、流程索引（完整路徑，含「新增或修改程式碼」一列）。
 2. `copilot-instructions.md`：四層分類精簡說明、指引目錄加入 `collaboration`、`process/` 與 `project/build.md`（標示載入方式）、改為「本檔只放目錄與分類說明」、維護方式加入常駐內容的原則；數字條列轉換另一個 commit。
 3. `CLAUDE.md`：`@` 引用加入 `collaboration.instructions.md`，移除 `coding-style-csharp`、`coding-style-cpp`。
 4. SPEC：SPEC-1、SPEC-12、SPEC-15。TEST：TEST-1、TEST-3、TEST-4、TEST-6、TEST-7。

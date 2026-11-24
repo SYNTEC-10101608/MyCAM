@@ -279,7 +279,7 @@
 ### SPEC-14 `project-overview.instructions.md`（REQ-1.2；DEC-2.6）
 
 1. 刪除「Git 流程」章節：分支命名、commit 規則、Claude Code worktree 的通用說明移到 `process/git-workflow.md`。
-2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`，並在該檔新增「worktree 準備」：需要複製的未追蹤檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/` 等；Claude Code 依 `.worktreeinclude` 自動複製，其他工具手動複製）、`CLAUDE.local.md` 由上層載入、第一次建置前執行 `CopyRef.bat`。
+2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`，並在該檔新增「worktree 準備」：需要複製的未追蹤檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/` 等；Claude Code 依 `.worktreeinclude` 自動複製，其他工具手動複製）、`CLAUDE.local.md` 由上層載入、第一次建置後執行 `CopyRef.bat`。
 3. `project-overview` 的「建置與執行」只留一行索引：建置、執行環境、worktree 準備時讀 `.github/project/build.md`。
 4. 新增「專案固定檢查項目」章節，作為 review 門檻段與規範段的專案項目：
    1. `Build.bat Debug` 建置成功。
