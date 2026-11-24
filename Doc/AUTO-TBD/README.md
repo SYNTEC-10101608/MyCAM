@@ -5,7 +5,7 @@
 | 分支 | `AUTO-TBD_f_DevProcess` |
 | 分支起點 | `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23） |
 | 級別 | L |
-| 狀態 | 施工中：STEP-1～STEP-10 完成，下一步 STEP-11 個人設定收斂 |
+| 狀態 | 施工中：STEP-1～STEP-11 完成，下一步 STEP-12 驗證 |
 
 ## 文件
 
@@ -17,6 +17,13 @@
 | [Implementation.md](Implementation.md) | 實作架構與步驟（STEP） |
 | [Discussion.md](Discussion.md) | 討論記錄：依主題整理的共識與決策（DEC） |
 | [FollowUp.md](FollowUp.md) | 後續處理（TODO） |
+
+## 個人設定收斂
+
+個人設定不進版控，依 SPEC-17 於 2026-11-24 完成，TEST-12 通過：
+
+1. 刪除 `~/.claude/issue-workflow.md`；`~/.claude/CLAUDE.md` 移除「開發議題處理流程」章節與數字條列規則。
+2. 主 checkout 的 `CLAUDE.local.md` 刪除議題資料夾位置與 push 章節，新增 `origin`、`github` 的 remote 用法。
 
 ## 完成清單（DoD）
 
