@@ -51,15 +51,6 @@
 1. 目標：格式類規則只寫在 `.editorconfig`，Coding Style 文件只留一行指引；Claude 依副檔名載入各語言 Coding Style。
 2. 完成條件：
    1. `coding-style-*.instructions.md` 中與 `.editorconfig` 重複的規則（編碼、換行、縮排、行長、行尾空白）刪除，改為一行「格式依 `.editorconfig`」。
-   2. 評估 Claude Code 依檔案路徑自動載入規則的機制，可行時取代流程索引中「新增或修改程式碼」一列的導向。
+   2. 評估 Claude Code 依檔案路徑自動載入規則的機制，可行時取代流程索引中「新增或修改程式碼」一列的導向；VS 2026 Copilot 實測也未依 `applyTo` 自動載入 `coding-style-csharp`，由 Copilot 依流程索引主動讀取，一併確認。
 3. 延後原因：本議題只修訂 `coding-style-general` 的兩項規則；其餘 Coding Style 檔案未修改，依「只改動到的檔案」原則留待後續。
 4. 建議做法：先確認 `.editorconfig` 已涵蓋所有被刪的規則，再刪除文件內容。
-
-## 4. 工具相容
-
-### TODO-6 VS 2026 Copilot 的入口機制
-
-1. 目標：VS 2026 Copilot 使用者也能以指令觸發開議題、review、release note。
-2. 完成條件：本議題 TEST-16 確認 Copilot 是否讀取 `.claude/skills/`；讀不到時，以 Copilot 的入口機制（如 prompt 檔）建立相同的三個入口，內容同樣只指向 `.github/process/`。
-3. 延後原因：須等本議題施工完成後由使用者在 VS 2026 實測；在此之前，Copilot 使用者依常駐流程索引即可導向相同文件。
-4. 建議做法：依 TEST-16 結果決定；讀得到時本項直接結案。
