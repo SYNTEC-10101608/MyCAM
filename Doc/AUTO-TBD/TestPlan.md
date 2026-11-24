@@ -22,7 +22,7 @@
 | TEST-3 | 規則只寫一處 | SPEC-1.6.1、SPEC-2.2、SPEC-13.5、SPEC-16.2 | 議題限定 | 靜態 | 自動 |
 | TEST-4 | 載入設定與檔案位置 | SPEC-1.1、SPEC-1.4、SPEC-11、SPEC-12.1、SPEC-15 | 議題限定 | 靜態 | 自動 |
 | TEST-5 | 異動範圍符合清單 | SPEC-11、相容性 3.2.3 | 議題限定 | 靜態 | 自動 |
-| TEST-6 | 格式與數字條列 | SPEC-1.6.3、SPEC-1.6.4、SPEC-11.1、SPEC-11.2 | 議題限定 | 靜態 | 自動 |
+| TEST-6 | 格式與數字條列 | SPEC-1.6.3、SPEC-1.6.4、SPEC-6.4、SPEC-11.1、SPEC-11.2 | 議題限定 | 靜態 | 自動 |
 | TEST-7 | 連結與引用有效 | SPEC-1.6.1、SPEC-12.2.3、SPEC-13.5、SPEC-16.2 | 議題限定 | 靜態 | 自動 |
 | TEST-8 | 規格內容落地 | SPEC-3～SPEC-9、SPEC-13 | 議題限定 | 靜態 | 人工 |
 | TEST-9 | 專案指引與 Coding Style 修訂 | SPEC-10、SPEC-14 | 議題限定 | 靜態 | 自動 |
@@ -80,7 +80,7 @@
 1. 方法：檢查本議題新增與修改的規範檔及 `Doc/AUTO-TBD/`。
 2. 通過條件：
    1. 編碼與換行符合 `.editorconfig`。
-   2. 程式碼區塊以外沒有無序號條列（`- `、`* ` 開頭）。
+   2. 程式碼區塊以外沒有無序號條列（`- `、`* ` 開頭），有序清單同一層不跳號（SPEC-6.4，DEC-17）。
    3. 檔名為英文，內容為繁體中文。
 
 #### TEST-7 連結與引用有效
@@ -178,7 +178,7 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 | SPEC-3 議題分級、階段與確認點 | TEST-8、TEST-15 |
 | SPEC-4 完成定義 | TEST-8、TEST-11、TEST-15 |
 | SPEC-5 議題文件組合與內容歸屬 | TEST-4、TEST-8、TEST-15 |
-| SPEC-6 項目編號與追溯 | TEST-8、TEST-15 |
+| SPEC-6 項目編號與追溯 | TEST-6、TEST-8、TEST-15 |
 | SPEC-7 Review | TEST-8、TEST-11、TEST-15 |
 | SPEC-8 Git 流程 | TEST-8、TEST-11 |
 | SPEC-9 Release note 與 merge log | TEST-8、TEST-15 |
@@ -231,7 +231,7 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 
 ### 5.3 人工
 
-1. TEST-8：AI 逐條比對，位置如 5.2；差異只有措辭（`issue-docs.md:22` 寫「STEP」未寫「與 commit 對應」，對應方式在 `git-workflow.md`）。使用者接受 AI 對照結果，免抽查。通過。
+1. TEST-8：AI 逐條比對，位置如 5.2，內容一致（SPEC-5.4 的「STEP 與 commit 對應」措辭已由 REV-39 對齊）。使用者接受 AI 對照結果，免抽查。通過。
 2. TEST-13：`FollowUp.md` 含 SPEC-18.2 第 1～4、6 項（TODO-1～TODO-5）；第 5 項以 TEST-16 讀不到 skill 為條件，實測讀得到，TODO-6 結案刪除（REV-7）。每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 3. TEST-10：於 Review 第 2 回合文件段執行（獨立 session），發現列為 REV-20～REV-29，全部有處置。通過。
 4. TEST-14：在 worktree 開新 session，讀任何檔案前列出已載入的指引，載入 `CLAUDE.md`、`copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general`，沒有載入 `process/`、`project/`、`coding-style-csharp`、`coding-style-cpp`（另有個人層 `~/.claude/CLAUDE.md` 與主 checkout 的 `CLAUDE.local.md`）。使用者以 `/context` 確認記憶檔 8 份（上述 5 份、2 份個人層、空的 auto memory 索引）。通過。

@@ -107,9 +107,9 @@
 | REV-36 | 6 | 建議 | `.claude/skills/review/SKILL.md:6` | 寫「門檻段與規範段加上專案固定檢查項目」，但專案固定檢查項目也涵蓋功能正確性段（第 5 項），讀者會漏看；改為不指定段，段的對應由 `project-overview` 說明 | 已修正（待人確認） |
 | REV-37 | 6 | 建議 | `Doc/AUTO-TBD/Review.md:84` | REV-30 處置寫「回溯至 SPEC-3.8、SPEC-5.8」，兩者已刪除，讀者找不到；改寫為「刪除 SPEC-3.8、SPEC-5.8」 | 已修正（待人確認） |
 | REV-38 | 6 | 建議 | `Doc/AUTO-TBD/Discussion.md:85` | DEC-9.6 的「硬上限」已由 DEC-11 取消，DEC-9.6 本身未標示；DEC-9.1 已有同類標示（REV-29） | 已修正（待人確認） |
-| REV-39 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:126` | SPEC-5.4 表格寫「STEP 與 commit 對應」，與 SPEC-8.5.4「`Implementation.md` 不記 commit hash」及 `issue-docs.md:22` 的「STEP」不一致；TEST-8 以措辭差異接受，但規格本身前後矛盾。建議改為「STEP」 | 待人決定（規格措辭） |
-| REV-40 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:18` | 規格未同步後續 review 的修正：SPEC-1.1 表格仍寫「Copilot 依 `applyTo` 載入；Claude 依流程索引」（REV-19 後指引目錄改為兩者皆依流程索引）；SPEC-8.6 仍寫「Push 與送 MR 由人決定」（REV-23 後 push 的決定權只寫在協作原則） | 待人決定（規格措辭） |
-| REV-41 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:85` | SPEC-6.4「刪除即跳號」與 Markdown 顯示衝突：有序清單只採用第一項的號碼，SPEC-3 的「9.」、SPEC-5 的「9.」在 GitLab / GitHub 顯示為「8.」，引用 SPEC-3.9 的讀者對不上。建議刪除的項目保留一行「8. （刪除，見 DEC-n）」 | 待人決定（規則變更，涉及 `issue-docs.md:44`） |
-| REV-42 | 4 | 建議 | `.github/process/review.md:12` | 功能正確性段寫「專案指引的領域檢查項目」，`project-overview` 沒有此名稱，對應的是「專案固定檢查項目」第 5 項；SPEC-7.1 同文。建議改為「專案指引的專案固定檢查項目」 | 待人決定（規格措辭） |
+| REV-39 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:126` | SPEC-5.4 表格寫「STEP 與 commit 對應」，與 SPEC-8.5.4「`Implementation.md` 不記 commit hash」及 `issue-docs.md:22` 的「STEP」不一致；TEST-8 以措辭差異接受，但規格本身前後矛盾。建議改為「STEP」 | 已修正（使用者同意依建議修正） |
+| REV-40 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:18` | 規格未同步後續 review 的修正：SPEC-1.1 表格仍寫「Copilot 依 `applyTo` 載入；Claude 依流程索引」（REV-19 後指引目錄改為兩者皆依流程索引）；SPEC-8.6 仍寫「Push 與送 MR 由人決定」（REV-23 後 push 的決定權只寫在協作原則） | 已修正（使用者同意依建議修正） |
+| REV-41 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:85` | SPEC-6.4「刪除即跳號」與 Markdown 顯示衝突：有序清單只採用第一項的號碼，SPEC-3 的「9.」、SPEC-5 的「9.」在 GitLab / GitHub 顯示為「8.」，引用 SPEC-3.9 的讀者對不上。建議刪除的項目保留一行「8. （刪除，見 DEC-n）」 | 已修正（回溯至 SPEC-6.4，DEC-17；使用者同意依建議修正） |
+| REV-42 | 4 | 建議 | `.github/process/review.md:12` | 功能正確性段寫「專案指引的領域檢查項目」，`project-overview` 沒有此名稱，對應的是「專案固定檢查項目」第 5 項；SPEC-7.1 同文。建議改為「專案指引的專案固定檢查項目」 | 已修正（使用者同意依建議修正） |
 | REV-43 | 2 | 必修 | `.github/instructions/coding-style-general.instructions.md:26` | 團隊通用層含 `AUTO-` 前綴：`coding-style-general` 的 `// AUTO-<編號>`、`issue-docs.md:8` 的 `AUTO-TBD`、`git-workflow.md:14` 的範例 `AUTO-23201`。`AUTO-` 是團隊共用的議題系統前綴，還是 MyCAM 專屬？若為專屬，違反 SPEC-1.2，應改為「`<議題編號>`，前綴見專案指引」。使用者回覆：`AUTO-` 只有 MyCAM 使用，改為必修 | 已修正（回溯至 REQ-1.2、SPEC-5.2、SPEC-8.3.1、SPEC-10.2、SPEC-14.7，DEC-16） |
 | REV-44 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:649` | TEST-11 只擋空白、「待處置」與「待人確認」，其他文字（如「待人決定」、「待回覆」）都通過，與 `review.md` 第 2 節第 2 項「處置只有三種」不符；改為處置須以已修正、不修正或列後續開頭 | 已修正（待人確認） |

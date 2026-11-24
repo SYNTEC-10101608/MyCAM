@@ -428,6 +428,9 @@ function Test-6()
 		# 6.2 程式碼區塊外沒有無序號條列；6.3 沒有簡體字
 		$lineArray = Read-Lines $szFile
 		$isInCode = $false
+
+		# 各縮排層的上一個條列號碼；Markdown 會依序重排有序清單，跳號會讓顯示的號碼與引用對不上
+		$lastNumMap = @{}
 		for( $i = 0; $i -lt $lineArray.Count; $i++ ) {
 			$szLine = $lineArray[ $i ]
 			if( $szLine -match '^\s*```' ) {
@@ -439,6 +442,25 @@ function Test-6()
 			}
 			if( $szLine -match '^\s*[-*]\s' ) {
 				$failList += "${szFile}:$( $i + 1 ) 無序號條列"
+			}
+
+			# 6.2 有序清單不跳號（SPEC-6.4）
+			if( $szLine -match '^#' ) {
+				$lastNumMap = @{}
+			}
+			elseif( $szLine -match '^(\s*)(\d+)\.\s' ) {
+				$nIndent = $Matches[ 1 ].Length
+				$nNum = [int]$Matches[ 2 ]
+				foreach( $nKey in @( $lastNumMap.Keys ) ) {
+					if( $nKey -gt $nIndent ) {
+						$lastNumMap.Remove( $nKey )
+					}
+				}
+				$hasLast = $lastNumMap.ContainsKey( $nIndent )
+				if( $hasLast -and $nNum -ne $lastNumMap[ $nIndent ] + 1 ) {
+					$failList += "${szFile}:$( $i + 1 ) 條列跳號（$( $lastNumMap[ $nIndent ] ) → $nNum）"
+				}
+				$lastNumMap[ $nIndent ] = $nNum
 			}
 			foreach( $szChar in $simplifiedArray ) {
 				if( $szLine.Contains( $szChar ) ) {

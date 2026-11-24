@@ -15,7 +15,7 @@
    | 團隊通用 | `.github/instructions/collaboration.instructions.md` | 協作原則、文件通則、流程索引 | 常駐（`applyTo: "**"`） |
    | 團隊通用 | `.github/process/*.md` | 流程本文 | 依流程索引的時機讀取 |
    | 團隊通用 | `.github/instructions/coding-style-general.instructions.md` | Coding Style 通用規則 | 常駐（`applyTo: "**"`） |
-   | 團隊通用 | `.github/instructions/coding-style-<語言>.instructions.md` | 各語言 Coding Style | Copilot 依 `applyTo` 載入；Claude 依流程索引讀取 |
+   | 團隊通用 | `.github/instructions/coding-style-<語言>.instructions.md` | 各語言 Coding Style | 依流程索引讀取，Copilot 另依 `applyTo` |
    | MyCAM 專案 | `.github/instructions/project-overview.instructions.md` | 架構、慣例、專案固定檢查項目 | 常駐 |
    | MyCAM 專案 | `.github/project/*.md` | 建置、執行環境；Claude 與 worktree 工作方式 | 依專案指引的索引讀取 |
    | 個人 | `~/.claude/CLAUDE.md`、`CLAUDE.local.md` 等 | 個人偏好 | 各工具自行載入，不進版控 |
@@ -82,6 +82,7 @@
    3. 另一可行選項：做法與取捨。
 6. 施工中遇到預料外的狀況，先停下來討論，不自行擴大範圍。
 7. 重新分級：發現範圍超出原級別時先停下提出；升級後補齊新級別要求的檔案與 DoD 項目，已完成的內容搬入對應檔案，不重做已確認的確認點。
+8. （刪除，見 DEC-14）
 9. 回溯：後段（含 review）發現前段內容要修改時：
    1. 原範圍內的修正：修改最早受影響的文件，依級別重做該段確認點，往下更新 TEST、STEP、程式與測試，review 從門檻段重來。
    2. 新需求或擴大範圍：列 `TODO`，以後續 MR 處理；必須在本 MR 處理時，走重新分級。
@@ -123,7 +124,7 @@
    | 現況盤點、目標、範圍、REQ（BUG 為現象與重現方式） | README | README | `Goal.md` |
    | SPEC、相容性異動（S 為修正方式與預期行為） | README | `Spec.md` | `Spec.md` |
    | TEST 與執行結果 | README | `TestPlan.md` | `TestPlan.md` |
-   | STEP 與 commit 對應 | README | `Implementation.md` | `Implementation.md` |
+   | STEP | README | `Implementation.md` | `Implementation.md` |
    | Review 報告 | README | `Review.md` | `Review.md` |
    | 討論記錄（DEC） | README | `Discussion.md`（有決策時） | `Discussion.md` |
    | 後續處理（TODO） | README | README | `FollowUp.md` |
@@ -131,6 +132,7 @@
 5. `README.md` 開頭為議題資訊表：分支、分支起點（commit 與版本）、級別、狀態。
 6. 議題文件遵守 SPEC-1 第 6 項的文件通則。
 7. 例外：`Discussion.md` 可增量描述，凸顯最終決策；`Review.md` 依 review 回合分節保留。
+8. （刪除，見 DEC-14）
 9. 收官時把議題結束後仍長期有效的結論（規則、慣例、架構說明）寫入指引規範，議題文件保留追溯用的記錄。
 
 ### SPEC-6 項目編號與追溯（REQ-5.3；DEC-3.7）
@@ -149,7 +151,7 @@
 
 2. 寫法為 `前綴-流水號`（`REQ-1`）；引用子項目寫 `REQ-1.2`。
 3. 追溯方向：SPEC 註明 REQ；TEST 註明 SPEC（或 REQ）；STEP 註明 SPEC 與 TEST；REV 的處置可指向 TODO。
-4. 確認點確認後，編號不重排、不重用；刪除的項目直接移除，編號跳號。
+4. 確認點確認後，編號不重排、不重用；刪除的項目直接移除，編號跳號；有序清單的條列保留一行「（刪除，見 DEC-n）」，因為 Markdown 會依序重排清單號碼（DEC-17）。
 
 ### SPEC-7 Review（REQ-6；DEC-4）
 
@@ -159,7 +161,7 @@
    | --- | --- | --- | --- |
    | 1 門檻 | 建置、檢查腳本、測試、專案固定檢查項目；動到自動載入的檔案時計算行數並與比對基準比較（SPEC-1 第 7 項） | 執行並回報結果 | 提供 AI 無法執行的環境 |
    | 2 需求與範圍 | 每個 REQ / SPEC 都有實作與測試，沒有範圍外的修改 | 追溯比對 | 判斷需求是否被誤解 |
-   | 3 功能正確性 | 邊界、錯誤處理、空值、資源釋放、執行緒；專案指引的領域檢查項目 | 靜態分析 | 實機操作驗證 |
+   | 3 功能正確性 | 邊界、錯誤處理、空值、資源釋放、執行緒；專案指引的專案固定檢查項目 | 靜態分析 | 實機操作驗證 |
    | 4 規範符合 | 依流程索引列出本次修改涉及的規範（如修改 C# 檔對應 C# Coding Style），逐一比對；專案慣例 | 檢查 | 確認處置 |
    | 5 設計品質 | 架構、重複、效率、可維護性 | 提出 | 取捨 |
    | 6 文件 | 議題文件與 DoD、指引規範、使用手冊是否受影響；是否符合文件通則（重複、無法判斷、可交給工具的規則） | 檢查 | 確認 |
@@ -197,7 +199,7 @@
    3. 訊息結尾標示修改的來由：施工 `(STEP-n)`、review 修正 `(REV-n)`，兩者皆是時並列（`(STEP-3, REV-2)`）；一個 STEP 可對應多個 commit。確認點文件（階段 1～5）的 commit 不標示。
    4. `Implementation.md` 不記 commit hash，以 `git log --grep "STEP-n"` 查詢對應。
    5. 純格式調整（含 SPEC-10 的方法改寫）獨立 commit。
-6. Push 與送 MR 由人決定；AI push 前先詢問 remote 與分支。
+6. 送 MR 由人決定；AI push 前先詢問 remote 與分支（push 由人決定寫在協作原則，SPEC-12.2.1）。
 7. 一個議題一個 branch。Worktree 為選用，同時處理多個議題時使用；未追蹤檔案不會出現在新 worktree，需要的檔案依專案指引複製（DEC-12）。
 
 ### SPEC-9 Release note 與 merge log（REQ-7.4；DEC-5.3）
@@ -298,7 +300,7 @@
 
 1. `copilot-instructions.md`：
    1. 說明四層分類與載入方式（SPEC-1 第 1 項的精簡版）。
-   2. 指引目錄加入 `collaboration.instructions.md`、`process/` 四份文件、`project/build.md` 與 `project/claude-worktree.md`，每份標示「常駐」或「依時機讀取」（各語言 Coding Style 標示 Copilot 依 `applyTo`、Claude 依索引）。
+   2. 指引目錄加入 `collaboration.instructions.md`、`process/` 四份文件、`project/build.md` 與 `project/claude-worktree.md`，每份標示「常駐」或「依時機讀取」（各語言 Coding Style 標示依流程索引讀取，Copilot 另依 `applyTo`）。
    3. 刪除「本檔只放目錄與跨主題的總則」中的「總則」說法，改為「本檔只放目錄與分類說明」。
    4. 「維護方式」加入常駐內容的原則（SPEC-1 第 7 項）。
 2. `CLAUDE.md`：`@` 只引用常駐的檔案（`copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general`）；`coding-style-csharp`、`coding-style-cpp`、`process/`、`project/` 不以 `@` 引用（`@` 會常駐載入），由流程索引導向。
@@ -370,4 +372,4 @@
 
 ## 5. 待討論
 
-無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11；worktree 改為選用、開議題時開分支見 DEC-12；先做後確認見 DEC-13；Claude 與 worktree 的做法獨立成檔見 DEC-14；review 規範段以流程索引為登記處見 DEC-15；議題編號前綴移到專案指引見 DEC-16。
+無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11；worktree 改為選用、開議題時開分支見 DEC-12；先做後確認見 DEC-13；Claude 與 worktree 的做法獨立成檔見 DEC-14；review 規範段以流程索引為登記處見 DEC-15；議題編號前綴移到專案指引見 DEC-16；刪除的條列保留編號見 DEC-17。
