@@ -29,7 +29,7 @@
    | --- | --- |
    | 開始議題、分級、進入下一階段、切換 session | `process/issue-workflow.md` |
    | 撰寫或修改議題文件 | `process/issue-docs.md` |
-   | 執行或回應 review | `process/review.md`，加上專案指引的專案固定檢查項目 |
+   | 執行或回應 review | `process/review.md`，加上專案指引的專案固定檢查項目；review 程式碼時加讀對應語言的 Coding Style |
    | 開分支、commit、送 MR、產出 release note、建立 worktree | `process/git-workflow.md` |
    | 新增或修改程式碼 | 對應語言的 `instructions/coding-style-<語言>.instructions.md` |
 
@@ -70,7 +70,7 @@
 
    | 級別 | 判斷依據 | 確認點 |
    | --- | --- | --- |
-   | S | 小 bug、影響範圍明確、無規格與相容性異動 | 1–5 合併為「分析與規劃」、7 |
+   | S | 影響範圍明確、無規格與相容性異動的小修改（含小 bug） | 1–5 合併為「分析與規劃」、7 |
    | M | 一般功能、跨模組 bug | 1–2、3–4、5、7 |
    | L | 新功能、規範或相容性異動 | 1、2、3、4、5、7 各自確認 |
 
@@ -161,7 +161,7 @@
    | --- | --- | --- | --- |
    | 1 門檻 | 建置、檢查腳本、測試、專案固定檢查項目；動到自動載入的檔案時計算行數並與比對基準比較（SPEC-1 第 7 項） | 執行並回報結果 | 提供 AI 無法執行的環境 |
    | 2 需求與範圍 | 每個 REQ / SPEC 都有實作與測試，沒有範圍外的修改 | 追溯比對 | 判斷需求是否被誤解 |
-   | 3 功能正確性 | 邊界、錯誤處理、空值、資源釋放、UI 執行緒、角度單位（rad / deg）、座標系 | 靜態分析 | 實機操作驗證 |
+   | 3 功能正確性 | 邊界、錯誤處理、空值、資源釋放、執行緒；專案指引的領域檢查項目 | 靜態分析 | 實機操作驗證 |
    | 4 規範符合 | Coding Style、專案慣例 | 檢查 | 確認處置 |
    | 5 設計品質 | 架構、重複、效率、可維護性 | 提出 | 取捨 |
    | 6 文件 | 議題文件與 DoD、指引規範、使用手冊是否受影響；是否符合文件通則（重複、無法判斷、可交給工具的規則） | 檢查 | 確認 |
@@ -194,7 +194,7 @@
 5. Commit：
    1. 每個 STEP 一個 commit；文件、測試、程式盡量分開。
    2. 訊息明確描述修改內容，中英文皆可。
-   3. 訊息結尾標示修改的來由：施工 `(STEP-n)`、review 修正 `(REV-n)`，兩者皆是時並列（`(STEP-3, REV-2)`）；一個 STEP 可對應多個 commit。
+   3. 訊息結尾標示修改的來由：施工 `(STEP-n)`、review 修正 `(REV-n)`，兩者皆是時並列（`(STEP-3, REV-2)`）；一個 STEP 可對應多個 commit。確認點文件（階段 1～5）的 commit 不標示。
    4. `Implementation.md` 不記 commit hash，以 `git log --grep "STEP-n"` 查詢對應。
    5. 純格式調整（含 SPEC-10 的方法改寫）獨立 commit。
 6. Push 與送 MR 由人決定；AI push 前先詢問 remote 與分支。
@@ -257,7 +257,7 @@
 2. 本議題新增與修改的規範檔改為數字條列；未修改的檔案（如 `coding-style-csharp`、`coding-style-cpp`）不動，日後修改時再改。
 3. `process/`、`project/` 不放 `applyTo` frontmatter，也不放在 `instructions/` 下，避免被工具自動常駐。
 
-### SPEC-12 `collaboration.instructions.md`（REQ-3.1、REQ-3.2；DEC-2.3、DEC-2.4）
+### SPEC-12 `collaboration.instructions.md`（REQ-3.1、REQ-3.2、REQ-11；DEC-2.3、DEC-2.4、DEC-13）
 
 1. Frontmatter `applyTo: "**"`。
 2. 章節：
@@ -281,11 +281,12 @@
 1. 刪除「Git 流程」章節：分支命名、commit 規則、Claude Code worktree 的通用說明移到 `process/git-workflow.md`。
 2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`，並在該檔新增「worktree 準備」：需要複製的未追蹤檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/` 等；Claude Code 依 `.worktreeinclude` 自動複製，其他工具手動複製）、`CLAUDE.local.md` 由上層載入、第一次建置後執行 `CopyRef.bat`。
 3. `project-overview` 的「建置與執行」只留一行索引：建置、執行環境、worktree 準備時讀 `.github/project/build.md`。
-4. 新增「專案固定檢查項目」章節，作為 review 門檻段與規範段的專案項目：
+4. 新增「專案固定檢查項目」章節，作為 review 門檻段、功能正確性段與規範段的專案項目：
    1. `Build.bat Debug` 建置成功。
    2. 使用者可見文字的四語系 XML（`zh-TW`、`zh-CN`、`en-US`、`ru-RU`）同步。
    3. 修改過的 `*.Designer.cs` 仍可在 Designer 開啟。
    4. 未修改 `reference/` 內的檔案（除非議題明確要求）。
+   5. 功能正確性的領域項目：UI 執行緒、角度單位（rad / deg）、座標系（由團隊通用的 review 移入）。
 5. 第 4 項的規則只寫在「專案固定檢查項目」：「慣例」與「技術棧」中重複的句子（四語系同步、Designer 可開、不修改 `reference/`）刪除，保留做法說明。
 
 ### SPEC-15 入口文件（REQ-1.3、REQ-2.1；DEC-2.1、DEC-2.2）
@@ -360,6 +361,7 @@
 | REQ-8 Coding Style 修訂 | SPEC-10 |
 | REQ-9 個人設定收斂 | SPEC-17 |
 | REQ-10 後續議題 | SPEC-18 |
+| REQ-11 協作原則 | SPEC-12 |
 
 ## 5. 待討論
 
