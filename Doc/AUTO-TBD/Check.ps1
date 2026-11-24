@@ -2,6 +2,7 @@
 # 用法：在 repo 任一位置執行 powershell -ExecutionPolicy Bypass -File Doc\AUTO-TBD\Check.ps1 [-Base <commit>]
 # 有失敗時 exit code 為失敗的 TEST 數
 
+[CmdletBinding()]
 param(
 	[string]$Base = '24c7276d'
 )
@@ -441,7 +442,8 @@ function Test-7()
 		foreach( $match in [regex]::Matches( $szText, '(?m)^@(\S+)' ) ) {
 			$refList += $match.Groups[ 1 ].Value
 		}
-		foreach( $match in [regex]::Matches( $szText, '`(\.github/[^`\s]+)`' ) ) {
+		# review 報告的位置寫成 `檔案:行號`，只檢查檔案部分
+		foreach( $match in [regex]::Matches( $szText, '`(\.github/[^`\s:]+)(:[0-9-]+)?`' ) ) {
 			$refList += $match.Groups[ 1 ].Value
 		}
 		foreach( $szRef in $refList ) {
