@@ -48,7 +48,7 @@
 
    | 入口 | 動作 | 依據文件 |
    | --- | --- | --- |
-   | `/issue-start` | 盤點現況、建議分級、建立議題資料夾與 `README.md` | `process/issue-workflow.md`、`process/issue-docs.md` |
+   | `/issue-start` | 盤點現況、建議分級、開分支、建立議題資料夾與 `README.md` | `process/issue-workflow.md`、`process/issue-docs.md`、`process/git-workflow.md` |
    | `/review` | 依六段執行 review 並產出報告 | `process/review.md` |
    | `/release-note` | 產出 release note 與 merge log | `process/git-workflow.md` |
 
@@ -74,7 +74,7 @@
    | M | 一般功能、跨模組 bug | 1–2、3–4、5、7 |
    | L | 新功能、規範或相容性異動 | 1、2、3、4、5、7 各自確認 |
 
-3. 分級由實作者確認（使用 AI 時由 AI 在盤點後提出建議）；合併者在 review 時認為級別不足，可要求升級並補齊文件。
+3. 分級由實作者確認（使用 AI 時由 AI 在盤點後提出建議）；合併者在 review 時認為級別不足，可要求升級並補齊文件。分級確認後依 SPEC-8 開分支，議題文件提交在該分支（DEC-12）。
 4. 每個確認點先出草案，最後列「待討論」；人確認沒有待決問題後，才進入下一段。
 5. 待討論每題固定三部分，文件與對話中都適用，不可省略為只有選項的摘要：
    1. 問題：背景、為什麼需要決定、要決定什麼。
@@ -132,7 +132,7 @@
 5. `README.md` 開頭為議題資訊表：分支、分支起點（commit 與版本）、級別、狀態。
 6. 議題文件遵守 SPEC-1 第 6 項的文件通則。
 7. 例外：`Discussion.md` 可增量描述，凸顯最終決策；`Review.md` 依 review 回合分節保留。
-8. `SESSION.md` 放在 worktree 根目錄，以 `.gitignore` 的 `/SESSION.md` 排除提交，只放交接 prompt 與暫時筆記；狀態與決策寫在提交的文件。
+8. `SESSION.md` 放在工作目錄（主 checkout 或 worktree）的根目錄，以 `.gitignore` 的 `/SESSION.md` 排除提交，只放交接 prompt 與暫時筆記；狀態與決策寫在提交的文件。
 9. 收官時把議題結束後仍長期有效的結論（規則、慣例、架構說明）寫入指引規範，議題文件保留追溯用的記錄。
 
 ### SPEC-6 項目編號與追溯（REQ-5.3；DEC-3.7）
@@ -184,7 +184,7 @@
    2. 版本完成時在版本分支提交 `RLS_0.<中>.<小>`。
 2. 合併：議題分支以 MR squash 合併進目標版本分支；合併後保留議題分支，分支內的 commit 供追溯。
 3. 分支命名：
-   1. `AUTO-<議題編號>_<類型>_<簡述>`；類型 `f` 為功能、`b` 為 bug；簡述為英文 PascalCase。
+   1. `<議題編號>_<類型>_<簡述>`；議題編號含前綴（`AUTO-23201`）；類型 `f` 為功能、`b` 為 bug；簡述為英文 PascalCase。
    2. 同一議題合併後的後續 MR：原名加 `_2nd`、`_3rd`…。
    3. 並存比較的另一種實作：原名加 `_Alt2`、`_Alt3`…。
    4. 送 MR 前的自測回合不開新分支，在原分支以 commit 推進。
@@ -197,7 +197,7 @@
    4. `Implementation.md` 不記 commit hash，以 `git log --grep "STEP-n"` 查詢對應。
    5. 純格式調整（含 SPEC-10 的方法改寫）獨立 commit。
 6. Push 與送 MR 由人決定；AI push 前先詢問 remote 與分支。
-7. Worktree：一個議題一個 branch 與一個 worktree；未追蹤檔案不會出現在新 worktree，需要的檔案依專案指引複製。
+7. 一個議題一個 branch。Worktree 為選用，同時處理多個議題時使用；未追蹤檔案不會出現在新 worktree，需要的檔案依專案指引複製（DEC-12）。
 
 ### SPEC-9 Release note 與 merge log（REQ-7.4；DEC-5.3）
 
@@ -278,7 +278,7 @@
 ### SPEC-14 `project-overview.instructions.md`（REQ-1.2；DEC-2.6）
 
 1. 刪除「Git 流程」章節：分支命名、commit 規則、Claude Code worktree 的通用說明移到 `process/git-workflow.md`。
-2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`，並在該檔新增「worktree 準備」：`.worktreeinclude` 複製的檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/` 等）、`CLAUDE.local.md` 由上層載入、第一次建置前執行 `CopyRef.bat`。
+2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`，並在該檔新增「worktree 準備」：需要複製的未追蹤檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/` 等；Claude Code 依 `.worktreeinclude` 自動複製，其他工具手動複製）、`CLAUDE.local.md` 由上層載入、第一次建置前執行 `CopyRef.bat`。
 3. `project-overview` 的「建置與執行」只留一行索引：建置、執行環境、worktree 準備時讀 `.github/project/build.md`。
 4. 新增「專案固定檢查項目」章節，作為 review 門檻段與規範段的專案項目：
    1. `Build.bat Debug` 建置成功。
@@ -362,4 +362,4 @@
 
 ## 5. 待討論
 
-無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11。
+無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11；worktree 改為選用、開議題時開分支見 DEC-12。
