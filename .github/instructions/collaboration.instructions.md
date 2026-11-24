@@ -27,7 +27,7 @@ applyTo: "**"
 
 | 時機 | 必讀文件 |
 | --- | --- |
-| 開始議題、分級、進入下一階段、切換 session | `.github/process/issue-workflow.md` |
+| 開始議題、分級、進入下一階段 | `.github/process/issue-workflow.md` |
 | 撰寫或修改議題文件 | `.github/process/issue-docs.md` |
 | 執行或回應 review | `.github/process/review.md`，加上專案指引的專案固定檢查項目；review 程式碼時加讀對應語言的 Coding Style |
 | 開分支、commit、送 MR、產出 release note、建立 worktree | `.github/process/git-workflow.md` |

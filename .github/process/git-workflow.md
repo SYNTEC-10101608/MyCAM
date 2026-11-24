@@ -59,4 +59,3 @@ Release note 範例：
 
 1. 一個議題一個 branch。Worktree 為選用，同時處理多個議題時使用；單線開發直接在主 checkout 切分支。
 2. 未追蹤的檔案不會出現在新 worktree；需要複製的檔案與初次建置步驟見專案指引。
-3. Claude Code 建立的 worktree 位於 `.claude/worktrees/<名稱>/`（已列入 `.gitignore`），分支名稱為 `worktree-<名稱>`，建立後以 `git branch -m` 改為第 2 節的命名。

@@ -65,3 +65,21 @@
 | REV-27 | 6 | 建議 | `Doc/AUTO-TBD/README.md:19` | 文件索引沒有 `Review.md`，`Review.md` 已存在；STEP-13 第 2 項列為收官工作，可於收官一併補上 | 已修正 |
 | REV-28 | 6 | 建議 | `Doc/AUTO-TBD/TestPlan.md:202` | 執行結果 TEST-11 仍寫「缺 `Review.md`、STEP-12、STEP-13 的 commit」，與目前狀態不符（現僅缺 DoD 與 Release Note）；`753ee71d` 更新了行數但未同步此項 | 已修正 |
 | REV-29 | 6 | 建議 | `Doc/AUTO-TBD/Implementation.md:61` | STEP-6 第 1 項「目標 40 行內」是取消行數上限（DEC-11）前的殘留；`Discussion.md:78` DEC-9.1「專案準備步驟留在 `project-overview`」已被 DEC-10.1 取代，未如 DEC-11 標示「取代」 | 已修正（待人確認） |
+
+## 第 3 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `24c7276d` |
+| 工具與模型 | Claude Code、Claude Opus 5.5；發現來自使用者的人工 review |
+| 日期 | 2026-11-25 |
+
+1. 門檻：`Check.ps1` 9 PASS、1 FAIL；TEST-11 只缺 DoD 第 9、10 項與待人確認的處置。常駐 192 行（基準 193，差異 -1），未增加。本議題只改文件，不需建置。
+2. 移出的 Claude 做法已寫入使用者的全域 `~/.claude/CLAUDE.md`「Claude Code 工作方式」（不進版控）。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-30 | 2 | 必修 | `.github/process/issue-workflow.md:45` | Session 交接、`SESSION.md`、Claude Code 的 worktree 位置與分支更名、`.worktreeinclude` 自動複製、`CLAUDE.local.md` 上層載入屬於使用 Claude 時的機制，Copilot 不同、成員也未必有此習慣，不應寫在團隊規範 | 已修正（回溯至 REQ-5.1、SPEC-3.8、SPEC-5.8、SPEC-14.2，DEC-14） |
+| REV-31 | 6 | 建議 | `CLAUDE.md:3` | 3 行說明可併為 1 行；`@` 引用 4 行保留 | 已修正（待人確認） |
