@@ -65,10 +65,6 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 
 1. 顯示給使用者的訊息使用 `MyApp.Logger.ShowOnLogPanel( szMessage, MyApp.NoticeType.Warning )`（`Hint` / `Warning` / `Error`）。
 
-### WinForms Designer
-
-1. `*.Designer.cs` 由 Visual Studio Designer 產生。
-
 ## 專案固定檢查項目
 
 Review 門檻段與規範段的專案項目（見 [review.md](../process/review.md)）：
