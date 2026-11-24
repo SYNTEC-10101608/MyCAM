@@ -5,7 +5,7 @@
 | 分支 | `AUTO-TBD_f_DevProcess` |
 | 分支起點 | `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23） |
 | 級別 | L |
-| 狀態 | 施工中：STEP-1 完成，下一步 STEP-2 |
+| 狀態 | 施工中：STEP-1～STEP-10 完成，下一步 STEP-11 個人設定收斂 |
 
 ## 文件
 
@@ -16,6 +16,7 @@
 | [TestPlan.md](TestPlan.md) | 測試規劃與執行結果（TEST） |
 | [Implementation.md](Implementation.md) | 實作架構與步驟（STEP） |
 | [Discussion.md](Discussion.md) | 討論記錄：依主題整理的共識與決策（DEC） |
+| [FollowUp.md](FollowUp.md) | 後續處理（TODO） |
 
 ## 完成清單（DoD）
 
