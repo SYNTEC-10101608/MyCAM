@@ -17,7 +17,7 @@
 
 | TEST | 內容 | SPEC | 週期 | 時機 | 執行者 |
 | --- | --- | --- | --- | --- | --- |
-| TEST-1 | 自動載入行數 | SPEC-1.7、SPEC-12.3、相容性 3.2.2 | 長期維護 | 靜態 | 自動 |
+| TEST-1 | 常駐行數 | SPEC-1.7、SPEC-12.3、相容性 3.2.2 | 長期維護 | 靜態 | 自動 |
 | TEST-2 | 團隊通用層不含專案內容 | SPEC-1.2、SPEC-13.3、SPEC-13.4 | 議題限定 | 靜態 | 自動 |
 | TEST-3 | 規則只寫一處 | SPEC-1.6.1、SPEC-2.2、SPEC-13.5、SPEC-16.2 | 議題限定 | 靜態 | 自動 |
 | TEST-4 | 載入設定與檔案位置 | SPEC-1.1、SPEC-1.4、SPEC-5.8、SPEC-11.3、SPEC-12.1、SPEC-15 | 議題限定 | 靜態 | 自動 |
@@ -40,11 +40,11 @@
 
 ### 3.1 靜態檢查
 
-#### TEST-1 自動載入行數
+#### TEST-1 常駐行數
 
-1. 方法：計算 `.github/copilot-instructions.md`、`CLAUDE.md`、`.github/instructions/*.md` 的行數，與比對基準比較。
+1. 方法：計算入口文件（`.github/copilot-instructions.md`、`CLAUDE.md`）與 `.github/instructions/` 中 `applyTo: "**"` 的檔案行數，與比對基準比較。
 2. 通過條件：
-   1. 總行數不超過 359 行（基準 `24c7276d`：入口 32 行、`instructions/` 327 行）。
+   1. 總行數不超過 193 行（基準 `24c7276d`：入口 32 行、`project-overview` 130 行、`coding-style-general` 31 行）。
    2. `collaboration.instructions.md` 不超過 60 行。
 3. 長期維護：即 review 門檻段的行數檢查（SPEC-7.1）；總行數增加時依 SPEC-1.7.2 寫明理由。
 
@@ -66,10 +66,11 @@
 1. 方法：檢查 frontmatter、`@` 引用、`.gitignore` 與 `git check-ignore`。
 2. 通過條件：
    1. `collaboration.instructions.md` 的 frontmatter 為 `applyTo: "**"`。
-   2. `.github/process/` 四份文件沒有 `applyTo` frontmatter，且不在 `instructions/` 下。
-   3. `CLAUDE.md` 以 `@` 引用 `collaboration.instructions.md`，沒有引用 `process/`。
-   4. `copilot-instructions.md` 的指引目錄列出 `collaboration` 與 `process/` 四份文件，並標示「常駐」或「依時機讀取」。
-   5. `git check-ignore SESSION.md` 回報由 `.gitignore` 的 `/SESSION.md` 排除。
+   2. `.github/process/` 四份文件與 `.github/project/build.md` 沒有 `applyTo` frontmatter，且不在 `instructions/` 下。
+   3. `CLAUDE.md` 的 `@` 引用恰為 `copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general` 四份。
+   4. `copilot-instructions.md` 的指引目錄列出 `collaboration`、`process/` 四份文件與 `project/build.md`，並標示載入方式。
+   5. `collaboration.instructions.md` 的流程索引有「新增或修改程式碼」一列。
+   6. `git check-ignore SESSION.md` 回報由 `.gitignore` 的 `/SESSION.md` 排除。
 
 #### TEST-5 異動範圍符合清單
 
@@ -99,10 +100,12 @@
 
 #### TEST-9 專案指引與 Coding Style 修訂
 
-1. 方法：搜尋 `project-overview.instructions.md` 與 `coding-style-general.instructions.md`。
+1. 方法：搜尋 `project-overview.instructions.md`、`.github/project/build.md` 與 `coding-style-general.instructions.md`。
 2. 通過條件：
-   1. `project-overview` 沒有「Git 流程」章節；有「worktree 準備」與「專案固定檢查項目」（四項，SPEC-14.3）。
-   2. `coding-style-general` 不再有「維持該方法內既有的命名方式」；有 SPEC-10.1 三項與 SPEC-10.2 註解規則。
+   1. `project-overview` 沒有「Git 流程」章節與建置細節（`FakeDebug`、`vswhere`、`MachineData`）；「建置與執行」只有指向 `project/build.md` 的索引；有「專案固定檢查項目」（四項，SPEC-14.4）。
+   2. `build.md` 有 FCLTool、命令列建置、執行期檔案、worktree 準備四節。
+   3. 四語系同步、Designer 可開、不修改 `reference/` 三項規則在 `project-overview` 只出現在「專案固定檢查項目」（SPEC-14.5）。
+   4. `coding-style-general` 不再有「維持該方法內既有的命名方式」；有 SPEC-10.1 三項與 SPEC-10.2 註解規則。
 
 #### TEST-10 文件精簡審查
 
@@ -130,7 +133,7 @@
 
 1. 方法：人閱讀 `FollowUp.md`。
 2. 通過條件：
-   1. 含 SPEC-18.2 五項；每項有目標、完成條件、延後原因，不需讀本議題其他文件就能開工。
+   1. 含 SPEC-18.2 六項；每項有目標、完成條件、延後原因，不需讀本議題其他文件就能開工。
    2. 自動化門檻項目列出 TEST-2 的檢查作為候選。
 
 ### 3.2 動態驗證
@@ -140,7 +143,7 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 #### TEST-14 Claude Code 載入範圍
 
 1. 方法：在 worktree 開新的 Claude Code session，以 `/context` 查看載入的記憶檔。
-2. 通過條件：載入 `CLAUDE.md`、`copilot-instructions.md`、`collaboration.instructions.md`；沒有載入 `process/` 文件。
+2. 通過條件：載入 `CLAUDE.md`、`copilot-instructions.md`、`collaboration.instructions.md`、`project-overview`、`coding-style-general`；沒有載入 `process/`、`project/` 與 `coding-style-csharp`、`coding-style-cpp`。
 
 #### TEST-15 Claude Code 入口與流程演練
 
@@ -148,11 +151,13 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
    1. 新 session 中以一個假設的 S 級 BUG 執行 `/issue-start`，產出放在 scratchpad，不提交。
    2. 在本分支執行 `/release-note`；執行 `/review`，確認依六段進行並產出 SPEC-7.3 格式的報告。
    3. 另開新 session，只輸入「開議題」。
+   4. 另開新 session，要求修改任一 `.cs` 檔的一個方法（修改不保留）。
 2. 通過條件：
    1. 三個入口都出現在 skill 清單，執行後讀取 SPEC-2 表格列出的必讀文件。
    2. `/issue-start` 產出的 `README.md` 符合 S 級範本：議題資訊表、各節、DoD 五項，編號使用 SPEC-6 的前綴；AI 提出分級建議後停下等人確認（SPEC-3.3、SPEC-3.4）。
    3. Release note 每條以 `新增` / `修改` / `刪除` 開頭；merge log 符合 SPEC-9.2 格式，目標版本留空。
    4. 只輸入「開議題」時，經 skill 或流程索引讀取 `issue-workflow.md` 與 `issue-docs.md`。
+   5. 修改 `.cs` 前，經流程索引讀取 `coding-style-csharp.instructions.md`。
 3. 演練產出不提交，檢查結果摘要寫入執行結果。
 
 #### TEST-16 VS 2026 Copilot 讀取與觸發
@@ -196,4 +201,4 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 
 ## 6. 待討論
 
-無。確認點 4 的決議見 DEC-4.5、DEC-7.1。
+無。確認點 4 的決議見 DEC-4.5、DEC-7.1；確認點 5 回溯修改見 DEC-10。

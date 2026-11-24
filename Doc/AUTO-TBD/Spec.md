@@ -14,8 +14,10 @@
    | 入口 | `.github/copilot-instructions.md`、`CLAUDE.md` | 規範如何分類、去哪裡讀 | 工具自動載入 |
    | 團隊通用 | `.github/instructions/collaboration.instructions.md` | 協作原則、文件通則、流程索引 | 常駐（`applyTo: "**"`） |
    | 團隊通用 | `.github/process/*.md` | 流程本文 | 依流程索引的時機讀取 |
-   | 團隊通用 | `.github/instructions/coding-style-*.instructions.md` | Coding Style | 依 `applyTo` 常駐 |
-   | MyCAM 專案 | `.github/instructions/project-overview.instructions.md` | 架構、慣例、建置、專案固定檢查項目 | 常駐 |
+   | 團隊通用 | `.github/instructions/coding-style-general.instructions.md` | Coding Style 通用規則 | 常駐（`applyTo: "**"`） |
+   | 團隊通用 | `.github/instructions/coding-style-<語言>.instructions.md` | 各語言 Coding Style | Copilot 依 `applyTo` 載入；Claude 依流程索引讀取 |
+   | MyCAM 專案 | `.github/instructions/project-overview.instructions.md` | 架構、慣例、專案固定檢查項目 | 常駐 |
+   | MyCAM 專案 | `.github/project/*.md` | 建置、執行環境、worktree 準備 | 依專案指引的索引讀取 |
    | 個人 | `~/.claude/CLAUDE.md`、`CLAUDE.local.md` 等 | 個人偏好 | 各工具自行載入，不進版控 |
 
 2. 團隊通用層不出現 MyCAM 專屬的檔名、專案名稱、建置指令；需要專案資訊時寫「見專案指引」。
@@ -29,15 +31,17 @@
    | 撰寫或修改議題文件 | `process/issue-docs.md` |
    | 執行或回應 review | `process/review.md`，加上專案指引的專案固定檢查項目 |
    | 開分支、commit、送 MR、產出 release note、建立 worktree | `process/git-workflow.md` |
+   | 新增或修改程式碼 | 對應語言的 `instructions/coding-style-<語言>.instructions.md` |
 
 6. 文件通則，適用所有規範指引與議題文件：
    1. 精簡：只寫讀者做對所需的資訊。不寫也會做對的不寫；同一規則只寫一處，其他地方以連結引用；機器能檢查的交給工具，文件只留一行指引；非直覺的規則附一句理由，容易誤解時才附範例。
    2. 只保留最終結果；正向表述，必要時才以反向表述強調；同類內容整合，不寫流水帳。
    3. 條列使用數字標號（巢狀也編號），表格除外。
    4. 內容使用繁體中文，檔名使用英文。
-7. 自動載入的內容（入口文件與 `.github/instructions/`）另設硬上限：
+7. 常駐內容（每次互動都載入：入口文件與 `applyTo: "**"` 的指引）另設硬上限：
    1. `collaboration.instructions.md` 不超過 60 行。
-   2. 自動載入的總行數增加時，review 報告寫明增加量與必須自動載入的理由，由人接受。
+   2. 常駐總行數增加時，review 報告寫明增加量與必須常駐的理由，由人接受。
+   3. 只在特定時機需要的內容（依副檔名適用的規範、建置與環境準備）不常駐，依索引讀取。
 
 ### SPEC-2 觸發入口（REQ-3.3、REQ-2.2；DEC-2.5）
 
@@ -237,10 +241,12 @@
 | `.github/process/review.md` | 新增 | SPEC-13 |
 | `.github/process/git-workflow.md` | 新增 | SPEC-13 |
 | `.github/instructions/project-overview.instructions.md` | 修改 | SPEC-14 |
+| `.github/project/build.md` | 新增 | SPEC-14 |
 | `.github/instructions/coding-style-general.instructions.md` | 修改 | SPEC-10 |
 | `.github/copilot-instructions.md` | 修改 | SPEC-15 |
 | `CLAUDE.md` | 修改 | SPEC-15 |
 | `.gitignore` | 修改：加入 `/SESSION.md` | SPEC-5 |
+| `.editorconfig` | 修改：加入 `[*.ps1] charset = utf-8-bom` | DEC-10.3 |
 | `.claude/skills/issue-start/SKILL.md` | 新增 | SPEC-16 |
 | `.claude/skills/review/SKILL.md` | 新增 | SPEC-16 |
 | `.claude/skills/release-note/SKILL.md` | 新增 | SPEC-16 |
@@ -249,7 +255,7 @@
 
 1. 所有規範文件遵守 SPEC-1 第 6 項；檔案格式依 `.editorconfig`。
 2. 本議題新增與修改的規範檔改為數字條列；未修改的檔案（如 `coding-style-csharp`、`coding-style-cpp`）不動，日後修改時再改。
-3. `process/` 不放 `applyTo` frontmatter，也不放在 `instructions/` 下，避免被工具自動常駐。
+3. `process/`、`project/` 不放 `applyTo` frontmatter，也不放在 `instructions/` 下，避免被工具自動常駐。
 
 ### SPEC-12 `collaboration.instructions.md`（REQ-3.1、REQ-3.2；DEC-2.3、DEC-2.4）
 
@@ -273,21 +279,23 @@
 ### SPEC-14 `project-overview.instructions.md`（REQ-1.2；DEC-2.6）
 
 1. 刪除「Git 流程」章節：分支命名、commit 規則、Claude Code worktree 的通用說明移到 `process/git-workflow.md`。
-2. 「建置與執行」下新增「worktree 準備」：`.worktreeinclude` 複製的檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/` 等）、`CLAUDE.local.md` 由上層載入、第一次建置前執行 `CopyRef.bat`。
-3. 新增「專案固定檢查項目」章節，作為 review 門檻段與規範段的專案項目：
+2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`，並在該檔新增「worktree 準備」：`.worktreeinclude` 複製的檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/` 等）、`CLAUDE.local.md` 由上層載入、第一次建置前執行 `CopyRef.bat`。
+3. `project-overview` 的「建置與執行」只留一行索引：建置、執行環境、worktree 準備時讀 `.github/project/build.md`。
+4. 新增「專案固定檢查項目」章節，作為 review 門檻段與規範段的專案項目：
    1. `Build.bat Debug` 建置成功。
    2. 使用者可見文字的四語系 XML（`zh-TW`、`zh-CN`、`en-US`、`ru-RU`）同步。
    3. 修改過的 `*.Designer.cs` 仍可在 Designer 開啟。
    4. 未修改 `reference/` 內的檔案（除非議題明確要求）。
+5. 第 4 項的規則只寫在「專案固定檢查項目」：「慣例」與「技術棧」中重複的句子（四語系同步、Designer 可開、不修改 `reference/`）刪除，保留做法說明。
 
 ### SPEC-15 入口文件（REQ-1.3、REQ-2.1；DEC-2.1、DEC-2.2）
 
 1. `copilot-instructions.md`：
    1. 說明四層分類與載入方式（SPEC-1 第 1 項的精簡版）。
-   2. 指引目錄加入 `collaboration.instructions.md` 與 `process/` 四份文件，並標示「常駐」或「依時機讀取」。
+   2. 指引目錄加入 `collaboration.instructions.md`、`process/` 四份文件與 `project/build.md`，每份標示「常駐」或「依時機讀取」（各語言 Coding Style 標示 Copilot 依 `applyTo`、Claude 依索引）。
    3. 刪除「本檔只放目錄與跨主題的總則」中的「總則」說法，改為「本檔只放目錄與分類說明」。
    4. 「維護方式」加入自動載入內容的硬上限（SPEC-1 第 7 項）。
-2. `CLAUDE.md`：`@` 引用加入 `collaboration.instructions.md`；`process/` 不以 `@` 引用（`@` 會常駐載入）。
+2. `CLAUDE.md`：`@` 只引用常駐的檔案（`copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general`）；`coding-style-csharp`、`coding-style-cpp`、`process/`、`project/` 不以 `@` 引用（`@` 會常駐載入），由流程索引導向。
 
 ### SPEC-16 Skills（REQ-3.3；DEC-2.5）
 
@@ -315,6 +323,7 @@
    3. GitLab MR 建立自動化（push options，或 `glab` CLI / GitLab API）。
    4. 既有分支 `AUTO-23254_f_UIStyleUnify` 依新規範調整。
    5. VS 2026 Copilot 讀取 skill 的結果若為讀不到，評估改用 Copilot 的入口機制。
+   6. Coding Style 與 `.editorconfig` 重複的格式規則縮減為一行指引，並評估 Claude 依副檔名自動載入各語言 Coding Style 的機制。
 
 ### SPEC-19 本議題自身的文件（REQ-5；DEC-1.1）
 
@@ -334,7 +343,7 @@
 ### 3.2 輸出
 
 1. Merge log：格式與現行一致，差別是 AI 產出時目標版本留空，由合併者填入。
-2. 自動載入的內容：新增 `collaboration.instructions.md`，`project-overview` 移出 Git 流程；本議題完成後總行數不超過施工前（359 行）。
+2. 常駐內容：新增 `collaboration.instructions.md`，`project-overview` 移出 Git 流程與建置細節，Claude 不再常駐各語言 Coding Style；本議題完成後常駐總行數不超過施工前（193 行）。
 3. Production Code、建置產物、NC 輸出：無。
 
 ## 4. 需求對照
@@ -354,4 +363,4 @@
 
 ## 5. 待討論
 
-無。確認點 3 的決議見 DEC-9。
+無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10。
