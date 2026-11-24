@@ -29,7 +29,7 @@
    | --- | --- |
    | 開始議題、分級、進入下一階段 | `process/issue-workflow.md` |
    | 撰寫或修改議題文件 | `process/issue-docs.md` |
-   | 執行或回應 review | `process/review.md`，加上專案指引的專案固定檢查項目；review 程式碼時加讀對應語言的 Coding Style |
+   | 執行或回應 review | `process/review.md`，加上專案指引的專案固定檢查項目；再依本表加讀本次修改涉及的文件 |
    | 開分支、commit、送 MR、產出 release note、建立 worktree | `process/git-workflow.md` |
    | 新增或修改程式碼 | 對應語言的 `instructions/coding-style-<語言>.instructions.md` |
 
@@ -160,7 +160,9 @@
    | 1 門檻 | 建置、檢查腳本、測試、專案固定檢查項目；動到自動載入的檔案時計算行數並與比對基準比較（SPEC-1 第 7 項） | 執行並回報結果 | 提供 AI 無法執行的環境 |
    | 2 需求與範圍 | 每個 REQ / SPEC 都有實作與測試，沒有範圍外的修改 | 追溯比對 | 判斷需求是否被誤解 |
    | 3 功能正確性 | 邊界、錯誤處理、空值、資源釋放、執行緒；專案指引的領域檢查項目 | 靜態分析 | 實機操作驗證 |
-   | 4 規範符合 | Coding Style、專案慣例 | 檢查 | 確認處置 |
+   | 4 規範符合 | 依流程索引列出本次修改涉及的規範（如修改 C# 檔對應 C# Coding Style），逐一比對；專案慣例 | 檢查 | 確認處置 |
+
+   流程索引是規範的唯一登記處：新增規範只在索引加一列，review 自動涵蓋，不需修改本表（DEC-15）。
    | 5 設計品質 | 架構、重複、效率、可維護性 | 提出 | 取捨 |
    | 6 文件 | 議題文件與 DoD、指引規範、使用手冊是否受影響；是否符合文件通則（重複、無法判斷、可交給工具的規則） | 檢查 | 確認 |
 
@@ -295,7 +297,7 @@
 
 1. `copilot-instructions.md`：
    1. 說明四層分類與載入方式（SPEC-1 第 1 項的精簡版）。
-   2. 指引目錄加入 `collaboration.instructions.md`、`process/` 四份文件與 `project/build.md`，每份標示「常駐」或「依時機讀取」（各語言 Coding Style 標示 Copilot 依 `applyTo`、Claude 依索引）。
+   2. 指引目錄加入 `collaboration.instructions.md`、`process/` 四份文件、`project/build.md` 與 `project/claude-worktree.md`，每份標示「常駐」或「依時機讀取」（各語言 Coding Style 標示 Copilot 依 `applyTo`、Claude 依索引）。
    3. 刪除「本檔只放目錄與跨主題的總則」中的「總則」說法，改為「本檔只放目錄與分類說明」。
    4. 「維護方式」加入常駐內容的原則（SPEC-1 第 7 項）。
 2. `CLAUDE.md`：`@` 只引用常駐的檔案（`copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general`）；`coding-style-csharp`、`coding-style-cpp`、`process/`、`project/` 不以 `@` 引用（`@` 會常駐載入），由流程索引導向。
@@ -367,4 +369,4 @@
 
 ## 5. 待討論
 
-無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11；worktree 改為選用、開議題時開分支見 DEC-12；先做後確認見 DEC-13；Claude 與 worktree 的做法獨立成檔見 DEC-14。
+無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11；worktree 改為選用、開議題時開分支見 DEC-12；先做後確認見 DEC-13；Claude 與 worktree 的做法獨立成檔見 DEC-14；review 規範段以流程索引為登記處見 DEC-15。

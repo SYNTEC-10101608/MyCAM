@@ -75,7 +75,7 @@
 
 ## DEC-9 規格確認點的決議（2026-11-24）
 
-1. 考量：worktree 說明混有 MyCAM 專屬內容（DLL 清單、`CopyRef.bat`）。**拆分**：通用規則移到 `git-workflow.md`，專案準備步驟留在專案指引（位置由 DEC-10.1 改為 `project/build.md`）。
+1. 考量：worktree 說明混有 MyCAM 專屬內容（DLL 清單、`CopyRef.bat`）。**拆分**：通用規則移到 `git-workflow.md`，專案準備步驟留在專案指引（位置由 DEC-10.1 改為 `project/build.md`，再由 DEC-14 改為 `project/claude-worktree.md`）。
 2. 考量：`.git/info/exclude` 不進版控，其他成員會誤提交。**`SESSION.md` 改由 `.gitignore` 的 `/SESSION.md` 排除**。
 3. 考量：commit hash 要 commit 後才知道，記在文件需要事後補，rebase 後也會變。
    **commit 訊息結尾標示 `(STEP-n)` 或 `(REV-n)`**，`Implementation.md` 不記 hash；一個 STEP 可對應多個 commit。
@@ -89,7 +89,7 @@
 ## DEC-10 實作規劃確認點的決議（2026-11-24）
 
 1. 考量：施工前常駐內容已用滿上限，加上 `collaboration` 後預估超出約 50 行。
-   **只在特定時機需要的內容不常駐**：`project-overview` 的建置細節移到 `.github/project/build.md`（含 worktree 準備），常駐處留一行索引；與「專案固定檢查項目」重複的句子刪除。
+   **只在特定時機需要的內容不常駐**：`project-overview` 的建置細節移到 `.github/project/build.md`（worktree 準備由 DEC-14 再移到 `claude-worktree.md`），常駐處留一行索引；與「專案固定檢查項目」重複的句子刪除。
 2. 考量：`coding-style-csharp`、`coding-style-cpp` 依副檔名適用，Copilot 已依 `applyTo` 按需載入，Claude 卻因 `@` 每次載入。
    **`CLAUDE.md` 不再 `@` 引用各語言 Coding Style**，改由流程索引「新增或修改程式碼」導向；行數上限改為只計常駐內容（入口與 `applyTo: "**"`，基準 193 行）。
    與 `.editorconfig` 重複的格式規則列後續。
@@ -124,3 +124,10 @@
 4. **從通用流程與建置說明移除**：`issue-workflow.md` 的 session 切換、流程索引的「切換 session」、`issue-docs.md` 的 `SESSION.md`、`git-workflow.md` 的 Claude Code worktree 細節（只留「worktree 為選用，做法見專案指引」）、`build.md` 的 worktree 準備與 worktree 的 `FCLTool` 卸載。
 5. **保留**：`.gitignore` 的 `/SESSION.md`、`copilot-instructions.md` 提到 `CLAUDE.md` 的維護規則、`.claude/skills/`（Copilot 也讀得到）、`build.md` 的 `.\Build.bat` 寫法。
 6. 回溯修改 REQ-5.1、SPEC-1.1、SPEC-1.5、SPEC-3.8（刪除）、SPEC-5.8（刪除）、SPEC-11、SPEC-13.1、SPEC-13.4、SPEC-14.2、SPEC-14.3，新增 SPEC-14.6；TEST-4、TEST-8、TEST-9 與 `Check.ps1` 同步。
+
+## DEC-15 Review 規範段以流程索引為登記處（2026-11-25）
+
+1. 考量：規範段原本寫「Coding Style、專案慣例」，流程索引的 review 列另寫「加讀 Coding Style」；之後新增 UI 等規範時，兩處都要改，容易漏。
+2. **流程索引是規範的唯一登記處**：review 規範段改為「依流程索引列出本次修改涉及的規範，逐一比對」，流程索引的 review 列改為「再依本表加讀本次修改涉及的文件」；新增規範只在索引加一列。
+3. 另一做法是每新增規範就同步改 review 的列舉，較明確但兩處維護；使用者同意採第 2 項。
+4. 回溯修改 SPEC-1.5、SPEC-7.1。

@@ -65,7 +65,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 
 ### STEP-7 專案指引
 
-1. 新增 `.github/project/build.md`：由 `project-overview` 搬入 FCLTool、命令列建置、執行期檔案，新增 worktree 準備；搬移與新增分開 commit，搬移的 commit 只做搬移與條列轉換，方便比對。
+1. 新增 `.github/project/build.md`：由 `project-overview` 搬入 FCLTool、命令列建置、執行期檔案（原新增的 worktree 準備由 REV-30 移到 `claude-worktree.md`）；搬移與新增分開 commit，搬移的 commit 只做搬移與條列轉換，方便比對。
 2. `project-overview.instructions.md`：
    1. 刪除「Git 流程」章節與建置細節，「建置與執行」只留指向 `project/build.md` 的索引。
    2. 新增「專案固定檢查項目」四項，刪除「慣例」與「技術棧」中重複的三句。

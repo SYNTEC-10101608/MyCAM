@@ -100,7 +100,7 @@
 
 1. 方法：搜尋 `project-overview.instructions.md`、`.github/project/build.md`、`.github/project/claude-worktree.md` 與 `coding-style-general.instructions.md`。
 2. 通過條件：
-   1. `project-overview` 沒有「Git 流程」章節與建置細節（`FakeDebug`、`vswhere`、`MachineData`）；「建置與執行」只有指向 `project/build.md` 的索引；有「專案固定檢查項目」（五項，SPEC-14.4）。
+   1. `project-overview` 沒有「Git 流程」章節與建置細節（`FakeDebug`、`vswhere`、`MachineData`）；「建置與執行」只有指向 `project/build.md` 與 `project/claude-worktree.md` 的索引；有「專案固定檢查項目」（五項，SPEC-14.4）。
    2. `build.md` 有 FCLTool、命令列建置、執行期檔案三節，沒有 worktree 相關內容；`claude-worktree.md` 有 Session 交接、Worktree 兩節，含 `SESSION.md` 與 `.worktreeinclude` 的說明（SPEC-14.6）。
    3. 四語系同步、Designer 可開、不修改 `reference/` 三項規則在 `project-overview` 只出現在「專案固定檢查項目」（SPEC-14.5）。
    4. `coding-style-general` 不再有「維持該方法內既有的命名方式」；有 SPEC-10.1 三項與 SPEC-10.2 註解規則。
