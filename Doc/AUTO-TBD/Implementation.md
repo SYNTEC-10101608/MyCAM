@@ -59,7 +59,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 ### STEP-6 常駐與入口文件
 
 1. 新增 `collaboration.instructions.md`：frontmatter `applyTo: "**"`；協作原則、文件通則、流程索引（完整路徑，含「新增或修改程式碼」一列）；目標 40 行內。
-2. `copilot-instructions.md`：四層分類精簡說明、指引目錄加入 `collaboration`、`process/` 與 `project/build.md`（標示載入方式）、改為「本檔只放目錄與分類說明」、維護方式加入硬上限；數字條列轉換另一個 commit。
+2. `copilot-instructions.md`：四層分類精簡說明、指引目錄加入 `collaboration`、`process/` 與 `project/build.md`（標示載入方式）、改為「本檔只放目錄與分類說明」、維護方式加入常駐內容的原則；數字條列轉換另一個 commit。
 3. `CLAUDE.md`：`@` 引用加入 `collaboration.instructions.md`，移除 `coding-style-csharp`、`coding-style-cpp`。
 4. SPEC：SPEC-1、SPEC-12、SPEC-15。TEST：TEST-1、TEST-3、TEST-4、TEST-6、TEST-7。
 
@@ -131,18 +131,6 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 | SPEC-18 後續議題 | STEP-10 |
 | SPEC-19 本議題自身的文件 | STEP-12、STEP-13 |
 
-## 4. 常駐行數估算
+## 4. 待討論
 
-基準 193 行（入口 32、`project-overview` 130、`coding-style-general` 31），對應 TEST-1。
-
-| 檔案 | 基準 | 預估 | 異動 |
-| --- | --- | --- | --- |
-| 入口（`copilot-instructions.md`、`CLAUDE.md`） | 32 | 約 40 | 分類說明、目錄加列；`CLAUDE.md` 加 1 減 2 |
-| `collaboration.instructions.md` | 0 | 約 40 | 新增 |
-| `project-overview` | 130 | 約 75 | 移出 Git 流程 15 行與建置細節約 42 行，加固定檢查項目約 7 行，刪重複 3 句 |
-| `coding-style-general` | 31 | 約 33 | SPEC-10 |
-| 合計 | 193 | 約 188 | |
-
-## 5. 待討論
-
-無。確認點 5 的決議與對 SPEC、TEST 的回溯修改見 DEC-10。
+無。確認點 5 的決議與對 SPEC、TEST 的回溯修改見 DEC-10；取消行數上限見 DEC-11。

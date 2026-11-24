@@ -38,10 +38,9 @@
    2. 只保留最終結果；正向表述，必要時才以反向表述強調；同類內容整合，不寫流水帳。
    3. 條列使用數字標號（巢狀也編號），表格除外。
    4. 內容使用繁體中文，檔名使用英文。
-7. 常駐內容（每次互動都載入：入口文件與 `applyTo: "**"` 的指引）另設硬上限：
-   1. `collaboration.instructions.md` 不超過 60 行。
-   2. 常駐總行數增加時，review 報告寫明增加量與必須常駐的理由，由人接受。
-   3. 只在特定時機需要的內容（依副檔名適用的規範、建置與環境準備）不常駐，依索引讀取。
+7. 常駐內容（每次互動都載入：入口文件與 `applyTo: "**"` 的指引）的行數是觀察指標，不設上限，避免為了數字刪減必要內容：
+   1. 常駐總行數增加時，review 報告寫明增加量與必須常駐的理由，由人接受。
+   2. 只在特定時機需要的內容（依副檔名適用的規範、建置與環境準備）不常駐，依索引讀取。
 
 ### SPEC-2 觸發入口（REQ-3.3、REQ-2.2；DEC-2.5）
 
@@ -264,7 +263,7 @@
    1. 協作原則：AI 以資深工程師角度提出想法與建議，有疑慮直接指出並附替代方案；一定由人做的決策：分級、確認點定案、各項發現的處置、合併、push。
    2. 文件通則：SPEC-1 第 6 項。
    3. 流程索引：SPEC-1 第 5 項的「時機 → 必讀文件」表格，路徑寫完整（`.github/process/...`）。
-3. 只放每次互動都適用的規則，行數上限見 SPEC-1 第 7 項。
+3. 只放每次互動都適用的規則；行數依 SPEC-1 第 7 項檢查。
 
 ### SPEC-13 `process/` 文件（REQ-4～REQ-7）
 
@@ -294,7 +293,7 @@
    1. 說明四層分類與載入方式（SPEC-1 第 1 項的精簡版）。
    2. 指引目錄加入 `collaboration.instructions.md`、`process/` 四份文件與 `project/build.md`，每份標示「常駐」或「依時機讀取」（各語言 Coding Style 標示 Copilot 依 `applyTo`、Claude 依索引）。
    3. 刪除「本檔只放目錄與跨主題的總則」中的「總則」說法，改為「本檔只放目錄與分類說明」。
-   4. 「維護方式」加入自動載入內容的硬上限（SPEC-1 第 7 項）。
+   4. 「維護方式」加入常駐內容的原則（SPEC-1 第 7 項）。
 2. `CLAUDE.md`：`@` 只引用常駐的檔案（`copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general`）；`coding-style-csharp`、`coding-style-cpp`、`process/`、`project/` 不以 `@` 引用（`@` 會常駐載入），由流程索引導向。
 
 ### SPEC-16 Skills（REQ-3.3；DEC-2.5）
@@ -343,7 +342,7 @@
 ### 3.2 輸出
 
 1. Merge log：格式與現行一致，差別是 AI 產出時目標版本留空，由合併者填入。
-2. 常駐內容：新增 `collaboration.instructions.md`，`project-overview` 移出 Git 流程與建置細節，Claude 不再常駐各語言 Coding Style；本議題完成後常駐總行數不超過施工前（193 行）。
+2. 常駐內容：新增 `collaboration.instructions.md`，`project-overview` 移出 Git 流程與建置細節，Claude 不再常駐各語言 Coding Style；常駐總行數與施工前（193 行）的差異依 SPEC-1 第 7 項在 review 說明。
 3. Production Code、建置產物、NC 輸出：無。
 
 ## 4. 需求對照
@@ -363,4 +362,4 @@
 
 ## 5. 待討論
 
-無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10。
+無。確認點 3 的決議見 DEC-9；確認點 5 回溯修改見 DEC-10；施工中取消行數上限見 DEC-11。

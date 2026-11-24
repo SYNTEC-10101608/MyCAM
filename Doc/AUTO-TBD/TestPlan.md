@@ -43,10 +43,8 @@
 #### TEST-1 常駐行數
 
 1. 方法：計算入口文件（`.github/copilot-instructions.md`、`CLAUDE.md`）與 `.github/instructions/` 中 `applyTo: "**"` 的檔案行數，與比對基準比較。
-2. 通過條件：
-   1. 總行數不超過 193 行（基準 `24c7276d`：入口 32 行、`project-overview` 130 行、`coding-style-general` 31 行）。
-   2. `collaboration.instructions.md` 不超過 60 行。
-3. 長期維護：即 review 門檻段的行數檢查（SPEC-7.1）；總行數增加時依 SPEC-1.7.2 寫明理由。
+2. 通過條件：輸出各檔與總行數，以及與基準 193 行（`24c7276d`：入口 32 行、`project-overview` 130 行、`coding-style-general` 31 行）的差異；總行數增加時，`Review.md` 寫明增加量與理由（SPEC-1.7.1）。
+3. 長期維護：即 review 門檻段的行數檢查（SPEC-7.1）。
 
 #### TEST-2 團隊通用層不含專案內容
 
@@ -201,4 +199,4 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 
 ## 6. 待討論
 
-無。確認點 4 的決議見 DEC-4.5、DEC-7.1；確認點 5 回溯修改見 DEC-10。
+無。確認點 4 的決議見 DEC-4.5、DEC-7.1；確認點 5 回溯修改見 DEC-10；TEST-1 取消上限見 DEC-11。
