@@ -40,6 +40,7 @@
 2. 需求與範圍：REQ-1～REQ-10 皆有 SPEC，SPEC-1～SPEC-19 皆有 TEST 與 STEP；DEC-12 落實於 `git-workflow.md` 第 5 節、`issue-workflow.md` 第 2 節第 2 項、`issue-start` 必讀清單、`build.md` worktree 準備，DEC-13 落實於 `collaboration` 協作原則第 2 項、`review.md` 第 3 節第 1 項；TEST-5 通過，沒有範圍外修改。
 3. 第 3 段以 `Check.ps1` 為對象（含以 `-Base deadbeef` 實際執行），第 5 段以 `Check.ps1` 與規範設計為對象；第 6 段即 TEST-10 文件精簡審查。
 4. 本回合沒有「必修」。
+5. 修正後常駐 194 行，比基準增加 1 行（REV-15）：UI 執行緒、角度單位、座標系是本專案 review 必查的領域項目，隨專案固定檢查項目常駐，review 時才不會漏看。
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
@@ -48,12 +49,12 @@
 | REV-11 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:594` | TEST-11 對非必修只檢查處置非空、對必修只檢查開頭為「已修正」，「待處置」與「已修正（待人確認）」都會通過，與 `review.md` 第 3 節第 4 項「送 MR 前不留未處置或待確認」不符 | 已修正（待人確認） |
 | REV-12 | 5 | 建議 | `Doc/AUTO-TBD/Check.ps1:640` | TEST-12 讀取執行者本人的 `~/.claude/CLAUDE.md` 與 `CLAUDE.local.md`，合併者或其他成員執行時必定 FAIL 或執行錯誤，門檻結果因人而異；建議偵測到檔案不存在時改為「略過」並輸出說明 | 已修正（待人確認） |
 | REV-13 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:331` | TEST-5 只檢查「異動都在清單內」，清單內檔案未異動不會發現；TEST-5 通過條件寫「一致」，建議補反向比對或把通過條件改為「異動不超出清單」 | 已修正（待人確認） |
-| REV-14 | 5 | 建議 | `.github/instructions/collaboration.instructions.md:32` | 流程索引的「執行或回應 review」只導向 `review.md` 與專案固定檢查項目；只做 review、不改程式碼時不會觸發「新增或修改程式碼」列，Claude 不會讀 `coding-style-<語言>`，第 4 段規範符合缺依據；建議該列加上「review 程式碼時加讀對應語言的 Coding Style」 | 待處置 |
-| REV-15 | 2 | 提問 | `.github/process/review.md:13` | 第 3 段列「UI 執行緒、角度單位（rad / deg）、座標系」，屬 CAD/CAM 與 WinForms 領域；團隊其他 repo 若不是同領域，違反 SPEC-1.2「團隊通用層不含專案內容」，應移到專案固定檢查項目。團隊其他 repo 是否同屬此領域？ | 待處置 |
-| REV-16 | 6 | 提問 | `.github/process/issue-workflow.md:25` | S 級判斷依據只有「小 bug」，小型功能或純文字修改（如修正 UI 字串）讀者無法判斷屬 S 或 M；是否放寬為「影響範圍明確的小修改（含小 bug）」？ | 待處置 |
-| REV-17 | 5 | 建議 | `.github/process/git-workflow.md:26` | Commit 標示只定義施工 `(STEP-n)` 與 review `(REV-n)`；確認點文件（階段 1～5）與回溯修改的 commit 沒有規則，本分支有 8 個未標示的 commit、`bd826055` 自訂 `(DEC-11)`，`Check.ps1` 以「只動議題文件即豁免」默認處理。建議在規範寫明確認點文件不標示（或標示 `DEC-n`），與腳本一致 | 待處置 |
-| REV-18 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:264` | SPEC-12.2.1 協作原則（資深工程師角度、DEC-13 依重要性先問或先做）沒有對應的 REQ，SPEC-12 只標 REQ-3.1、REQ-3.2（載入時機）；DEC-13 回溯時未補需求來源。建議補一條 REQ 或在 REQ-4 下增列子項 | 待處置 |
-| REV-19 | 6 | 建議 | `.github/copilot-instructions.md:23` | 指引目錄寫各語言 Coding Style「Copilot 依 `applyTo`」，但 TEST-16 實測 VS 2026 Copilot 未依 `applyTo` 自動載入 `coding-style-csharp`；讀者會以為 Copilot 不需依索引讀取。建議改為「Copilot、Claude 皆依流程索引（Copilot 另有 `applyTo`）」，或由 TODO-5 處理 | 已修正（待人確認） |
+| REV-14 | 5 | 建議 | `.github/instructions/collaboration.instructions.md:32` | 流程索引的「執行或回應 review」只導向 `review.md` 與專案固定檢查項目；只做 review、不改程式碼時不會觸發「新增或修改程式碼」列，Claude 不會讀 `coding-style-<語言>`，第 4 段規範符合缺依據；建議該列加上「review 程式碼時加讀對應語言的 Coding Style」 | 已修正（回溯至 SPEC-1.5） |
+| REV-15 | 2 | 提問 | `.github/process/review.md:13` | 第 3 段列「UI 執行緒、角度單位（rad / deg）、座標系」，屬 CAD/CAM 與 WinForms 領域；團隊其他 repo 若不是同領域，違反 SPEC-1.2「團隊通用層不含專案內容」，應移到專案固定檢查項目。團隊其他 repo 是否同屬此領域？ | 已修正（回溯至 SPEC-7.1、SPEC-14.4） |
+| REV-16 | 6 | 提問 | `.github/process/issue-workflow.md:25` | S 級判斷依據只有「小 bug」，小型功能或純文字修改（如修正 UI 字串）讀者無法判斷屬 S 或 M；是否放寬為「影響範圍明確的小修改（含小 bug）」？ | 已修正（回溯至 SPEC-3.2） |
+| REV-17 | 5 | 建議 | `.github/process/git-workflow.md:26` | Commit 標示只定義施工 `(STEP-n)` 與 review `(REV-n)`；確認點文件（階段 1～5）與回溯修改的 commit 沒有規則，本分支有 8 個未標示的 commit、`bd826055` 自訂 `(DEC-11)`，`Check.ps1` 以「只動議題文件即豁免」默認處理。建議在規範寫明確認點文件不標示（或標示 `DEC-n`），與腳本一致 | 已修正（回溯至 SPEC-8.5.3：確認點文件的 commit 不標示） |
+| REV-18 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:264` | SPEC-12.2.1 協作原則（資深工程師角度、DEC-13 依重要性先問或先做）沒有對應的 REQ，SPEC-12 只標 REQ-3.1、REQ-3.2（載入時機）；DEC-13 回溯時未補需求來源。建議補一條 REQ 或在 REQ-4 下增列子項 | 已修正（回溯至 REQ-11、SPEC-12） |
+| REV-19 | 6 | 建議 | `.github/copilot-instructions.md:23` | 指引目錄寫各語言 Coding Style「Copilot 依 `applyTo`」，但 TEST-16 實測 VS 2026 Copilot 未依 `applyTo` 自動載入 `coding-style-csharp`；讀者會以為 Copilot 不需依索引讀取。建議改為「Copilot、Claude 皆依流程索引（Copilot 另有 `applyTo`）」，或由 TODO-5 處理 | 已修正 |
 | REV-20 | 6 | 建議 | `.github/process/issue-docs.md:29` | 規則寫「確認點文件的最後一節為『待討論』」，但 S 級範本的待討論之後還有 DoD 與 Release Note；M 級 `README.md` 承載確認點 1–2 的內容，骨架卻沒有待討論。建議改為「確認點內容之後列『待討論』」，並在 M、L 骨架補上 | 已修正（待人確認） |
 | REV-21 | 6 | 建議 | `Doc/AUTO-TBD/Goal.md:118` | `Goal.md` 是確認點 1、2 的文件，沒有「待討論」一節，不符 `issue-docs.md` 第 2 節第 2 項；Spec、TestPlan、Implementation 都有 | 已修正（待人確認） |
 | REV-22 | 6 | 建議 | `.github/project/build.md:50` | 與同檔第 30 行矛盾：第 30 行寫 `CopyRef.bat`「首次建置後執行一次」，第 50 行寫「第一次建置前執行」（腳本會自建目錄，兩者皆可）；同句「以 Visual Studio 開啟前先卸載 `FCLTool`」順序不可行，應為開啟後卸載（第 12 行已寫） | 已修正（待人確認） |
