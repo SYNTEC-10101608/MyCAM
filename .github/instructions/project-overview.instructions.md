@@ -67,12 +67,13 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 
 ## 專案固定檢查項目
 
-Review 門檻段與規範段的專案項目（見 [review.md](../process/review.md)）：
+Review 門檻段、功能正確性段與規範段的專案項目（見 [review.md](../process/review.md)）：
 
 1. `Build.bat Debug` 建置成功。
 2. 使用者可見文字的四語系 XML 同步新增 / 修改（語系見「多語系」）。
 3. 修改過的 `*.Designer.cs` 仍可在 Designer 中開啟。
 4. 未修改 `reference/` 內的檔案，除非議題明確要求。
+5. 功能正確性：UI 執行緒、角度單位（rad / deg）、座標系。
 
 ## 建置與執行
 

@@ -524,8 +524,8 @@ function Test-9()
 	}
 	else {
 		$nItemCount = @( $check.Lines | Where-Object { $_ -match '^\d+\.\s' } ).Count
-		if( $nItemCount -ne 4 ) {
-			$failList += "「專案固定檢查項目」有 $nItemCount 項，應為 4 項"
+		if( $nItemCount -ne 5 ) {
+			$failList += "「專案固定檢查項目」有 $nItemCount 項，應為 5 項"
 		}
 	}
 
