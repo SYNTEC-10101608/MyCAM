@@ -158,17 +158,16 @@ function Test-1()
 		$nTotal += $nLines
 		$noteList += "$szFile = $nLines"
 	}
-	$noteList += "總計 = $nTotal（上限 193）"
-	if( $nTotal -gt 193 ) {
-		$failList += "常駐總行數 $nTotal 超過 193"
+	# 行數只是觀察指標（DEC-11）：輸出與基準的差異，增加時由人在 Review.md 確認理由
+	$nDiff = $nTotal - 193
+	$noteList += "總計 = $nTotal（基準 193，差異 $nDiff）"
+	if( $nDiff -gt 0 ) {
+		$noteList += '常駐總行數增加，Review.md 須寫明增加量與理由'
 	}
 
 	$szCollab = '.github/instructions/collaboration.instructions.md'
 	if( -not ( Test-Path -LiteralPath ( Join-Path $Root $szCollab ) ) ) {
 		$failList += "缺少 $szCollab"
-	}
-	elseif( ( Get-LineCount $szCollab ) -gt 60 ) {
-		$failList += "$szCollab 超過 60 行"
 	}
 	Add-Result 'TEST-1' $failList $noteList
 }
