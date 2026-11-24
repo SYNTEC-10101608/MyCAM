@@ -8,10 +8,8 @@
 | --- | --- | --- |
 | 入口 | 本檔、`CLAUDE.md` | 規範如何分類、去哪裡讀 |
 | 團隊通用 | `collaboration`、`coding-style-*`、`process/` | 協作原則、文件通則、流程、Coding Style；不含本專案專屬內容 |
-| 專案 | `project-overview`、`project/` | 本專案的架構、慣例、專案固定檢查項目、建置與環境 |
+| 專案 | `project-overview`、`project/` | 本專案的架構、慣例、專案固定檢查項目、建置與環境；可補充或具體化團隊通用層 |
 | 個人 | `~/.claude/CLAUDE.md`、`CLAUDE.local.md` 等（不進版控） | 個人偏好，不改變團隊規範的要求 |
-
-專案層可補充或具體化團隊通用層。
 
 ## 指引目錄
 
