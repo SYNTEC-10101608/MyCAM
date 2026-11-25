@@ -236,9 +236,11 @@ function Test-2()
 {
 	$failList = @()
 	$termArray = @( 'MyCAM', 'Build.bat', 'CopyRef', 'FCLTool', 'PostTool', 'OCC', 'LanguageManager',
-		'Designer', 'reference/', '.worktreeinclude', 'CustPost', 'zh-TW', 'AUTO-' )
+		'Designer', 'reference/', '.worktreeinclude', 'CustPost', 'zh-TW', 'AUTO-', '.NET Framework' )
 	$fileList = @( '.github/instructions/team-collaboration.instructions.md',
-		'.github/instructions/team-coding-style-general.instructions.md' ) + @( Get-Files '.github/team' '*.md' )
+		'.github/instructions/team-coding-style-general.instructions.md',
+		'.github/instructions/team-coding-style-csharp.instructions.md',
+		'.github/instructions/team-coding-style-cpp.instructions.md' ) + @( Get-Files '.github/team' '*.md' )
 	foreach( $szFile in $fileList ) {
 		$lineArray = Read-Lines $szFile
 		if( $null -eq $lineArray ) {

@@ -48,7 +48,7 @@
 
 #### TEST-2 團隊通用層不含專案內容
 
-1. 方法：在 `team-collaboration.instructions.md`、`team-coding-style-general.instructions.md` 與 `.github/team/*.md` 搜尋專案專屬字詞：`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`、`AUTO-`（DEC-16）。
+1. 方法：在 `team-collaboration.instructions.md`、`team-coding-style-general`、`team-coding-style-csharp`、`team-coding-style-cpp`（REV-52）與 `.github/team/*.md` 搜尋專案專屬字詞：`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`、`AUTO-`（DEC-16）、`.NET Framework`（REV-52）。
 2. 通過條件：零筆；需要專案資訊處寫「見專案指引」。
 3. 本檢查列入 `FollowUp.md` 自動化門檻的候選項目（DEC-4.5）。
 

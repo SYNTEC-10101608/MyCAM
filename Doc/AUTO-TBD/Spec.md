@@ -252,7 +252,7 @@
 | `.github/project/build.md` | 新增 | SPEC-14 |
 | `.github/project/claude-code.md` | 新增 | SPEC-14.6 |
 | `.github/instructions/team-coding-style-general.instructions.md` | 改名（原 `coding-style-general`）、修改 | SPEC-10、DEC-18 |
-| `.github/instructions/team-coding-style-csharp.instructions.md`、`team-coding-style-cpp.instructions.md` | 改名、更新互相連結 | DEC-18 |
+| `.github/instructions/team-coding-style-csharp.instructions.md`、`team-coding-style-cpp.instructions.md` | 改名、更新互相連結；專案資訊改為依專案指引（REV-52） | DEC-18 |
 | `.github/copilot-instructions.md` | 修改 | SPEC-15 |
 | `CLAUDE.md` | 修改 | SPEC-15 |
 | `.gitignore` | 修改：加入 `/SESSION.md`，防止個人交接檔誤提交 | DEC-9.2、DEC-14 |
@@ -264,7 +264,7 @@
 | 個人設定（不進版控） | 修改 / 刪除 | SPEC-17 |
 
 1. 所有規範文件遵守 SPEC-1 第 6 項；檔案格式依 `.editorconfig`。
-2. 本議題新增與修改的規範檔改為數字條列；只改名與更新連結的檔案（`team-coding-style-csharp`、`team-coding-style-cpp`）條列不轉換，日後修改內容時再改。
+2. 本議題新增與修改的規範檔改為數字條列；`team-coding-style-csharp`、`team-coding-style-cpp` 只改名、更新連結與替換專案資訊（REV-52），條列不轉換，留待 TODO-5 整理時再改。
 3. `team/`、`project/` 不放 `applyTo` frontmatter，也不放在 `instructions/` 下，避免被工具自動常駐。
 
 ### SPEC-12 `team-collaboration.instructions.md`（REQ-3.1、REQ-3.2、REQ-11；DEC-2.3、DEC-2.4、DEC-13）
