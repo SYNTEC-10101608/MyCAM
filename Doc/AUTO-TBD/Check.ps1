@@ -164,15 +164,40 @@ function Get-BaseResidentLineCount()
 	$fileList = @( '.github/copilot-instructions.md', 'CLAUDE.md' )
 	$fileList += @( git ls-tree --name-only "$Base" '.github/instructions/' ) | Where-Object { $_ -like '*.md' }
 	$nTotal = 0
+
+	# PowerShell 5.1 收集原生命令輸出時，在輸出被重導的環境（如經 Bash 呼叫）會丟掉空行；
+	# 改以 Process 直接讀 git 的標準輸出，與 Get-LineCount 同一口徑計算
 	foreach( $szFile in ( $fileList | Sort-Object -Unique ) ) {
-		$lineArray = @( git show "${Base}:$szFile" )
+		$szText = Get-GitBlobText "${Base}:$szFile"
+		$lineArray = $szText -split "\r?\n"
+		$nLineCount = $lineArray.Count
+		if( $nLineCount -gt 0 -and $lineArray[ -1 ] -eq '' ) {
+			$nLineCount--
+		}
 		$isEntry = ( $szFile -eq 'CLAUDE.md' ) -or ( $szFile -eq '.github/copilot-instructions.md' )
-		$isResident = ( $lineArray -join "`n" ) -match '(?s)\A---\s*\n.*?applyTo:\s*"\*\*".*?\n---'
+		$isResident = $szText -match '(?s)\A---\s*\r?\n.*?applyTo:\s*"\*\*".*?\n---'
 		if( $isEntry -or $isResident ) {
-			$nTotal += $lineArray.Count
+			$nTotal += $nLineCount
 		}
 	}
 	return $nTotal
+}
+
+function Get-GitBlobText( [string]$Spec )
+{
+	$startInfo = New-Object System.Diagnostics.ProcessStartInfo
+	$startInfo.FileName = 'git'
+	$startInfo.Arguments = "show `"$Spec`""
+	$startInfo.WorkingDirectory = $Root
+	$startInfo.UseShellExecute = $false
+	$startInfo.RedirectStandardOutput = $true
+	$startInfo.StandardOutputEncoding = New-Object System.Text.UTF8Encoding( $false )
+	$process = [System.Diagnostics.Process]::Start( $startInfo )
+	$szText = $process.StandardOutput.ReadToEnd()
+	$process.WaitForExit()
+
+	# BOM 不算內容
+	return $szText.TrimStart( [char]0xFEFF )
 }
 
 function Test-1()

@@ -139,7 +139,7 @@
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
-| REV-51 | 1 | 必修 | `Doc/AUTO-TBD/Check.ps1:165` | `Get-BaseResidentLineCount` 以 `@( git show ... )` 取基準檔內容；主 session 驗證：在 PowerShell 主控台執行時基準為 193，經 Bash 呼叫（輸出被重導）時基準為 122，空行被丟掉。現況行數用 `Get-LineCount`，兩邊口徑不同，門檻報告會誤判常駐增量 | 待處置（必修，先由人確認）。建議：基準檔改以 `git show --output=<暫存檔>` 輸出，再用 `Get-LineCount` 計算，兩種環境都確認為 193 |
+| REV-51 | 1 | 必修 | `Doc/AUTO-TBD/Check.ps1:165` | `Get-BaseResidentLineCount` 以 `@( git show ... )` 取基準檔內容；主 session 驗證：在 PowerShell 主控台執行時基準為 193，經 Bash 呼叫（輸出被重導）時基準為 122，空行被丟掉。現況行數用 `Get-LineCount`，兩邊口徑不同，門檻報告會誤判常駐增量 | 已修正（使用者同意）：`git show` 對 blob 不理會 `--output`，改以 `Process` 直接讀標準輸出，與 `Get-LineCount` 同一口徑；PowerShell 主控台與經 Bash 呼叫皆為基準 193、差異 +9 |
 | REV-52 | 2 | 必修 | `.github/instructions/team-coding-style-cpp.instructions.md:7` | DEC-18 把語言 Coding Style 歸為團隊通用，內容卻有 MyCAM 專屬資訊，違反 SPEC-1.2：cpp 第 7 行「適用於 `PostTool`、`FCLTool`」、csharp 第 139 行 .NET Framework 4.8 / C# 7.3；TEST-2 未掃描這兩份 | 待處置（分層規則，先由人決定）。建議：只改這兩行（cpp「適用於 C / C++ 原始碼」，C# 版本「依專案指引的技術棧」），TEST-2 與 TODO-2 擴大範圍；另一選項：改歸專案層 `project-coding-style-*` |
 | REV-53 | 5 | 建議 | `.github/instructions/project-overview.instructions.md:57` | 四語系 XML 同步、Designer 可開、不改 `reference/` 是寫程式時就要遵守的規則，DEC-18 後只在 review 才讀的 `project/review.md`，AI 新增文字時讀不到 | 待處置（規格 SPEC-14.4～14.5，先由人決定）。建議：三條放回 `project-overview` 的慣例（常駐約 +3），`project/review.md` 改為依慣例檢查；另一選項：專案指引索引加「新增或修改程式碼時讀 `project/review.md`」 |
 | REV-54 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:23` | DEC-18 的說明句插進 SPEC-1.1 表格，「個人」列脫離表格；與 REV-33 同類 | 已修正（待人確認）：說明句移到「個人」列之後 |
