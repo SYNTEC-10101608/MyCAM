@@ -206,3 +206,11 @@
 9. **Claude Code 通用的 worktree 做法移到 `team/tool-claude-code.md`**；專案層只留要複製的專案檔、`CopyRef.bat`、卸載 `FCLTool`。
 10. **專案 review 門檻建置 Debug 與 Release**，改到 C++ 時另建該專案；平時只建 Debug 是個人習慣，留在 `CLAUDE.local.md`。
 11. 施工階段補一句「施工前依流程索引讀取程式規範」，補上議題流程中讀取程式規範的提醒；不新增寫程式的 skill。
+
+## DEC-24 VS 支援版本、worktree 準備與交接不限工具（2026-11-26）
+
+1. 考量：Review 第 8 回合（VS 2026 Copilot）指出 skill 的最低支援版本是 VS 2026 18.5，TEST-16 沒有記錄版本，也沒有測 release-note；新 worktree 的檔案準備只寫在 Claude 專用的文件；使用者另指出 session 交接也不限 Claude Code。
+2. **VS 2026 最低支援 18.5**（修改 REQ-2）：團隊統一使用 VS 2026，更新到 18.5 的成本低；不在入口另加連結，也不驗 18.0～18.4 無 skill 的路徑。TEST-16 記錄實測版本、在 Agent 模式執行，並加測 release-note。
+3. **新 worktree 的環境準備獨立成 `project/env-worktree.md`，不限工具**（取代 DEC-14.3 後半）：要複製的檔案、`CopyRef.bat`、卸載 `FCLTool` 是任何工具建立 worktree 都要做的；建置文件只講編譯，不放 worktree（DEC-14.4 維持）。刪除 `project/tool-claude-code.md`，專案索引改為「建立或準備新 worktree（不限工具）」。
+4. **Session 交接改為通用規則**（取代 DEC-14.1 把交接歸為 Claude 專用的前提）：寫入 `process-issue.md` 第 5 節，流程索引「切換 session 或對話」指向該檔；`team/tool-claude-code.md` 只留 Claude Code 的 worktree 機制。
+5. **工具文件只單向引用通用流程**：`process-git.md` 第 5 節改指 `project/env-worktree.md`，不再導向 Claude 文件；`process-issue.md` 與 `process-review.md` 的互相引用是流程接續，保留。

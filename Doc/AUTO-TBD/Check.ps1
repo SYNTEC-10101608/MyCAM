@@ -408,7 +408,7 @@ function Test-5()
 		'.github/project/coding-general.md',
 		'.github/project/process-review.md',
 		'.github/project/env-build.md',
-		'.github/project/tool-claude-code.md',
+		'.github/project/env-worktree.md',
 		'.github/project/coding-architecture.md',
 		'.github/team/coding-general.md',
 		'.github/team/coding-csharp.md',
@@ -664,16 +664,30 @@ function Test-9()
 		}
 	}
 
-	# 9.2 Claude Code 做法每層一份：通用的 session 交接與 worktree、專案要複製的檔案
-	$claudeMap = [ordered]@{ '.github/team/tool-claude-code.md' = 'SESSION.md'; '.github/project/tool-claude-code.md' = 'FCLTool.dll' }
-	foreach( $szFile in $claudeMap.Keys ) {
-		$szClaude = Read-Text $szFile
-		if( $null -eq $szClaude ) {
+	# 9.2 交接寫在 process-issue（不限工具）；新 worktree 準備寫在 env-worktree（不限工具）；Claude 文件不含交接（DEC-24）
+	$needMap = [ordered]@{
+		'.github/team/process-issue.md' = @( 'SESSION.md' )
+		'.github/project/env-worktree.md' = @( 'FCLTool.dll', 'CopyRef.bat', '.worktreeinclude' )
+		'.github/team/tool-claude-code.md' = @( '.worktreeinclude' )
+	}
+	foreach( $szFile in $needMap.Keys ) {
+		$szDoc = Read-Text $szFile
+		if( $null -eq $szDoc ) {
 			$failList += "缺少 $szFile"
+			continue
 		}
-		elseif( -not $szClaude.Contains( $claudeMap[ $szFile ] ) ) {
-			$failList += "$szFile 缺少 '$( $claudeMap[ $szFile ] )' 的說明"
+		foreach( $szNeed in $needMap[ $szFile ] ) {
+			if( -not $szDoc.Contains( $szNeed ) ) {
+				$failList += "$szFile 缺少 '$szNeed' 的說明"
+			}
 		}
+	}
+	$szClaudeDoc = Read-Text '.github/team/tool-claude-code.md'
+	if( $null -ne $szClaudeDoc -and $szClaudeDoc.Contains( 'SESSION.md' ) ) {
+		$failList += 'team/tool-claude-code.md 仍有 SESSION.md 交接'
+	}
+	if( Test-Path '.github/project/tool-claude-code.md' ) {
+		$failList += 'project/tool-claude-code.md 應已刪除'
 	}
 
 	# 9.3 三項規則寫在 project/coding-general.md，不出現在 project-overview

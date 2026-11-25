@@ -19,4 +19,4 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 | 盤點現況、新增或修改程式碼與設定檔 | `.github/project/coding-architecture.md`（技術棧、方案與主程式結構）、`.github/project/coding-general.md`（慣例與專案規則） |
 | 執行或回應 review | 依流程索引讀全部文件；專案固定檢查項目在 `.github/project/process-review.md` |
 | 建置、準備執行環境 | `.github/project/env-build.md` |
-| 以 Claude Code 建立或使用 worktree | `.github/project/tool-claude-code.md` |
+| 建立或準備新 worktree（不限工具） | `.github/project/env-worktree.md` |

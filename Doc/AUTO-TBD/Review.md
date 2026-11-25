@@ -202,3 +202,27 @@
 | REV-78 | 1 | 建議 | `.github/project/process-review.md:5` | Review 門檻應建置 Debug 與 Release；C++ 只在修改時建置 | 已修正（DEC-23.10；使用者同意依建議） |
 | REV-79 | 6 | 建議 | `~/.claude/CLAUDE.md:4` | 回覆方式已由團隊概觀涵蓋，使用者會帶團隊規範到其他 repo | 已修正（DEC-23.6；使用者同意依建議）：刪除該項 |
 | REV-80 | 4 | 建議 | `.github/team/process-issue.md:14` | 議題流程的施工階段沒有提醒讀取程式規範 | 已修正（DEC-23.11；使用者同意依建議）：補「施工前依流程索引讀取程式規範」 |
+
+## 第 8 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `24c7276d`；受審 HEAD `5e05f844` |
+| 工具與模型 | Visual Studio 2026 GitHub Copilot（本機 Visual Studio 18.12；模型未記錄） |
+| 日期 | 2026-11-26 |
+
+1. 門檻：Debug 與 Release 建置成功，各 6 個警告、0 個錯誤；未修改 C++，不需單獨建置。分支的 `git diff --check` 通過。
+2. `Check.ps1 -Base 24c7276d -SkipPersonal`：7 PASS、3 FAIL。TEST-4、TEST-5 因工作樹有未追蹤的 `.github/instructions/fromCLAUDE.instructions.md`；它不在受審 commit，未變動該檔。TEST-11 有兩項 DoD 未勾選，並有前回合處置仍待人確認。TEST-12 依參數略過實際檢查。
+3. 本次 VS Copilot session 可載入兩份概觀及 `review` skill，並依路徑讀取規範；沒有重跑最舊支援版本、無 skill 的路徑或 VS 的 release-note 入口。
+4. 處置（2026-11-26）：全部經使用者同意，決策見 DEC-24；另依使用者意見把 session 交接改為通用規則（DEC-24.4）。未追蹤的 `fromCLAUDE.instructions.md` 是個人設定，已移到 `%USERPROFILE%\copilot-instructions.md`。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-81 | 2 | 必修 | `Doc/AUTO-TBD/TestPlan.md:140` | REQ-2 涵蓋 VS 2026 18 版以上，但 [Microsoft 的 Agent Skills 文件](https://learn.microsoft.com/en-us/visualstudio/ide/copilot-agent-skills?view=visualstudio) 將 Visual Studio 的 skill 探索門檻列為 18.5。TEST-16 沒記實測的次版本，只驗有 skill 的情境，四個案例也沒有 `release-note`。這不代表 18.0–18.4 讀不到 Markdown，而是未驗證這些版本不靠 skill 仍能讀到規範。建議在 Copilot 入口直接連到兩份概觀、說明顯式開檔的替代路徑，並按最低支援次版本驗證無 skill 的讀取及三項動作；若要把 18.5 設為最低版本，須先由人確認 REQ-2 的範圍。 | 已修正（回溯至 DEC-24.2；使用者決定）：REQ-2 最低版本改為 VS 2026 18.5；TEST-16 記錄實測版本、以 Agent 模式執行並加測 release-note，待使用者重跑 |
+| REV-82 | 2 | 必修 | `Doc/AUTO-TBD/TestPlan.md:187` | DEC-23.5 和現行 `process-issue.md` 第 1 節要求開始時先開分支，但 TEST-15 將提出 S 級建議後停下、未開分支的舊演練列為通過；TEST-16 的「開議題」也只記觸發和讀檔。現有結果無法證明兩個入口都遵守新順序。應以現行 HEAD 在一次性情境重驗：先開分支，再盤點並於分級確認點停下。實測時可用已有正式編號的情境。 | 已修正（使用者同意依建議）：TEST-15、TEST-16 的「開議題」通過條件改為先開分支、盤點後在分級確認點停下，待重跑 |
+| REV-83 | 4 | 必修 | `.github/project/tool-claude-code.md:3` | 文件將讀取條件限定為 Claude Code，卻包含其他工具建立 MyCAM worktree 時也要做的檔案準備。專案概觀只對 Claude 使用者導向此檔，通用 Git 工作流又沒給其他工具獨立的準備路徑，可能漏掉 `FCLTool.dll`、`PostTool.dll` 或 `Custom/`。將專案準備放入 `project/env-build.md` 的 Worktree 章節，由專案索引對所有工具導向；Claude 文件只說明自動複製方式並單向引用。 | 已修正（回溯至 DEC-24.3；使用者同意依建議）：新增 `project/env-worktree.md`（不限工具），刪除 `project/tool-claude-code.md`，專案索引同步 |
+| REV-84 | 6 | 建議 | `.github/team/process-git.md:53` | 團隊 Git 規範導向 Claude 操作文件，Claude 文件又要求回讀 Git §5；團隊與專案的 `tool-claude-code.md` 亦互相指定必讀。`process-issue.md` 和 `process-review.md` 也互指對方作為施工與回溯入口。區分「切換到下一個流程」與「解釋本條規則所需的前置閱讀」；索引負責導覽，專案或工具補充只單向指向團隊規則，不讓通用文件反過來依賴工具。C++ 的「同 C#」也應改指共同權威來源，而非重列規則。 | 已修正（DEC-24.5；使用者同意依建議）：`process-git.md` 改指 `env-worktree.md`，工具文件只單向引用通用流程；`process-issue` 與 `process-review` 的互相引用是流程接續，不修正；C++ 的「同 C#」列後續（TODO-5） |
+| REV-85 | 6 | 建議 | `.github/team/coding-general.md:3` | 編碼、換行、tab 等已由 `.editorconfig` 定義，入口和 Coding Style 仍重述；例：通用文件將 120 字元寫成所有原始碼與設定檔的限制，但 `.editorconfig` 只對 C#、C/C++ 設這個值。C# 文件另列「方法保持短小」「變數在最小作用範圍」等一般建議，沒有團隊特有的判定條件。保留工具驗證不到的團隊慣例，格式只連到 `.editorconfig`；若沿用 TODO-5，明確列為尚未符合本次精簡與單一來源的項目。 | 列後續（TODO-5；使用者同意依建議）：TODO-5 本為 Coding Style 與 `.editorconfig` 的重複，完成條件加入 120 字元適用範圍與 C# 一般性建議 |
+| REV-86 | 6 | 建議 | `.github/team/process-issue.md:51` | FollowUp 的必填欄位在 DoD 與 `process-docs.md` §4 各寫一次，後者另外要求「建議做法」與「內容自足」。S 級文件範本又寫「所有內容都在 README」，與 §2 的 FollowUp 例外不符。DoD 只檢查是否符合 `process-docs.md` §2、§4，範本明列 FollowUp 例外，讓寫法只維護一處。 | 已修正（使用者同意依建議）：DoD 改為依 `process-docs.md` 第 4 節寫入，S 級範本註明 `FollowUp.md` 例外 |

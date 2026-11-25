@@ -63,7 +63,7 @@
 
 ## 5. `README.md` 範本
 
-S 級完整範本（所有內容都在 `README.md`）：
+S 級完整範本（除 `FollowUp.md` 外，所有內容都在 `README.md`）：
 
 ```markdown
 # <議題編號> <標題>

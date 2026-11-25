@@ -23,7 +23,7 @@
 5. 分支後綴未成文：`_2nd`、`(2nd)`、`_V2`、`_merge`、`_Rebase` 並存。
 6. 沒有自動測試與 CI，驗證靠人工與個別議題的腳本。
 7. 研發文件剛開始試行，已有共識放在 `Doc/<議題編號>/`，結構與命名尚不一致。
-8. 開發工具：全員使用 GitHub Copilot，部分成員使用 Claude Code；Visual Studio 統一使用 2026（18 版以上）。
+8. 開發工具：全員使用 GitHub Copilot，部分成員使用 Claude Code；Visual Studio 統一使用 2026（18.5 版以上，skill 的最低支援版本，DEC-24）。
 
 ### 1.3 問題
 
@@ -65,7 +65,7 @@
 
 ### REQ-2 工具共用
 
-1. Copilot（VS 2026 18 版以上）與 Claude Code 讀同一份規範，內容不重複維護。
+1. Copilot（VS 2026 18.5 版以上）與 Claude Code 讀同一份規範，內容不重複維護。
 2. 只用其中一種工具的成員，也能完整遵循流程。
 
 ### REQ-3 載入時機

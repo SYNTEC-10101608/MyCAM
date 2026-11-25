@@ -35,9 +35,9 @@ applyTo: "**"
 
 | 時機 | 必讀文件 |
 | --- | --- |
-| 開始議題、分級、進入下一階段 | `.github/team/process-issue.md` |
+| 開始議題、分級、進入下一階段、切換 session 或對話 | `.github/team/process-issue.md` |
 | 撰寫或修改議題文件 | `.github/team/process-docs.md` |
 | 開分支、commit、送 MR、產出 release note、建立 worktree | `.github/team/process-git.md` |
 | 新增或修改程式碼與設定檔（`*.cs`、`*.c`、`*.cpp`、`*.h`、`*.hpp`、`*.xml`、`*.resx`、`*.config` 等） | `.github/team/coding-general.md`，加上對應語言的 `.github/team/coding-<語言>.md`（`csharp`、`cpp`） |
 | 執行或回應 review | `.github/team/process-review.md`，再讀 `.github/team/`、`.github/project/` 下其餘全部文件 |
-| 以 Claude Code 處理議題、切換 session、建立 worktree | `.github/team/tool-claude-code.md` |
+| 以 Claude Code 建立 worktree | `.github/team/tool-claude-code.md` |

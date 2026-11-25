@@ -52,6 +52,7 @@
 2. 完成條件：
    1. `team/coding-*.md` 中與 `.editorconfig` 重複的規則（編碼、換行、縮排、行長、行尾空白）刪除，改為一行「格式依 `.editorconfig`」。
    2. 評估 Claude Code 依檔案路徑自動載入規則的機制，可行時取代流程索引中「新增或修改程式碼」一列的導向；VS 2026 Copilot 實測也未依 `applyTo` 自動載入 `team/coding-csharp.md`，由 Copilot 依流程索引主動讀取，一併確認。
+   3. REV-85、REV-84 指出的項目（Review 第 8 回合）：`coding-general.md` 把 120 字元寫成所有檔案的限制，`.editorconfig` 只對 C#、C/C++ 設定；`coding-csharp.md` 的一般性建議（方法保持短小、變數在最小作用範圍）沒有團隊特有的判定條件；`coding-cpp.md` 以「同 C#」重列規則，改指共同來源。
 3. 延後原因：本議題只修訂 `team/coding-general.md` 的兩項規則；其餘 Coding Style 檔案只改名、更新連結與替換專案資訊，依「只改動到的檔案」原則留待後續。
 4. 建議做法：先確認 `.editorconfig` 已涵蓋所有被刪的規則，再刪除文件內容。
 

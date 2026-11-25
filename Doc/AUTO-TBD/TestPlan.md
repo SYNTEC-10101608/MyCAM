@@ -86,7 +86,7 @@
 1. 方法：搜尋 `project-overview`、`.github/project/` 與 `team/coding-general.md`。
 2. 通過條件：
    1. `project-overview` 沒有 Git 流程、專案固定檢查項目、建置細節、技術棧與架構、慣例；有含 `AUTO-TBD` 的「議題編號」。
-   2. `project/process-review.md` 兩項；`env-build.md` 有 FCLTool、命令列建置、執行期檔案三節且沒有 worktree；兩份 `tool-claude-code.md` 分別含 `SESSION.md`、`.worktreeinclude` 的說明。
+   2. `project/process-review.md` 兩項；`env-build.md` 有 FCLTool、命令列建置、執行期檔案三節且沒有 worktree；`env-worktree.md` 有要複製的檔案、`CopyRef.bat`、卸載 `FCLTool` 三項；`process-issue.md` 有 `SESSION.md` 交接，`tool-claude-code.md` 沒有（DEC-24）。
    3. 四語系同步、Designer、`reference/` 三項規則只寫在 `project/coding-general.md`。
    4. `team/coding-general.md` 沒有「維持該方法內既有的命名方式」，有 SPEC-10 的兩項規則。
 
@@ -126,29 +126,31 @@
 #### TEST-15 Claude Code 入口與流程演練
 
 1. 方法：新 session 中：
-   1. 以假設的 S 級 BUG 執行 `/issue-start`，產出放在 scratchpad，不提交。
+   1. 以假設的 S 級 BUG 執行 `/issue-start`，產出放在 scratchpad，不提交；開分支一步在執行指令前停下，說明分支名稱與基準即可，不實際建立。
    2. 在本分支執行 `/release-note` 與 `/review`。
    3. 另開新 session，只輸入「開議題」；問「切換 session 要怎麼做」。
    4. 要求修改任一 `.cs` 檔的一個方法，修改不保留。
 2. 通過條件：
    1. 三個 skill 讀取各自的必讀清單；`/review` 讀入 `team/`、`project/` 全部文件。
-   2. `/issue-start` 產出符合 S 級範本，提出分級建議後停下。
+   2. `/issue-start` 第一個動作是開分支（DEC-23.5），再盤點並產出符合 S 級範本的 `README.md`，提出分級建議後停下。
    3. Release note 與 merge log 符合格式，目標版本留空。
-   4. 「開議題」與「切換 session」經流程索引讀到對應文件。
+   4. 「開議題」與「切換 session」經流程索引讀到對應文件；切換 session 讀到 `process-issue.md` 的交接（DEC-24）。
    5. 修改 `.cs` 前經索引讀取 `team/coding-general.md`、`team/coding-csharp.md`、`project/coding-architecture.md`、`project/coding-general.md`。
 
 #### TEST-16 VS 2026 Copilot 讀取與觸發
 
 1. 執行者：使用者；AI 提供逐步清單並記錄結果。
-2. 方法：VS 2026（18 版以上）在 worktree 開啟方案，每項開新的 Copilot Chat 對話：
+2. 方法：VS 2026（18.5 版以上，記錄實測版本）在 worktree 開啟方案，每項以 Agent 模式開新的 Copilot Chat 對話：
    1. 附加任一 `.cs` 檔，要求修改一個方法（不保留）。
    2. 附加任一 `.cs` 檔，問「寫法有沒有不符規範的地方」。
    3. 輸入「開議題」。
    4. 問「切換 session 要怎麼做」。
+   5. 輸入「產出 release note」（DEC-24）。
 3. 通過條件：
    1. 第 1 項讀取 `team/coding-csharp.md` 與 `project/` 的 `coding-*`。
    2. 第 2 項觸發 `review` skill，讀入 `team/`、`project/` 的規範。
-   3. 第 3 項觸發 `issue-start` skill；第 4 項讀取 `tool-claude-code.md`。
+   3. 第 3 項觸發 `issue-start` skill，先開分支，盤點後在分級確認點停下（DEC-23.5）；第 4 項讀取 `process-issue.md` 的交接。
+   4. 第 5 項觸發 `release-note` skill，讀取 `process-git.md`。
 
 ## 4. SPEC 對照
 
@@ -181,7 +183,7 @@
 
 1. TEST-13：`FollowUp.md` 含 SPEC-18 各項（TODO-1～TODO-5），每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 2. TEST-10：於 Review 第 2 回合文件段執行（獨立 session），發現列為 REV-20～REV-29，全部有處置。通過。
-3. TEST-14～TEST-16：DEC-21 調整結構後重跑（2026-11-25，`8b513b37`）；前一次（DEC-19 之後）三項皆通過，並確認 VS 2026 Copilot 可讀取 `.claude/skills/`。
+3. TEST-15、TEST-16 依 DEC-23.5、DEC-24 修改條件後待重跑（REV-82、REV-81）；以下為前一次結果。TEST-14～TEST-16：DEC-21 調整結構後重跑（2026-11-25，`8b513b37`）；前一次（DEC-19 之後）三項皆通過，並確認 VS 2026 Copilot 可讀取 `.claude/skills/`。
    1. TEST-14：在 worktree 開新 session，載入 worktree 的 `CLAUDE.md`、`copilot-instructions.md`、`team-overview`、`project-overview`，以及個人層 `~/.claude/CLAUDE.md`、主 checkout 的 `CLAUDE.local.md` 與 auto memory 的 `MEMORY.md`；沒有載入 `team/`、`project/` 的檔案，主 checkout 的 `CLAUDE.md` 及其 `@` 引用（master 的 `coding-style-*.instructions.md`）也沒有載入。通過。
    2. TEST-15：在同一 worktree session 依序演練，第 3、4 項未另開 session，判斷依據為常駐索引指向的文件，讀取結果受前幾項影響。
       1. `/issue-start`：讀 `process-issue`、`process-docs`、`process-git`；以假設 S 級 BUG 在 scratchpad 產出符合 S 級範本的 `README.md`，提出分級建議後停下，未開分支。通過。

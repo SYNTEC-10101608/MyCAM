@@ -1,6 +1,6 @@
 # 議題處理流程
 
-開始議題、分級、進入下一階段時讀本文件。議題文件的組合與寫法見 [process-docs.md](process-docs.md)。
+開始議題、分級、進入下一階段、切換 session 或對話時讀本文件。議題文件的組合與寫法見 [process-docs.md](process-docs.md)。
 
 ## 1. 處理階段
 
@@ -48,7 +48,7 @@
    2. 重現測試修正前失敗、修正後通過；無法自動化時附人工步驟與結果。
    3. 門檻通過（見 [process-review.md](process-review.md) 第 1 節）。
    4. Review 完成，每項發現都有處置。
-   5. 有範圍外項目時寫入 `FollowUp.md`，每項寫明目標、完成條件與延後原因。
+   5. 有範圍外項目時，依 [process-docs.md](process-docs.md) 第 4 節寫入 `FollowUp.md`。
    6. Release note 寫入 `README.md`。
 2. M 級：
    1. 每個 REQ 有 SPEC、每個 SPEC 有 TEST。
@@ -62,3 +62,8 @@
 3. L 級：M 級全部項目，再加：
    1. 各確認點分別經人確認。
    2. 長期有效的結論已提升到指引規範。
+
+## 5. 交接
+
+1. AI 在適合切換 session 或對話時提出建議（多在確認點）；切換前在工作目錄（主 checkout 或 worktree）根目錄的 `SESSION.md` 更新交接 prompt。
+2. `SESSION.md` 以 `.gitignore` 排除，只放交接 prompt 與暫時筆記；狀態與決策寫在提交的議題文件。

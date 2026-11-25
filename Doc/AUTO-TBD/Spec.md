@@ -24,16 +24,17 @@
 
 1. 三個 skill：`issue-start`（開議題）、`review`、`release-note`，各自依序列出必讀文件；`review` 讀入 `team/`、`project/` 全部文件。
 2. Skill 只是入口，規則寫在指引檔；沒有 skill 時直接說出動作，由流程索引導向相同文件。
-3. VS 2026 Copilot 也讀取 `.claude/skills/`（TEST-16）。
+3. VS 2026 Copilot 也讀取 `.claude/skills/`（TEST-16）；最低支援 18.5，官方文件寫明 Agent 模式會自動找 skill（DEC-24.2）。
 
-### SPEC-3 議題分級、階段與確認點（REQ-4.1、REQ-4.3、REQ-4.4；DEC-3.1、DEC-8、DEC-12）
+### SPEC-3 議題分級、階段與確認點（REQ-4.1、REQ-4.3、REQ-4.4；DEC-3.1、DEC-8、DEC-12、DEC-24）
 
-位置：[process-issue.md](../../.github/team/process-issue.md) 第 1～3 節。
+位置：[process-issue.md](../../.github/team/process-issue.md) 第 1～3、5 節。
 
 1. 開始議題時先開分支（DEC-23）；八個處理階段；施工前依流程索引讀取程式規範，遇到預料外的狀況先停下討論；各級都做自我 review，不另要求獨立 review（DEC-23）。
 2. S、M、L 三級：S 級把確認點 1～5 合併，L 級每個確認點各自確認；分級由實作者確認，AI 在盤點後提建議。
 3. 每個確認點最後列「待討論」，格式見協作原則。
 4. 範圍超出級別時重新分級；後段發現前段要修改時，從最早受影響的文件回溯。
+5. Session 或對話的交接不限工具：AI 提出切換建議，切換前更新 `SESSION.md`（DEC-24.4）。
 
 ### SPEC-4 完成定義（REQ-4.2；DEC-3.1、DEC-20）
 
@@ -75,7 +76,7 @@
 1. 成文化現行版本號、版本分支、squash 合併與保留分支。
 2. 分支 `<議題編號>_<類型>_<簡述>`，建議後綴 `_2nd`、`_Alt2`；開分支前先 fetch。
 3. 每個 STEP 一個 commit；標題行結尾建議標示 `(STEP-n)` / `(REV-n)`；議題文件不記 commit hash。
-4. Worktree 為選用；送 MR 由人決定，push 前先詢問 remote 與分支。
+4. Worktree 為選用，新 worktree 的環境準備見 `project/env-worktree.md`（不限工具，DEC-24.3）；送 MR 由人決定，push 前先詢問 remote 與分支。
 
 ### SPEC-9 Release note 與 merge log（REQ-7.4；DEC-5.3）
 
@@ -103,12 +104,12 @@
 | `.github/team/process-issue.md`、`process-docs.md`、`process-review.md`、`process-git.md` | 團隊流程 | 新增 |
 | `.github/team/coding-general.md` | 團隊程式規範 | 改名（原 `instructions/coding-style-general`）、修改、移出常駐 |
 | `.github/team/coding-csharp.md`、`coding-cpp.md` | 團隊程式規範 | 改名、更新連結、專案資訊改為連到 `project/coding-architecture.md`（REV-52、DEC-23） |
-| `.github/team/tool-claude-code.md` | 團隊工具做法 | 新增：session 交接與 Claude Code 通用的 worktree 做法（DEC-23） |
+| `.github/team/tool-claude-code.md` | 團隊工具做法 | 新增：Claude Code 的 worktree 機制（DEC-23、DEC-24） |
 | `.github/project/coding-architecture.md` | 專案程式規範 | 新增：由 `project-overview` 搬入技術棧、方案與主程式結構 |
 | `.github/project/coding-general.md` | 專案程式規範 | 新增：由 `project-overview` 搬入慣例，加上四語系同步、Designer、`reference/` |
 | `.github/project/process-review.md` | 專案流程 | 新增：專案固定檢查項目 |
 | `.github/project/env-build.md` | 專案環境 | 新增：由 `project-overview` 搬入建置與執行環境 |
-| `.github/project/tool-claude-code.md` | 專案工具做法 | 新增：worktree 要複製的專案檔、`CopyRef.bat`、卸載 `FCLTool` |
+| `.github/project/env-worktree.md` | 專案環境 | 新增：新 worktree 要複製的檔案、`CopyRef.bat`、卸載 `FCLTool`，不限工具（DEC-24） |
 | `.claude/skills/{issue-start,review,release-note}/SKILL.md` | 觸發入口 | 新增 |
 | `.gitignore` | 版控設定 | 加入 `/SESSION.md` |
 | `.editorconfig` | 格式設定 | 加入 `[*.ps1] charset = utf-8-bom`，更新註解路徑 |
@@ -166,4 +167,4 @@
 
 ## 5. 待討論
 
-無。各確認點與施工中的決策見 DEC-9～DEC-23。
+無。各確認點與施工中的決策見 DEC-9～DEC-24。
