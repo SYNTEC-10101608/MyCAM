@@ -183,14 +183,15 @@
 
 1. TEST-13：`FollowUp.md` 含 SPEC-18 各項（TODO-1～TODO-5），每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 2. TEST-10：於 Review 第 2 回合文件段執行（獨立 session），發現列為 REV-20～REV-29，全部有處置。通過。
-3. TEST-15、TEST-16 依 DEC-23.5、DEC-24 修改條件後待重跑（REV-82、REV-81）；以下為前一次結果。TEST-14～TEST-16：DEC-21 調整結構後重跑（2026-11-25，`8b513b37`）；前一次（DEC-19 之後）三項皆通過，並確認 VS 2026 Copilot 可讀取 `.claude/skills/`。
+3. TEST-15 已依 DEC-23.5、DEC-24 的新條件重跑；TEST-16 待使用者重跑（REV-81、REV-82），以下 TEST-16 為前一次結果。TEST-14～TEST-16：DEC-21 調整結構後重跑（2026-11-25，`8b513b37`）；前一次（DEC-19 之後）三項皆通過，並確認 VS 2026 Copilot 可讀取 `.claude/skills/`。
    1. TEST-14：在 worktree 開新 session，載入 worktree 的 `CLAUDE.md`、`copilot-instructions.md`、`team-overview`、`project-overview`，以及個人層 `~/.claude/CLAUDE.md`、主 checkout 的 `CLAUDE.local.md` 與 auto memory 的 `MEMORY.md`；沒有載入 `team/`、`project/` 的檔案，主 checkout 的 `CLAUDE.md` 及其 `@` 引用（master 的 `coding-style-*.instructions.md`）也沒有載入。通過。
-   2. TEST-15：在同一 worktree session 依序演練，第 3、4 項未另開 session，判斷依據為常駐索引指向的文件，讀取結果受前幾項影響。
-      1. `/issue-start`：讀 `process-issue`、`process-docs`、`process-git`；以假設 S 級 BUG 在 scratchpad 產出符合 S 級範本的 `README.md`，提出分級建議後停下，未開分支。通過。
-      2. `/release-note`：讀 `process-git`；既有 13 條 release note 符合前綴與格式，merge log 由 release note 組合、目標版本留空。通過。
-      3. `/review`：讀 `team/process-review`、`project/process-review`，再讀 `team/`、`project/` 其餘 11 份，共 13 份；依六段與報告格式進行（未寫入 `Review.md`）。通過。
-      4. 「開議題」觸發 `issue-start`，流程索引指向 `team/process-issue.md`；「切換 session」流程索引指向 `team/tool-claude-code.md`。通過。
-      5. 修改 `MyCAM/Post/NCWriterHelper.cs` 的 `WriteEntry`：依兩份索引讀 `team/coding-general.md`、`team/coding-csharp.md`、`project/coding-architecture.md`、`project/coding-general.md` 後修改，BOM 保留，修改已還原。通過。
+   2. TEST-15：DEC-24 後在 `b558e814` 重跑（2026-11-26，Claude Code、Opus 5.5，worktree 子 session）；第 3、4 項在同一 session 內執行，判斷依據為索引的對應關係。開始與結束時 `git status` 皆乾淨。
+      1. `/issue-start`：讀 `process-issue`、`process-docs`、`process-git`；第一個動作是開分支，fetch 逾時時依 `process-git.md` 第 2 節第 3 項停下確認，說明分支名稱與基準後未實際建立；之後讀 `coding-architecture`、`project/coding-general` 盤點，在 scratchpad 產出符合 S 級範本的 `README.md`，提出分級建議後停下。通過。
+      2. `/release-note`：讀 `process-git` 第 4 節；13 條 release note 符合前綴與格式，merge log 由 release note 組合、目標版本留空。通過。
+      3. `/review`：讀兩份 `process-review`，再讀 `team/` 8 份、`project/` 5 份；門檻段執行 `Check.ps1`，依六段進行（未寫入 `Review.md`）。通過。
+      4. 「開議題」符合 `issue-start` 的 description；「切換 session 或對話」經流程索引指向 `process-issue.md` 第 5 節的交接。通過。
+      5. 修改 `AddPathDlg.SetFaceSelected` 前依兩份索引讀 `team/coding-general.md`、`team/coding-csharp.md`、`project/coding-architecture.md`、`project/coding-general.md`，修改已還原。通過。
+      6. 發現：`issue-start` 的 description 把開分支寫在分級之後（已修正，REV-87）；新分支的基準沒有寫明（REV-88）。
    3. TEST-16：使用者在 VS 2026 Copilot Chat 於 worktree 方案執行，每項開新對話；結果依使用者提供的畫面記錄。
       1. 附加 `VectorTool.cs` 要求為 `GetAngle_deg` 加 `gp_Vec` 多載：觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git`、`team/coding-general.md`、`coding-csharp.md`、`coding-architecture.md`、`project/coding-general.md`、`.editorconfig`；提出 S 級建議後停下等人確認。通過。
       2. 附加 `VectorTool.cs` 問「寫法是否有不符合規範的地方」：觸發 `review`，讀兩份 `process-review` 後搜尋 `*.md`，讀入 `team/`、`project/` 全部 13 份與 `.editorconfig`，並讀 `Build.bat` 執行建置門檻。通過。
