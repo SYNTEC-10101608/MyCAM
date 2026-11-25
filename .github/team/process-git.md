@@ -11,21 +11,16 @@
 
 ## 2. 分支
 
-1. 命名 `<議題編號>_<類型>_<簡述>`；議題編號含前綴，格式與範例見專案指引；類型 `f` 為功能、`b` 為 bug；簡述為英文 PascalCase。
-2. 後綴：
-   1. 同一議題合併後的後續 MR：原名加 `_2nd`、`_3rd`…。
-   2. 並存比較的另一種實作：原名加 `_Alt2`、`_Alt3`…。
-3. 送 MR 前的自測回合不開新分支，在原分支以 commit 推進。
-4. Rebase 前的暫時 squash 分支只留在本機，不 push，用完刪除。
-5. 開分支前先 fetch 遠端；fetch 失敗時，新分支會以本機舊的遠端分支為基準，須先確認。
+1. 命名 `<議題編號>_<類型>_<簡述>`；議題編號含前綴，格式與範例見[專案概觀](../instructions/project-overview.instructions.md)的議題編號；類型 `f` 為功能、`b` 為 bug；簡述為英文 PascalCase。
+2. 建議的後綴：同一議題合併後的後續 MR 加 `_2nd`、`_3rd`…；並存比較的另一種實作加 `_Alt2`、`_Alt3`…。
+3. 開分支前先 fetch 遠端；fetch 失敗時，新分支會以本機舊的遠端分支為基準，須先確認。
 
 ## 3. Commit
 
 1. 每個 STEP 一個 commit；文件、測試、程式盡量分開。
 2. 訊息明確描述修改內容，中英文皆可。
-3. 建議在標題行結尾標示修改的來由：施工 `(STEP-n)`、review 修正 `(REV-n)`，兩者皆是時並列（`(STEP-3, REV-2)`）；一個 STEP 可對應多個 commit。確認點文件（階段 1～5）的 commit 不標示。
-4. 有標示時以 `git log --grep "STEP-n"` 查詢 STEP 對應的 commit，沒有標示時在 review 需求與範圍段人工對照；議題文件不記 commit hash。
-5. 純格式調整（含 Coding Style 的整個方法改寫）獨立 commit。
+3. 建議在標題行結尾標示來由（施工 `(STEP-n)`、review 修正 `(REV-n)`，可並列），方便追溯；議題文件不記 commit hash。
+4. 純格式調整（含 Coding Style 的整個方法改寫）獨立 commit。
 
 ## 4. Release note 與 merge log
 
@@ -58,4 +53,4 @@ Release note 範例：
 ## 5. Worktree
 
 1. 一個議題一個 branch。Worktree 為選用，同時處理多個議題時使用；單線開發直接在主 checkout 切分支。
-2. 建立與準備 worktree 的做法見專案指引。
+2. 以 Claude Code 建立與準備 worktree 的做法見 [tool-claude-code.md](tool-claude-code.md) 與 [project/tool-claude-code.md](../project/tool-claude-code.md)。

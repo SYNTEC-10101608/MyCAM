@@ -5,7 +5,7 @@
 ## 1. 存放
 
 1. 存放於 `Doc/<議題編號>/`；同一議題的後續 MR（`_2nd`、`_3rd`）沿用同一資料夾。
-2. 尚未取得議題編號時以 `<前綴>-TBD` 暫代（前綴見專案指引），取得後一併更名資料夾與分支。
+2. 尚未取得議題編號時以 `<前綴>-TBD` 暫代（前綴見[專案概觀](../instructions/project-overview.instructions.md)的議題編號），取得後一併更名資料夾與分支。
 3. 檔名不加數字前綴；閱讀順序由 `README.md` 的文件索引決定。
 4. 收官時把議題結束後仍長期有效的結論（規則、慣例、架構說明）寫入指引規範，議題文件保留追溯用的記錄。
 
@@ -22,10 +22,11 @@
 | STEP | README | `Implementation.md` | `Implementation.md` |
 | Review 報告 | README | `Review.md` | `Review.md` |
 | 討論記錄（DEC） | README | `Discussion.md`（有決策時） | `Discussion.md` |
-| 後續處理（TODO） | README | README | `FollowUp.md` |
+| 後續處理（TODO） | `FollowUp.md`（有項目時） | `FollowUp.md`（有項目時） | `FollowUp.md`（有項目時） |
 
 1. 文件只保留最終結果；例外是 `Discussion.md` 可增量描述並凸顯最終決策，`Review.md` 依 review 回合分節保留。
-2. 確認點文件在確認點內容之後列「待討論」一節，格式見 [process-issue.md](process-issue.md) 第 2 節；沒有待決問題時寫「無」。
+2. 確認點文件在確認點內容之後列「待討論」一節，格式見[團隊概觀](../instructions/team-overview.instructions.md)的協作原則第 3 項；沒有待決問題時寫「無」。
+3. 後續處理不論級別都另寫 `FollowUp.md`，因為範圍外項目的多寡與議題大小無關。
 
 ## 3. 編號與追溯
 
@@ -35,7 +36,7 @@
 | `SPEC` | 規格 | Spec / README |
 | `TEST` | 測試項目 | TestPlan / README |
 | `STEP` | 實作步驟 | Implementation / README |
-| `TODO` | 後續處理 | FollowUp / README |
+| `TODO` | 後續處理 | FollowUp |
 | `DEC` | 討論決策 | Discussion / README |
 | `REV` | Review 發現 | Review / README |
 
@@ -56,7 +57,7 @@
 | `FollowUp.md` | 依範疇分節；每個 TODO 寫目標、完成條件、延後原因、建議做法，內容自足 |
 
 1. 相容性異動分輸入（讀取或接收的資料、設定）與輸出（產生或提供的檔案、報表），每項寫異動內容與既有資料如何處理（相容、轉換或不再支援）；沒有異動寫「無」。
-2. STEP 包含程式、測試、研發文件與專案指引；`Implementation.md` 不記 commit hash，對應方式見 [process-git.md](process-git.md)。
+2. STEP 包含程式、測試、研發文件與指引規範；`Implementation.md` 不記 commit hash，對應方式見 [process-git.md](process-git.md)。
 3. 測試執行結果寫最終一次的結果。
 4. 交付物是規範或文件的議題，指引檔本身就是規格：每條 SPEC 只寫決策重點與規則所在的檔案章節，不重述指引內容；TEST 以連結有效與抽查代替逐條比對。
 
@@ -102,10 +103,6 @@ S 級完整範本（所有內容都在 `README.md`）：
 
 無。
 
-## 後續處理
-
-無。
-
 ## 待討論
 
 無。
@@ -133,8 +130,6 @@ M、L 級骨架（其餘內容放各檔，見第 2 節）：
 | <文件連結> | <內容> |
 
 ## 現況、目標與需求（M 級；L 級寫在 Goal.md）
-
-## 後續處理（M 級；L 級寫在 FollowUp.md）
 
 ## 待討論（M 級確認點 1–2；L 級寫在 Goal.md）
 

@@ -13,9 +13,10 @@
 2. 目錄表示載入方式：`instructions/` 只放每層一份的常駐概觀；`team/`、`project/` 依時機讀取，檔名以分類開頭（`process-`、`coding-`、`env-`、`tool-`）。
 3. 載入門檻：AI 無法自行察覺何時該讀的內容才常駐；其他內容由概觀的索引寫明動作名稱或副檔名。Claude Code 只依 `@` 載入、VS 2026 Copilot 未依 `applyTo` 載入，兩者實際都靠索引（TEST-14、TEST-16）。
 4. Copilot 與 Claude Code 讀同一份文件；`CLAUDE.md` 只以 `@` 引用常駐檔。
-5. 常駐行數是觀察指標，不設上限；增加時 review 報告寫明增加量與理由。
+5. 常駐行數不設上限也不逐回合比對；review 文件段檢查新增的常駐內容是否符合載入門檻（DEC-23）。
 6. 文件通則：精簡（只寫做對所需的資訊、同一規則只寫一處、機器能檢查的交給工具、非直覺的規則附理由）、只保留最終結果、數字條列、內容繁體中文與檔名英文。
-7. 協作原則（REQ-11，DEC-13）：AI 以資深工程師角度提出建議；依重要性決定先由人決定或先處理再請人確認；回覆人時待決事項寫問題、建議、另一選項。
+7. 協作原則（REQ-11，DEC-13）：AI 以資深工程師角度提出建議；依重要性決定先由人決定或先處理再請人確認；待討論的三部分（問題、建議、另一可行選項）只定義在協作原則第 3 項，文件與對話共用（DEC-23）。
+8. 參照其他指引時寫明檔案連結；團隊層可連到 `project/` 與專案概觀的固定檔名（DEC-23）。
 
 ### SPEC-2 觸發入口（REQ-3.3、REQ-2.2；DEC-2.5、DEC-21）
 
@@ -29,24 +30,25 @@
 
 位置：[process-issue.md](../../.github/team/process-issue.md) 第 1～3 節。
 
-1. 八個處理階段；施工中遇到預料外的狀況先停下討論。
-2. S、M、L 三級：S 級把確認點 1～5 合併，L 級每個確認點各自確認；分級由實作者確認，AI 在盤點後提建議；分級確認後開分支。
-3. 每個確認點最後列「待討論」，每題寫問題、建議、另一可行選項。
+1. 開始議題時先開分支（DEC-23）；八個處理階段；施工前依流程索引讀取程式規範，遇到預料外的狀況先停下討論；各級都做自我 review，不另要求獨立 review（DEC-23）。
+2. S、M、L 三級：S 級把確認點 1～5 合併，L 級每個確認點各自確認；分級由實作者確認，AI 在盤點後提建議。
+3. 每個確認點最後列「待討論」，格式見協作原則。
 4. 範圍超出級別時重新分級；後段發現前段要修改時，從最早受影響的文件回溯。
 
 ### SPEC-4 完成定義（REQ-4.2；DEC-3.1、DEC-20）
 
 位置：[process-issue.md](../../.github/team/process-issue.md) 第 4 節。
 
-1. 議題 `README.md` 放該級別的 DoD 勾選清單，全部勾選才送 MR；S 級精簡為五項。
-2. 每個 STEP 可追溯到 commit；commit 標示為建議。
+1. 議題 `README.md` 放該級別的 DoD 勾選清單，全部勾選才送 MR；S 級精簡為六項。
+2. 每個 STEP 可追溯到 commit；commit 標示為建議，未標示時 review 人工對照。
+3. 各級有範圍外項目時都寫 `FollowUp.md`（DEC-23）。
 
 ### SPEC-5 議題文件組合與內容歸屬（REQ-5.1、REQ-5.2、REQ-5.4；DEC-3、DEC-16、DEC-22）
 
 位置：[process-docs.md](../../.github/team/process-docs.md) 第 1、2、4、5 節。
 
-1. 存放於 `Doc/<議題編號>/`，後續 MR 沿用；尚未取得編號時以 `<前綴>-TBD` 暫代，前綴見專案指引。
-2. S 級全部寫在 `README.md`；M 級拆出 Spec、TestPlan、Implementation、Review；L 級再拆出 Goal、Discussion、FollowUp。
+1. 存放於 `Doc/<議題編號>/`，後續 MR 沿用；尚未取得編號時以 `<前綴>-TBD` 暫代，前綴見專案概觀。
+2. S 級全部寫在 `README.md`；M 級拆出 Spec、TestPlan、Implementation、Review；L 級再拆出 Goal、Discussion；各級有後續項目時另寫 FollowUp（DEC-23）。
 3. 只保留最終結果，Discussion 與 Review 例外；收官時長期有效的結論提升到指引規範。
 4. 規範類議題的 Spec 不重述指引內容。
 
@@ -64,15 +66,15 @@
 1. 六段依序：門檻、需求與範圍、功能正確性、規範符合、設計品質、文件；每段寫明 AI 與人的分工。
 2. Review 讀入 `team/`、`project/` 全部規範，作為寫程式時漏讀的保險。
 3. 報告格式固定；處置只有已修正、不修正、列後續；非必修可先修正，寫「已修正（待人確認）」，送 MR 前不留待確認。
-4. 專案固定檢查項目：建置門檻與專案程式規範。
+4. 專案固定檢查項目：Debug 與 Release 建置門檻（改到 C++ 時另建該專案）與專案程式規範（DEC-23）。
 
 ### SPEC-8 Git 流程（REQ-7.1～REQ-7.3；DEC-5、DEC-12、DEC-20）
 
 位置：[process-git.md](../../.github/team/process-git.md) 第 1～3、5 節。
 
 1. 成文化現行版本號、版本分支、squash 合併與保留分支。
-2. 分支 `<議題編號>_<類型>_<簡述>`，後綴 `_2nd`、`_Alt2`；開分支前先 fetch。
-3. 每個 STEP 一個 commit；標題行結尾建議標示 `(STEP-n)` / `(REV-n)`。
+2. 分支 `<議題編號>_<類型>_<簡述>`，建議後綴 `_2nd`、`_Alt2`；開分支前先 fetch。
+3. 每個 STEP 一個 commit；標題行結尾建議標示 `(STEP-n)` / `(REV-n)`；議題文件不記 commit hash。
 4. Worktree 為選用；送 MR 由人決定，push 前先詢問 remote 與分支。
 
 ### SPEC-9 Release note 與 merge log（REQ-7.4；DEC-5.3）
@@ -100,13 +102,13 @@
 | `.github/instructions/project-overview.instructions.md` | 專案概觀，常駐 | 修改：只留產品簡介、議題編號、專案指引索引 |
 | `.github/team/process-issue.md`、`process-docs.md`、`process-review.md`、`process-git.md` | 團隊流程 | 新增 |
 | `.github/team/coding-general.md` | 團隊程式規範 | 改名（原 `instructions/coding-style-general`）、修改、移出常駐 |
-| `.github/team/coding-csharp.md`、`coding-cpp.md` | 團隊程式規範 | 改名、更新連結、專案資訊改為依專案指引（REV-52） |
-| `.github/team/tool-claude-code.md` | 團隊工具做法 | 新增 |
+| `.github/team/coding-csharp.md`、`coding-cpp.md` | 團隊程式規範 | 改名、更新連結、專案資訊改為連到 `project/coding-architecture.md`（REV-52、DEC-23） |
+| `.github/team/tool-claude-code.md` | 團隊工具做法 | 新增：session 交接與 Claude Code 通用的 worktree 做法（DEC-23） |
 | `.github/project/coding-architecture.md` | 專案程式規範 | 新增：由 `project-overview` 搬入技術棧、方案與主程式結構 |
 | `.github/project/coding-general.md` | 專案程式規範 | 新增：由 `project-overview` 搬入慣例，加上四語系同步、Designer、`reference/` |
 | `.github/project/process-review.md` | 專案流程 | 新增：專案固定檢查項目 |
 | `.github/project/env-build.md` | 專案環境 | 新增：由 `project-overview` 搬入建置與執行環境 |
-| `.github/project/tool-claude-code.md` | 專案工具做法 | 新增：worktree 做法 |
+| `.github/project/tool-claude-code.md` | 專案工具做法 | 新增：worktree 要複製的專案檔、`CopyRef.bat`、卸載 `FCLTool` |
 | `.claude/skills/{issue-start,review,release-note}/SKILL.md` | 觸發入口 | 新增 |
 | `.gitignore` | 版控設定 | 加入 `/SESSION.md` |
 | `.editorconfig` | 格式設定 | 加入 `[*.ps1] charset = utf-8-bom`，更新註解路徑 |
@@ -117,7 +119,7 @@
 
 ### SPEC-17 個人設定收斂（REQ-9；DEC-2.7）
 
-1. 刪除 `~/.claude/issue-workflow.md`；`~/.claude/CLAUDE.md` 移除「開發議題處理流程」章節與 `@` 引用，已成為團隊通則的數字條列與回覆方式也刪除，保留溝通語言、記憶規則、本機環境。
+1. 刪除 `~/.claude/issue-workflow.md`；`~/.claude/CLAUDE.md` 移除「開發議題處理流程」章節與 `@` 引用，已成為團隊通則的數字條列與回覆方式也刪除（回覆方式由團隊概觀的協作原則涵蓋，帶到其他 repo 亦同，DEC-23），保留溝通語言、記憶規則、本機環境。
 2. 主 checkout 的 `CLAUDE.local.md` 刪除議題資料夾位置與 push 前詢問；新增 `origin`（公司 GitLab，正式流程、MR）與 `github`（遠端協作）的用法。
 3. 不進版控，完成結果記入 `README.md`。
 
@@ -164,4 +166,4 @@
 
 ## 5. 待討論
 
-無。各確認點與施工中的決策見 DEC-9～DEC-22。
+無。各確認點與施工中的決策見 DEC-9～DEC-23。

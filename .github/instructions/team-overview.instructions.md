@@ -12,7 +12,7 @@ applyTo: "**"
    2. 可先處理再請人確認：措辭、格式、補漏、明顯錯誤；在該階段結束時列出清單，人可逐項否決。
    3. 無法判斷屬於哪一類時，先由人決定。
 3. 回覆人時：
-   1. 需要人決定的事項，依待討論格式寫問題、建議、另一可行選項，每部分一兩句，細節等人追問再補。
+   1. 需要人決定的事項（待討論）寫三部分，文件與對話都適用：問題（背景與要決定什麼）、建議（做法與理由）、另一可行選項（做法與取捨）；對話中每部分一兩句，細節等人追問再補。
    2. 待決定或待確認的項目除了寫入文件，也直接列在回覆中；可先處理的小事每項一句摘要。
    3. 提到追溯編號（如 `REV-14`）時，附一句說明它在講什麼。
 
@@ -40,4 +40,4 @@ applyTo: "**"
 | 開分支、commit、送 MR、產出 release note、建立 worktree | `.github/team/process-git.md` |
 | 新增或修改程式碼與設定檔（`*.cs`、`*.c`、`*.cpp`、`*.h`、`*.hpp`、`*.xml`、`*.resx`、`*.config` 等） | `.github/team/coding-general.md`，加上對應語言的 `.github/team/coding-<語言>.md`（`csharp`、`cpp`） |
 | 執行或回應 review | `.github/team/process-review.md`，再讀 `.github/team/`、`.github/project/` 下其餘全部文件 |
-| 以 Claude Code 處理議題、切換 session | `.github/team/tool-claude-code.md` |
+| 以 Claude Code 處理議題、切換 session、建立 worktree | `.github/team/tool-claude-code.md` |

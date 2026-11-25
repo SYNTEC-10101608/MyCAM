@@ -174,3 +174,31 @@
 | REV-66 | 6 | 建議 | `.claude/skills/review/SKILL.md:6` | 沒有 skill 的撰寫原則；skill 本文的說明句與必讀清單重複（REV-25） | 已修正（DEC-21.7；使用者同意依建議）：原則寫在維護方式第 3 項，skill 只留清單 |
 | REV-67 | 6 | 建議 | `.github/team/process-docs.md:44` | 第 3 節第 3 項「刪除的項目直接移除，編號跳號」與「有序清單的條列保留一行」前後矛盾 | 已修正（使用者同意依建議）：改為「刪除的表格列與標題直接移除」 |
 | REV-68 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:6` | 使用者人工 review：Spec 重述指引內容、TEST-8 只為核對重複而存在，分類明確後研發文件可更精簡 | 已修正（回溯至 DEC-22；使用者同意依建議）：`process-docs.md` 加入規範類議題的 Spec 寫法，Spec 重寫為位置與決策重點，刪除 TEST-8，新增 STEP-14 |
+
+## 第 7 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `24c7276d` |
+| 工具與模型 | Claude Code、Claude Opus 5.5；發現來自使用者的人工 review |
+| 日期 | 2026-11-25 |
+
+1. 門檻：`Check.ps1` 9 PASS、1 FAIL，TEST-11 只缺 DoD 第 9、10 項與待人確認的處置。本議題只改文件，不需建置。
+2. 本回合處置全部經使用者同意，決策見 DEC-23。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-69 | 6 | 建議 | `.github/team/process-review.md:11` | 門檻段的常駐行數比對在載入門檻訂定後已無必要 | 已修正（回溯至 DEC-23.3；使用者同意依建議）：刪除行數比對，文件段改查新增常駐內容是否符合載入門檻；TEST-1 改為議題限定 |
+| REV-70 | 6 | 建議 | `.github/team/process-git.md:15` | 分支後綴、commit 標示是建議；自測回合、rebase 暫存分支、`git log --grep` 是招式，不是規範 | 已修正（DEC-23.2；使用者同意依建議）：後綴與標示改為建議，其餘刪除 |
+| REV-71 | 6 | 提問 | `.github/team/process-issue.md:16` | 「獨立 review」沒有定義誰算獨立 | 已修正（DEC-23.4；使用者決定）：取消獨立 review 要求，DoD 與 `review` skill 同步 |
+| REV-72 | 2 | 建議 | `.github/team/process-issue.md:30` | 分支應在開始議題時開，而非分級確認後 | 已修正（回溯至 DEC-23.5；使用者同意依建議）：移到第 1 節開頭 |
+| REV-73 | 6 | 建議 | `.github/team/process-issue.md:32` | 待討論格式與團隊概觀協作原則第 3 項重複 | 已修正（DEC-23.6；使用者同意依建議）：只定義在協作原則，流程文件改連結 |
+| REV-74 | 2 | 建議 | `.github/team/process-docs.md:25` | S、M 級的後續處理也可能很多，不應因範圍小就寫在 README | 已修正（回溯至 DEC-23.7；使用者同意依建議）：各級有項目時都寫 `FollowUp.md`，DoD 同步 |
+| REV-75 | 6 | 建議 | `.github/team/tool-claude-code.md:3` | 「見專案指引」未指明檔案，同類共 7 處 | 已修正（DEC-23.8；使用者同意依建議）：改為連到專案概觀或 `project/` 的檔案 |
+| REV-76 | 6 | 建議 | `.github/team/tool-claude-code.md:5` | 「只在確認點切換 session」不是規定；「主 session 可開子 session」是招式 | 已修正（DEC-23.2；使用者同意依建議）：改為 AI 提出切換建議，刪除子 session 一項 |
+| REV-77 | 5 | 建議 | `.github/project/tool-claude-code.md:5` | Worktree 位置、`.worktreeinclude`、`settings.local.json`、`CLAUDE.local.md` 是 Claude Code 通用行為 | 已修正（DEC-23.9；使用者同意依建議）：移到 `team/tool-claude-code.md` 第 2 節 |
+| REV-78 | 1 | 建議 | `.github/project/process-review.md:5` | Review 門檻應建置 Debug 與 Release；C++ 只在修改時建置 | 已修正（DEC-23.10；使用者同意依建議） |
+| REV-79 | 6 | 建議 | `~/.claude/CLAUDE.md:4` | 回覆方式已由團隊概觀涵蓋，使用者會帶團隊規範到其他 repo | 已修正（DEC-23.6；使用者同意依建議）：刪除該項 |
+| REV-80 | 4 | 建議 | `.github/team/process-issue.md:14` | 議題流程的施工階段沒有提醒讀取程式規範 | 已修正（DEC-23.11；使用者同意依建議）：補「施工前依流程索引讀取程式規範」 |

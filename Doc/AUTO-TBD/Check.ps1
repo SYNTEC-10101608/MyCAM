@@ -234,7 +234,7 @@ function Test-2()
 {
 	$failList = @()
 	$termArray = @( 'MyCAM', 'Build.bat', 'CopyRef', 'FCLTool', 'PostTool', 'OCC', 'LanguageManager',
-		'Designer', 'reference/', '.worktreeinclude', 'CustPost', 'zh-TW', 'AUTO-', '.NET Framework' )
+		'Designer', 'reference/', 'CustPost', 'zh-TW', 'AUTO-', '.NET Framework' )
 	$fileList = @( '.github/instructions/team-overview.instructions.md' ) + @( Get-Files '.github/team' '*.md' )
 	foreach( $szFile in $fileList ) {
 		$lineArray = Read-Lines $szFile
@@ -664,8 +664,8 @@ function Test-9()
 		}
 	}
 
-	# 9.2 Claude Code 做法每層一份：通用的 session 交接、專案的 worktree
-	$claudeMap = [ordered]@{ '.github/team/tool-claude-code.md' = 'SESSION.md'; '.github/project/tool-claude-code.md' = '.worktreeinclude' }
+	# 9.2 Claude Code 做法每層一份：通用的 session 交接與 worktree、專案要複製的檔案
+	$claudeMap = [ordered]@{ '.github/team/tool-claude-code.md' = 'SESSION.md'; '.github/project/tool-claude-code.md' = 'FCLTool.dll' }
 	foreach( $szFile in $claudeMap.Keys ) {
 		$szClaude = Read-Text $szFile
 		if( $null -eq $szClaude ) {

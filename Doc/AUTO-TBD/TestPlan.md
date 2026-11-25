@@ -17,7 +17,7 @@
 
 | TEST | 內容 | SPEC | 週期 | 時機 | 執行者 |
 | --- | --- | --- | --- | --- | --- |
-| TEST-1 | 常駐行數 | SPEC-1 | 長期維護 | 靜態 | 自動 |
+| TEST-1 | 常駐行數 | SPEC-1 | 議題限定 | 靜態 | 自動 |
 | TEST-2 | 團隊通用層不含專案內容 | SPEC-1 | 議題限定 | 靜態 | 自動 |
 | TEST-3 | 規則只寫一處 | SPEC-1、SPEC-2 | 議題限定 | 靜態 | 自動 |
 | TEST-4 | 載入設定、檔案分類與索引涵蓋 | SPEC-1、SPEC-11 | 議題限定 | 靜態 | 自動 |
@@ -43,12 +43,12 @@
 
 1. 方法：計算入口文件與 `.github/instructions/` 中 `applyTo: "**"` 的檔案行數，與比對基準比較。
 2. 通過條件：輸出各檔與總行數，以及與基準（`24c7276d`，193 行）的差異；總行數增加時，`Review.md` 寫明增加量與理由。
-3. 長期維護：即 review 門檻段的行數檢查。
+3. 只驗證本議題的常駐縮減；之後的修改改由 review 文件段檢查載入門檻（TEST-10，DEC-23）。
 
 #### TEST-2 團隊通用層不含專案內容
 
 1. 方法：在 `team-overview.instructions.md` 與 `.github/team/*.md` 搜尋專案專屬字詞（`MyCAM`、`Build.bat`、`FCLTool`、`LanguageManager`、`AUTO-`、`.NET Framework` 等，清單在 `Check.ps1`）。
-2. 通過條件：零筆；需要專案資訊處寫「見專案指引」。
+2. 通過條件：零筆；需要專案資訊處連到 `project/` 或專案概觀的對應檔案（DEC-23）。
 3. 列入 `FollowUp.md` 自動化門檻的候選項目（DEC-4.5）。
 
 #### TEST-3 規則只寫一處
@@ -92,7 +92,7 @@
 
 #### TEST-10 文件精簡審查
 
-1. 方法：review 文件段，AI 依文件通則列出重複、讀者無法判斷、可交給工具的內容，人決定處置。
+1. 方法：review 文件段，AI 依文件通則列出重複、讀者無法判斷、可交給工具的內容，以及不符合載入門檻的新增常駐內容，人決定處置。
 2. 通過條件：發現全部有處置，記入 `Review.md`。
 3. 長期維護：即 review 文件段。
 
@@ -181,7 +181,19 @@
 
 1. TEST-13：`FollowUp.md` 含 SPEC-18 各項（TODO-1～TODO-5），每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 2. TEST-10：於 Review 第 2 回合文件段執行（獨立 session），發現列為 REV-20～REV-29，全部有處置。通過。
-3. TEST-14～TEST-16：DEC-21 調整結構後待重跑。前一次（DEC-19 之後）三項皆通過，並確認 VS 2026 Copilot 可讀取 `.claude/skills/`。
+3. TEST-14～TEST-16：DEC-21 調整結構後重跑（2026-11-25，`8b513b37`）；前一次（DEC-19 之後）三項皆通過，並確認 VS 2026 Copilot 可讀取 `.claude/skills/`。
+   1. TEST-14：在 worktree 開新 session，載入 worktree 的 `CLAUDE.md`、`copilot-instructions.md`、`team-overview`、`project-overview`，以及個人層 `~/.claude/CLAUDE.md`、主 checkout 的 `CLAUDE.local.md` 與 auto memory 的 `MEMORY.md`；沒有載入 `team/`、`project/` 的檔案，主 checkout 的 `CLAUDE.md` 及其 `@` 引用（master 的 `coding-style-*.instructions.md`）也沒有載入。通過。
+   2. TEST-15：在同一 worktree session 依序演練，第 3、4 項未另開 session，判斷依據為常駐索引指向的文件，讀取結果受前幾項影響。
+      1. `/issue-start`：讀 `process-issue`、`process-docs`、`process-git`；以假設 S 級 BUG 在 scratchpad 產出符合 S 級範本的 `README.md`，提出分級建議後停下，未開分支。通過。
+      2. `/release-note`：讀 `process-git`；既有 13 條 release note 符合前綴與格式，merge log 由 release note 組合、目標版本留空。通過。
+      3. `/review`：讀 `team/process-review`、`project/process-review`，再讀 `team/`、`project/` 其餘 11 份，共 13 份；依六段與報告格式進行（未寫入 `Review.md`）。通過。
+      4. 「開議題」觸發 `issue-start`，流程索引指向 `team/process-issue.md`；「切換 session」流程索引指向 `team/tool-claude-code.md`。通過。
+      5. 修改 `MyCAM/Post/NCWriterHelper.cs` 的 `WriteEntry`：依兩份索引讀 `team/coding-general.md`、`team/coding-csharp.md`、`project/coding-architecture.md`、`project/coding-general.md` 後修改，BOM 保留，修改已還原。通過。
+   3. TEST-16：使用者在 VS 2026 Copilot Chat 於 worktree 方案執行，每項開新對話；結果依使用者提供的畫面記錄。
+      1. 附加 `VectorTool.cs` 要求為 `GetAngle_deg` 加 `gp_Vec` 多載：觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git`、`team/coding-general.md`、`coding-csharp.md`、`coding-architecture.md`、`project/coding-general.md`、`.editorconfig`；提出 S 級建議後停下等人確認。通過。
+      2. 附加 `VectorTool.cs` 問「寫法是否有不符合規範的地方」：觸發 `review`，讀兩份 `process-review` 後搜尋 `*.md`，讀入 `team/`、`project/` 全部 13 份與 `.editorconfig`，並讀 `Build.bat` 執行建置門檻。通過。
+      3. 輸入「開議題」：觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git`。通過。
+      4. 問「切換 session 要怎麼做」：讀兩份 `tool-claude-code.md`。通過。
 
 ## 6. 待討論
 

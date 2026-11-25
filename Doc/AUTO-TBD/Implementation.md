@@ -1,7 +1,7 @@
 # 實作架構與步驟
 
 每個 STEP 標示對應的 SPEC（見 [Spec.md](Spec.md)）與 TEST（見 [TestPlan.md](TestPlan.md)）。
-Commit 標題行結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對應。
+本議題的 commit 標題行結尾標示 `(STEP-n)`。
 
 ## 1. 實作架構
 
@@ -92,7 +92,7 @@ Commit 標題行結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢�
 
 ### STEP-13 Review 與收官
 
-1. 自我 review 與獨立 review 寫入 `Review.md`；`README.md` 的 DoD、文件索引、Release Note。
+1. Review 寫入 `Review.md`；`README.md` 的 DoD、文件索引、Release Note。
 2. SPEC：SPEC-4、SPEC-7、SPEC-9、SPEC-19。TEST：TEST-10、TEST-11。
 
 ### STEP-14 載入門檻與檔案分類（DEC-21、DEC-22）
@@ -103,25 +103,31 @@ Commit 標題行結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢�
 4. 重跑 TEST-14～TEST-16。
 5. SPEC：SPEC-1、SPEC-2、SPEC-5、SPEC-7、SPEC-11。TEST：TEST-1～TEST-7、TEST-9、TEST-14～TEST-16。
 
+### STEP-15 規範與建議分開、參照明確（DEC-23）
+
+1. 依 DEC-23 修改 `team/` 的 `process-issue`、`process-docs`、`process-review`、`process-git`、`tool-claude-code`、`coding-csharp`，`project/` 的 `process-review`、`tool-claude-code`，團隊概觀的協作原則與流程索引，`review` skill 的觸發說明，個人 `~/.claude/CLAUDE.md`。
+2. 同步 Goal、Spec、TestPlan、README。
+3. SPEC：SPEC-1、SPEC-3、SPEC-4、SPEC-5、SPEC-7、SPEC-8、SPEC-11、SPEC-17。TEST：TEST-1、TEST-2、TEST-7、TEST-9、TEST-10。
+
 ## 3. SPEC 對照
 
 | SPEC | STEP |
 | --- | --- |
-| SPEC-1 規範分層、載入與文件通則 | STEP-6、STEP-7、STEP-14 |
+| SPEC-1 規範分層、載入與文件通則 | STEP-6、STEP-7、STEP-14、STEP-15 |
 | SPEC-2 觸發入口 | STEP-9、STEP-14 |
-| SPEC-3 議題分級、階段與確認點 | STEP-2 |
-| SPEC-4 完成定義 | STEP-2、STEP-13 |
-| SPEC-5 議題文件組合與內容歸屬 | STEP-3、STEP-14 |
+| SPEC-3 議題分級、階段與確認點 | STEP-2、STEP-15 |
+| SPEC-4 完成定義 | STEP-2、STEP-13、STEP-15 |
+| SPEC-5 議題文件組合與內容歸屬 | STEP-3、STEP-14、STEP-15 |
 | SPEC-6 項目編號與追溯 | STEP-3 |
-| SPEC-7 Review | STEP-4、STEP-13、STEP-14 |
-| SPEC-8 Git 流程 | STEP-5 |
+| SPEC-7 Review | STEP-4、STEP-13、STEP-14、STEP-15 |
+| SPEC-8 Git 流程 | STEP-5、STEP-15 |
 | SPEC-9 Release note 與 merge log | STEP-5、STEP-13 |
 | SPEC-10 Coding Style 修訂 | STEP-8 |
-| SPEC-11 檔案與異動 | STEP-1、STEP-3、STEP-7、STEP-14 |
-| SPEC-17 個人設定收斂 | STEP-11 |
+| SPEC-11 檔案與異動 | STEP-1、STEP-3、STEP-7、STEP-14、STEP-15 |
+| SPEC-17 個人設定收斂 | STEP-11、STEP-15 |
 | SPEC-18 後續議題 | STEP-10 |
 | SPEC-19 本議題自身的文件 | STEP-12、STEP-13 |
 
 ## 4. 待討論
 
-無。確認點 5 的決議見 DEC-10；施工中的結構調整見 DEC-14、DEC-18、DEC-21、DEC-22。
+無。確認點 5 的決議見 DEC-10；施工中的結構調整見 DEC-14、DEC-18、DEC-21～DEC-23。
