@@ -8,9 +8,9 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 | 模組 | 檔案 | SPEC |
 | --- | --- | --- |
 | 檢查腳本 | `Doc/AUTO-TBD/Check.ps1`、`.editorconfig` | TestPlan 第 1 節（DEC-7.1、DEC-10.3） |
-| 流程本文 | `.github/team/issue-workflow.md`、`issue-docs.md`、`review.md`、`git-workflow.md` | SPEC-3～SPEC-9、SPEC-13 |
+| 流程本文 | `.github/team/issue-workflow.md`、`issue-docs.md`、`review.md`、`git-workflow.md`、`claude-code.md` | SPEC-3～SPEC-9、SPEC-13 |
 | 常駐與入口 | `team-collaboration.instructions.md`、`copilot-instructions.md`、`CLAUDE.md` | SPEC-1、SPEC-12、SPEC-15 |
-| 專案層與 Coding Style | `project-overview.instructions.md`、`.github/project/build.md`、`.github/project/claude-code.md`、`team-coding-style-general.instructions.md` | SPEC-10、SPEC-14 |
+| 專案層與 Coding Style | `project-overview.instructions.md`、`.github/project/build.md`、`.github/project/review.md`、`.github/project/claude-code.md`、`team-coding-style-general.instructions.md` | SPEC-10、SPEC-14 |
 | 觸發入口 | `.claude/skills/{issue-start,review,release-note}/SKILL.md` | SPEC-2、SPEC-16 |
 | 版控設定 | `.gitignore` | SPEC-11 |
 | 個人設定（不進版控） | `~/.claude/CLAUDE.md`、`~/.claude/issue-workflow.md`、主 checkout 的 `CLAUDE.local.md` | SPEC-17 |
@@ -125,7 +125,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 | SPEC-10 Coding Style 修訂 | STEP-8 |
 | SPEC-11 檔案異動清單 | STEP-1～STEP-13 |
 | SPEC-12 `team-collaboration.instructions.md` | STEP-6 |
-| SPEC-13 `team/` 文件 | STEP-2～STEP-5 |
+| SPEC-13 `team/` 文件 | STEP-2～STEP-5、STEP-7 |
 | SPEC-14 `project-overview.instructions.md` | STEP-7 |
 | SPEC-15 入口文件 | STEP-6 |
 | SPEC-16 Skills | STEP-9 |

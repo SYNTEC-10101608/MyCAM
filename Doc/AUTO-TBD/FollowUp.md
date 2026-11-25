@@ -52,19 +52,19 @@
 2. 完成條件：
    1. `team-coding-style-*.instructions.md` 中與 `.editorconfig` 重複的規則（編碼、換行、縮排、行長、行尾空白）刪除，改為一行「格式依 `.editorconfig`」。
    2. 評估 Claude Code 依檔案路徑自動載入規則的機制，可行時取代流程索引中「新增或修改程式碼」一列的導向；VS 2026 Copilot 實測也未依 `applyTo` 自動載入 `team-coding-style-csharp`，由 Copilot 依流程索引主動讀取，一併確認。
-3. 延後原因：本議題只修訂 `team-coding-style-general` 的兩項規則；其餘 Coding Style 檔案只改名、內容未修改，依「只改動到的檔案」原則留待後續。
+3. 延後原因：本議題只修訂 `team-coding-style-general` 的兩項規則；其餘 Coding Style 檔案只改名與更新連結，依「只改動到的檔案」原則留待後續。
 4. 建議做法：先確認 `.editorconfig` 已涵蓋所有被刪的規則，再刪除文件內容。
 
 ## 4. `AUTO-23254_f_UIStyleUnify` rebase 指引
 
-TODO-4 的做法。盤點日期 2026-11-25，依本機 ref（當時 `git fetch origin` 失敗），開工時先重新 fetch 並重跑第 2 項的比對。
+TODO-4 的做法。盤點日期 2026-11-25，依本機 ref（當時 `git fetch origin` 失敗），開工時先重新 fetch 並重跑第 1、3 項的盤點與衝突預估。
 
 1. 現況：
    1. 分支只在本機（worktree `.claude/worktrees/ui-style-unify`），未 push；起點 `a4b3826d`，73 個 commit、無 merge commit，對 `origin/master`（`24c7276d`）ahead 73、behind 11。
    2. 修改 356 檔：Production Code 91、`Language/` XML 128、`*.Designer.cs` 36、議題文件 14、指引 5（改 `copilot-instructions.md`、`project-overview`、`CLAUDE.md`，新增 `ui-style.instructions.md`、`icon-design.instructions.md`）、`Tools/UICheck/` 14、圖示與資源 68。
    3. 議題文件在 `Doc/AUTO-23254/`，用舊編號 `R` / `S` / `T` 與數字檔名前綴；沒有 DoD 勾選清單、Release Note、`Review.md`；commit 沒有 `STEP` / `REV` 標示。依新規範屬 L 級。
 2. 時機：等本議題以 squash 合併進目標版本分支後，再把 UI 分支 rebase 到該版本分支；先 rebase 到 `AUTO-TBD_f_DevProcess` 會帶入本議題的全部 commit。
-3. 預估衝突（逐 commit 模擬停 6 次）：
+3. 預估衝突（以本議題 `99dcd2e7`（DEC-18 之前）為對象逐 commit 模擬，停 6 次；實際 rebase 到版本分支時會不同，以重跑結果為準）：
    1. 指引：`CLAUDE.md`、`copilot-instructions.md`、`project-overview.instructions.md`（`origin/master` 與本議題都改過）。
    2. 程式：`MyCAM/Editor/Dialog/LockMSAxisDlg.cs`、`CNCThreePointDlg.cs`（`origin/master` 的 `AUTO-23220`、`AUTO-23240` 修正）。
 4. 程式衝突的解法：
@@ -75,18 +75,19 @@ TODO-4 的做法。盤點日期 2026-11-25，依本機 ref（當時 `git fetch o
    1. `ui-style`、`icon-design` 屬專案層、依副檔名或路徑適用，依新命名改為 `project-ui-style.instructions.md`、`project-icon-design.instructions.md`；不加 `CLAUDE.md` 的 `@` 引用（只有 `applyTo: "**"` 的指引常駐）。
    2. `copilot-instructions.md`：指引目錄加兩列，填「層」與「載入方式」。
    3. `project-overview`：`CommonUI` 的方案結構採 UI 版；「多語系」與 `project/review.md` 第 2 項的語系措辭合併；「專案指引索引」加一項「修改畫面或圖示時讀 `project-ui-style` / `project-icon-design`」。
-   4. `ui-style` 內連到 `coding-style-general`、`coding-style-csharp` 的連結改為 `team-` 前綴；這是新增檔，rebase 不會提示衝突，要主動搜尋。
+   4. 改名會讓連結失效，但新增檔與議題文件不會提示衝突：以 `git grep -nE "coding-style-|ui-style\.instructions|icon-design\.instructions"` 搜尋，結果全部改為新檔名（`team-coding-style-*`、`project-ui-style`、`project-icon-design`）。盤點時已知：`ui-style` 連到 `coding-style-*` 與 `icon-design`、`icon-design` 內的路徑字串、`Doc/AUTO-23254/` 的 `README.md`、`1_Goal.md`、`2_Spec.md`；UI 版 `project-overview` 連到 `ui-style` 的那一行位於本議題已刪除的段落，改由第 3 項的專案指引索引指向。
    5. 依 `copilot-instructions.md` 維護方式第 4 項，在議題文件寫明指引的異動與理由。
 6. 格式：`MyCAM/Resource/IconSource/` 的兩個 `.ps1` 沒有 BOM，依 `.editorconfig` 補上，獨立 commit。
 7. 步驟：
    1. 連上公司網路 `git fetch origin`；失敗就停下確認，不用舊的遠端 ref。
    2. 在 UI worktree 確認工作目錄乾淨，建立只留本機的備份分支，保住舊 hash（議題文件記錄的人工測試版本 `c4e6dd64` 等）。
    3. `git rebase <目標版本分支>`，依第 4、5 項解衝突。
-   4. 執行 `CopyRef.bat`（`Language/` 有更新）、`Build.bat Debug`、`Tools\UICheck\UICheck.bat runtime`、議題的 `Doc\AUTO-23254\Tests\RunIssueChecks.bat`。
-   5. 人工確認鎖軸與三點校正兩個對話框（含 CNC 連線），確認 `master` 的兩個修正仍有效。
-   6. 補議題文件：`README.md` 的分支起點、狀態、L 級 DoD、Release Note；`TestPlan` 的結果；後續處理中「master 只前進 2 個 commit」的過時描述。
-   7. 依新格式做一回合獨立 review，寫入 `Review.md`，處理完「必修」。
-   8. 由人決定 remote 與分支後 push、送 MR。
+   4. 依第 6 項補 `.ps1` 的 BOM，獨立 commit。
+   5. 執行 `CopyRef.bat`（`Language/` 有更新）、`Build.bat Debug`、`Tools\UICheck\UICheck.bat runtime`、議題的 `Doc\AUTO-23254\Tests\RunIssueChecks.bat`。
+   6. 人工確認鎖軸與三點校正兩個對話框（含 CNC 連線），確認 `master` 的兩個修正仍有效。
+   7. 補議題文件：`README.md` 的分支起點、狀態、L 級 DoD、Release Note；`TestPlan` 的結果；後續處理中「master 只前進 2 個 commit」的過時描述。
+   8. 依新格式做一回合獨立 review，寫入 `Review.md`，處理完「必修」。
+   9. 由人決定 remote 與分支後 push、送 MR。
 8. 開工時先由人決定（建議在前）：
    1. Rebase 方式：直接 rebase 保留 73 個 commit；另一選項是本機暫時 squash 後再 rebase，只解一次衝突。
    2. 既有 commit 沒有 `STEP` 標示：不改舊訊息，`README.md` 註明依相容性規則不適用，rebase 後的新 commit 標 `(STEP-n)` / `(REV-n)`。

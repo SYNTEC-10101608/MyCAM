@@ -19,9 +19,9 @@
    | 團隊通用 | `.github/team/claude-code.md` | Claude Code 的 session 交接 | 依流程索引讀取（只適用 Claude Code） |
    | MyCAM 專案 | `.github/instructions/project-overview.instructions.md` | 架構、慣例、專案指引索引 | 常駐 |
    | MyCAM 專案 | `.github/project/*.md` | 專案固定檢查項目、建置與執行環境、Claude Code 的 worktree 做法 | 依專案指引的索引讀取 |
+   | 個人 | `~/.claude/CLAUDE.md`、`CLAUDE.local.md` 等 | 個人偏好 | 各工具自行載入，不進版控 |
 
    目錄與檔名表示層與載入方式（DEC-18）：`instructions/` 為工具自動載入（`applyTo: "**"` 常駐，其他依副檔名），檔名加 `team-` 或 `project-` 前綴；`team/`、`project/` 依時機讀取；只適用 Claude Code 的做法每層一份 `claude-code.md`。
-   | 個人 | `~/.claude/CLAUDE.md`、`CLAUDE.local.md` 等 | 個人偏好 | 各工具自行載入，不進版控 |
 
 2. 團隊通用層不出現 MyCAM 專屬的檔名、專案名稱、建置指令；需要專案資訊時寫「見專案指引」。
 3. 優先順序：MyCAM 專案層可補充或具體化團隊通用層；個人層只放偏好，不改變團隊規範的要求。
@@ -163,7 +163,7 @@
 
    | 段 | 內容 | AI | 人 |
    | --- | --- | --- | --- |
-   | 1 門檻 | 建置、檢查腳本、測試、專案固定檢查項目；動到自動載入的檔案時計算行數並與比對基準比較（SPEC-1 第 7 項） | 執行並回報結果 | 提供 AI 無法執行的環境 |
+   | 1 門檻 | 建置、檢查腳本、測試、專案固定檢查項目；動到常駐檔案時計算行數並與比對基準比較（SPEC-1 第 7 項） | 執行並回報結果 | 提供 AI 無法執行的環境 |
    | 2 需求與範圍 | 每個 REQ / SPEC 都有實作與測試，沒有範圍外的修改 | 追溯比對 | 判斷需求是否被誤解 |
    | 3 功能正確性 | 邊界、錯誤處理、空值、資源釋放、執行緒；專案指引的專案固定檢查項目 | 靜態分析 | 實機操作驗證 |
    | 4 規範符合 | 依流程索引列出本次修改涉及的規範（如修改 C# 檔對應 C# Coding Style），逐一比對；專案慣例 | 檢查 | 確認處置 |
@@ -264,7 +264,7 @@
 | 個人設定（不進版控） | 修改 / 刪除 | SPEC-17 |
 
 1. 所有規範文件遵守 SPEC-1 第 6 項；檔案格式依 `.editorconfig`。
-2. 本議題新增與修改的規範檔改為數字條列；未修改的檔案（如 `team-coding-style-csharp`、`team-coding-style-cpp`）不動，日後修改時再改。
+2. 本議題新增與修改的規範檔改為數字條列；只改名與更新連結的檔案（`team-coding-style-csharp`、`team-coding-style-cpp`）條列不轉換，日後修改內容時再改。
 3. `team/`、`project/` 不放 `applyTo` frontmatter，也不放在 `instructions/` 下，避免被工具自動常駐。
 
 ### SPEC-12 `team-collaboration.instructions.md`（REQ-3.1、REQ-3.2、REQ-11；DEC-2.3、DEC-2.4、DEC-13）
@@ -311,7 +311,7 @@
    2. 指引目錄列出所有指引，每份標示層（團隊通用 / 專案）與載入方式（「常駐」或「依時機讀取」；各語言 Coding Style 標示依流程索引讀取，Copilot 另依 `applyTo`）；分層表說明目錄與檔名的對應（DEC-18）。
    3. 刪除「本檔只放目錄與跨主題的總則」中的「總則」說法，改為「本檔只放目錄與分類說明」。
    4. 「維護方式」加入常駐內容的原則（SPEC-1 第 7 項：只放每次都適用的通則並力求精簡），以及修改任何指引文件都在議題文件寫明異動與理由、由 review 文件段檢查（REV-45）。
-2. `CLAUDE.md`：`@` 只引用常駐的檔案（`copilot-instructions.md`、`collaboration`、`project-overview`、`team-coding-style-general`）；`team-coding-style-csharp`、`team-coding-style-cpp`、`team/`、`project/` 不以 `@` 引用（`@` 會常駐載入），由流程索引導向。
+2. `CLAUDE.md`：`@` 只引用常駐的檔案（`copilot-instructions.md`、`team-collaboration`、`project-overview`、`team-coding-style-general`）；`team-coding-style-csharp`、`team-coding-style-cpp`、`team/`、`project/` 不以 `@` 引用（`@` 會常駐載入），由流程索引導向。
 
 ### SPEC-16 Skills（REQ-3.3；DEC-2.5）
 

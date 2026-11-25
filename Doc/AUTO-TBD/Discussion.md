@@ -151,7 +151,7 @@
 1. 考量：使用者人工 review 指出指引可依四個面向區分（個人 / 團隊、通用 / 專案、常駐 / 細節、Claude / 通用），但檔案結構看不出後三者：`process/` 依內容、`project/` 依層命名，語意對不上；`instructions/` 內看不出層；Claude 限定內容只有一份專案層的檔案，其中 session 交接其實是通用做法。
 2. **目錄名稱表示層、`instructions/` 表示自動載入**：`process/` 改名為 `team/`；`instructions/` 只放工具自動載入的檔（常駐與依副檔名），檔名加 `team-` 或 `project-` 前綴；各語言 Coding Style 留在 `instructions/`，保留 Copilot 依副檔名載入。指引目錄加「層」欄。
 3. **Claude Code 限定做法每層一份 `claude-code.md`**：`team/claude-code.md` 放 session 交接，`project/claude-code.md` 放 worktree 位置與需複製的檔案；Copilot 使用者整份跳過。另一做法是在流程內標註「（Claude 限定）」，檔案少但每個人都要讀到。
-4. **專案固定檢查項目移到 `project/review.md`**，只在 review 時讀取，常駐 -9 行；`project-overview` 的「建置與執行」改為「專案指引索引」。
+4. **專案固定檢查項目移到 `project/review.md`**，只在 review 時讀取，常駐淨 -9 行（移出 -10，索引改寫 +1）；`project-overview` 的「建置與執行」改為「專案指引索引」。
 5. 檔名不用 `claude.md`：Windows 不分大小寫，Claude Code 會當成 `CLAUDE.md` 自動載入（施工時實際發生），寫在 `copilot-instructions.md` 維護方式並由 TEST-4 檢查。
 6. 改名會影響進行中的 `AUTO-23254_f_UIStyleUnify`：rebase 時連到團隊通用檔的連結要更新，指引見 `FollowUp.md` TODO-4。
 7. 回溯修改 SPEC-1.1、SPEC-1.5、SPEC-11、SPEC-13.6（新增）、SPEC-14.3、SPEC-14.4、SPEC-14.5、SPEC-14.6、SPEC-15.1.2；TEST-4、TEST-9 與 `Check.ps1` 同步。

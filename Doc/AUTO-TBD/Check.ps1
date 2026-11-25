@@ -439,6 +439,12 @@ function Test-6()
 			$failList += "$szFile 換行設定不符：$szEol"
 		}
 
+		# 6.1 檔尾換行（.editorconfig insert_final_newline）
+		$hasFinalNewline = $byteArray.Count -gt 0 -and $byteArray[ $byteArray.Count - 1 ] -eq 0x0A
+		if( -not $hasFinalNewline ) {
+			$failList += "$szFile 檔尾缺少換行"
+		}
+
 		# 6.3 檔名
 		$szName = Split-Path $szFile -Leaf
 		if( $szName -notmatch '^[A-Za-z0-9_.\-]+$' ) {

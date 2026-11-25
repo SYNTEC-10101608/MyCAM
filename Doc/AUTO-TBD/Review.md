@@ -95,7 +95,7 @@
 | 工具與模型 | Claude Code、Claude Opus 5.5；收官前全域自我 review（子 session），範圍為整個分支的最終結果 |
 | 日期 | 2026-11-25 |
 
-1. 門檻：`Check.ps1` 9 PASS、1 FAIL；TEST-11 只缺 DoD 第 9、10 項與待人決定或待人確認的處置。常駐 202 行（基準 193，差異 +9）：第 3 回合 +1；本回合 `project-overview` 新增「議題編號」+4（REV-43），開分支、commit、寫註解時都要用到前綴格式；`collaboration` 回覆人的方式 +4（REV-46），每次回覆都適用；文件通則分段 +4（REV-47），可讀性優先；維護方式 +1（REV-45）；分層說明與指引目錄的「層」欄 +4、流程索引 Claude Code 列 +1、專案固定檢查項目移出常駐 -10（REV-48）。檔案位置以改名後的路徑表示（DEC-18）。本議題只改文件，不需建置。
+1. 門檻：`Check.ps1` 9 PASS、1 FAIL；TEST-11 只缺 DoD 第 9、10 項與待人決定或待人確認的處置。常駐 202 行（基準 193，差異 +9）：第 3 回合 +1；本回合 `project-overview` 新增「議題編號」+4（REV-43），開分支、commit、寫註解時都要用到前綴格式；`team-collaboration` 回覆人的方式 +4（REV-46），每次回覆都適用；文件通則分段 +4（REV-47），可讀性優先；維護方式 +1（REV-45）；分層說明與指引目錄的「層」欄 +4、流程索引 Claude Code 列 +1、專案固定檢查項目移出常駐 -10（REV-48）。檔案位置以改名後的路徑表示（DEC-18）。本議題只改文件，不需建置。
 2. 需求與範圍：REQ-1～REQ-11 皆有 SPEC，SPEC-1～SPEC-19 皆有 TEST 與 STEP；被刪除的 SPEC-3.8、SPEC-5.8 只在討論與 review 記錄中以「刪除」出現。DEC-14、DEC-15 已落實於 `claude-code.md`、`build.md`、`git-workflow.md` 第 5 節、`issue-workflow.md`、`issue-docs.md`、流程索引、指引目錄與 `project-overview` 索引，沒有殘留的 session 或 worktree 說明。
 3. REV-43 依使用者回覆改為「必修」並回溯修正。
 
@@ -114,8 +114,40 @@
 | REV-43 | 2 | 必修 | `.github/instructions/team-coding-style-general.instructions.md:26` | 團隊通用層含 `AUTO-` 前綴：`team-coding-style-general` 的 `// AUTO-<編號>`、`issue-docs.md:8` 的 `AUTO-TBD`、`git-workflow.md:14` 的範例 `AUTO-23201`。`AUTO-` 是團隊共用的議題系統前綴，還是 MyCAM 專屬？若為專屬，違反 SPEC-1.2，應改為「`<議題編號>`，前綴見專案指引」。使用者回覆：`AUTO-` 只有 MyCAM 使用，改為必修 | 已修正（回溯至 REQ-1.2、SPEC-5.2、SPEC-8.3.1、SPEC-10.2、SPEC-14.7，DEC-16） |
 | REV-44 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:649` | TEST-11 只擋空白、「待處置」與「待人確認」，其他文字（如「待人決定」、「待回覆」）都通過，與 `review.md` 第 2 節第 2 項「處置只有三種」不符；改為處置須以已修正、不修正或列後續開頭 | 已修正（待人確認） |
 | REV-45 | 6 | 建議 | `.github/copilot-instructions.md:38` | 使用者人工 review：維護方式第 3 項讀起來像「不適合改常駐檔、改了要注意行數」，沒講到重點；重點是常駐耗成本，維護時以通則與精簡為主；且不論常駐與否，修改指引文件都應說明並在 review 檢查 | 已修正（待人確認）：第 3 項改寫，新增第 4 項；`review.md` 文件段加「修改的指引文件是否寫明異動與理由」；SPEC-7.1、SPEC-15.1.4 同步 |
-| REV-46 | 6 | 建議 | `~/.claude/CLAUDE.md:4` | 使用者人工 review：個人設定「溝通與文件」第 2～4 項（待決三部分各一兩句、待確認列在回覆、編號附說明）是團隊可共用的 AI 溝通原則 | 已修正（待人確認）：移入 `collaboration` 協作原則第 3 項；個人檔留一行指向團隊規範（沒有該規範的 repo 照同樣原則）；SPEC-12.2.1、SPEC-17.2 同步 |
+| REV-46 | 6 | 建議 | `~/.claude/CLAUDE.md:4` | 使用者人工 review：個人設定「溝通與文件」第 2～4 項（待決三部分各一兩句、待確認列在回覆、編號附說明）是團隊可共用的 AI 溝通原則 | 已修正（待人確認）：移入 `team-collaboration` 協作原則第 3 項；個人檔留一行指向團隊規範（沒有該規範的 repo 照同樣原則）；SPEC-12.2.1、SPEC-17.2 同步 |
 | REV-47 | 6 | 建議 | `.github/instructions/team-collaboration.instructions.md:19` | 使用者人工 review：文件通則「精簡」一句太長 | 已修正（待人確認）：分為四個子項，內容不變 |
 | REV-48 | 5 | 建議 | `.github/copilot-instructions.md:5` | 使用者人工 review：指引的四個面向中，通用 / 專案、常駐 / 細節、Claude / 通用在檔案結構上看不出來；`process/` 與 `project/` 命名軸不同、`instructions/` 未分層、Claude 限定內容只有專案層一份且混入通用的 session 交接；專案固定檢查項目只在 review 用到卻常駐 | 已修正（回溯至 SPEC-1.1、SPEC-13.6、SPEC-14、SPEC-15.1.2，DEC-18；使用者同意依建議） |
 | REV-49 | 1 | 必修 | `.github/project/claude-code.md:1` | 施工中曾把檔案命名為 `claude.md`，Windows 不分大小寫，Claude Code 立即把它當成 `CLAUDE.md` 自動載入，等於常駐 | 已修正：改名為 `claude-code.md`，維護方式寫明、TEST-4 檢查（DEC-18） |
 | REV-50 | 6 | 建議 | `Doc/AUTO-TBD/FollowUp.md:42` | 使用者要求：TODO-4 的建議做法只有一句，接手 UI 分支 rebase 的人不知道衝突點與步驟 | 已修正（待人確認）：新增第 4 節 rebase 指引，依子 session 的唯讀盤點撰寫 |
+
+## 第 5 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess`（HEAD `0788d340`） |
+| 比對基準 | `24c7276d`；重點範圍 `857aaab5~1..HEAD`（REV-43 之後） |
+| 工具與模型 | Claude Code、Claude Opus 5.5；獨立 review（子 session，未參與撰寫），由主 session 整合 |
+| 日期 | 2026-11-25 |
+
+1. 門檻：`Check.ps1` 9 PASS、1 FAIL，TEST-11 只缺 DoD 第 9、10 項與待人確認的處置。手算常駐：基準 193、HEAD 202、差異 +9，與第 4 回合的拆解相符；腳本在部分執行環境把基準算成 122（REV-51）。本議題只改文件，不需建置。
+2. 需求與範圍：REQ-1～REQ-11 都有 SPEC，SPEC-1～SPEC-19 都有 TEST 與 STEP；SPEC 對照漏了 SPEC-13 的 STEP-7（REV-59）；動態測試結果早於 DEC-18（REV-55）。
+3. DEC-18 落地：`.github/`、skills、`CLAUDE.md`、`.editorconfig`、`.worktreeinclude` 沒有殘留舊路徑；舊名只出現在 Discussion、Review、STEP-7.4 與 `Check.ps1` 的改名例外，屬合理；議題文件的簡稱 `collaboration` 未同步（REV-58）。
+4. 分層：兩份 `claude-code.md` 分工清楚，指引目錄的層與載入方式和 frontmatter、`@` 引用一致；語言 Coding Style 含專案內容（REV-52），撰寫程式時要用的三條專案規則不再常駐（REV-53）。
+5. TestPlan 5.2 的 22 列 `檔案:行號` 逐一對照，全部正確。
+6. FollowUp 第 4 節可照做，但漏列改名後失效的連結、引用項次有誤（REV-56、REV-57）。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-51 | 1 | 必修 | `Doc/AUTO-TBD/Check.ps1:165` | `Get-BaseResidentLineCount` 以 `@( git show ... )` 取基準檔內容；主 session 驗證：在 PowerShell 主控台執行時基準為 193，經 Bash 呼叫（輸出被重導）時基準為 122，空行被丟掉。現況行數用 `Get-LineCount`，兩邊口徑不同，門檻報告會誤判常駐增量 | 待處置（必修，先由人確認）。建議：基準檔改以 `git show --output=<暫存檔>` 輸出，再用 `Get-LineCount` 計算，兩種環境都確認為 193 |
+| REV-52 | 2 | 必修 | `.github/instructions/team-coding-style-cpp.instructions.md:7` | DEC-18 把語言 Coding Style 歸為團隊通用，內容卻有 MyCAM 專屬資訊，違反 SPEC-1.2：cpp 第 7 行「適用於 `PostTool`、`FCLTool`」、csharp 第 139 行 .NET Framework 4.8 / C# 7.3；TEST-2 未掃描這兩份 | 待處置（分層規則，先由人決定）。建議：只改這兩行（cpp「適用於 C / C++ 原始碼」，C# 版本「依專案指引的技術棧」），TEST-2 與 TODO-2 擴大範圍；另一選項：改歸專案層 `project-coding-style-*` |
+| REV-53 | 5 | 建議 | `.github/instructions/project-overview.instructions.md:57` | 四語系 XML 同步、Designer 可開、不改 `reference/` 是寫程式時就要遵守的規則，DEC-18 後只在 review 才讀的 `project/review.md`，AI 新增文字時讀不到 | 待處置（規格 SPEC-14.4～14.5，先由人決定）。建議：三條放回 `project-overview` 的慣例（常駐約 +3），`project/review.md` 改為依慣例檢查；另一選項：專案指引索引加「新增或修改程式碼時讀 `project/review.md`」 |
+| REV-54 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:23` | DEC-18 的說明句插進 SPEC-1.1 表格，「個人」列脫離表格；與 REV-33 同類 | 已修正（待人確認）：說明句移到「個人」列之後 |
+| REV-55 | 2 | 必修 | `Doc/AUTO-TBD/TestPlan.md:238` | TEST-14～TEST-16 的結果是 DEC-18 改名與拆檔前跑的，5.3 卻以新檔名改寫，讀起來像已在最終結構驗證；REV-49 證明檔名會影響自動載入，需實測。子 session 重跑時因工作目錄在主 checkout，載入的是 master 的舊指引，TEST-14 無法判定、TEST-15 只完成靜態演練 | 待處置（必修，先由人確認）。建議：在 worktree 開新 session 重跑 TEST-14、TEST-15（含只輸入「開議題」），連同 TEST-16 依實測改寫 5.3 並註明 commit |
+| REV-56 | 6 | 建議 | `Doc/AUTO-TBD/FollowUp.md:78` | 第 4.5.4 項只列 `ui-style` 連到 `coding-style-*`；`icon-design` 的連結與路徑字串、UI 版 `project-overview` 連到 `ui-style`、`Doc/AUTO-23254/` 的檔名也會失效且不提示衝突 | 已修正（待人確認）：改為一條 `git grep` 搜尋並列出已知位置，`project-overview` 的那一行改由專案指引索引指向 |
+| REV-57 | 6 | 建議 | `Doc/AUTO-TBD/FollowUp.md:60` | 第 4 節「重跑第 2 項的比對」應為第 1、3 項；衝突預估以 `99dcd2e7` 為對象未寫明；第 6 項補 BOM 不在步驟中 | 已修正（待人確認）：三處照改，步驟加入第 4 步補 BOM |
+| REV-58 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:314` | DEC-18 後議題文件仍用舊簡稱 `collaboration`：`Spec.md:314`、`TestPlan.md:238`、第 4 回合門檻說明與 REV-46 | 已修正（待人確認）：改為 `team-collaboration`；第 1、2 回合與 Discussion 的歷史描述保留原名 |
+| REV-59 | 2 | 建議 | `Doc/AUTO-TBD/Implementation.md:128` | SPEC 對照的 SPEC-13 漏了 STEP-7；實作架構表漏了 `team/claude-code.md` 與 `project/review.md` | 已修正（待人確認） |
+| REV-60 | 1 | 建議 | `.github/team/claude-code.md:7` | 檔尾沒有換行，違反 `.editorconfig` 的 `insert_final_newline`；TEST-6 不檢查檔尾換行 | 已修正（待人確認）：補換行，TEST-6 加入檔尾換行檢查 |
+| REV-61 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:267` | SPEC-11.2 寫 `team-coding-style-csharp`、`cpp` 是「未修改的檔案」，表格卻寫改名與更新連結；TODO-5.3 同 | 已修正（待人確認）：兩處改為「只改名與更新連結」 |
+| REV-62 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:166` | SPEC-7.1 門檻段寫「動到自動載入的檔案」，`team/review.md` 寫「常駐檔案」；DEC-18.4 寫 -9、第 4 回合寫 -10 | 已修正（待人確認）：SPEC-7.1 改為「常駐檔案」；DEC-18.4 註明淨 -9（移出 -10、索引 +1） |

@@ -235,7 +235,7 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 1. TEST-8：AI 逐條比對，位置如 5.2，內容一致（SPEC-5.4 的「STEP 與 commit 對應」措辭已由 REV-39 對齊）。使用者接受 AI 對照結果，免抽查。通過。
 2. TEST-13：`FollowUp.md` 含 SPEC-18.2 第 1～4、6 項（TODO-1～TODO-5）；第 5 項以 TEST-16 讀不到 skill 為條件，實測讀得到，TODO-6 結案刪除（REV-7）。每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 3. TEST-10：於 Review 第 2 回合文件段執行（獨立 session），發現列為 REV-20～REV-29，全部有處置。通過。
-4. TEST-14：在 worktree 開新 session，讀任何檔案前列出已載入的指引，載入 `CLAUDE.md`、`copilot-instructions.md`、`collaboration`、`project-overview`、`team-coding-style-general`，沒有載入 `team/`、`project/`、`team-coding-style-csharp`、`team-coding-style-cpp`（另有個人層 `~/.claude/CLAUDE.md` 與主 checkout 的 `CLAUDE.local.md`）。使用者以 `/context` 確認記憶檔 8 份（上述 5 份、2 份個人層、空的 auto memory 索引）。通過。
+4. TEST-14：在 worktree 開新 session，讀任何檔案前列出已載入的指引，載入 `CLAUDE.md`、`copilot-instructions.md`、`team-collaboration`、`project-overview`、`team-coding-style-general`，沒有載入 `team/`、`project/`、`team-coding-style-csharp`、`team-coding-style-cpp`（另有個人層 `~/.claude/CLAUDE.md` 與主 checkout 的 `CLAUDE.local.md`）。使用者以 `/context` 確認記憶檔 8 份（上述 5 份、2 份個人層、空的 auto memory 索引）。通過。
 5. TEST-15：在 worktree 各開新 session 演練，產出放在 scratchpad，未提交。
    1. 三個 skill 都在清單中，執行後讀取 SPEC-2 的必讀文件。通過。
    2. `/issue-start` 產出的 S 級 `README.md` 有議題資訊表、各節、DoD 五項，編號使用 REQ、SPEC、TEST、STEP；AI 在盤點後提出分級建議並停下。通過。
