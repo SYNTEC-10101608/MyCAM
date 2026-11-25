@@ -56,7 +56,7 @@
    1. 每個 REQ 有 SPEC、每個 SPEC 有 TEST。
    2. 相容性異動已寫明，沒有異動寫「無」。
    3. `TestPlan.md` 附最終執行結果。
-   4. 每個 STEP 有對應的 commit（訊息標示 `(STEP-n)`）。
+   4. 每個 STEP 可追溯到 commit（標示方式見 [git-workflow.md](git-workflow.md)）。
    5. 門檻通過（建置與專案指引的專案固定檢查項目）。
    6. 獨立 review 報告寫入 `Review.md`，「必修」全部已修正。
    7. 範圍外項目寫入 `README.md` 的後續處理，各附延後原因。

@@ -39,5 +39,5 @@ applyTo: "**"
 | 撰寫或修改議題文件 | `.github/team/issue-docs.md` |
 | 執行或回應 review | `.github/team/review.md`，加上專案指引的專案固定檢查項目；再依本表加讀本次修改涉及的文件 |
 | 開分支、commit、送 MR、產出 release note、建立 worktree | `.github/team/git-workflow.md` |
-| 新增或修改程式碼 | 對應語言的 `.github/instructions/team-coding-style-<語言>.instructions.md` |
+| 新增或修改程式碼 | 對應語言的 `.github/instructions/team-coding-style-<語言>.instructions.md`，加上專案指引的專案程式規範 |
 | 以 Claude Code 處理議題、切換 session | `.github/team/claude-code.md` |

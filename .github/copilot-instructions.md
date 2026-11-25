@@ -8,11 +8,12 @@
 | --- | --- | --- |
 | 入口 | 本檔、`CLAUDE.md` | 規範如何分類、去哪裡讀 |
 | 團隊通用 | `instructions/team-*`、`team/` | 協作原則、文件通則、流程、Coding Style；不含本專案專屬內容 |
-| 專案 | `instructions/project-*`、`project/` | 本專案的架構、慣例、review 檢查項目、建置與環境；可補充或具體化團隊通用層 |
+| 專案 | `instructions/project-*`、`project/` | 本專案的架構、慣例、程式規範、review 檢查項目、建置與環境；可補充或具體化團隊通用層 |
 | 個人 | `~/.claude/CLAUDE.md`、`CLAUDE.local.md` 等（不進版控） | 個人偏好，不改變團隊規範的要求 |
 
 1. `instructions/` 放工具自動載入的指引：`applyTo: "**"` 為常駐，其他依副檔名適用；`team/`、`project/` 依時機讀取，由流程索引或專案概觀的索引指出時機。
-2. 只適用 Claude Code 的做法，每層各放一份 `claude-code.md`；不使用 Claude Code 的成員不需要讀。
+2. 本專案寫程式時必須遵守、但不屬於 Coding Style 的規則，放在 `instructions/project-coding-<主題>.instructions.md`，並列入專案概觀的專案指引索引。
+3. 只適用 Claude Code 的做法，每層各放一份 `claude-code.md`；不使用 Claude Code 的成員不需要讀。
 
 ## 指引目錄
 
@@ -28,7 +29,8 @@
 | [Git 流程](team/git-workflow.md) | 團隊通用 | 版本、分支、commit、release note、worktree | 依時機讀取 |
 | [Claude Code 工作方式](team/claude-code.md) | 團隊通用 | Session 交接、子 session | 依時機讀取（Claude Code） |
 | [專案概觀](instructions/project-overview.instructions.md) | 專案 | 產品、方案結構、主程式架構、慣例、專案指引索引 | 常駐 |
-| [專案固定檢查項目](project/review.md) | 專案 | review 必查的建置、多語系、Designer、第三方檔案與領域項目 | 依時機讀取 |
+| [專案程式規範：通用](instructions/project-coding-general.instructions.md) | 專案 | 多語系同步、Designer、第三方檔案 | `*.cs` `*.xml`：依專案指引索引讀取，Copilot 另依 `applyTo` |
+| [專案固定檢查項目](project/review.md) | 專案 | review 必查的建置門檻與專案程式規範 | 依時機讀取 |
 | [建置與環境](project/build.md) | 專案 | FCLTool、命令列建置、執行期檔案 | 依時機讀取 |
 | [Claude Code 與 worktree](project/claude-code.md) | 專案 | worktree 位置與分支更名、需複製的檔案 | 依時機讀取（Claude Code） |
 

@@ -10,7 +10,7 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
 | 檢查腳本 | `Doc/AUTO-TBD/Check.ps1`、`.editorconfig` | TestPlan 第 1 節（DEC-7.1、DEC-10.3） |
 | 流程本文 | `.github/team/issue-workflow.md`、`issue-docs.md`、`review.md`、`git-workflow.md`、`claude-code.md` | SPEC-3～SPEC-9、SPEC-13 |
 | 常駐與入口 | `team-collaboration.instructions.md`、`copilot-instructions.md`、`CLAUDE.md` | SPEC-1、SPEC-12、SPEC-15 |
-| 專案層與 Coding Style | `project-overview.instructions.md`、`.github/project/build.md`、`.github/project/review.md`、`.github/project/claude-code.md`、`team-coding-style-general.instructions.md` | SPEC-10、SPEC-14 |
+| 專案層與 Coding Style | `project-overview.instructions.md`、`project-coding-general.instructions.md`、`.github/project/build.md`、`.github/project/review.md`、`.github/project/claude-code.md`、`team-coding-style-general.instructions.md` | SPEC-10、SPEC-14 |
 | 觸發入口 | `.claude/skills/{issue-start,review,release-note}/SKILL.md` | SPEC-2、SPEC-16 |
 | 版控設定 | `.gitignore` | SPEC-11 |
 | 個人設定（不進版控） | `~/.claude/CLAUDE.md`、`~/.claude/issue-workflow.md`、主 checkout 的 `CLAUDE.local.md` | SPEC-17 |
@@ -71,8 +71,9 @@ Commit 訊息結尾標示 `(STEP-n)`，以 `git log --grep "STEP-n"` 查詢對�
    1. 刪除「Git 流程」章節與建置細節，「專案指引索引」指向 `project/review.md`、`project/build.md` 與 `project/claude-code.md`。
    2. 刪除「慣例」與「技術棧」中重複的三句；「慣例」新增「議題編號」（SPEC-14.7）。
    3. 數字條列轉換另一個 commit。
-4. 依 DEC-18 改名：`process/` → `team/`，`instructions/` 的團隊通用檔加 `team-` 前綴，以 `git mv` 保留改名記錄。
-5. SPEC：SPEC-14、SPEC-13.6、SPEC-1.1、SPEC-1.7。TEST：TEST-1、TEST-2（專案內容不外流到通用層）、TEST-4.2、TEST-6、TEST-7、TEST-9。
+4. 新增 `project-coding-general.instructions.md`（三項專案程式規範，SPEC-14.8），`project/review.md` 改為建置門檻與引用專案程式規範（REV-53、DEC-19）。
+5. 依 DEC-18 改名：`process/` → `team/`，`instructions/` 的團隊通用檔加 `team-` 前綴，以 `git mv` 保留改名記錄。
+6. SPEC：SPEC-14、SPEC-13.6、SPEC-1.1、SPEC-1.7。TEST：TEST-1、TEST-2（專案內容不外流到通用層）、TEST-4.2、TEST-6、TEST-7、TEST-9。
 
 ### STEP-8 Coding Style 修訂
 

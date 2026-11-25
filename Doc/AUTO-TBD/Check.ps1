@@ -109,7 +109,8 @@ function Get-GuideFiles()
 		'.github/instructions/team-coding-style-general.instructions.md',
 		'.github/project/build.md',
 		'.github/project/review.md',
-		'.github/project/claude-code.md'
+		'.github/project/claude-code.md',
+		'.github/instructions/project-coding-general.instructions.md'
 	)
 	$fileList += Get-Files '.github/team' '*.md'
 	$fileList += Get-Files '.claude/skills' 'SKILL.md' -Recurse
@@ -352,7 +353,7 @@ function Test-4()
 	# 4.4
 	$szCopilot = Read-Text '.github/copilot-instructions.md'
 	$needArray = @( 'team-collaboration.instructions.md', 'issue-workflow.md', 'issue-docs.md', 'review.md',
-		'git-workflow.md', 'team/claude-code.md', 'project/review.md', 'project/build.md', 'project/claude-code.md',
+		'git-workflow.md', 'team/claude-code.md', 'project-coding-general.instructions.md', 'project/review.md', 'project/build.md', 'project/claude-code.md',
 		'團隊通用', '常駐', '依時機讀取' )
 	foreach( $szNeed in $needArray ) {
 		if( -not $szCopilot.Contains( $szNeed ) ) {
@@ -389,6 +390,7 @@ function Test-5()
 		'.github/team/git-workflow.md',
 		'.github/team/claude-code.md',
 		'.github/instructions/project-overview.instructions.md',
+		'.github/instructions/project-coding-general.instructions.md',
 		'.github/project/review.md',
 		'.github/project/build.md',
 		'.github/project/claude-code.md',
@@ -596,7 +598,7 @@ function Test-9()
 			$failList += "$szOverview 仍有建置細節 '$szTerm'"
 		}
 	}
-	foreach( $szIndex in @( 'project/review.md', 'project/build.md', 'project/claude-code.md' ) ) {
+	foreach( $szIndex in @( 'project-coding-general.instructions.md', 'project/review.md', 'project/build.md', 'project/claude-code.md' ) ) {
 		if( -not $szText.Contains( $szIndex ) ) {
 			$failList += "$szOverview 沒有指向 $szIndex 的索引"
 		}
@@ -613,8 +615,8 @@ function Test-9()
 	}
 	else {
 		$nItemCount = @( $reviewLineArray | Where-Object { $_ -match '^\d+\.\s' } ).Count
-		if( $nItemCount -ne 5 ) {
-			$failList += "project/review.md 有 $nItemCount 項，應為 5 項"
+		if( $nItemCount -ne 2 ) {
+			$failList += "project/review.md 有 $nItemCount 項，應為 2 項"
 		}
 	}
 
@@ -652,7 +654,18 @@ function Test-9()
 		}
 	}
 
-	# 9.3 三項規則只出現在 project/review.md
+	# 9.3 三項規則寫在 project-coding-general，不出現在 project-overview
+	$szCoding = Read-Text '.github/instructions/project-coding-general.instructions.md'
+	if( $null -eq $szCoding ) {
+		$failList += '缺少 project-coding-general.instructions.md'
+	}
+	else {
+		foreach( $szNeed in @( '四個語系', 'Designer', 'reference/' ) ) {
+			if( -not $szCoding.Contains( $szNeed ) ) {
+				$failList += "project-coding-general 缺少 '$szNeed'"
+			}
+		}
+	}
 	$ruleMap = [ordered]@{ '四語系同步' = '語系.*同步|同步.*語系'; 'Designer 可開' = 'Designer.*開啟'; '不修改 reference/' = 'reference/.*修改|修改.*reference/' }
 	foreach( $section in $sectionList ) {
 		foreach( $szKey in $ruleMap.Keys ) {
@@ -747,7 +760,7 @@ function Test-11()
 		}
 	}
 
-	# 11.3 施工 commit 須標示 STEP 或 REV；只動議題文件（.md）的 commit 屬確認點文件
+	# 11.3 標示為建議（DEC-20）：未標示只提示；每個 STEP 仍須有標示的 commit
 	$hashArray = @( git log --format=%H "$Base..HEAD" )
 	$stepSet = @{}
 	foreach( $szHash in $hashArray ) {
@@ -761,7 +774,7 @@ function Test-11()
 			}
 		}
 		elseif( -not $isDocOnly ) {
-			$failList += "commit $( $szHash.Substring( 0, 8 ) ) 未標示 STEP 或 REV：$szSubject"
+			$noteList += "commit $( $szHash.Substring( 0, 8 ) ) 標題行未標示 STEP 或 REV：$szSubject"
 		}
 	}
 	$nStepCount = ( [regex]::Matches( ( Read-Text 'Doc/AUTO-TBD/Implementation.md' ), '(?m)^###\s+STEP-\d+' ) ).Count

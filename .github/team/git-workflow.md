@@ -23,8 +23,8 @@
 
 1. 每個 STEP 一個 commit；文件、測試、程式盡量分開。
 2. 訊息明確描述修改內容，中英文皆可。
-3. 訊息結尾標示修改的來由：施工 `(STEP-n)`、review 修正 `(REV-n)`，兩者皆是時並列（`(STEP-3, REV-2)`）；一個 STEP 可對應多個 commit。確認點文件（階段 1～5）的 commit 不標示。
-4. 以 `git log --grep "STEP-n"` 查詢 STEP 對應的 commit，議題文件不記 commit hash。
+3. 建議在標題行結尾標示修改的來由：施工 `(STEP-n)`、review 修正 `(REV-n)`，兩者皆是時並列（`(STEP-3, REV-2)`）；一個 STEP 可對應多個 commit。確認點文件（階段 1～5）的 commit 不標示。
+4. 有標示時以 `git log --grep "STEP-n"` 查詢 STEP 對應的 commit，沒有標示時在 review 需求與範圍段人工對照；議題文件不記 commit hash。
 5. 純格式調整（含 Coding Style 的整個方法改寫）獨立 commit。
 
 ## 4. Release note 與 merge log

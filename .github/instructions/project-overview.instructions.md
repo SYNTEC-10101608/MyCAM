@@ -71,6 +71,7 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 
 ## 專案指引索引
 
-1. 執行或回應 review 時，讀 [`.github/project/review.md`](../project/review.md)（專案固定檢查項目）。
-2. 建置、準備執行環境時，讀 [`.github/project/build.md`](../project/build.md)。
-3. 以 Claude Code 建立或使用 worktree 時，讀 [`.github/project/claude-code.md`](../project/claude-code.md)。
+1. 新增或修改程式碼時，讀專案程式規範：[`project-coding-general`](project-coding-general.instructions.md)。
+2. 執行或回應 review 時，讀 [`.github/project/review.md`](../project/review.md)（專案固定檢查項目）。
+3. 建置、準備執行環境時，讀 [`.github/project/build.md`](../project/build.md)。
+4. 以 Claude Code 建立或使用 worktree 時，讀 [`.github/project/claude-code.md`](../project/claude-code.md)。

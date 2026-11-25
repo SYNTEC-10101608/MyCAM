@@ -18,6 +18,7 @@
    | 團隊通用 | `.github/instructions/team-coding-style-<語言>.instructions.md` | 各語言 Coding Style | 依流程索引讀取，Copilot 另依 `applyTo` |
    | 團隊通用 | `.github/team/claude-code.md` | Claude Code 的 session 交接 | 依流程索引讀取（只適用 Claude Code） |
    | MyCAM 專案 | `.github/instructions/project-overview.instructions.md` | 架構、慣例、專案指引索引 | 常駐 |
+   | MyCAM 專案 | `.github/instructions/project-coding-<主題>.instructions.md` | 專案程式規範：寫程式時必須遵守、不屬於 Coding Style 的規則 | 依專案指引的索引讀取，Copilot 另依 `applyTo` |
    | MyCAM 專案 | `.github/project/*.md` | 專案固定檢查項目、建置與執行環境、Claude Code 的 worktree 做法 | 依專案指引的索引讀取 |
    | 個人 | `~/.claude/CLAUDE.md`、`CLAUDE.local.md` 等 | 個人偏好 | 各工具自行載入，不進版控 |
 
@@ -34,7 +35,7 @@
    | 撰寫或修改議題文件 | `team/issue-docs.md` |
    | 執行或回應 review | `team/review.md`，加上專案指引的專案固定檢查項目；再依本表加讀本次修改涉及的文件 |
    | 開分支、commit、送 MR、產出 release note、建立 worktree | `team/git-workflow.md` |
-   | 新增或修改程式碼 | 對應語言的 `instructions/team-coding-style-<語言>.instructions.md` |
+   | 新增或修改程式碼 | 對應語言的 `instructions/team-coding-style-<語言>.instructions.md`，加上專案指引的專案程式規範 |
    | 以 Claude Code 處理議題、切換 session | `team/claude-code.md` |
 
 6. 文件通則，適用所有規範指引與議題文件：
@@ -105,7 +106,7 @@
    1. 每個 REQ 有 SPEC、每個 SPEC 有 TEST。
    2. 相容性異動已寫明，沒有異動寫「無」。
    3. `TestPlan.md` 附最終執行結果。
-   4. 每個 STEP 有對應的 commit（訊息標示 `(STEP-n)`）。
+   4. 每個 STEP 可追溯到 commit（標示為建議，DEC-20）。
    5. 門檻通過（建置與專案固定檢查項目）。
    6. 獨立 review 報告寫入 `Review.md`，「必修」全部已修正。
    7. 範圍外項目寫入 `README.md` 的後續處理，各附延後原因。
@@ -165,8 +166,8 @@
    | --- | --- | --- | --- |
    | 1 門檻 | 建置、檢查腳本、測試、專案固定檢查項目；動到常駐檔案時計算行數並與比對基準比較（SPEC-1 第 7 項） | 執行並回報結果 | 提供 AI 無法執行的環境 |
    | 2 需求與範圍 | 每個 REQ / SPEC 都有實作與測試，沒有範圍外的修改 | 追溯比對 | 判斷需求是否被誤解 |
-   | 3 功能正確性 | 邊界、錯誤處理、空值、資源釋放、執行緒；專案指引的專案固定檢查項目 | 靜態分析 | 實機操作驗證 |
-   | 4 規範符合 | 依流程索引列出本次修改涉及的規範（如修改 C# 檔對應 C# Coding Style），逐一比對；專案慣例 | 檢查 | 確認處置 |
+   | 3 功能正確性 | 邊界、錯誤處理、空值、資源釋放、執行緒 | 靜態分析 | 實機操作驗證 |
+   | 4 規範符合 | 依流程索引列出本次修改涉及的規範（如修改 C# 檔對應 C# Coding Style），逐一比對 | 檢查 | 確認處置 |
    | 5 設計品質 | 架構、重複、效率、可維護性 | 提出 | 取捨 |
    | 6 文件 | 議題文件與 DoD、指引規範、使用手冊是否受影響；修改的指引文件是否寫明異動與理由；是否符合文件通則（重複、無法判斷、可交給工具的規則） | 檢查 | 確認 |
 
@@ -176,7 +177,7 @@
 3. 報告格式：
    1. 表頭：議題、分支、比對基準 commit、工具與模型、日期。
    2. 發現表格欄位：`REV-n`、段（1～6）、嚴重度（必修 / 建議 / 提問）、位置（`檔案:行號`）、說明、處置。
-   3. 處置只有三種：已修正、不修正（附理由）、列後續（`TODO-n`）；修正的 commit 訊息標示 `(REV-n)`。
+   3. 處置只有三種：已修正、不修正（附理由）、列後續（`TODO-n`）；修正的 commit 建議標示 `(REV-n)`（DEC-20）。
 4. 處置規則：
    1. 「必修」與涉及需求、規格的發現，先由人決定處置再修；其他發現可先修正，處置寫「已修正（待人確認）」，人確認後移除標示（DEC-13）。
    2. 「必修」只能是「已修正」；若人判定不需修正，先調整嚴重度並寫明理由。
@@ -200,8 +201,8 @@
 5. Commit：
    1. 每個 STEP 一個 commit；文件、測試、程式盡量分開。
    2. 訊息明確描述修改內容，中英文皆可。
-   3. 訊息結尾標示修改的來由：施工 `(STEP-n)`、review 修正 `(REV-n)`，兩者皆是時並列（`(STEP-3, REV-2)`）；一個 STEP 可對應多個 commit。確認點文件（階段 1～5）的 commit 不標示。
-   4. `Implementation.md` 不記 commit hash，以 `git log --grep "STEP-n"` 查詢對應。
+   3. 建議在標題行結尾標示修改的來由（DEC-20）：施工 `(STEP-n)`、review 修正 `(REV-n)`，兩者皆是時並列（`(STEP-3, REV-2)`）；一個 STEP 可對應多個 commit。確認點文件（階段 1～5）的 commit 不標示。
+   4. `Implementation.md` 不記 commit hash；有標示時以 `git log --grep "STEP-n"` 查詢對應，沒有標示時在 review 需求與範圍段人工對照。
    5. 純格式調整（含 SPEC-10 的方法改寫）獨立 commit。
 6. 送 MR 由人決定；AI push 前先詢問 remote 與分支（push 由人決定寫在協作原則，SPEC-12.2.1）。
 7. 一個議題一個 branch。Worktree 為選用，同時處理多個議題時使用；未追蹤檔案不會出現在新 worktree，需要的檔案依專案指引複製（DEC-12）。
@@ -248,6 +249,7 @@
 | `.github/team/git-workflow.md` | 新增 | SPEC-13 |
 | `.github/team/claude-code.md` | 新增 | SPEC-13.6 |
 | `.github/instructions/project-overview.instructions.md` | 修改 | SPEC-14 |
+| `.github/instructions/project-coding-general.instructions.md` | 新增 | SPEC-14.8 |
 | `.github/project/review.md` | 新增 | SPEC-14.4 |
 | `.github/project/build.md` | 新增 | SPEC-14 |
 | `.github/project/claude-code.md` | 新增 | SPEC-14.6 |
@@ -291,18 +293,16 @@
 
 1. 刪除「Git 流程」章節：分支命名、commit 規則、Claude Code worktree 的通用說明移到 `team/git-workflow.md`。
 2. 「建置與執行」的內容（FCLTool、命令列建置、執行期檔案）移到 `.github/project/build.md`；與 worktree 相關的內容不放在此檔（SPEC-14.6）。
-3. `project-overview` 以「專案指引索引」取代「建置與執行」：review 時讀 `.github/project/review.md`；建置、執行環境時讀 `.github/project/build.md`；以 Claude Code 建立或使用 worktree 時讀 `.github/project/claude-code.md`（DEC-18）。
-4. 新增 `.github/project/review.md`「專案固定檢查項目」，依時機讀取，作為 review 門檻段、功能正確性段與規範段的專案項目（DEC-18：只在 review 時用到，不常駐）：
+3. `project-overview` 以「專案指引索引」取代「建置與執行」：新增或修改程式碼時讀專案程式規範（DEC-19）；review 時讀 `.github/project/review.md`；建置、執行環境時讀 `.github/project/build.md`；以 Claude Code 建立或使用 worktree 時讀 `.github/project/claude-code.md`（DEC-18）。
+4. 新增 `.github/project/review.md`「專案固定檢查項目」，依時機讀取，作為 review 門檻段與規範段的專案項目（DEC-18：只在 review 時用到，不常駐）：
    1. `Build.bat Debug` 建置成功。
-   2. 使用者可見文字的四語系 XML（`zh-TW`、`zh-CN`、`en-US`、`ru-RU`）同步。
-   3. 修改過的 `*.Designer.cs` 仍可在 Designer 開啟。
-   4. 未修改 `reference/` 內的檔案（除非議題明確要求）。
-   5. 功能正確性的領域項目：UI 執行緒、角度單位（rad / deg）、座標系（由團隊通用的 review 移入）。
-5. 第 4 項的規則只寫在 `project/review.md`：「慣例」與「技術棧」中重複的句子（四語系同步、Designer 可開、不修改 `reference/`）刪除，保留做法說明。
+   2. 修改的檔案符合專案程式規範（DEC-19；原本的四語系、Designer、`reference/` 三項移到 SPEC-14.8，功能正確性的領域項目刪除）。
+5. 四語系同步、Designer 可開、不修改 `reference/` 三項規則只寫在 `project-coding-general`（SPEC-14.8）：「慣例」與「技術棧」中重複的句子刪除，保留做法說明。
 6. 新增 `.github/project/claude-code.md`，集中以 Claude Code 使用本專案 worktree 時才需要的做法，不使用的成員不需讀（DEC-14、DEC-18；session 交接移到 SPEC-13.6）：
    1. （刪除，見 DEC-18）
    2. Worktree：Claude Code 的 worktree 位置與分支更名；`.worktreeinclude` 列出需複製的未追蹤檔案（`FCLTool.dll`、`PostTool.dll`、`Custom/`、`.claude/settings.local.json`），Claude Code 自動複製、其他工具手動複製；`CLAUDE.local.md` 由上層載入；第一次建置後執行 `CopyRef.bat`；開啟方案後再卸載 `FCLTool`。
 7. 「慣例」新增「議題編號」：格式 `AUTO-<數字>`、未取得時以 `AUTO-TBD` 暫代、分支範例；團隊通用層只寫 `<議題編號>` 並指向專案指引（DEC-16）。
+8. 新增 `.github/instructions/project-coding-general.instructions.md`「專案程式規範：通用」，`applyTo` 為 `*.cs`、`*.xml`，不常駐；內容為四語系 XML 同步、`*.Designer.cs` 可在 Designer 開啟、不修改 `reference/`。之後的專案程式規範（如 UI 規範）以 `project-coding-<主題>` 命名並列入專案指引索引（DEC-19）。
 
 ### SPEC-15 入口文件（REQ-1.3、REQ-2.1；DEC-2.1、DEC-2.2）
 

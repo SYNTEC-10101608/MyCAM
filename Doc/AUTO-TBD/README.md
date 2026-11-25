@@ -31,7 +31,7 @@
 1. [x] 每個 REQ 有 SPEC、每個 SPEC 有 TEST（Spec 第 4 節、TestPlan 第 4 節）。
 2. [x] 相容性異動已寫明（Spec 第 3 節）。
 3. [x] `TestPlan.md` 附最終執行結果（第 5 節）。
-4. [x] 每個 STEP 有對應的 commit（`Check.ps1` TEST-11）。
+4. [x] 每個 STEP 可追溯到 commit（`Check.ps1` TEST-11）。
 5. [x] 門檻通過：`Check.ps1` 通過；本議題只改文件，不需建置。
 6. [x] 獨立 review 報告寫入 `Review.md`，「必修」全部已修正。
 7. [x] `FollowUp.md` 每項寫明目標、完成條件與延後原因。
@@ -47,7 +47,7 @@
 4. 新增 Review 規範：六段檢查、報告格式與處置規則。
 5. 新增 Git 流程規範：版本與分支命名、commit 標示、release note 與 merge log 格式，worktree 改為選用。
 6. 新增 開議題、review、產出 release note 三個 AI 入口指令，Claude Code 與 VS 2026 Copilot 皆可使用。
-7. 新增 專案固定檢查項目，作為 review 必查的建置、多語系、Designer、第三方檔案與領域正確性項目，只在 review 時讀取。
+7. 新增 專案程式規範與專案固定檢查項目，多語系同步、Designer、第三方檔案的規則在寫程式時讀取，review 另查建置門檻。
 8. 修改 專案概觀，建置與執行環境的細節移到獨立的建置說明，需要時才讀取；新增議題編號格式。
 9. 修改 Coding Style 通用規則，修改既有程式碼時以方法為單位套用新規範，程式碼不引用文件編號。
 10. 修改 Claude 不再常駐載入各語言 Coding Style，改為修改或 review 程式碼時依流程索引讀取。

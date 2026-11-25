@@ -100,9 +100,9 @@
 
 1. 方法：搜尋 `project-overview.instructions.md`、`.github/project/` 三份文件、`.github/team/claude-code.md` 與 `team-coding-style-general.instructions.md`。
 2. 通過條件：
-   1. `project-overview` 沒有「Git 流程」與「專案固定檢查項目」章節、沒有建置細節（`FakeDebug`、`vswhere`、`MachineData`）；索引指向 `project/review.md`、`project/build.md`、`project/claude-code.md`；`project/review.md` 有五項（SPEC-14.4）；「議題編號」含 `AUTO-TBD`（SPEC-14.7）。
+   1. `project-overview` 沒有「Git 流程」與「專案固定檢查項目」章節、沒有建置細節（`FakeDebug`、`vswhere`、`MachineData`）；索引指向 `project-coding-general`、`project/review.md`、`project/build.md`、`project/claude-code.md`；`project/review.md` 有兩項（SPEC-14.4）；「議題編號」含 `AUTO-TBD`（SPEC-14.7）。
    2. `build.md` 有 FCLTool、命令列建置、執行期檔案三節，沒有 worktree 相關內容；`team/claude-code.md` 含 `SESSION.md` 的說明（SPEC-13.6），`project/claude-code.md` 含 `.worktreeinclude` 的說明（SPEC-14.6）。
-   3. 四語系同步、Designer 可開、不修改 `reference/` 三項規則不出現在 `project-overview`（SPEC-14.5）。
+   3. 四語系同步、Designer 可開、不修改 `reference/` 三項規則不出現在 `project-overview`，且寫在 `project-coding-general`（SPEC-14.5、SPEC-14.8）。
    4. `team-coding-style-general` 不再有「維持該方法內既有的命名方式」；有 SPEC-10.1 三項與 SPEC-10.2 註解規則。
 
 #### TEST-10 文件精簡審查
@@ -117,7 +117,7 @@
 2. 通過條件：
    1. 有 L 級八份文件；`README.md` 含文件索引、L 級 DoD（全部勾選）、Release Note。
    2. `Review.md` 表頭五欄、發現表格六欄；每項有處置，「必修」全部為「已修正」。
-   3. 施工 commit 訊息結尾有 `(STEP-n)` 或 `(REV-n)`，每個 STEP 至少一個 commit；純格式調整獨立 commit。
+   3. 每個 STEP 至少一個標示 `(STEP-n)` 的 commit；未標示的施工 commit 只提示、不判失敗（DEC-20）；純格式調整獨立 commit。
 
 #### TEST-12 個人設定收斂
 

@@ -78,7 +78,7 @@
 1. 考量：worktree 說明混有 MyCAM 專屬內容（DLL 清單、`CopyRef.bat`）。**拆分**：通用規則移到 `git-workflow.md`，專案準備步驟留在專案指引（位置由 DEC-10.1 改為 `project/build.md`，再由 DEC-14 改為 `project/claude-code.md`）。
 2. 考量：`.git/info/exclude` 不進版控，其他成員會誤提交。**`SESSION.md` 改由 `.gitignore` 的 `/SESSION.md` 排除**。
 3. 考量：commit hash 要 commit 後才知道，記在文件需要事後補，rebase 後也會變。
-   **commit 訊息結尾標示 `(STEP-n)` 或 `(REV-n)`**，`Implementation.md` 不記 hash；一個 STEP 可對應多個 commit。
+   **commit 訊息結尾標示 `(STEP-n)` 或 `(REV-n)`**，`Implementation.md` 不記 hash；一個 STEP 可對應多個 commit（標示由 DEC-20 改為建議）。
 4. 考量：編號被其他文件與 commit 訊息引用，commit 訊息無法再改。**確認點確認後編號不重排、不重用，刪除即跳號**（有序清單的條列由 DEC-17 改為保留一行）。
 5. **文件條列使用數字標號提升為團隊通則**，理由是溝通時可直接指出第幾項；只在新增或修改的檔案套用。
 6. 考量：自動載入的內容每次互動都付成本，其他文件的成本來自重複與模糊。
@@ -151,7 +151,25 @@
 1. 考量：使用者人工 review 指出指引可依四個面向區分（個人 / 團隊、通用 / 專案、常駐 / 細節、Claude / 通用），但檔案結構看不出後三者：`process/` 依內容、`project/` 依層命名，語意對不上；`instructions/` 內看不出層；Claude 限定內容只有一份專案層的檔案，其中 session 交接其實是通用做法。
 2. **目錄名稱表示層、`instructions/` 表示自動載入**：`process/` 改名為 `team/`；`instructions/` 只放工具自動載入的檔（常駐與依副檔名），檔名加 `team-` 或 `project-` 前綴；各語言 Coding Style 留在 `instructions/`，保留 Copilot 依副檔名載入。指引目錄加「層」欄。
 3. **Claude Code 限定做法每層一份 `claude-code.md`**：`team/claude-code.md` 放 session 交接，`project/claude-code.md` 放 worktree 位置與需複製的檔案；Copilot 使用者整份跳過。另一做法是在流程內標註「（Claude 限定）」，檔案少但每個人都要讀到。
-4. **專案固定檢查項目移到 `project/review.md`**，只在 review 時讀取，常駐淨 -9 行（移出 -10，索引改寫 +1）；`project-overview` 的「建置與執行」改為「專案指引索引」。
+4. **專案固定檢查項目移到 `project/review.md`**（其中三項規則由 DEC-19 改放 `project-coding-general`），只在 review 時讀取，常駐淨 -9 行（移出 -10，索引改寫 +1）；`project-overview` 的「建置與執行」改為「專案指引索引」。
 5. 檔名不用 `claude.md`：Windows 不分大小寫，Claude Code 會當成 `CLAUDE.md` 自動載入（施工時實際發生），寫在 `copilot-instructions.md` 維護方式並由 TEST-4 檢查。
 6. 改名會影響進行中的 `AUTO-23254_f_UIStyleUnify`：rebase 時連到團隊通用檔的連結要更新，指引見 `FollowUp.md` TODO-4。
 7. 回溯修改 SPEC-1.1、SPEC-1.5、SPEC-11、SPEC-13.6（新增）、SPEC-14.3、SPEC-14.4、SPEC-14.5、SPEC-14.6、SPEC-15.1.2；TEST-4、TEST-9 與 `Check.ps1` 同步。
+
+## DEC-19 專案程式規範（2026-11-25）
+
+1. 考量：四語系同步、Designer 可開、不修改 `reference/` 是寫程式時就要遵守的規則，DEC-18 後只在 review 才讀的 `project/review.md`，AI 寫程式時讀不到（REV-53）。它們屬於程式規範，但不是 Coding Style；之後 UI 規範等同類規範會陸續增加。
+2. **新增「專案程式規範」一類：`instructions/project-coding-<主題>.instructions.md`**，依副檔名 `applyTo`、不常駐；團隊流程索引「新增或修改程式碼」一列加上「專案指引的專案程式規範」，專案概觀的專案指引索引列出各檔。新增同類規範時只在索引加一項，review 規範段依流程索引自動涵蓋。
+3. 本議題新增 `project-coding-general`，放上述三項；`project/review.md` 只留建置門檻與「符合專案程式規範」。
+4. **刪除功能正確性的領域項目（UI 執行緒、角度單位、座標系）**：只列名詞，寫程式與 review 時都無法照做；日後有具體的陷阱與做法再寫進專案程式規範。
+5. UI 分支的 `ui-style`、`icon-design` rebase 時改名為 `project-coding-ui-style`、`project-coding-icon-design`（`FollowUp.md` 第 4 節）。
+6. 常駐 +3 行：入口的分層說明與指引目錄各 +1、專案指引索引 +1；常駐合計 205（基準 193）。
+7. 回溯修改 SPEC-1.1、SPEC-1.5、SPEC-7.1、SPEC-11、SPEC-14.3、SPEC-14.4、SPEC-14.5，新增 SPEC-14.8；TEST-9 與 `Check.ps1` 同步。
+
+## DEC-20 Commit 標示改為建議（2026-11-25）
+
+1. 考量：`(STEP-n)`、`(REV-n)` 標示是 AI 流程方便追溯的做法，手寫程式的成員通常不會逐一標示；規定為必要會讓不用 AI 的成員難以符合（REV-63）。
+2. **標示改為建議，位置為標題行結尾**，`git log --oneline` 即可看到。
+3. DoD「每個 STEP 有對應的 commit」改為「每個 STEP 可追溯到 commit」：有標示時以 `git log --grep` 查詢，沒有標示時在 review 需求與範圍段人工對照。
+4. 本議題的 `Check.ps1` TEST-11 對標題行未標示的 commit 只提示，每個 STEP 仍須有標示的 commit。
+5. 回溯修改 SPEC-4、SPEC-7.3、SPEC-8.5；TEST-11 與 `Check.ps1` 同步。

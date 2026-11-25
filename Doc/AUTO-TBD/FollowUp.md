@@ -72,10 +72,10 @@ TODO-4 的做法。盤點日期 2026-11-25，依本機 ref（當時 `git fetch o
    2. 同檔有 git 不報衝突但會編譯失敗的地方：自動併入的 `m_rdoMasterAuto_CheckedChanged` 仍用舊名 `m_rbtnMasterAuto`，要改為 `m_rdoMasterAuto`；rebase 後搜尋舊前綴 `m_rbtn`、`m_dbtn` 確認沒有殘留。
    3. `CNCThreePointDlg.cs`：刪掉建構子中訂閱圖紙欄位 `TextChanged` 的迴圈（`master` 已改由 `SetDrawingPoint` / `SetWorkpiecePoint` 主動觸發），圖紙欄位維持 UI 的寫法。
 5. 指引衝突的解法：以本議題的版本為底，移植 UI 的新增內容。
-   1. `ui-style`、`icon-design` 屬專案層、依副檔名或路徑適用，依新命名改為 `project-ui-style.instructions.md`、`project-icon-design.instructions.md`；不加 `CLAUDE.md` 的 `@` 引用（只有 `applyTo: "**"` 的指引常駐）。
+   1. `ui-style`、`icon-design` 屬專案程式規範、依副檔名或路徑適用，依新命名改為 `project-coding-ui-style.instructions.md`、`project-coding-icon-design.instructions.md`（DEC-19）；不加 `CLAUDE.md` 的 `@` 引用（只有 `applyTo: "**"` 的指引常駐）。
    2. `copilot-instructions.md`：指引目錄加兩列，填「層」與「載入方式」。
-   3. `project-overview`：`CommonUI` 的方案結構採 UI 版；「多語系」與 `project/review.md` 第 2 項的語系措辭合併；「專案指引索引」加一項「修改畫面或圖示時讀 `project-ui-style` / `project-icon-design`」。
-   4. 改名會讓連結失效，但新增檔與議題文件不會提示衝突：以 `git grep -nE "coding-style-|ui-style\.instructions|icon-design\.instructions"` 搜尋，結果全部改為新檔名（`team-coding-style-*`、`project-ui-style`、`project-icon-design`）。盤點時已知：`ui-style` 連到 `coding-style-*` 與 `icon-design`、`icon-design` 內的路徑字串、`Doc/AUTO-23254/` 的 `README.md`、`1_Goal.md`、`2_Spec.md`；UI 版 `project-overview` 連到 `ui-style` 的那一行位於本議題已刪除的段落，改由第 3 項的專案指引索引指向。
+   3. `project-overview`：`CommonUI` 的方案結構採 UI 版；「多語系」與 `project-coding-general` 第 1 項的語系措辭合併；「專案指引索引」第 1 項加入 `project-coding-ui-style`、`project-coding-icon-design`。
+   4. 改名會讓連結失效，但新增檔與議題文件不會提示衝突：以 `git grep -nE "coding-style-|ui-style\.instructions|icon-design\.instructions"` 搜尋，結果全部改為新檔名（`team-coding-style-*`、`project-coding-ui-style`、`project-coding-icon-design`）。盤點時已知：`ui-style` 連到 `coding-style-*` 與 `icon-design`、`icon-design` 內的路徑字串、`Doc/AUTO-23254/` 的 `README.md`、`1_Goal.md`、`2_Spec.md`；UI 版 `project-overview` 連到 `ui-style` 的那一行位於本議題已刪除的段落，改由第 3 項的專案指引索引指向。
    5. 依 `copilot-instructions.md` 維護方式第 4 項，在議題文件寫明指引的異動與理由。
 6. 格式：`MyCAM/Resource/IconSource/` 的兩個 `.ps1` 沒有 BOM，依 `.editorconfig` 補上，獨立 commit。
 7. 步驟：
@@ -95,6 +95,6 @@ TODO-4 的做法。盤點日期 2026-11-25，依本機 ref（當時 `git fetch o
    4. 既有後續處理缺完成條件：視為既有內容不轉換，只有新增項用 `TODO` 完整格式。
    5. 獨立 review：先前 6 回合 VS Copilot review 的結論已在討論記錄；rebase 後再做一回合，重點為衝突解法、`master` 併入與指引移植。
    6. 議題檢查腳本的固定基準 `a4b3826d`：改為 rebase 目標 commit，文件註明原基準與備份分支；沿用舊基準會把 `master` 與本議題的變更算成差異。
-   7. `UICheck.bat` 是否加入 `project/review.md` 的專案固定檢查項目：建議加入，語系措辭改為「`Language/` 中所有語系」。
+   7. `UICheck.bat` 是否加入 `project/review.md` 的專案固定檢查項目：建議加入門檻；`project-coding-general` 的語系措辭改為「`Language/` 中所有語系」。
    8. 目標版本：本議題與 UI 議題進同一個下一版，本議題先合。
    9. 人工確認範圍：自動檢查全跑，人工只重做衝突涉及的兩個對話框與其 Designer。
