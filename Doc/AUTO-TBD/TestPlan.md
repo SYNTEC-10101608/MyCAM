@@ -235,15 +235,15 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 1. TEST-8：AI 逐條比對，位置如 5.2，內容一致（SPEC-5.4 的「STEP 與 commit 對應」措辭已由 REV-39 對齊）。使用者接受 AI 對照結果，免抽查。通過。
 2. TEST-13：`FollowUp.md` 含 SPEC-18.2 第 1～4、6 項（TODO-1～TODO-5）；第 5 項以 TEST-16 讀不到 skill 為條件，實測讀得到，TODO-6 結案刪除（REV-7）。每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 3. TEST-10：於 Review 第 2 回合文件段執行（獨立 session），發現列為 REV-20～REV-29，全部有處置。通過。
-4. TEST-14：在 worktree 開新 session，讀任何檔案前列出已載入的指引，載入 `CLAUDE.md`、`copilot-instructions.md`、`team-collaboration`、`project-overview`、`team-coding-style-general`，沒有載入 `team/`、`project/`、`team-coding-style-csharp`、`team-coding-style-cpp`（另有個人層 `~/.claude/CLAUDE.md` 與主 checkout 的 `CLAUDE.local.md`）。使用者以 `/context` 確認記憶檔 8 份（上述 5 份、2 份個人層、空的 auto memory 索引）。通過。
-5. TEST-15：在 worktree 各開新 session 演練，產出放在 scratchpad，未提交。
-   1. 三個 skill 都在清單中，執行後讀取 SPEC-2 的必讀文件。通過。
-   2. `/issue-start` 產出的 S 級 `README.md` 有議題資訊表、各節、DoD 五項，編號使用 REQ、SPEC、TEST、STEP；AI 在盤點後提出分級建議並停下。通過。
-   3. `/release-note` 產出 9 條，皆以 `新增` 或 `修改` 開頭；merge log 為 `Merge branch 'AUTO-TBD_f_DevProcess' into ''` 加 `by <名字>`。通過。
-   4. `/review` 依六段進行，表頭五欄、發現表六欄。通過。
-   5. 只輸入「開議題」：經 `issue-start` skill 讀取 `issue-workflow.md` 與 `issue-docs.md`，停下詢問議題內容與編號，未建立檔案。通過。
-   6. 要求修改 `.cs` 方法：動手前經流程索引讀取 `team-coding-style-csharp.instructions.md`，修改符合 C# 規範；修改已還原。通過。
-6. TEST-16：使用者在 VS 2026 Copilot Chat（GPT-6.1）於 worktree 方案執行，每項開新對話。
+4. TEST-14：DEC-18 改名後於 worktree（HEAD `ff2f9b8f`）開新 session 重跑，讀任何檔案前依系統提示列出已載入的檔案，共 8 份：`CLAUDE.md`、`copilot-instructions.md`、`team-collaboration`、`project-overview`、`team-coding-style-general`、個人層 `~/.claude/CLAUDE.md` 與主 checkout 的 `CLAUDE.local.md`、auto memory 索引（1 項）。沒有載入 `team-coding-style-csharp`、`team-coding-style-cpp`、`team/`、`project/`、任何 `claude-code.md`。通過。
+5. TEST-15：與 TEST-14 同一 session 演練（HEAD `ff2f9b8f`），產出放在 scratchpad，未提交，`.cs` 修改已還原。
+   1. 三個 skill 都在清單中，必讀文件與 SPEC-2 一致。通過。
+   2. `/issue-start`（假設 S 級 BUG）：依序讀 `team/issue-workflow.md`、`issue-docs.md`、`git-workflow.md`；草稿有 S 級範本各節與 DoD 五項，編號使用 REQ、SPEC、TEST、STEP；盤點後在「待討論」提出分級建議並停下，未開分支。通過。
+   3. `/review`：讀 `team/review.md`，並經常駐的專案指引索引讀 `project/review.md`；依六段進行，表頭五欄、發現表六欄。通過。
+   4. `/release-note`：每條以 `新增` 或 `修改` 開頭，merge log 為 `Merge branch 'AUTO-TBD_f_DevProcess' into ''` 加 `by <名字>`。通過。
+   5. 只輸入「開議題」、問「切換 session 要怎麼做」：常駐流程索引分別導向 `team/issue-workflow.md`、`team/claude-code.md`，後者可答出確認點切換與 `SESSION.md` 交接。通過；限制：在同一 session 內判斷，未另開乾淨的 session（改名前曾以新 session 實測「開議題」通過）。
+   6. 要求修改 `.cs` 方法：動手前經流程索引讀取 `team-coding-style-csharp.instructions.md`（不常駐），修改符合 C# 規範；修改已還原。通過。
+6. TEST-16：使用者在 VS 2026 Copilot Chat（GPT-6.1）於 worktree 方案執行，每項開新對話；以下為 DEC-18 改名前的結果，待使用者在最終結構重跑後更新。
    1. 一般提問：附加 `.cs` 檔提問，回應引用 `team-coding-style-general`、使用 `project-overview` 內容，未讀檔；另以未附檔的提問「哪些決策一定要由人做」，未讀檔即依 `team-collaboration.instructions.md` 答出五項。`team-coding-style-csharp` 未依 `applyTo` 自動載入，由 Copilot 主動讀取。通過。
    2. 輸入「開議題」：自動觸發 `issue-start` skill，讀取 `issue-workflow.md` 與 `issue-docs.md` 後停下詢問議題內容與編號。通過。
    3. 輸入 `/issue-start`：辨識為 skill 並讀取相同兩份文件。VS 2026 Copilot 可讀取 `.claude/skills/`。
