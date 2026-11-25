@@ -214,3 +214,4 @@
 3. **新 worktree 的環境準備獨立成 `project/env-worktree.md`，不限工具**（取代 DEC-14.3 後半）：要複製的檔案、`CopyRef.bat`、卸載 `FCLTool` 是任何工具建立 worktree 都要做的；建置文件只講編譯，不放 worktree（DEC-14.4 維持）。刪除 `project/tool-claude-code.md`，專案索引改為「建立或準備新 worktree（不限工具）」。
 4. **Session 交接改為通用規則**（取代 DEC-14.1 把交接歸為 Claude 專用的前提）：寫入 `process-issue.md` 第 5 節，流程索引「切換 session 或對話」指向該檔；`team/tool-claude-code.md` 只留 Claude Code 的 worktree 機制。
 5. **工具文件只單向引用通用流程**：`process-git.md` 第 5 節改指 `project/env-worktree.md`，不再導向 Claude 文件；`process-issue.md` 與 `process-review.md` 的互相引用是流程接續，保留。
+6. **新議題分支以遠端 `master` 為基準**（REV-88，使用者決定）：現行做法不會先切目標版本分支，一律由 `master` 開分支；寫入 `process-git.md` 第 2 節。

@@ -74,7 +74,7 @@
 位置：[process-git.md](../../.github/team/process-git.md) 第 1～3、5 節。
 
 1. 成文化現行版本號、版本分支、squash 合併與保留分支。
-2. 分支 `<議題編號>_<類型>_<簡述>`，建議後綴 `_2nd`、`_Alt2`；開分支前先 fetch。
+2. 分支 `<議題編號>_<類型>_<簡述>`，建議後綴 `_2nd`、`_Alt2`；新分支以遠端 `master` 為基準，開分支前先 fetch（DEC-24.6）。
 3. 每個 STEP 一個 commit；標題行結尾建議標示 `(STEP-n)` / `(REV-n)`；議題文件不記 commit hash。
 4. Worktree 為選用，新 worktree 的環境準備見 `project/env-worktree.md`（不限工具，DEC-24.3）；送 MR 由人決定，push 前先詢問 remote 與分支。
 
