@@ -1,6 +1,6 @@
 # Review
 
-依 [review.md](../../.github/team/review.md) 的報告格式，每回合一節。
+依 [process-review.md](../../.github/team/process-review.md) 的報告格式，每回合一節。
 
 ## 第 1 回合
 
@@ -152,3 +152,25 @@
 | REV-61 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:267` | SPEC-11.2 寫 `team-coding-style-csharp`、`cpp` 是「未修改的檔案」，表格卻寫改名與更新連結；TODO-5.3 同 | 已修正（待人確認）：兩處改為「只改名與更新連結」 |
 | REV-62 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:166` | SPEC-7.1 門檻段寫「動到自動載入的檔案」，`team/review.md` 寫「常駐檔案」；DEC-18.4 寫 -9、第 4 回合寫 -10 | 已修正（待人確認）：SPEC-7.1 改為「常駐檔案」；DEC-18.4 註明淨 -9（移出 -10、索引 +1） |
 | REV-63 | 1 | 建議 | `Doc/AUTO-TBD/Check.ps1:755` | TEST-15 演練中發現：TEST-11 只比對 commit 標題行結尾的 `(STEP/REV-n)`，`git-workflow.md:26` 寫「訊息結尾標示」；`2723da5a`、`ff2f9b8f` 把標示放在本文最後一段，被判為未標示。本分支其他 commit 都標在標題行 | 已修正（使用者同意依建議）：早期共識（DEC-9.3）為規範；考量手寫程式的成員不會逐一標示，改為建議、位置為標題行結尾，DoD 改為可追溯，TEST-11 未標示只提示；兩個 commit 不改寫（DEC-20） |
+
+## 第 6 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `24c7276d` |
+| 工具與模型 | Claude Code、Claude Opus 5.5；發現來自使用者的人工 review |
+| 日期 | 2026-11-25 |
+
+1. 門檻：`Check.ps1` 9 PASS、1 FAIL，TEST-11 只缺 DoD 第 9、10 項與待人確認的處置。常駐 112 行（基準 193，差異 -81）：`team/coding-general.md` 移出常駐、`project-overview` 的技術棧、架構與慣例拆到 `project/`、指引目錄改為分類表。本議題只改文件，不需建置。
+2. 本回合的位置使用改名後的檔名；第 1～5 回合保留當時的檔名（DEC-21.8）。
+3. Spec、TestPlan、Implementation 依 DEC-22 重寫（REV-68）。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-64 | 5 | 建議 | `.github/copilot-instructions.md:14` | 使用者人工 review：`instructions/` 加前綴與放 `team/`、`project/` 的差別不易理解；兩個工具實際都不依副檔名載入，常駐與依時機讀取的門檻沒有定義 | 已修正（回溯至 DEC-21；使用者同意依建議）：訂載入門檻，目錄只表示載入方式，檔名以分類開頭，review 讀入全部規範 |
+| REV-65 | 6 | 建議 | `.github/copilot-instructions.md:16` | 指引目錄逐檔列出且常駐，與兩份概觀的索引重複，新增指引時要改兩處 | 已修正（DEC-21.6；使用者同意依建議）：改為分類表，TEST-4 檢查索引涵蓋每份文件 |
+| REV-66 | 6 | 建議 | `.claude/skills/review/SKILL.md:6` | 沒有 skill 的撰寫原則；skill 本文的說明句與必讀清單重複（REV-25） | 已修正（DEC-21.7；使用者同意依建議）：原則寫在維護方式第 3 項，skill 只留清單 |
+| REV-67 | 6 | 建議 | `.github/team/process-docs.md:44` | 第 3 節第 3 項「刪除的項目直接移除，編號跳號」與「有序清單的條列保留一行」前後矛盾 | 已修正（使用者同意依建議）：改為「刪除的表格列與標題直接移除」 |
+| REV-68 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:6` | 使用者人工 review：Spec 重述指引內容、TEST-8 只為核對重複而存在，分類明確後研發文件可更精簡 | 已修正（回溯至 DEC-22；使用者同意依建議）：`process-docs.md` 加入規範類議題的 Spec 寫法，Spec 重寫為位置與決策重點，刪除 TEST-8，新增 STEP-14 |

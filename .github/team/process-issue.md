@@ -1,6 +1,6 @@
 # 議題處理流程
 
-開始議題、分級、進入下一階段時讀本文件。議題文件的組合與寫法見 [issue-docs.md](issue-docs.md)。
+開始議題、分級、進入下一階段時讀本文件。議題文件的組合與寫法見 [process-docs.md](process-docs.md)。
 
 ## 1. 處理階段
 
@@ -13,8 +13,8 @@
    1. 依 STEP 施工；遇到預料外的狀況先停下討論，不自行擴大範圍。
    2. BUG 先完成重現測試並確認修正前失敗；無法自動化時寫明人工重現步驟與預期結果。
    3. 執行測試，迭代修正直到通過。
-   4. 自我 review；M、L 級另做獨立 review。做法見 [review.md](review.md)。
-   5. 提交，規則見 [git-workflow.md](git-workflow.md)。
+   4. 自我 review；M、L 級另做獨立 review。做法見 [process-review.md](process-review.md)。
+   5. 提交，規則見 [process-git.md](process-git.md)。
 7. Review：與人合作 review、產出 release note 與 merge log、處理同事的 review 意見；每次修正後回到 6.3。
 8. 收官：全域自我 review，長期有效的結論提升到指引規範。
 
@@ -27,7 +27,7 @@
 | L | 新功能、規範或相容性異動 | 1、2、3、4、5、7 各自確認 |
 
 1. 分級由實作者確認；使用 AI 時，AI 在盤點後提出建議並等人確認。合併者在 review 時認為級別不足，可要求升級並補齊文件。
-2. 分級確認後開分支，議題文件提交在該分支；做法見 [git-workflow.md](git-workflow.md)。
+2. 分級確認後開分支，議題文件提交在該分支；做法見 [process-git.md](process-git.md)。
 3. 每個確認點先出草案，最後列「待討論」；人確認沒有待決問題後，才進入下一段。
 4. 待討論每題固定三部分，文件與對話中都適用，不可省略為只有選項的摘要：
    1. 問題：背景、為什麼需要決定、要決定什麼。
@@ -56,7 +56,7 @@
    1. 每個 REQ 有 SPEC、每個 SPEC 有 TEST。
    2. 相容性異動已寫明，沒有異動寫「無」。
    3. `TestPlan.md` 附最終執行結果。
-   4. 每個 STEP 可追溯到 commit（標示方式見 [git-workflow.md](git-workflow.md)）。
+   4. 每個 STEP 可追溯到 commit（標示方式見 [process-git.md](process-git.md)）。
    5. 門檻通過（建置與專案指引的專案固定檢查項目）。
    6. 獨立 review 報告寫入 `Review.md`，「必修」全部已修正。
    7. 範圍外項目寫入 `README.md` 的後續處理，各附延後原因。

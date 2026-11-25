@@ -2,7 +2,7 @@
 applyTo: "**"
 ---
 
-# 團隊協作
+# 團隊概觀
 
 ## 協作原則
 
@@ -31,13 +31,13 @@ applyTo: "**"
 
 ## 流程索引
 
-到了下列時機，先讀對應文件再動手：
+到了下列時機，先讀對應文件再動手；專案的時機另見專案概觀的專案指引索引。
 
 | 時機 | 必讀文件 |
 | --- | --- |
-| 開始議題、分級、進入下一階段 | `.github/team/issue-workflow.md` |
-| 撰寫或修改議題文件 | `.github/team/issue-docs.md` |
-| 執行或回應 review | `.github/team/review.md`，加上專案指引的專案固定檢查項目；再依本表加讀本次修改涉及的文件 |
-| 開分支、commit、送 MR、產出 release note、建立 worktree | `.github/team/git-workflow.md` |
-| 新增或修改程式碼 | 對應語言的 `.github/instructions/team-coding-style-<語言>.instructions.md`，加上專案指引的專案程式規範 |
-| 以 Claude Code 處理議題、切換 session | `.github/team/claude-code.md` |
+| 開始議題、分級、進入下一階段 | `.github/team/process-issue.md` |
+| 撰寫或修改議題文件 | `.github/team/process-docs.md` |
+| 開分支、commit、送 MR、產出 release note、建立 worktree | `.github/team/process-git.md` |
+| 新增或修改程式碼與設定檔（`*.cs`、`*.c`、`*.cpp`、`*.h`、`*.hpp`、`*.xml`、`*.resx`、`*.config` 等） | `.github/team/coding-general.md`，加上對應語言的 `.github/team/coding-<語言>.md`（`csharp`、`cpp`） |
+| 執行或回應 review | `.github/team/process-review.md`，再讀 `.github/team/`、`.github/project/` 下其餘全部文件 |
+| 以 Claude Code 處理議題、切換 session | `.github/team/tool-claude-code.md` |

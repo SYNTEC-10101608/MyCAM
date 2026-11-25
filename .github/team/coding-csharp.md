@@ -1,10 +1,6 @@
----
-applyTo: "**/*.cs"
----
-
 # Coding Style：C#
 
-另須遵守 [通用規則](team-coding-style-general.instructions.md)。
+另須遵守 [通用規則](coding-general.md)。
 
 ## 格式
 

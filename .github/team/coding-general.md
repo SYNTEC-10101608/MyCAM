@@ -1,7 +1,3 @@
----
-applyTo: "**"
----
-
 # Coding Style：通用規則
 
 適用於本 repo 所有原始碼與設定檔。格式類規則已寫入 `.editorconfig`，衝突時以 `.editorconfig` 為準。

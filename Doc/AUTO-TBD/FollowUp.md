@@ -1,6 +1,6 @@
 # 後續處理
 
-本議題（團隊與 AI 協作開發流程規範）範圍外的項目。流程規範本文在 `.github/team/`，常駐規範在 `.github/instructions/team-collaboration.instructions.md`；各項內容自足，接手時不需回溯本議題的討論。
+本議題（團隊與 AI 協作開發流程規範）範圍外的項目。流程規範本文在 `.github/team/`，常駐規範在 `.github/instructions/team-overview.instructions.md`；各項內容自足，接手時不需回溯本議題的討論。
 
 ## 1. 文件維護
 
@@ -9,7 +9,7 @@
 1. 目標：功能修改時，客戶操作手冊（`Documents/`，簡體中文，目前已落後）能同步更新。
 2. 完成條件：
    1. 決定手冊的格式、存放位置與負責人。
-   2. `team/issue-workflow.md` 或 DoD 加入「手冊是否受影響」的判斷與更新步驟；review 文件段已檢查手冊是否受影響，補上處理方式。
+   2. `team/process-issue.md` 或 DoD 加入「手冊是否受影響」的判斷與更新步驟；review 文件段已檢查手冊是否受影響，補上處理方式。
 3. 延後原因：手冊的格式與負責人尚未決定，內容更新量大，不屬於流程成文化的範圍。
 4. 建議做法：先盤點手冊與現行功能的落差，再決定是否改用可隨程式一起版控的格式（如 Markdown）。
 
@@ -25,13 +25,13 @@
 3. 延後原因：本議題以成文化現有機制為主；議題限定的檢查已在 `Doc/AUTO-TBD/Check.ps1`，長期維護版需要另行設計與團隊同意。
 4. 建議做法：
    1. 以 `Doc/AUTO-TBD/Check.ps1` 為起點，抽出長期維護的檢查。
-   2. 第一個候選：團隊通用層（`team-collaboration.instructions.md`、`team-coding-style-general.instructions.md`、`.github/team/*.md`）不得含專案專屬字詞（`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`、`AUTO-`），對應本議題 TEST-2。
+   2. 第一個候選：團隊通用層（`team-overview.instructions.md`、`team/coding-general.md`、`.github/team/*.md`）不得含專案專屬字詞（`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`、`AUTO-`），對應本議題 TEST-2。
    3. 每建立一項自動檢查，就把規範中對應的文字規則縮為一行指引。
 
 ### TODO-3 GitLab MR 建立自動化
 
 1. 目標：議題分支 push 時自動建立 MR，標題與描述取自 release note 與 merge log。
-2. 完成條件：`team/git-workflow.md` 寫明建立方式，並以一個實際議題驗證。
+2. 完成條件：`team/process-git.md` 寫明建立方式，並以一個實際議題驗證。
 3. 延後原因：需要團隊決定工具與權限；push 與送 MR 仍由人決定，自動化只省去手動操作。
 4. 建議做法：
    1. 不需額外環境：`git push` 的 push options（`-o merge_request.create`、`-o merge_request.target=<版本分支>`、`-o merge_request.title=<標題>`）。
@@ -42,7 +42,7 @@
 ### TODO-4 既有分支依新規範調整
 
 1. 目標：進行中的分支 `AUTO-23254_f_UIStyleUnify` 依新規範收尾。
-2. 完成條件：rebase 到含新規範的版本分支後，議題文件與 commit 標示符合 `.github/team/issue-docs.md` 與 `git-workflow.md`，DoD 全部勾選。
+2. 完成條件：rebase 到含新規範的版本分支後，議題文件與 commit 標示符合 `.github/team/process-docs.md` 與 `process-git.md`，DoD 全部勾選。
 3. 延後原因：該分支在新規範合併前已開工，須等本議題合併後才能 rebase。
 4. 建議做法：見第 4 節 rebase 指引。
 
@@ -50,9 +50,9 @@
 
 1. 目標：格式類規則只寫在 `.editorconfig`，Coding Style 文件只留一行指引；Claude 依副檔名載入各語言 Coding Style。
 2. 完成條件：
-   1. `team-coding-style-*.instructions.md` 中與 `.editorconfig` 重複的規則（編碼、換行、縮排、行長、行尾空白）刪除，改為一行「格式依 `.editorconfig`」。
-   2. 評估 Claude Code 依檔案路徑自動載入規則的機制，可行時取代流程索引中「新增或修改程式碼」一列的導向；VS 2026 Copilot 實測也未依 `applyTo` 自動載入 `team-coding-style-csharp`，由 Copilot 依流程索引主動讀取，一併確認。
-3. 延後原因：本議題只修訂 `team-coding-style-general` 的兩項規則；其餘 Coding Style 檔案只改名、更新連結與替換專案資訊，依「只改動到的檔案」原則留待後續。
+   1. `team/coding-*.md` 中與 `.editorconfig` 重複的規則（編碼、換行、縮排、行長、行尾空白）刪除，改為一行「格式依 `.editorconfig`」。
+   2. 評估 Claude Code 依檔案路徑自動載入規則的機制，可行時取代流程索引中「新增或修改程式碼」一列的導向；VS 2026 Copilot 實測也未依 `applyTo` 自動載入 `team/coding-csharp.md`，由 Copilot 依流程索引主動讀取，一併確認。
+3. 延後原因：本議題只修訂 `team/coding-general.md` 的兩項規則；其餘 Coding Style 檔案只改名、更新連結與替換專案資訊，依「只改動到的檔案」原則留待後續。
 4. 建議做法：先確認 `.editorconfig` 已涵蓋所有被刪的規則，再刪除文件內容。
 
 ## 4. `AUTO-23254_f_UIStyleUnify` rebase 指引
@@ -72,10 +72,10 @@ TODO-4 的做法。盤點日期 2026-11-25，依本機 ref（當時 `git fetch o
    2. 同檔有 git 不報衝突但會編譯失敗的地方：自動併入的 `m_rdoMasterAuto_CheckedChanged` 仍用舊名 `m_rbtnMasterAuto`，要改為 `m_rdoMasterAuto`；rebase 後搜尋舊前綴 `m_rbtn`、`m_dbtn` 確認沒有殘留。
    3. `CNCThreePointDlg.cs`：刪掉建構子中訂閱圖紙欄位 `TextChanged` 的迴圈（`master` 已改由 `SetDrawingPoint` / `SetWorkpiecePoint` 主動觸發），圖紙欄位維持 UI 的寫法。
 5. 指引衝突的解法：以本議題的版本為底，移植 UI 的新增內容。
-   1. `ui-style`、`icon-design` 屬專案程式規範、依副檔名或路徑適用，依新命名改為 `project-coding-ui-style.instructions.md`、`project-coding-icon-design.instructions.md`（DEC-19）；不加 `CLAUDE.md` 的 `@` 引用（只有 `applyTo: "**"` 的指引常駐）。
-   2. `copilot-instructions.md`：指引目錄加兩列，填「層」與「載入方式」。
-   3. `project-overview`：`CommonUI` 的方案結構採 UI 版；「多語系」與 `project-coding-general` 第 1 項的語系措辭合併；「專案指引索引」第 1 項加入 `project-coding-ui-style`、`project-coding-icon-design`。
-   4. 改名會讓連結失效，但新增檔與議題文件不會提示衝突：以 `git grep -nE "coding-style-|ui-style\.instructions|icon-design\.instructions"` 搜尋，結果全部改為新檔名（`team-coding-style-*`、`project-coding-ui-style`、`project-coding-icon-design`）。盤點時已知：`ui-style` 連到 `coding-style-*` 與 `icon-design`、`icon-design` 內的路徑字串、`Doc/AUTO-23254/` 的 `README.md`、`1_Goal.md`、`2_Spec.md`；UI 版 `project-overview` 連到 `ui-style` 的那一行位於本議題已刪除的段落，改由第 3 項的專案指引索引指向。
+   1. `ui-style`、`icon-design` 屬專案程式規範，改為 `project/coding-ui-style.md`、`project/coding-icon-design.md`，移除 `applyTo`（DEC-21）；不加 `CLAUDE.md` 的 `@` 引用（只有概觀常駐）。
+   2. `copilot-instructions.md`：分類表已涵蓋 `coding-`，不需加列；UI 版新增的指引目錄列捨棄。
+   3. `project-overview`：UI 版的方案結構與慣例改寫到拆出的檔案：`CommonUI` 的方案結構採 UI 版、寫入 `project/coding-architecture.md`；「多語系」併入 `project/coding-general.md` 的多語系段；專案指引索引的程式碼列加入 `project/coding-ui-style.md`、`project/coding-icon-design.md`。
+   4. 改名會讓連結失效，但新增檔與議題文件不會提示衝突：以 `git grep -nE "coding-style-|project-coding-|ui-style\.instructions|icon-design\.instructions"` 搜尋，結果全部改為新檔名（`team/coding-*.md`、`project/coding-ui-style.md`、`project/coding-icon-design.md`）。盤點時已知：`ui-style` 連到 `coding-style-*` 與 `icon-design`、`icon-design` 內的路徑字串、`Doc/AUTO-23254/` 的 `README.md`、`1_Goal.md`、`2_Spec.md`；UI 版 `project-overview` 連到 `ui-style` 的那一行位於本議題已刪除的段落，改由第 3 項的專案指引索引指向。
    5. 依 `copilot-instructions.md` 維護方式第 4 項，在議題文件寫明指引的異動與理由。
 6. 格式：`MyCAM/Resource/IconSource/` 的兩個 `.ps1` 沒有 BOM，依 `.editorconfig` 補上，獨立 commit。
 7. 步驟：
@@ -95,6 +95,6 @@ TODO-4 的做法。盤點日期 2026-11-25，依本機 ref（當時 `git fetch o
    4. 既有後續處理缺完成條件：視為既有內容不轉換，只有新增項用 `TODO` 完整格式。
    5. 獨立 review：先前 6 回合 VS Copilot review 的結論已在討論記錄；rebase 後再做一回合，重點為衝突解法、`master` 併入與指引移植。
    6. 議題檢查腳本的固定基準 `a4b3826d`：改為 rebase 目標 commit，文件註明原基準與備份分支；沿用舊基準會把 `master` 與本議題的變更算成差異。
-   7. `UICheck.bat` 是否加入 `project/review.md` 的專案固定檢查項目：建議加入門檻；`project-coding-general` 的語系措辭改為「`Language/` 中所有語系」。
+   7. `UICheck.bat` 是否加入 `project/process-review.md` 的專案固定檢查項目：建議加入門檻；`project/coding-general.md` 的語系措辭改為「`Language/` 中所有語系」。
    8. 目標版本：本議題與 UI 議題進同一個下一版，本議題先合。
    9. 人工確認範圍：自動檢查全跑，人工只重做衝突涉及的兩個對話框與其 Designer。

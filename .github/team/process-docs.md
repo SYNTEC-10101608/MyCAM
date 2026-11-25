@@ -1,6 +1,6 @@
 # 議題文件
 
-撰寫或修改議題文件時讀本文件。各階段與各級 DoD 見 [issue-workflow.md](issue-workflow.md)；文件通則見 [team-collaboration.instructions.md](../instructions/team-collaboration.instructions.md)。
+撰寫或修改議題文件時讀本文件。各階段與各級 DoD 見 [process-issue.md](process-issue.md)；文件通則見 [team-overview.instructions.md](../instructions/team-overview.instructions.md)。
 
 ## 1. 存放
 
@@ -25,7 +25,7 @@
 | 後續處理（TODO） | README | README | `FollowUp.md` |
 
 1. 文件只保留最終結果；例外是 `Discussion.md` 可增量描述並凸顯最終決策，`Review.md` 依 review 回合分節保留。
-2. 確認點文件在確認點內容之後列「待討論」一節，格式見 [issue-workflow.md](issue-workflow.md) 第 2 節；沒有待決問題時寫「無」。
+2. 確認點文件在確認點內容之後列「待討論」一節，格式見 [process-issue.md](process-issue.md) 第 2 節；沒有待決問題時寫「無」。
 
 ## 3. 編號與追溯
 
@@ -41,7 +41,7 @@
 
 1. 寫法為 `前綴-流水號`（`REQ-1`）；引用子項目寫 `REQ-1.2`。
 2. 追溯方向：SPEC 註明 REQ；TEST 註明 SPEC（或 REQ）；STEP 註明 SPEC 與 TEST；REV 的處置可指向 TODO。
-3. 確認點確認後，編號不重排、不重用；刪除的項目直接移除，編號跳號；有序清單的條列保留一行「（刪除，見 DEC-n）」，因為 Markdown 會依序重排清單號碼。
+3. 確認點確認後，編號不重排、不重用；刪除的表格列與標題直接移除，編號跳號；有序清單的條列保留一行「（刪除，見 DEC-n）」，因為 Markdown 會依序重排清單號碼。
 
 ## 4. 各文件內容
 
@@ -51,13 +51,14 @@
 | `Spec.md` | 操作規格（對外：用途、操作方式、範例、限制）；實作規格（對內：檔案與資料結構、核心 API）；相容性異動；REQ 對照 |
 | `TestPlan.md` | 分類（週期：議題限定 / 長期維護；時機：靜態 / 動態；執行者：自動 / 人工）；總表；各 TEST 的方法與通過條件；SPEC 對照；執行結果 |
 | `Implementation.md` | 實作架構（模組與檔案）；各 STEP 的內容、SPEC 與 TEST；SPEC 對照 |
-| `Review.md` | 依 [review.md](review.md) 的報告格式，每回合一節 |
+| `Review.md` | 依 [process-review.md](process-review.md) 的報告格式，每回合一節 |
 | `Discussion.md` | 每個 DEC 一節，依主題整理：原始考量、最終決策（粗體）與依據 |
 | `FollowUp.md` | 依範疇分節；每個 TODO 寫目標、完成條件、延後原因、建議做法，內容自足 |
 
 1. 相容性異動分輸入（讀取或接收的資料、設定）與輸出（產生或提供的檔案、報表），每項寫異動內容與既有資料如何處理（相容、轉換或不再支援）；沒有異動寫「無」。
-2. STEP 包含程式、測試、研發文件與專案指引；`Implementation.md` 不記 commit hash，對應方式見 [git-workflow.md](git-workflow.md)。
+2. STEP 包含程式、測試、研發文件與專案指引；`Implementation.md` 不記 commit hash，對應方式見 [process-git.md](process-git.md)。
 3. 測試執行結果寫最終一次的結果。
+4. 交付物是規範或文件的議題，指引檔本身就是規格：每條 SPEC 只寫決策重點與規則所在的檔案章節，不重述指引內容；TEST 以連結有效與抽查代替逐條比對。
 
 ## 5. `README.md` 範本
 
@@ -95,7 +96,7 @@ S 級完整範本（所有內容都在 `README.md`）：
 
 ## Review
 
-<依 review.md 的報告格式>
+<依 process-review.md 的報告格式>
 
 ## 討論記錄
 
@@ -111,7 +112,7 @@ S 級完整範本（所有內容都在 `README.md`）：
 
 ## DoD
 
-1. [ ] <依 issue-workflow.md 第 4 節 S 級逐項列出>
+1. [ ] <依 process-issue.md 第 4 節 S 級逐項列出>
 
 ## Release Note
 
@@ -139,7 +140,7 @@ M、L 級骨架（其餘內容放各檔，見第 2 節）：
 
 ## DoD
 
-1. [ ] <依 issue-workflow.md 第 4 節該級別逐項列出>
+1. [ ] <依 process-issue.md 第 4 節該級別逐項列出>
 
 ## Release Note
 ```

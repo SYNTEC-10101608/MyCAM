@@ -173,3 +173,22 @@
 3. DoD「每個 STEP 有對應的 commit」改為「每個 STEP 可追溯到 commit」：有標示時以 `git log --grep` 查詢，沒有標示時在 review 需求與範圍段人工對照。
 4. 本議題的 `Check.ps1` TEST-11 對標題行未標示的 commit 只提示，每個 STEP 仍須有標示的 commit。
 5. 回溯修改 SPEC-4、SPEC-7.3、SPEC-8.5；TEST-11 與 `Check.ps1` 同步。
+
+## DEC-21 載入門檻、檔案分類與 skill 原則（2026-11-25）
+
+1. 考量：使用者人工 review 指出 `instructions/` 加前綴與放 `team/`、`project/` 的差別不易理解。實測 Claude Code 只依 `@` 載入，VS 2026 Copilot 未依 `applyTo` 自動載入（REV-19、TEST-16），兩者實際都靠索引讀取，依副檔名載入只是名義上的機制。
+2. **載入門檻**：AI 無法自行察覺何時該讀的內容（協作原則、文件通則、索引）才常駐；能以動作或修改的檔案類型辨識時機的內容放 `team/`、`project/`，索引寫明動作名稱或副檔名。取代 DEC-18 第 2 項「`instructions/` 放常駐與依副檔名」。
+3. **review 讀入全部規範**：流程索引的 review 列與 `review` skill 讀 `team/`、`project/` 全部文件，作為寫程式時漏讀的保險；review 規範段不再依流程索引列出涉及的規範，取代 DEC-15。
+4. **檔案分類**：目錄表示載入方式（`instructions/` 只放每層一份的 `<層>-overview`）；`team/`、`project/` 的檔名以分類開頭：`process-`（流程）、`coding-`（程式規範）、`env-`（環境）、`tool-`（特定工具）。`team-collaboration` 改名 `team-overview`；`coding-style` 與 `project-coding` 統一為 `coding-`；`issue-` 改為分類後的主題（`process-issue`、`process-docs`）。DEC-19 的 `instructions/project-coding-<主題>` 改為 `project/coding-<主題>.md`。
+5. **`project-overview` 拆分**：常駐只留產品簡介、議題編號與專案指引索引；技術棧、方案與主程式結構移到 `project/coding-architecture.md`，慣例併入 `project/coding-general.md`。`team/coding-general.md` 移出常駐。常駐 205 → 112 行。
+6. **指引目錄改為分類表**：`copilot-instructions.md` 不再逐檔列出，改為「開頭 → 分類 → 讀取時機」，各檔由兩份概觀的索引指出；`Check.ps1` TEST-4 檢查每份 `team/`、`project/` 文件都列在該層索引。
+7. **Skill 原則**寫在 `copilot-instructions.md` 維護方式：skill 只是觸發入口；人主動發起、常用、要讀多份文件的動作才寫成 skill，以動作命名；內容只有 `description` 與依序條列的必讀文件，規則寫在指引檔。三個 skill 刪除與清單重複的說明句（REV-25 改為依此處理）。
+8. 議題文件中描述最終狀態的文件（Spec、TestPlan、Implementation、FollowUp、README）路徑改為新檔名；Review 與 Discussion 是歷史記錄，保留當時的檔名，`Check.ps1` TEST-7 不檢查兩者的反引號路徑。
+9. 改名再次影響 `AUTO-23254_f_UIStyleUnify`：`FollowUp.md` 第 4 節的對照改為新檔名。
+
+## DEC-22 規範類議題的規格寫法（2026-11-25）
+
+1. 考量：本議題 Spec 的操作規格重述 `team/` 規範的內容，實作規格又逐檔重述各檔內容，同一規則寫兩處，違反文件通則；TEST-8 的「規格 → 檔案:行號」對照只為核對這份重複而存在，每次改名都要重算。
+2. **交付物是規範或文件的議題，指引檔本身就是規格**：每條 SPEC 只寫決策重點與規則所在的檔案章節，TEST 以連結有效與抽查代替逐條比對；寫入 `process-docs.md` 第 4 節第 4 項。程式議題的 Spec 仍完整描述行為。
+3. 本議題依此重寫 Spec：SPEC-1～SPEC-10 改為「位置 + 決策重點」；SPEC-12～SPEC-16 併入 SPEC-11 的檔案表（標題直接移除，編號跳號）；SPEC 子項目重新整理，DEC-22 之前的 Review、Discussion 引用的子項目編號指當時的版本（見 git 記錄）。
+4. 刪除 TEST-8，由 TEST-7 的連結檢查涵蓋；TestPlan、Implementation 的對應改為以 SPEC 為單位，新增 STEP-14。

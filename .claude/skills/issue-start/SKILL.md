@@ -3,10 +3,8 @@ name: issue-start
 description: 開始新議題時使用：盤點現況、建議分級、開分支、建立議題資料夾與 README.md。使用者說「開議題」、「開始議題」，或要開始處理新的 bug、功能時觸發。
 ---
 
-依 `.github/team/issue-workflow.md` 執行，議題文件依 `.github/team/issue-docs.md` 撰寫，開分支依 `.github/team/git-workflow.md`。
+必讀文件，依序：
 
-必讀文件：
-
-1. `.github/team/issue-workflow.md`
-2. `.github/team/issue-docs.md`
-3. `.github/team/git-workflow.md`
+1. `.github/team/process-issue.md`
+2. `.github/team/process-docs.md`
+3. `.github/team/process-git.md`

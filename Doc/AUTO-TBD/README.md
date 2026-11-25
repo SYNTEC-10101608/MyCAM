@@ -5,14 +5,14 @@
 | 分支 | `AUTO-TBD_f_DevProcess` |
 | 分支起點 | `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23） |
 | 級別 | L |
-| 狀態 | 收官：STEP-1～STEP-13 與 Review 第 5 回合完成，待人工全域 review |
+| 狀態 | 收官：STEP-1～STEP-14 與 Review 第 6 回合完成，待人工確認與 TEST-14～TEST-16 重跑 |
 
 ## 文件
 
 | 文件 | 內容 |
 | --- | --- |
 | [Goal.md](Goal.md) | 現況盤點、目標、範圍、需求（REQ） |
-| [Spec.md](Spec.md) | 操作規格、實作規格、相容性異動（SPEC） |
+| [Spec.md](Spec.md) | 規則與位置、檔案配置、相容性異動（SPEC） |
 | [TestPlan.md](TestPlan.md) | 測試規劃與執行結果（TEST） |
 | [Implementation.md](Implementation.md) | 實作架構與步驟（STEP） |
 | [Review.md](Review.md) | Review 報告（REV） |
@@ -47,9 +47,10 @@
 4. 新增 Review 規範：六段檢查、報告格式與處置規則。
 5. 新增 Git 流程規範：版本與分支命名、commit 標示、release note 與 merge log 格式，worktree 改為選用。
 6. 新增 開議題、review、產出 release note 三個 AI 入口指令，Claude Code 與 VS 2026 Copilot 皆可使用。
-7. 新增 專案程式規範與專案固定檢查項目，多語系同步、Designer、第三方檔案的規則在寫程式時讀取，review 另查建置門檻。
-8. 修改 專案概觀，建置與執行環境的細節移到獨立的建置說明，需要時才讀取；新增議題編號格式。
+7. 新增 專案程式規範與專案固定檢查項目，專案架構、慣例與多語系同步、Designer、第三方檔案的規則在寫程式時讀取，review 另查建置門檻。
+8. 修改 專案概觀只留產品簡介、議題編號格式與專案指引索引，架構、慣例與建置說明改為需要時才讀取。
 9. 修改 Coding Style 通用規則，修改既有程式碼時以方法為單位套用新規範，程式碼不引用文件編號。
-10. 修改 Claude 不再常駐載入各語言 Coding Style，改為修改或 review 程式碼時依流程索引讀取。
+10. 修改 Coding Style 不再常駐載入，改為修改程式碼時依流程索引讀取；review 時讀入全部規範。
 11. 新增 Claude Code 工作方式說明，團隊通用的 session 交接與專案的 worktree 做法各一份，只在使用時讀取。
-12. 修改 指引檔案依團隊通用與專案分層命名，指引目錄標示每份文件的層與載入方式。
+12. 修改 指引檔案依層與分類命名（流程、程式規範、環境、工具），常駐內容只留協作通則與索引，約為原本的六成。
+13. 新增 指引維護原則：常駐與依時機讀取的判斷門檻、skill 的撰寫原則；規範類議題的規格只寫決策與位置。
