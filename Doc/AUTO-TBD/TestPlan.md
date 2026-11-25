@@ -243,10 +243,13 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
    4. `/release-note`：每條以 `新增` 或 `修改` 開頭，merge log 為 `Merge branch 'AUTO-TBD_f_DevProcess' into ''` 加 `by <名字>`。通過。
    5. 只輸入「開議題」、問「切換 session 要怎麼做」：常駐流程索引分別導向 `team/issue-workflow.md`、`team/claude-code.md`，後者可答出確認點切換與 `SESSION.md` 交接。通過；限制：在同一 session 內判斷，未另開乾淨的 session（改名前曾以新 session 實測「開議題」通過）。
    6. 要求修改 `.cs` 方法：動手前經流程索引讀取 `team-coding-style-csharp.instructions.md`（不常駐），修改符合 C# 規範；修改已還原。通過。
-6. TEST-16：使用者在 VS 2026 Copilot Chat（GPT-6.1）於 worktree 方案執行，每項開新對話；以下為 DEC-18 改名前的結果，待使用者在最終結構重跑後更新。
-   1. 一般提問：附加 `.cs` 檔提問，回應引用 `team-coding-style-general`、使用 `project-overview` 內容，未讀檔；另以未附檔的提問「哪些決策一定要由人做」，未讀檔即依 `team-collaboration.instructions.md` 答出五項。`team-coding-style-csharp` 未依 `applyTo` 自動載入，由 Copilot 主動讀取。通過。
-   2. 輸入「開議題」：自動觸發 `issue-start` skill，讀取 `issue-workflow.md` 與 `issue-docs.md` 後停下詢問議題內容與編號。通過。
-   3. 輸入 `/issue-start`：辨識為 skill 並讀取相同兩份文件。VS 2026 Copilot 可讀取 `.claude/skills/`。
+6. TEST-16：DEC-18 改名與 DEC-19 之後，使用者在 VS 2026 Copilot Chat 於 worktree 方案（HEAD `f0cc1462`）重跑，每項開新對話；結果依使用者提供的畫面記錄。
+   1. 附加 `VectorTool.cs` 問「寫法有沒有不符規範的地方」：觸發 `review` skill，讀取 `team/review.md`、`project/review.md`、`team-coding-style-csharp`、`project-coding-general`、`.editorconfig` 與該檔。通過。
+   2. 不附檔問「這個 repo 哪些決策一定要由人做」：讀取 `team/` 的 `issue-workflow.md`、`git-workflow.md`、`review.md`、`issue-docs.md` 後整理。改名前的結果是未讀檔、直接依常駐的協作原則回答；這次另外讀檔核對，結論仍出自規範，不影響判定。通過。
+   3. 輸入「開議題」：自動觸發 `issue-start` skill，讀取 `issue-workflow.md`、`issue-docs.md`、`git-workflow.md`，並查看目前分支與工作目錄。通過。
+   4. 輸入 `/issue-start`：辨識為 skill 並載入，讀取相同三份文件，再盤點分支與方案。VS 2026 Copilot 可讀取 `.claude/skills/`。
+   5. 以「Review: my code changes」要求 review：觸發 `review` skill，讀取兩份 `review.md`，再依需要讀 `build.md`、`issue-docs.md`、`issue-workflow.md` 與議題的 `README.md`、`Check.ps1`。通過。
+   6. 問「切換 session 要怎麼做」：讀取 `team/claude-code.md` 與 `project/claude-code.md`。通過。
 7. 演練中發現的規範問題於 STEP-13 review 處理：議題編號是否含 `AUTO-` 前綴的寫法不一致、S 級範本缺「現況盤點」與「待討論」、`review.md` 報告標題層級放入 S 級 `README.md` 時衝突、`issue-start` 必讀清單未含 `git-workflow.md`、`Check.ps1` 不檢查未知參數。
 
 ## 6. 待討論

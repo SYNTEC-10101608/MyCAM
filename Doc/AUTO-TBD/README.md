@@ -5,7 +5,7 @@
 | 分支 | `AUTO-TBD_f_DevProcess` |
 | 分支起點 | `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23） |
 | 級別 | L |
-| 狀態 | 收官：STEP-1～STEP-13 完成，待人工全域 review |
+| 狀態 | 收官：STEP-1～STEP-13 與 Review 第 5 回合完成，待人工全域 review |
 
 ## 文件
 
