@@ -198,7 +198,7 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 ### 5.1 自動（`Check.ps1`，2026-11-25，比對基準 `24c7276d`）
 
 1. TEST-1～TEST-7、TEST-9、TEST-12：通過。
-2. TEST-1 常駐 202 行（基準 193，差異 +9，理由見 Review 第 3、4 回合）：入口 51 行、`team-collaboration` 43 行、`project-overview` 76 行、`team-coding-style-general` 32 行。
+2. TEST-1 常駐 205 行（基準 193，差異 +12，理由見 Review 第 3～5 回合）：入口 53 行、`team-collaboration` 43 行、`project-overview` 77 行、`team-coding-style-general` 32 行。
 3. TEST-11：收官後只剩 DoD 第 9、10 項與 REV 的「待人確認」，待人工全域 review 後通過。
 
 ### 5.2 TEST-8 規格內容落地
