@@ -69,17 +69,8 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 
 1. 格式 `AUTO-<數字>`，尚未取得時以 `AUTO-TBD` 暫代；分支例：`AUTO-23201_b_CannotOutputFrogLeapMacro`。
 
-## 專案固定檢查項目
+## 專案指引索引
 
-Review 門檻段、功能正確性段與規範段的專案項目（見 [review.md](../process/review.md)）：
-
-1. `Build.bat Debug` 建置成功。
-2. 使用者可見文字的四語系 XML 同步新增 / 修改（語系見「多語系」）。
-3. 修改過的 `*.Designer.cs` 仍可在 Designer 中開啟。
-4. 未修改 `reference/` 內的檔案，除非議題明確要求。
-5. 功能正確性：UI 執行緒、角度單位（rad / deg）、座標系。
-
-## 建置與執行
-
-1. 建置、準備執行環境時，讀 [`.github/project/build.md`](../project/build.md)。
-2. 切換 session、建立或使用 worktree、以 Claude Code 處理議題時，讀 [`.github/project/claude-worktree.md`](../project/claude-worktree.md)。
+1. 執行或回應 review 時，讀 [`.github/project/review.md`](../project/review.md)（專案固定檢查項目）。
+2. 建置、準備執行環境時，讀 [`.github/project/build.md`](../project/build.md)。
+3. 以 Claude Code 建立或使用 worktree 時，讀 [`.github/project/claude-code.md`](../project/claude-code.md)。

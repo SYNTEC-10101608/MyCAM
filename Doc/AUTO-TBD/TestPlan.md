@@ -43,12 +43,12 @@
 #### TEST-1 常駐行數
 
 1. 方法：計算入口文件（`.github/copilot-instructions.md`、`CLAUDE.md`）與 `.github/instructions/` 中 `applyTo: "**"` 的檔案行數，與比對基準比較。
-2. 通過條件：輸出各檔與總行數，以及與基準 193 行（`24c7276d`：入口 32 行、`project-overview` 130 行、`coding-style-general` 31 行）的差異；總行數增加時，`Review.md` 寫明增加量與理由（SPEC-1.7.1）。
+2. 通過條件：輸出各檔與總行數，以及與基準 193 行（`24c7276d`：入口 32 行、`project-overview` 130 行、`team-coding-style-general` 31 行）的差異；總行數增加時，`Review.md` 寫明增加量與理由（SPEC-1.7.1）。
 3. 長期維護：即 review 門檻段的行數檢查（SPEC-7.1）。
 
 #### TEST-2 團隊通用層不含專案內容
 
-1. 方法：在 `collaboration.instructions.md`、`coding-style-general.instructions.md` 與 `.github/process/*.md` 搜尋專案專屬字詞：`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`、`AUTO-`（DEC-16）。
+1. 方法：在 `team-collaboration.instructions.md`、`team-coding-style-general.instructions.md` 與 `.github/team/*.md` 搜尋專案專屬字詞：`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`、`AUTO-`（DEC-16）。
 2. 通過條件：零筆；需要專案資訊處寫「見專案指引」。
 3. 本檢查列入 `FollowUp.md` 自動化門檻的候選項目（DEC-4.5）。
 
@@ -57,18 +57,18 @@
 1. 方法：以各規則的特徵字串搜尋 `.github/`、`CLAUDE.md`、`.claude/skills/`，例如分級表（`1–5 合併`）、嚴重度（`必修 / 建議 / 提問`）、分支後綴（`_Alt2`）、release note 前綴（`前綴與內容間空一格`）、DoD 標題。
 2. 通過條件：
    1. 每個特徵字串只出現在一個規範檔，其他檔案以連結引用。
-   2. `SKILL.md` 本文只有指向 `process/` 的說明與必讀文件清單，沒有規則內容。
+   2. `SKILL.md` 本文只有指向 `team/` 的說明與必讀文件清單，沒有規則內容。
 
 #### TEST-4 載入設定與檔案位置
 
 1. 方法：檢查 frontmatter、`@` 引用、`.gitignore` 與 `git check-ignore`。
 2. 通過條件：
-   1. `collaboration.instructions.md` 的 frontmatter 為 `applyTo: "**"`。
-   2. `.github/process/` 四份文件與 `.github/project/` 的 `build.md`、`claude-worktree.md` 沒有 `applyTo` frontmatter，且不在 `instructions/` 下。
-   3. `CLAUDE.md` 的 `@` 引用恰為 `copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general` 四份。
-   4. `copilot-instructions.md` 的指引目錄列出 `collaboration`、`process/` 四份文件、`project/build.md` 與 `project/claude-worktree.md`，並標示載入方式。
-   5. `collaboration.instructions.md` 的流程索引有「新增或修改程式碼」一列。
-   6. `git check-ignore SESSION.md` 回報由 `.gitignore` 的 `/SESSION.md` 排除（SPEC-11、SPEC-14.6.1）。
+   1. `team-collaboration.instructions.md` 的 frontmatter 為 `applyTo: "**"`。
+   2. `.github/team/` 五份文件與 `.github/project/` 三份文件沒有 `applyTo` frontmatter；`instructions/` 的檔名都有 `team-` 或 `project-` 前綴；`.github/` 下沒有名為 `claude.md` 的檔案（DEC-18）。
+   3. `CLAUDE.md` 的 `@` 引用恰為 `copilot-instructions.md`、`team-collaboration`、`project-overview`、`team-coding-style-general` 四份。
+   4. `copilot-instructions.md` 的指引目錄列出 `team-collaboration`、`team/` 五份文件、`project/` 三份文件，並標示層與載入方式。
+   5. `team-collaboration.instructions.md` 的流程索引有「新增或修改程式碼」一列。
+   6. `git check-ignore SESSION.md` 回報由 `.gitignore` 的 `/SESSION.md` 排除（SPEC-11、SPEC-13.6）。
 
 #### TEST-5 異動範圍符合清單
 
@@ -90,7 +90,7 @@
 
 #### TEST-8 規格內容落地
 
-1. 方法：AI 依 SPEC-13 的對應，逐條列出 SPEC-3～SPEC-9 每個子項目在 `process/` 文件中的位置（`檔案:行號`），人抽查。
+1. 方法：AI 依 SPEC-13 的對應，逐條列出 SPEC-3～SPEC-9 每個子項目在 `team/` 文件中的位置（`檔案:行號`），人抽查。
 2. 通過條件：
    1. 每個子項目都有位置，內容與 SPEC 一致。
    2. `issue-docs.md` 含各文件內容規範與精簡範本（S 級完整範本；M、L 骨架）。
@@ -98,12 +98,12 @@
 
 #### TEST-9 專案指引與 Coding Style 修訂
 
-1. 方法：搜尋 `project-overview.instructions.md`、`.github/project/build.md`、`.github/project/claude-worktree.md` 與 `coding-style-general.instructions.md`。
+1. 方法：搜尋 `project-overview.instructions.md`、`.github/project/` 三份文件、`.github/team/claude-code.md` 與 `team-coding-style-general.instructions.md`。
 2. 通過條件：
-   1. `project-overview` 沒有「Git 流程」章節與建置細節（`FakeDebug`、`vswhere`、`MachineData`）；「建置與執行」只有指向 `project/build.md` 與 `project/claude-worktree.md` 的索引；有「專案固定檢查項目」（五項，SPEC-14.4）；「議題編號」含 `AUTO-TBD`（SPEC-14.7）。
-   2. `build.md` 有 FCLTool、命令列建置、執行期檔案三節，沒有 worktree 相關內容；`claude-worktree.md` 有 Session 交接、Worktree 兩節，含 `SESSION.md` 與 `.worktreeinclude` 的說明（SPEC-14.6）。
-   3. 四語系同步、Designer 可開、不修改 `reference/` 三項規則在 `project-overview` 只出現在「專案固定檢查項目」（SPEC-14.5）。
-   4. `coding-style-general` 不再有「維持該方法內既有的命名方式」；有 SPEC-10.1 三項與 SPEC-10.2 註解規則。
+   1. `project-overview` 沒有「Git 流程」與「專案固定檢查項目」章節、沒有建置細節（`FakeDebug`、`vswhere`、`MachineData`）；索引指向 `project/review.md`、`project/build.md`、`project/claude-code.md`；`project/review.md` 有五項（SPEC-14.4）；「議題編號」含 `AUTO-TBD`（SPEC-14.7）。
+   2. `build.md` 有 FCLTool、命令列建置、執行期檔案三節，沒有 worktree 相關內容；`team/claude-code.md` 含 `SESSION.md` 的說明（SPEC-13.6），`project/claude-code.md` 含 `.worktreeinclude` 的說明（SPEC-14.6）。
+   3. 四語系同步、Designer 可開、不修改 `reference/` 三項規則不出現在 `project-overview`（SPEC-14.5）。
+   4. `team-coding-style-general` 不再有「維持該方法內既有的命名方式」；有 SPEC-10.1 三項與 SPEC-10.2 註解規則。
 
 #### TEST-10 文件精簡審查
 
@@ -141,7 +141,7 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 #### TEST-14 Claude Code 載入範圍
 
 1. 方法：在 worktree 開新的 Claude Code session，以 `/context` 查看載入的記憶檔。
-2. 通過條件：載入 `CLAUDE.md`、`copilot-instructions.md`、`collaboration.instructions.md`、`project-overview`、`coding-style-general`；沒有載入 `process/`、`project/` 與 `coding-style-csharp`、`coding-style-cpp`。
+2. 通過條件：載入 `CLAUDE.md`、`copilot-instructions.md`、`team-collaboration.instructions.md`、`project-overview`、`team-coding-style-general`；沒有載入 `team/`、`project/` 與 `team-coding-style-csharp`、`team-coding-style-cpp`。
 
 #### TEST-15 Claude Code 入口與流程演練
 
@@ -155,7 +155,7 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
    2. `/issue-start` 產出的 `README.md` 符合 S 級範本：議題資訊表、各節、DoD 五項，編號使用 SPEC-6 的前綴；AI 提出分級建議後停下等人確認（SPEC-3.3、SPEC-3.4）。
    3. Release note 每條以 `新增` / `修改` / `刪除` 開頭；merge log 符合 SPEC-9.2 格式，目標版本留空。
    4. 只輸入「開議題」時，經 skill 或流程索引讀取 `issue-workflow.md` 與 `issue-docs.md`。
-   5. 修改 `.cs` 前，經流程索引讀取 `coding-style-csharp.instructions.md`。
+   5. 修改 `.cs` 前，經流程索引讀取 `team-coding-style-csharp.instructions.md`。
 3. 演練產出不提交，檢查結果摘要寫入執行結果。
 
 #### TEST-16 VS 2026 Copilot 讀取與觸發
@@ -163,10 +163,10 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 1. 執行者：使用者；AI 在施工完成後提供逐步清單並記錄結果。
 2. 方法：VS 2026（18 版以上）開啟方案，在 Copilot Chat：
    1. 開啟任一 `.cs` 檔提問，查看回應引用的指引。
-   2. 輸入「開議題」，查看是否讀取 `.github/process/issue-workflow.md`。
+   2. 輸入「開議題」，查看是否讀取 `.github/team/issue-workflow.md`。
    3. 輸入 `/issue-start`，確認是否辨識 `.claude/skills/`。
 3. 通過條件：
-   1. 第 1、2 項：引用 `copilot-instructions.md` 與 `collaboration.instructions.md`，並依索引讀取 `process/`。
+   1. 第 1、2 項：引用 `copilot-instructions.md` 與 `team-collaboration.instructions.md`，並依索引讀取 `team/`。
    2. 第 3 項只記錄結果，不判定失敗；讀不到時確認 `FollowUp.md` 有 SPEC-18.2.5 項目。
 
 ## 4. SPEC 對照
@@ -184,8 +184,8 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 | SPEC-9 Release note 與 merge log | TEST-8、TEST-15 |
 | SPEC-10 Coding Style 修訂 | TEST-9 |
 | SPEC-11 檔案異動清單 | TEST-4、TEST-5、TEST-6 |
-| SPEC-12 `collaboration.instructions.md` | TEST-1、TEST-4、TEST-7、TEST-14 |
-| SPEC-13 `process/` 文件 | TEST-2、TEST-3、TEST-7、TEST-8、TEST-15 |
+| SPEC-12 `team-collaboration.instructions.md` | TEST-1、TEST-4、TEST-7、TEST-14 |
+| SPEC-13 `team/` 文件 | TEST-2、TEST-3、TEST-7、TEST-8、TEST-15 |
 | SPEC-14 `project-overview.instructions.md` | TEST-9 |
 | SPEC-15 入口文件 | TEST-4、TEST-14、TEST-16 |
 | SPEC-16 Skills | TEST-3、TEST-7、TEST-15、TEST-16 |
@@ -198,12 +198,12 @@ TEST-14～TEST-16 在 TEST-12 完成後執行，確認只靠 repo 的規範就�
 ### 5.1 自動（`Check.ps1`，2026-11-25，比對基準 `24c7276d`）
 
 1. TEST-1～TEST-7、TEST-9、TEST-12：通過。
-2. TEST-1 常駐 207 行（基準 193，差異 +14，理由見 Review 第 3、4 回合）：入口 48 行、`collaboration` 42 行、`project-overview` 85 行、`coding-style-general` 32 行。
+2. TEST-1 常駐 202 行（基準 193，差異 +9，理由見 Review 第 3、4 回合）：入口 51 行、`team-collaboration` 43 行、`project-overview` 76 行、`team-coding-style-general` 32 行。
 3. TEST-11：收官後只剩 DoD 第 9、10 項與 REV 的「待人確認」，待人工全域 review 後通過。
 
 ### 5.2 TEST-8 規格內容落地
 
-AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-docs.md`、`RV` 為 `review.md`、`GW` 為 `git-workflow.md`（皆在 `.github/process/`）。
+AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-docs.md`、`RV` 為 `review.md`、`GW` 為 `git-workflow.md`（皆在 `.github/team/`）。
 
 | SPEC | 位置 |
 | --- | --- |
@@ -214,7 +214,7 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 | SPEC-5.1～5.3、5.9 存放 | `ID:5-10` |
 | SPEC-5.4、5.7 檔案組合、例外 | `ID:12-28` |
 | SPEC-5.5 議題資訊表 | `ID:69-74`（範本） |
-| SPEC-5.6 文件通則 | `ID:3`（連結 `collaboration`） |
+| SPEC-5.6 文件通則 | `ID:3`（連結 `team-collaboration`） |
 | SPEC-6 編號與追溯 | `ID:30-44` |
 | SPEC-13.2.1 各文件內容規範 | `ID:46-60` |
 | SPEC-13.2.2 S 級完整範本；M、L 骨架 | `ID:62-145` |
@@ -228,22 +228,23 @@ AI 列出位置，待人抽查。`IW` 為 `issue-workflow.md`、`ID` 為 `issue-
 | SPEC-8.5 Commit | `GW:22-28` |
 | SPEC-9 Release note 與 merge log | `GW:30-56` |
 | SPEC-8.7、SPEC-13.4 Worktree 通用規則 | `GW:58-61` |
+| SPEC-13.6 Claude Code 的 session 交接 | `.github/team/claude-code.md:5-7` |
 
 ### 5.3 人工
 
 1. TEST-8：AI 逐條比對，位置如 5.2，內容一致（SPEC-5.4 的「STEP 與 commit 對應」措辭已由 REV-39 對齊）。使用者接受 AI 對照結果，免抽查。通過。
 2. TEST-13：`FollowUp.md` 含 SPEC-18.2 第 1～4、6 項（TODO-1～TODO-5）；第 5 項以 TEST-16 讀不到 skill 為條件，實測讀得到，TODO-6 結案刪除（REV-7）。每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 3. TEST-10：於 Review 第 2 回合文件段執行（獨立 session），發現列為 REV-20～REV-29，全部有處置。通過。
-4. TEST-14：在 worktree 開新 session，讀任何檔案前列出已載入的指引，載入 `CLAUDE.md`、`copilot-instructions.md`、`collaboration`、`project-overview`、`coding-style-general`，沒有載入 `process/`、`project/`、`coding-style-csharp`、`coding-style-cpp`（另有個人層 `~/.claude/CLAUDE.md` 與主 checkout 的 `CLAUDE.local.md`）。使用者以 `/context` 確認記憶檔 8 份（上述 5 份、2 份個人層、空的 auto memory 索引）。通過。
+4. TEST-14：在 worktree 開新 session，讀任何檔案前列出已載入的指引，載入 `CLAUDE.md`、`copilot-instructions.md`、`collaboration`、`project-overview`、`team-coding-style-general`，沒有載入 `team/`、`project/`、`team-coding-style-csharp`、`team-coding-style-cpp`（另有個人層 `~/.claude/CLAUDE.md` 與主 checkout 的 `CLAUDE.local.md`）。使用者以 `/context` 確認記憶檔 8 份（上述 5 份、2 份個人層、空的 auto memory 索引）。通過。
 5. TEST-15：在 worktree 各開新 session 演練，產出放在 scratchpad，未提交。
    1. 三個 skill 都在清單中，執行後讀取 SPEC-2 的必讀文件。通過。
    2. `/issue-start` 產出的 S 級 `README.md` 有議題資訊表、各節、DoD 五項，編號使用 REQ、SPEC、TEST、STEP；AI 在盤點後提出分級建議並停下。通過。
    3. `/release-note` 產出 9 條，皆以 `新增` 或 `修改` 開頭；merge log 為 `Merge branch 'AUTO-TBD_f_DevProcess' into ''` 加 `by <名字>`。通過。
    4. `/review` 依六段進行，表頭五欄、發現表六欄。通過。
    5. 只輸入「開議題」：經 `issue-start` skill 讀取 `issue-workflow.md` 與 `issue-docs.md`，停下詢問議題內容與編號，未建立檔案。通過。
-   6. 要求修改 `.cs` 方法：動手前經流程索引讀取 `coding-style-csharp.instructions.md`，修改符合 C# 規範；修改已還原。通過。
+   6. 要求修改 `.cs` 方法：動手前經流程索引讀取 `team-coding-style-csharp.instructions.md`，修改符合 C# 規範；修改已還原。通過。
 6. TEST-16：使用者在 VS 2026 Copilot Chat（GPT-6.1）於 worktree 方案執行，每項開新對話。
-   1. 一般提問：附加 `.cs` 檔提問，回應引用 `coding-style-general`、使用 `project-overview` 內容，未讀檔；另以未附檔的提問「哪些決策一定要由人做」，未讀檔即依 `collaboration.instructions.md` 答出五項。`coding-style-csharp` 未依 `applyTo` 自動載入，由 Copilot 主動讀取。通過。
+   1. 一般提問：附加 `.cs` 檔提問，回應引用 `team-coding-style-general`、使用 `project-overview` 內容，未讀檔；另以未附檔的提問「哪些決策一定要由人做」，未讀檔即依 `team-collaboration.instructions.md` 答出五項。`team-coding-style-csharp` 未依 `applyTo` 自動載入，由 Copilot 主動讀取。通過。
    2. 輸入「開議題」：自動觸發 `issue-start` skill，讀取 `issue-workflow.md` 與 `issue-docs.md` 後停下詢問議題內容與編號。通過。
    3. 輸入 `/issue-start`：辨識為 skill 並讀取相同兩份文件。VS 2026 Copilot 可讀取 `.claude/skills/`。
 7. 演練中發現的規範問題於 STEP-13 review 處理：議題編號是否含 `AUTO-` 前綴的寫法不一致、S 級範本缺「現況盤點」與「待討論」、`review.md` 報告標題層級放入 S 級 `README.md` 時衝突、`issue-start` 必讀清單未含 `git-workflow.md`、`Check.ps1` 不檢查未知參數。

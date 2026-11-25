@@ -104,13 +104,14 @@ function Get-GuideFiles()
 	$fileList = @(
 		'.github/copilot-instructions.md',
 		'CLAUDE.md',
-		'.github/instructions/collaboration.instructions.md',
+		'.github/instructions/team-collaboration.instructions.md',
 		'.github/instructions/project-overview.instructions.md',
-		'.github/instructions/coding-style-general.instructions.md',
+		'.github/instructions/team-coding-style-general.instructions.md',
 		'.github/project/build.md',
-		'.github/project/claude-worktree.md'
+		'.github/project/review.md',
+		'.github/project/claude-code.md'
 	)
-	$fileList += Get-Files '.github/process' '*.md'
+	$fileList += Get-Files '.github/team' '*.md'
 	$fileList += Get-Files '.claude/skills' 'SKILL.md' -Recurse
 	return $fileList
 }
@@ -195,7 +196,7 @@ function Test-1()
 		$noteList += '常駐總行數增加，Review.md 須寫明增加量與理由'
 	}
 
-	$szCollab = '.github/instructions/collaboration.instructions.md'
+	$szCollab = '.github/instructions/team-collaboration.instructions.md'
 	if( -not ( Test-Path -LiteralPath ( Join-Path $Root $szCollab ) ) ) {
 		$failList += "缺少 $szCollab"
 	}
@@ -211,8 +212,8 @@ function Test-2()
 	$failList = @()
 	$termArray = @( 'MyCAM', 'Build.bat', 'CopyRef', 'FCLTool', 'PostTool', 'OCC', 'LanguageManager',
 		'Designer', 'reference/', '.worktreeinclude', 'CustPost', 'zh-TW', 'AUTO-' )
-	$fileList = @( '.github/instructions/collaboration.instructions.md',
-		'.github/instructions/coding-style-general.instructions.md' ) + @( Get-Files '.github/process' '*.md' )
+	$fileList = @( '.github/instructions/team-collaboration.instructions.md',
+		'.github/instructions/team-coding-style-general.instructions.md' ) + @( Get-Files '.github/team' '*.md' )
 	foreach( $szFile in $fileList ) {
 		$lineArray = Read-Lines $szFile
 		if( $null -eq $lineArray ) {
@@ -227,8 +228,8 @@ function Test-2()
 			}
 		}
 	}
-	if( ( Get-Files '.github/process' '*.md' ).Count -lt 4 ) {
-		$failList += '.github/process/ 不足四份文件'
+	if( ( Get-Files '.github/team' '*.md' ).Count -lt 5 ) {
+		$failList += '.github/team/ 不足五份文件'
 	}
 	Add-Result 'TEST-2' $failList
 }
@@ -251,7 +252,7 @@ function Test-3()
 		}
 	}
 
-	# SKILL.md 本文只能是指向 process/ 的說明與必讀清單
+	# SKILL.md 本文只能是指向 team/ 的說明與必讀清單
 	$skillList = @( Get-Files '.claude/skills' 'SKILL.md' -Recurse )
 	if( $skillList.Count -lt 3 ) {
 		$failList += ".claude/skills/ 只有 $( $skillList.Count ) 個 SKILL.md"
@@ -259,8 +260,8 @@ function Test-3()
 	foreach( $szSkill in $skillList ) {
 		$szBody = ( Read-Text $szSkill ) -replace '(?s)\A---.*?\r?\n---\s*', ''
 		$bodyLineArray = @( $szBody -split "\r?\n" | Where-Object { $_.Trim() -ne '' } )
-		if( -not $szBody.Contains( '.github/process/' ) ) {
-			$failList += "$szSkill 本文沒有指向 .github/process/"
+		if( -not $szBody.Contains( '.github/team/' ) ) {
+			$failList += "$szSkill 本文沒有指向 .github/team/"
 		}
 		if( $bodyLineArray.Count -gt 10 ) {
 			$failList += "$szSkill 本文 $( $bodyLineArray.Count ) 行，疑似含規則內容"
@@ -276,7 +277,7 @@ function Test-3()
 function Test-4()
 {
 	$failList = @()
-	$szCollab = '.github/instructions/collaboration.instructions.md'
+	$szCollab = '.github/instructions/team-collaboration.instructions.md'
 
 	# 4.1
 	if( -not ( Test-ApplyToAll $szCollab ) ) {
@@ -284,7 +285,7 @@ function Test-4()
 	}
 
 	# 4.2
-	$onDemandList = @( Get-Files '.github/process' '*.md' ) + @( '.github/project/build.md', '.github/project/claude-worktree.md' )
+	$onDemandList = @( Get-Files '.github/team' '*.md' ) + @( Get-Files '.github/project' '*.md' )
 	foreach( $szFile in $onDemandList ) {
 		if( -not ( Test-Path -LiteralPath ( Join-Path $Root $szFile ) ) ) {
 			$failList += "缺少 $szFile"
@@ -293,13 +294,28 @@ function Test-4()
 			$failList += "$szFile 不應有 applyTo"
 		}
 	}
-	if( @( Get-Files '.github/instructions/process' '*.md' -Recurse ).Count -gt 0 ) {
-		$failList += 'process 文件不應放在 instructions/ 下'
+	if( $onDemandList.Count -lt 8 ) {
+		$failList += "team/、project/ 只有 $( $onDemandList.Count ) 份文件"
+	}
+
+	# 4.2 instructions/ 的檔名以層為前綴
+	foreach( $szFile in @( Get-Files '.github/instructions' '*.md' ) ) {
+		$szName = Split-Path $szFile -Leaf
+		if( $szName -notmatch '^(team|project)-' ) {
+			$failList += "$szFile 檔名沒有 team- 或 project- 前綴"
+		}
+	}
+
+	# 4.2 Windows 不分大小寫，claude.md 會被當成 CLAUDE.md 自動載入
+	foreach( $szFile in @( Get-Files '.github' '*.md' -Recurse ) ) {
+		if( ( Split-Path $szFile -Leaf ) -eq 'claude.md' ) {
+			$failList += "$szFile 會被 Claude Code 當成 CLAUDE.md 載入"
+		}
 	}
 
 	# 4.3
-	$expectArray = @( '.github/copilot-instructions.md', '.github/instructions/collaboration.instructions.md',
-		'.github/instructions/project-overview.instructions.md', '.github/instructions/coding-style-general.instructions.md' )
+	$expectArray = @( '.github/copilot-instructions.md', '.github/instructions/team-collaboration.instructions.md',
+		'.github/instructions/project-overview.instructions.md', '.github/instructions/team-coding-style-general.instructions.md' )
 	$refArray = @( Read-Lines 'CLAUDE.md' | Where-Object { $_ -match '^@' } | ForEach-Object { $_.Substring( 1 ).Trim() } )
 	$diff = Compare-Object -ReferenceObject $expectArray -DifferenceObject $refArray
 	if( $null -ne $diff ) {
@@ -308,8 +324,9 @@ function Test-4()
 
 	# 4.4
 	$szCopilot = Read-Text '.github/copilot-instructions.md'
-	$needArray = @( 'collaboration.instructions.md', 'issue-workflow.md', 'issue-docs.md', 'review.md',
-		'git-workflow.md', 'project/build.md', 'project/claude-worktree.md', '常駐', '依時機讀取' )
+	$needArray = @( 'team-collaboration.instructions.md', 'issue-workflow.md', 'issue-docs.md', 'review.md',
+		'git-workflow.md', 'team/claude-code.md', 'project/review.md', 'project/build.md', 'project/claude-code.md',
+		'團隊通用', '常駐', '依時機讀取' )
 	foreach( $szNeed in $needArray ) {
 		if( -not $szCopilot.Contains( $szNeed ) ) {
 			$failList += "copilot-instructions.md 缺少 '$szNeed'"
@@ -338,14 +355,21 @@ function Test-5()
 {
 	$failList = @()
 	$allowArray = @(
-		'.github/instructions/collaboration.instructions.md',
-		'.github/process/issue-workflow.md',
-		'.github/process/issue-docs.md',
-		'.github/process/review.md',
-		'.github/process/git-workflow.md',
+		'.github/instructions/team-collaboration.instructions.md',
+		'.github/team/issue-workflow.md',
+		'.github/team/issue-docs.md',
+		'.github/team/review.md',
+		'.github/team/git-workflow.md',
+		'.github/team/claude-code.md',
 		'.github/instructions/project-overview.instructions.md',
+		'.github/project/review.md',
 		'.github/project/build.md',
-		'.github/project/claude-worktree.md',
+		'.github/project/claude-code.md',
+		'.github/instructions/team-coding-style-general.instructions.md',
+		'.github/instructions/team-coding-style-csharp.instructions.md',
+		'.github/instructions/team-coding-style-cpp.instructions.md',
+
+		# 改名且內容大改，git 判為刪除舊檔、新增新檔
 		'.github/instructions/coding-style-general.instructions.md',
 		'.github/copilot-instructions.md',
 		'CLAUDE.md',
@@ -539,18 +563,25 @@ function Test-9()
 			$failList += "$szOverview 仍有建置細節 '$szTerm'"
 		}
 	}
-	if( -not $szText.Contains( 'project/build.md' ) ) {
-		$failList += "$szOverview 沒有指向 project/build.md 的索引"
+	foreach( $szIndex in @( 'project/review.md', 'project/build.md', 'project/claude-code.md' ) ) {
+		if( -not $szText.Contains( $szIndex ) ) {
+			$failList += "$szOverview 沒有指向 $szIndex 的索引"
+		}
 	}
 	$sectionList = Get-Sections $lineArray
-	$check = $sectionList | Where-Object { $_.Title -match '專案固定檢查項目' } | Select-Object -First 1
-	if( $null -eq $check ) {
-		$failList += "$szOverview 沒有「專案固定檢查項目」章節"
+
+	# 9.1 專案固定檢查項目只在 review 時讀取，不常駐
+	if( $szText -match '(?m)^#+\s*專案固定檢查項目' ) {
+		$failList += "$szOverview 仍有「專案固定檢查項目」章節"
+	}
+	$reviewLineArray = Read-Lines '.github/project/review.md'
+	if( $null -eq $reviewLineArray ) {
+		$failList += '缺少 .github/project/review.md'
 	}
 	else {
-		$nItemCount = @( $check.Lines | Where-Object { $_ -match '^\d+\.\s' } ).Count
+		$nItemCount = @( $reviewLineArray | Where-Object { $_ -match '^\d+\.\s' } ).Count
 		if( $nItemCount -ne 5 ) {
-			$failList += "「專案固定檢查項目」有 $nItemCount 項，應為 5 項"
+			$failList += "project/review.md 有 $nItemCount 項，應為 5 項"
 		}
 	}
 
@@ -576,30 +607,21 @@ function Test-9()
 		}
 	}
 
-	# 9.2 worktree 與 session 的做法集中在 claude-worktree.md
-	$szWorktree = Read-Text '.github/project/claude-worktree.md'
-	if( $null -eq $szWorktree ) {
-		$failList += '缺少 .github/project/claude-worktree.md'
-	}
-	else {
-		foreach( $szHead in @( 'Session 交接', 'Worktree' ) ) {
-			if( $szWorktree -notmatch "(?m)^#+\s.*$( [regex]::Escape( $szHead ) )" ) {
-				$failList += "claude-worktree.md 缺少「$szHead」章節"
-			}
+	# 9.2 Claude Code 做法每層一份：通用的 session 交接、專案的 worktree
+	$claudeMap = [ordered]@{ '.github/team/claude-code.md' = 'SESSION.md'; '.github/project/claude-code.md' = '.worktreeinclude' }
+	foreach( $szFile in $claudeMap.Keys ) {
+		$szClaude = Read-Text $szFile
+		if( $null -eq $szClaude ) {
+			$failList += "缺少 $szFile"
 		}
-		foreach( $szNeed in @( 'SESSION.md', '.worktreeinclude' ) ) {
-			if( -not $szWorktree.Contains( $szNeed ) ) {
-				$failList += "claude-worktree.md 缺少 '$szNeed' 的說明"
-			}
+		elseif( -not $szClaude.Contains( $claudeMap[ $szFile ] ) ) {
+			$failList += "$szFile 缺少 '$( $claudeMap[ $szFile ] )' 的說明"
 		}
 	}
 
-	# 9.3 三項規則只出現在「專案固定檢查項目」
+	# 9.3 三項規則只出現在 project/review.md
 	$ruleMap = [ordered]@{ '四語系同步' = '語系.*同步|同步.*語系'; 'Designer 可開' = 'Designer.*開啟'; '不修改 reference/' = 'reference/.*修改|修改.*reference/' }
 	foreach( $section in $sectionList ) {
-		if( $section.Title -match '專案固定檢查項目' ) {
-			continue
-		}
 		foreach( $szKey in $ruleMap.Keys ) {
 			if( @( $section.Lines | Where-Object { $_ -match $ruleMap[ $szKey ] } ).Count -gt 0 ) {
 				$failList += "「$szKey」重複出現在「$( $section.Title )」"
@@ -608,13 +630,13 @@ function Test-9()
 	}
 
 	# 9.4
-	$szGeneral = Read-Text '.github/instructions/coding-style-general.instructions.md'
+	$szGeneral = Read-Text '.github/instructions/team-coding-style-general.instructions.md'
 	if( $szGeneral.Contains( '維持該方法內既有的命名方式' ) ) {
-		$failList += 'coding-style-general 仍有「維持該方法內既有的命名方式」'
+		$failList += 'team-coding-style-general 仍有「維持該方法內既有的命名方式」'
 	}
 	foreach( $szNeed in @( '採新規範', '整個方法', '獨立 commit', '沒有動到的方法', '<議題編號>:' ) ) {
 		if( -not $szGeneral.Contains( $szNeed ) ) {
-			$failList += "coding-style-general 缺少 '$szNeed'"
+			$failList += "team-coding-style-general 缺少 '$szNeed'"
 		}
 	}
 	Add-Result 'TEST-9' $failList

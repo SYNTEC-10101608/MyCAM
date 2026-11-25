@@ -1,6 +1,6 @@
 # 議題文件
 
-撰寫或修改議題文件時讀本文件。各階段與各級 DoD 見 [issue-workflow.md](issue-workflow.md)；文件通則見 [collaboration.instructions.md](../instructions/collaboration.instructions.md)。
+撰寫或修改議題文件時讀本文件。各階段與各級 DoD 見 [issue-workflow.md](issue-workflow.md)；文件通則見 [team-collaboration.instructions.md](../instructions/team-collaboration.instructions.md)。
 
 ## 1. 存放
 

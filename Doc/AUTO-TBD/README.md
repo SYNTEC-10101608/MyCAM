@@ -47,8 +47,9 @@
 4. 新增 Review 規範：六段檢查、報告格式與處置規則。
 5. 新增 Git 流程規範：版本與分支命名、commit 標示、release note 與 merge log 格式，worktree 改為選用。
 6. 新增 開議題、review、產出 release note 三個 AI 入口指令，Claude Code 與 VS 2026 Copilot 皆可使用。
-7. 新增 專案固定檢查項目，作為 review 必查的建置、多語系、Designer、第三方檔案與領域正確性項目。
-8. 修改 專案概觀，建置與執行環境的細節移到獨立的建置說明，需要時才讀取。
+7. 新增 專案固定檢查項目，作為 review 必查的建置、多語系、Designer、第三方檔案與領域正確性項目，只在 review 時讀取。
+8. 修改 專案概觀，建置與執行環境的細節移到獨立的建置說明，需要時才讀取；新增議題編號格式。
 9. 修改 Coding Style 通用規則，修改既有程式碼時以方法為單位套用新規範，程式碼不引用文件編號。
 10. 修改 Claude 不再常駐載入各語言 Coding Style，改為修改或 review 程式碼時依流程索引讀取。
-11. 新增 Claude 與 worktree 工作方式說明，集中 session 交接、worktree 建立與需複製的檔案，只在使用時讀取。
+11. 新增 Claude Code 工作方式說明，團隊通用的 session 交接與專案的 worktree 做法各一份，只在使用時讀取。
+12. 修改 指引檔案依團隊通用與專案分層命名，指引目錄標示每份文件的層與載入方式。
