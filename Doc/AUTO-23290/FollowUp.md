@@ -43,7 +43,7 @@
 
 1. 目標：進行中的分支 `AUTO-23254_f_UIStyleUnify` 依新規範收尾。
 2. 完成條件：rebase 到含新規範的版本分支後，議題文件與 commit 標示符合 `.github/team/process-docs.md` 與 `process-git.md`，DoD 全部勾選。
-3. 延後原因：該分支在新規範合併前已開工，須等本議題合併後才能 rebase。
+3. 延後原因：該分支在新規範合併前已開工；本議題已於 2026-11-26 合併進 `0.49.0`，可開工。
 4. 建議做法：見第 4 節 rebase 指引。
 
 ### TODO-5 Coding Style 與 `.editorconfig` 的重複
@@ -64,7 +64,7 @@ TODO-4 的做法。盤點日期 2026-11-25，依本機 ref（當時 `git fetch o
    1. 分支只在本機（worktree `.claude/worktrees/ui-style-unify`），未 push；起點 `a4b3826d`，73 個 commit、無 merge commit，對 `origin/master`（`24c7276d`）ahead 73、behind 11。
    2. 修改 356 檔：Production Code 91、`Language/` XML 128、`*.Designer.cs` 36、議題文件 14、指引 5（改 `copilot-instructions.md`、`project-overview`、`CLAUDE.md`，新增 `ui-style.instructions.md`、`icon-design.instructions.md`）、`Tools/UICheck/` 14、圖示與資源 68。
    3. 議題文件在 `Doc/AUTO-23254/`，用舊編號 `R` / `S` / `T` 與數字檔名前綴；沒有 DoD 勾選清單、Release Note、`Review.md`；commit 沒有 `STEP` / `REV` 標示。依新規範屬 L 級。
-2. 時機：等本議題以 squash 合併進目標版本分支後，再把 UI 分支 rebase 到該版本分支；先 rebase 到 `AUTO-23290_f_DevProcess` 會帶入本議題的全部 commit。
+2. 時機：本議題已 squash 合併進 `0.49.0`，把 UI 分支 rebase 到該版本分支；不要 rebase 到 `AUTO-23290_f_DevProcess`，會帶入本議題的全部 commit。
 3. 預估衝突（以本議題 `99dcd2e7`（DEC-18 之前）為對象逐 commit 模擬，停 6 次；實際 rebase 到版本分支時會不同，以重跑結果為準）：
    1. 指引：`CLAUDE.md`、`copilot-instructions.md`、`project-overview.instructions.md`（`origin/master` 與本議題都改過）。
    2. 程式：`MyCAM/Editor/Dialog/LockMSAxisDlg.cs`、`CNCThreePointDlg.cs`（`origin/master` 的 `AUTO-23220`、`AUTO-23240` 修正）。

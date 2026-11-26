@@ -125,11 +125,19 @@
 4. VS 案例第一次未通過後，新增 `ai-tools-review` skill，`review` skill 的觸發說明排除委託（DEC-25.12）。
 5. SPEC：SPEC-1、SPEC-2、SPEC-7、SPEC-11、SPEC-20。TEST：TEST-3（skill 數量下限改為 4）、TEST-4、TEST-5、TEST-7、TEST-9、TEST-17。
 
+### STEP-18 2nd MR：結案報告與引用方向（DEC-27）
+
+1. 以 `origin/master`（`fbb7ae34`）開 `AUTO-23290_f_DevProcess_2nd`。
+2. 新增 `Closure.md`；團隊概觀的文件通則加第 5 項（引用方向）；`process-git.md` 第 4 節加後續 MR 的 Release Note 分節（REV-110）。
+3. 修正過時的記錄：README 的分支與狀態、2nd MR 的 Release Note；TestPlan 第 5.1 節；TODO-4 的延後原因與 rebase 時機。
+4. `Check.ps1` 的 STEP 追溯另查保留的 `AUTO-23290_f_DevProcess`；TEST-11 檢查每一個 Release Note 節。
+5. SPEC：SPEC-1、SPEC-9、SPEC-19。TEST：TEST-1、TEST-6、TEST-7、TEST-11。
+
 ## 3. SPEC 對照
 
 | SPEC | STEP |
 | --- | --- |
-| SPEC-1 規範分層、載入與文件通則 | STEP-6、STEP-7、STEP-14、STEP-15、STEP-17 |
+| SPEC-1 規範分層、載入與文件通則 | STEP-6、STEP-7、STEP-14、STEP-15、STEP-17、STEP-18 |
 | SPEC-2 觸發入口 | STEP-9、STEP-14、STEP-16、STEP-17 |
 | SPEC-3 議題分級、階段與確認點 | STEP-2、STEP-15、STEP-16 |
 | SPEC-4 完成定義 | STEP-2、STEP-13、STEP-15、STEP-16 |
@@ -137,14 +145,14 @@
 | SPEC-6 項目編號與追溯 | STEP-3 |
 | SPEC-7 Review | STEP-4、STEP-13、STEP-14、STEP-15、STEP-17 |
 | SPEC-8 Git 流程 | STEP-5、STEP-15、STEP-16 |
-| SPEC-9 Release note 與 merge log | STEP-5、STEP-13 |
+| SPEC-9 Release note 與 merge log | STEP-5、STEP-13、STEP-18 |
 | SPEC-10 Coding Style 修訂 | STEP-8 |
 | SPEC-11 檔案與異動 | STEP-1、STEP-3、STEP-7、STEP-14、STEP-15、STEP-16、STEP-17 |
 | SPEC-17 個人設定收斂 | STEP-11、STEP-15 |
 | SPEC-18 後續議題 | STEP-10、STEP-16 |
-| SPEC-19 本議題自身的文件 | STEP-12、STEP-13 |
+| SPEC-19 本議題自身的文件 | STEP-12、STEP-13、STEP-18 |
 | SPEC-20 委託 AI Tools Review 與 AI 工具部署 | STEP-17 |
 
 ## 4. 待討論
 
-無。確認點 5 的決議見 DEC-10；施工中的結構調整見 DEC-14、DEC-18、DEC-21～DEC-25。
+無。確認點 5 的決議見 DEC-10；施工中的結構調整見 DEC-14、DEC-18、DEC-21～DEC-25、DEC-27。

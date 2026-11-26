@@ -5,7 +5,7 @@
 
 ## 1. 規則
 
-### SPEC-1 規範分層、載入與文件通則（REQ-1、REQ-2、REQ-3、REQ-5.5、REQ-11；DEC-2、DEC-9、DEC-11、DEC-13、DEC-18、DEC-21）
+### SPEC-1 規範分層、載入與文件通則（REQ-1、REQ-2、REQ-3、REQ-5.5、REQ-11；DEC-2、DEC-9、DEC-11、DEC-13、DEC-18、DEC-21、DEC-27）
 
 位置：[copilot-instructions.md](../../.github/copilot-instructions.md) 的規範分層、檔案分類、維護方式；[team-overview](../../.github/instructions/team-overview.instructions.md) 的文件通則與流程索引；[project-overview](../../.github/instructions/project-overview.instructions.md) 的專案指引索引。
 
@@ -14,7 +14,7 @@
 3. 載入門檻：AI 無法自行察覺何時該讀的內容才常駐；其他內容由概觀的索引寫明動作名稱或副檔名。Claude Code 只依 `@` 載入、VS 2026 Copilot 未依 `applyTo` 載入，兩者實際都靠索引（TEST-14、TEST-16）。
 4. Copilot 與 Claude Code 讀同一份文件；`CLAUDE.md` 只以 `@` 引用常駐檔。
 5. 常駐行數不設上限也不逐回合比對；review 文件段檢查新增的常駐內容是否符合載入門檻（DEC-23）。
-6. 文件通則：精簡（只寫做對所需的資訊、同一規則只寫一處、機器能檢查的交給工具、非直覺的規則附理由）、只保留最終結果、數字條列、內容繁體中文與檔名英文。
+6. 文件通則：精簡（只寫做對所需的資訊、同一規則只寫一處、機器能檢查的交給工具、非直覺的規則附理由）、只保留最終結果、數字條列、內容繁體中文與檔名英文。快照只引用持續維護的文件，持續維護的文件只以追溯編號指向快照（DEC-27）。
 7. 協作原則（REQ-11，DEC-13）：AI 以資深工程師角度提出建議；依重要性決定先由人決定或先處理再請人確認；待討論的三部分（問題、建議、另一可行選項）只定義在協作原則第 3 項，文件與對話共用（DEC-23）。
 8. 參照其他指引時寫明檔案連結；團隊層可連到 `project/` 與專案概觀的固定檔名（DEC-23）。
 
@@ -78,12 +78,13 @@
 3. 每個 STEP 一個 commit；標題行結尾建議標示 `(STEP-n)` / `(REV-n)`；議題文件不記 commit hash。
 4. Worktree 為選用，新 worktree 的環境準備見 `project/env-worktree.md`（不限工具，DEC-24.3）；送 MR 由人決定，push 前先詢問 remote 與分支。
 
-### SPEC-9 Release note 與 merge log（REQ-7.4；DEC-5.3）
+### SPEC-9 Release note 與 merge log（REQ-7.4；DEC-5.3、DEC-27.6）
 
 位置：[process-git.md](../../.github/team/process-git.md) 第 4 節。
 
 1. Release note 數字條列，以 `新增` / `修改` / `刪除` 開頭，由 AI 產出寫入 `README.md`。
 2. Merge log 由 release note 組成，目標版本留空由合併者填入。
+3. 同一議題有後續 MR 時，Release Note 依 MR 分節（`1st`、`2nd`…），merge log 取本次 MR 的那一節（DEC-27.6）。
 
 ### SPEC-10 Coding Style 修訂（REQ-8；DEC-6、DEC-16）
 
@@ -183,4 +184,4 @@
 
 ## 5. 待討論
 
-無。各確認點與施工中的決策見 DEC-9～DEC-25。
+無。各確認點與施工中的決策見 DEC-9～DEC-27。
