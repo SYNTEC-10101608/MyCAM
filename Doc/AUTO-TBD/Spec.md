@@ -10,7 +10,7 @@
 位置：[copilot-instructions.md](../../.github/copilot-instructions.md) 的規範分層、檔案分類、維護方式；[team-overview](../../.github/instructions/team-overview.instructions.md) 的文件通則與流程索引；[project-overview](../../.github/instructions/project-overview.instructions.md) 的專案指引索引。
 
 1. 四層：入口、團隊通用、專案、個人；團隊通用層不含專案專屬內容，可直接搬到其他 repo；專案層可補充或具體化團隊通用層，個人層不改變團隊規範的要求。
-2. 目錄表示載入方式：`instructions/` 只放每層一份的常駐概觀；`team/`、`project/` 依時機讀取，檔名以分類開頭（`process-`、`coding-`、`env-`、`tool-`）。
+2. 目錄表示載入方式：`instructions/` 只放每層一份的常駐概觀；`team/`、`project/` 依時機讀取，檔名以分類開頭（`process-`、`coding-`、`env-`、`tool-`）；`scripts/` 放指引引用的輔助腳本（DEC-25.9）。
 3. 載入門檻：AI 無法自行察覺何時該讀的內容才常駐；其他內容由概觀的索引寫明動作名稱或副檔名。Claude Code 只依 `@` 載入、VS 2026 Copilot 未依 `applyTo` 載入，兩者實際都靠索引（TEST-14、TEST-16）。
 4. Copilot 與 Claude Code 讀同一份文件；`CLAUDE.md` 只以 `@` 引用常駐檔。
 5. 常駐行數不設上限也不逐回合比對；review 文件段檢查新增的常駐內容是否符合載入門檻（DEC-23）。
@@ -92,6 +92,18 @@
 1. 新增與修改的程式碼採新規範；同一方法混用到難讀時可整個方法改寫，格式調整獨立 commit；不修改沒動到的方法。
 2. Production Code 不引用文件、測試或規範條目，特例最多留 `// <議題編號>: <原因>`。
 
+### SPEC-20 委託 AI Tools Review 與 AI 工具部署（REQ-12；DEC-25）
+
+位置：[process-ai-review.md](../../.github/team/process-ai-review.md)、[tool-copilot-cli.md](../../.github/team/tool-copilot-cli.md)、[env-ai-tools.md](../../.github/team/env-ai-tools.md)、[Invoke-CopilotReview.ps1](../../.github/scripts/Invoke-CopilotReview.ps1)；[process-review.md](../../.github/team/process-review.md) 第 2 節的報告格式。
+
+1. 委託是建議；施工方、reviewer、人分工，每項發現的處置仍由人決定。
+2. 交接以單一請求檔 `REVIEW-REQUEST.md` 完成（`.gitignore` 排除），內含 reviewer 規則，reviewer 只讀它與 `review` skill。
+3. 模型與推理強度由人在請求時決定，AI 列出清單並建議與施工方不同家族、可用的最高等級；規範不寫模型名稱。
+4. 第一回合審整個分支，之後為增量回合；增量回合沒有「必修」就結束；與既有決策衝突的發現只能列「提問」。
+5. 報告的比對基準加註受審 HEAD，工具與模型加註推理強度；既有回合不改。
+6. 部署：必要為 VS 2026 18.5 以上的 Copilot（Agent 模式）；建議為 Copilot CLI；Claude Code 為選用。
+7. 腳本清除 Copilot Agent 傳給子程序的環境變數，VS Copilot 也能當施工方委託。
+
 ## 2. 檔案配置
 
 ### SPEC-11 檔案與異動（REQ-1、REQ-2、REQ-3；DEC-14、DEC-18、DEC-19、DEC-21）
@@ -105,13 +117,15 @@
 | `.github/team/coding-general.md` | 團隊程式規範 | 改名（原 `instructions/coding-style-general`）、修改、移出常駐 |
 | `.github/team/coding-csharp.md`、`coding-cpp.md` | 團隊程式規範 | 改名、更新連結、專案資訊改為連到 `project/coding-architecture.md`（REV-52、DEC-23） |
 | `.github/team/tool-claude-code.md` | 團隊工具做法 | 新增：Claude Code 的 worktree 機制（DEC-23、DEC-24） |
+| `.github/team/process-ai-review.md`、`tool-copilot-cli.md`、`env-ai-tools.md` | 團隊流程、工具做法、環境 | 新增：委託 AI Tools Review 與 AI 工具部署（DEC-25） |
+| `.github/scripts/Invoke-CopilotReview.ps1` | 輔助腳本 | 新增：列出模型、以 Copilot CLI 執行 review（DEC-25） |
 | `.github/project/coding-architecture.md` | 專案程式規範 | 新增：由 `project-overview` 搬入技術棧、方案與主程式結構 |
 | `.github/project/coding-general.md` | 專案程式規範 | 新增：由 `project-overview` 搬入慣例，加上四語系同步、Designer、`reference/` |
 | `.github/project/process-review.md` | 專案流程 | 新增：專案固定檢查項目 |
 | `.github/project/env-build.md` | 專案環境 | 新增：由 `project-overview` 搬入建置與執行環境 |
 | `.github/project/env-worktree.md` | 專案環境 | 新增：新 worktree 要複製的檔案、`CopyRef.bat`、卸載 `FCLTool`，不限工具（DEC-24） |
 | `.claude/skills/{issue-start,review,release-note}/SKILL.md` | 觸發入口 | 新增 |
-| `.gitignore` | 版控設定 | 加入 `/SESSION.md` |
+| `.gitignore` | 版控設定 | 加入 `/SESSION.md`、`/REVIEW-REQUEST.md` |
 | `.editorconfig` | 格式設定 | 加入 `[*.ps1] charset = utf-8-bom`，更新註解路徑 |
 | `Doc/AUTO-TBD/*` | 議題文件 | 新增 |
 
@@ -164,7 +178,8 @@
 | REQ-9 個人設定收斂 | SPEC-17 |
 | REQ-10 後續議題 | SPEC-18 |
 | REQ-11 協作原則 | SPEC-1 |
+| REQ-12 委託 AI Tools Review | SPEC-11、SPEC-20 |
 
 ## 5. 待討論
 
-無。各確認點與施工中的決策見 DEC-9～DEC-24。
+無。各確認點與施工中的決策見 DEC-9～DEC-25。

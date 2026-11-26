@@ -40,4 +40,6 @@ applyTo: "**"
 | 開分支、commit、送 MR、產出 release note、建立 worktree | `.github/team/process-git.md` |
 | 新增或修改程式碼與設定檔（`*.cs`、`*.c`、`*.cpp`、`*.h`、`*.hpp`、`*.xml`、`*.resx`、`*.config` 等） | `.github/team/coding-general.md`，加上對應語言的 `.github/team/coding-<語言>.md`（`csharp`、`cpp`） |
 | 執行或回應 review | `.github/team/process-review.md`，再讀 `.github/team/`、`.github/project/` 下其餘全部文件 |
+| 委託 AI Tools Review（委託另一個 AI 工具或模型 review） | `.github/team/process-ai-review.md`；reviewer 為 Copilot CLI 時加讀 `.github/team/tool-copilot-cli.md` |
+| 準備 AI 工具環境、新成員加入 | `.github/team/env-ai-tools.md` |
 | 以 Claude Code 建立 worktree | `.github/team/tool-claude-code.md` |

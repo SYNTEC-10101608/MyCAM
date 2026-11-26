@@ -10,10 +10,11 @@
 | 分類 | 檔案 | SPEC |
 | --- | --- | --- |
 | 入口與概觀（常駐） | `copilot-instructions.md`、`CLAUDE.md`、`instructions/team-overview`、`instructions/project-overview` | SPEC-1、SPEC-11 |
-| 流程 `process-` | `team/process-{issue,docs,review,git}.md`、`project/process-review.md` | SPEC-3～SPEC-9 |
+| 流程 `process-` | `team/process-{issue,docs,review,git,ai-review}.md`、`project/process-review.md` | SPEC-3～SPEC-9、SPEC-20 |
 | 程式規範 `coding-` | `team/coding-{general,csharp,cpp}.md`、`project/coding-{architecture,general}.md` | SPEC-10、SPEC-11 |
-| 環境 `env-` | `project/env-build.md`、`project/env-worktree.md` | SPEC-11 |
-| 工具 `tool-` | `team/tool-claude-code.md` | SPEC-11 |
+| 環境 `env-` | `team/env-ai-tools.md`、`project/env-build.md`、`project/env-worktree.md` | SPEC-11、SPEC-20 |
+| 工具 `tool-` | `team/tool-claude-code.md`、`team/tool-copilot-cli.md` | SPEC-11、SPEC-20 |
+| 輔助腳本 | `.github/scripts/Invoke-CopilotReview.ps1` | SPEC-20 |
 | 觸發入口 | `.claude/skills/{issue-start,review,release-note}/SKILL.md` | SPEC-2 |
 | 設定 | `.gitignore`、`.editorconfig` | SPEC-11 |
 | 檢查腳本 | `Doc/AUTO-TBD/Check.ps1` | TestPlan 第 1 節 |
@@ -116,25 +117,33 @@
 3. Goal（REQ-2 最低版本 18.5）、Spec、TestPlan（TEST-9、TEST-15、TEST-16 條件）與 `Check.ps1` 同步；重跑 TEST-15、TEST-16。
 4. SPEC：SPEC-2、SPEC-3、SPEC-4、SPEC-8、SPEC-11、SPEC-18。TEST：TEST-4、TEST-7、TEST-9、TEST-15、TEST-16。
 
+### STEP-17 委託 AI Tools Review（DEC-25）
+
+1. 新增 `team/process-ai-review.md`、`team/tool-copilot-cli.md`、`team/env-ai-tools.md` 與 `.github/scripts/Invoke-CopilotReview.ps1`；`process-review.md` 報告格式加註受審 HEAD 與推理強度；團隊概觀的流程索引加兩列；`copilot-instructions.md` 的檔案分類加入 `scripts/`；`.gitignore` 加入 `/REVIEW-REQUEST.md`。
+2. Goal（REQ-12）、Spec、TestPlan（TEST-17）與 `Check.ps1`（TEST-4、TEST-5、TEST-9）同步。
+3. 以腳本跑一回合委託 review 驗收；VS 端由使用者執行 TEST-17 第 1.2 項。
+4. SPEC：SPEC-1、SPEC-7、SPEC-11、SPEC-20。TEST：TEST-4、TEST-5、TEST-7、TEST-9、TEST-17。
+
 ## 3. SPEC 對照
 
 | SPEC | STEP |
 | --- | --- |
-| SPEC-1 規範分層、載入與文件通則 | STEP-6、STEP-7、STEP-14、STEP-15 |
+| SPEC-1 規範分層、載入與文件通則 | STEP-6、STEP-7、STEP-14、STEP-15、STEP-17 |
 | SPEC-2 觸發入口 | STEP-9、STEP-14、STEP-16 |
 | SPEC-3 議題分級、階段與確認點 | STEP-2、STEP-15、STEP-16 |
 | SPEC-4 完成定義 | STEP-2、STEP-13、STEP-15、STEP-16 |
 | SPEC-5 議題文件組合與內容歸屬 | STEP-3、STEP-14、STEP-15 |
 | SPEC-6 項目編號與追溯 | STEP-3 |
-| SPEC-7 Review | STEP-4、STEP-13、STEP-14、STEP-15 |
+| SPEC-7 Review | STEP-4、STEP-13、STEP-14、STEP-15、STEP-17 |
 | SPEC-8 Git 流程 | STEP-5、STEP-15、STEP-16 |
 | SPEC-9 Release note 與 merge log | STEP-5、STEP-13 |
 | SPEC-10 Coding Style 修訂 | STEP-8 |
-| SPEC-11 檔案與異動 | STEP-1、STEP-3、STEP-7、STEP-14、STEP-15、STEP-16 |
+| SPEC-11 檔案與異動 | STEP-1、STEP-3、STEP-7、STEP-14、STEP-15、STEP-16、STEP-17 |
 | SPEC-17 個人設定收斂 | STEP-11、STEP-15 |
 | SPEC-18 後續議題 | STEP-10、STEP-16 |
 | SPEC-19 本議題自身的文件 | STEP-12、STEP-13 |
+| SPEC-20 委託 AI Tools Review 與 AI 工具部署 | STEP-17 |
 
 ## 4. 待討論
 
-無。確認點 5 的決議見 DEC-10；施工中的結構調整見 DEC-14、DEC-18、DEC-21～DEC-24。
+無。確認點 5 的決議見 DEC-10；施工中的結構調整見 DEC-14、DEC-18、DEC-21～DEC-25。

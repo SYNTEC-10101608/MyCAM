@@ -32,6 +32,7 @@
 | TEST-14 | Claude Code 載入範圍 | SPEC-1 | 議題限定 | 動態 | 人工 |
 | TEST-15 | Claude Code 入口與流程演練 | SPEC-2～SPEC-9 | 議題限定 | 動態 | 人工 |
 | TEST-16 | VS 2026 Copilot 讀取與觸發 | SPEC-1、SPEC-2 | 議題限定 | 動態 | 人工 |
+| TEST-17 | 委託 AI Tools Review 演練 | SPEC-20 | 議題限定 | 動態 | 人工 |
 
 現有測試的異動：無（repo 沒有自動測試）。
 
@@ -64,7 +65,7 @@
    2. `team/`、`project/` 的檔案沒有 `applyTo`，檔名以 `process-`、`coding-`、`env-`、`tool-` 開頭，且都列在該層概觀的索引（各語言 Coding Style 以 `coding-<語言>` 一列涵蓋）；`.github/` 下沒有 `claude.md`。
    3. `CLAUDE.md` 的 `@` 引用恰為 `copilot-instructions.md` 與兩份概觀。
    4. `copilot-instructions.md` 有分類表與 skill 原則。
-   5. 流程索引有「新增或修改程式碼」一列；`SESSION.md` 由 `.gitignore` 的 `/SESSION.md` 排除。
+   5. 流程索引有「新增或修改程式碼」一列；`SESSION.md`、`REVIEW-REQUEST.md` 由 `.gitignore` 根目錄規則排除。
 
 #### TEST-5 異動範圍符合清單
 
@@ -86,7 +87,7 @@
 1. 方法：搜尋 `project-overview`、`.github/project/` 與 `team/coding-general.md`。
 2. 通過條件：
    1. `project-overview` 沒有 Git 流程、專案固定檢查項目、建置細節、技術棧與架構、慣例；有含 `AUTO-TBD` 的「議題編號」。
-   2. `project/process-review.md` 兩項；`env-build.md` 有 FCLTool、命令列建置、執行期檔案三節且沒有 worktree；`env-worktree.md` 有要複製的檔案、`CopyRef.bat`、卸載 `FCLTool` 三項；`process-issue.md` 有 `SESSION.md` 交接，`tool-claude-code.md` 沒有（DEC-24）。
+   2. `project/process-review.md` 兩項；`env-build.md` 有 FCLTool、命令列建置、執行期檔案三節且沒有 worktree；`env-worktree.md` 有要複製的檔案、`CopyRef.bat`、卸載 `FCLTool` 三項；`process-issue.md` 有 `SESSION.md` 交接，`tool-claude-code.md` 沒有（DEC-24）；`process-ai-review.md`、`tool-copilot-cli.md`、`env-ai-tools.md` 有 SPEC-20 的請求檔、推理強度、清除繼承變數、18.5 與登入（DEC-25）。
    3. 四語系同步、Designer、`reference/` 三項規則只寫在 `project/coding-general.md`。
    4. `team/coding-general.md` 沒有「維持該方法內既有的命名方式」，有 SPEC-10 的兩項規則。
 
@@ -152,6 +153,17 @@
    3. 第 3 項觸發 `issue-start` skill，先開分支，盤點後在分級確認點停下（DEC-23.5）；第 4 項讀取 `process-issue.md` 的交接。
    4. 第 5 項觸發 `release-note` skill，讀取 `process-git.md`。
 
+#### TEST-17 委託 AI Tools Review 演練
+
+1. 方法：
+   1. Claude Code 為施工方：以腳本 `-ListModels` 列出模型，依 `process-ai-review.md` 寫請求檔，以腳本執行一回合全範圍 review，再逐項分析。
+   2. VS 2026 Copilot 為施工方（使用者執行）：在 Agent 模式要求它依流程索引委託 AI Tools Review，列出模型清單。
+2. 通過條件：
+   1. 模型清單含費用等級與各模型支援的推理強度；在 Copilot Agent 的子程序中也能執行。
+   2. Reviewer 只改 `Review.md` 與請求檔；回合資訊含受審 HEAD 與推理強度，處置為「待處置」。
+   3. 施工方確認異動範圍並逐項分析，處置由人決定。
+3. Review 第 9、10 回合是流程定案前的試跑（DEC-25.1）。
+
 ## 4. SPEC 對照
 
 | SPEC | TEST |
@@ -170,6 +182,7 @@
 | SPEC-17 個人設定收斂 | TEST-12 |
 | SPEC-18 後續議題 | TEST-13 |
 | SPEC-19 本議題自身的文件 | TEST-11 |
+| SPEC-20 委託 AI Tools Review 與 AI 工具部署 | TEST-4、TEST-5、TEST-7、TEST-9、TEST-17 |
 
 ## 5. 執行結果
 

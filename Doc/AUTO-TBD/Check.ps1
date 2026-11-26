@@ -383,9 +383,11 @@ function Test-4()
 	}
 
 	# 4.6
-	$szIgnore = ( git check-ignore -v SESSION.md 2>$null ) -join ''
-	if( $szIgnore -notmatch '^\.gitignore:\d+:/SESSION\.md' ) {
-		$failList += "SESSION.md 未由 .gitignore 的 /SESSION.md 排除（$szIgnore）"
+	foreach( $szName in @( 'SESSION.md', 'REVIEW-REQUEST.md' ) ) {
+		$szIgnore = ( git check-ignore -v $szName 2>$null ) -join ''
+		if( $szIgnore -notmatch "^\.gitignore:\d+:/$( [regex]::Escape( $szName ) )" ) {
+			$failList += "$szName 未由 .gitignore 的 /$szName 排除（$szIgnore）"
+		}
 	}
 	Add-Result 'TEST-4' $failList
 }
@@ -404,6 +406,10 @@ function Test-5()
 		'.github/team/process-review.md',
 		'.github/team/process-git.md',
 		'.github/team/tool-claude-code.md',
+		'.github/team/process-ai-review.md',
+		'.github/team/tool-copilot-cli.md',
+		'.github/team/env-ai-tools.md',
+		'.github/scripts/Invoke-CopilotReview.ps1',
 		'.github/instructions/project-overview.instructions.md',
 		'.github/project/coding-general.md',
 		'.github/project/process-review.md',
@@ -669,6 +675,9 @@ function Test-9()
 		'.github/team/process-issue.md' = @( 'SESSION.md' )
 		'.github/project/env-worktree.md' = @( 'FCLTool.dll', 'CopyRef.bat', '.worktreeinclude', '卸載' )
 		'.github/team/tool-claude-code.md' = @( '.worktreeinclude' )
+		'.github/team/process-ai-review.md' = @( 'REVIEW-REQUEST.md', '推理強度', '增量', '提問' )
+		'.github/team/tool-copilot-cli.md' = @( 'Invoke-CopilotReview.ps1', '-ListModels', 'COPILOT_HOME' )
+		'.github/team/env-ai-tools.md' = @( '18.5', 'Agent', 'copilot login' )
 	}
 	foreach( $szFile in $needMap.Keys ) {
 		$szDoc = Read-Text $szFile
