@@ -2,10 +2,10 @@
 
 | 項目 | 內容 |
 | --- | --- |
-| 分支 | `AUTO-23290_f_DevProcess` |
-| 分支起點 | `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23） |
+| 分支 | 1st `AUTO-23290_f_DevProcess`；2nd `AUTO-23290_f_DevProcess_2nd` |
+| 分支起點 | 1st `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23）；2nd `fbb7ae34`（`origin/master`，2026-11-26） |
 | 級別 | L |
-| 狀態 | 完成：STEP-1～STEP-17、Review 第 14 回合處置完成，人工全域 review 通過；待送 MR |
+| 狀態 | 1st 已於 2026-11-26 合併進 `0.49.0`；2nd（STEP-18：結案報告、文件通則的引用方向）待送 MR |
 
 ## 文件
 
@@ -33,7 +33,7 @@
 ### 1. 處理的事項
 
 1. 開發流程原本只在個人設定（`~/.claude/issue-workflow.md`），現在移入 repo 的 `.github/`，Copilot 與 Claude Code 讀同一份（REQ-1、REQ-2）。
-2. 規範分為入口、團隊通用、專案、個人四層，依載入時機分目錄：常駐只留入口與兩份概觀（193 行降為 114 行），其餘由索引依動作或副檔名讀取（REQ-3）。
+2. 規範分為入口、團隊通用、專案、個人四層，依載入時機分目錄：常駐只留入口與兩份概觀（193 行降為 115 行），其餘由索引依動作或副檔名讀取（REQ-3）。
 3. 流程成文：議題分級、確認點、DoD、範圍變動與回溯（`process-issue.md`）；議題文件的組合與編號（`process-docs.md`）；六段 review 與報告格式（`process-review.md`）；版本、分支、commit、release note、merge log（`process-git.md`）。
 4. 協作原則：AI 以資深工程師的角度提出建議；小事先做後確認，重要事項先由人決定；待討論一律寫問題、建議、另一可行選項（REQ-11）。
 5. Coding Style 修訂：新增與修改的程式碼採新規範；Production Code 不引用文件（REQ-8）。
@@ -59,6 +59,7 @@
 | 送 MR | README 的 DoD 全部勾選；release note 以 `新增` / `修改` / `刪除` 開頭，由 AI 產出；merge log 的目標版本留空，由合併者填入 | `team/process-issue.md` 第 4 節、`team/process-git.md` 第 4 節 |
 | 寫程式 | 新增與修改的程式碼採新規範；Production Code 的註解不引用文件與條目 | `team/coding-general.md` |
 | 改指引 | 在議題文件寫明異動與理由；新增常駐內容須符合載入門檻 | `copilot-instructions.md` 的維護方式 |
+| 引用文件 | 快照（結案報告、review 回合）可引用持續維護的文件；持續維護的文件只以追溯編號指向快照 | 團隊概觀的文件通則第 5 項 |
 
 #### 2.2 執行上的差異
 
@@ -172,7 +173,7 @@ Doc/<議題編號>/                   議題文件
 9. [x] 各確認點分別經人確認（確認點 7 的人工全域 review 於 2026-11-26 完成，45 項待確認 REV 一併確認）。
 10. [x] 長期有效的結論已提升到指引規範（見「議題總結」第 2 節）。
 
-## Release Note
+## Release Note（1st）
 
 1. 新增 團隊與 AI 共用的開發規範，Copilot 與 Claude Code 讀同一份，依團隊、專案、個人分層並依需要載入。
 2. 新增 議題處理流程，涵蓋分級、確認點、完成定義、議題文件、review 與 Git 規範。
@@ -180,3 +181,9 @@ Doc/<議題編號>/                   議題文件
 4. 新增 開議題、review、產出 release note、委託 AI Tools Review 的 skill 入口。
 5. 新增 委託其他 AI 工具 review 的建議流程與 AI 工具部署說明。
 6. 修改 Coding Style，新增與修改的程式碼採新規範，程式註解不引用文件。
+
+## Release Note（2nd）
+
+1. 修改 文件通則，明定快照類文件與持續維護文件的引用方向。
+2. 新增 開發流程規範議題的結案報告，濃縮研發文件的重點。
+3. 修改 Release Note 規範，同一議題有後續 MR 時依 MR 分節。

@@ -374,3 +374,21 @@
    3. 另一可行選項：逐項指定不修正並附理由，或列入後續；本回合沒有必修，不自行再開一回合。
 
 使用者決定五項都採納，並保留 VS 依 `release-note` skill 改寫的 Release Note（2026-11-26）；修正由 Claude Code 完成。本回合沒有「必修」，委託 review 依 `process-ai-review.md` 第 3 節結束。
+
+## 第 15 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-23290 |
+| 分支 | `AUTO-23290_f_DevProcess_2nd` |
+| 比對基準 | `fbb7ae34`；受審 HEAD 為工作樹（STEP-18 提交前） |
+| 工具與模型 | Claude Code、Claude Opus 5.5；2nd 的自我 review |
+| 日期 | 2026-11-26 |
+
+1. 門檻：`Check.ps1 -Base 24c7276d -SkipPersonal` 9 PASS、1 FAIL，只有 TEST-11 的 STEP-18 尚未提交；`git diff --check` 無異常。本次只改文件與議題腳本，不需建置。
+2. 需求與範圍：異動都在 STEP-18 內；新增的常駐 1 行（文件通則第 5 項）適用於撰寫任何文件時，AI 無法自行察覺時機，符合載入門檻。
+3. 文件：`Closure.md` 只引用持續維護的文件，README 的文件索引未列它，符合 DEC-27.3。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-110 | 6 | 提問 | `.github/team/process-docs.md:7` | 規範只寫後續 MR（`_2nd`）沿用同一資料夾，沒寫 README 的 Release Note 怎麼分 MR；本次暫以「Release Note」放本次 MR、「Release Note（第 1 個 MR）」保留前次。STEP 追溯可由 `process-git.md` 第 1 節第 3 項的保留分支涵蓋。是否在 `process-docs.md` 第 1 節補一條後續 MR 的 Release Note 寫法？ | 已修正（使用者決定）：寫入 `process-git.md` 第 4 節第 1.4 項，依 MR 分為 `Release Note（1st）`、`（2nd）`…；README 依此分節，`Check.ps1` 的 TEST-11 檢查每一節 |

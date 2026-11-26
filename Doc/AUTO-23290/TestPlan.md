@@ -186,11 +186,11 @@
 
 ## 5. 執行結果
 
-### 5.1 自動（`Check.ps1`，2026-11-25，比對基準 `24c7276d`）
+### 5.1 自動（`Check.ps1`，2026-11-26，比對基準 `24c7276d`）
 
-1. TEST-1～TEST-7、TEST-9、TEST-12：通過。
-2. TEST-1 常駐 112 行（基準 193，差異 -81）：`copilot-instructions.md` 40、`CLAUDE.md` 7、`team-overview` 43、`project-overview` 22。
-3. TEST-11：只剩 DoD 第 9、10 項與 REV 的「待人確認」，待人確認後通過。
+1. 1st MR 合併前（`3755f66f`）與 2nd MR（STEP-18）：全部通過。
+2. TEST-1 常駐 115 行（基準 193，差異 -78）：`copilot-instructions.md` 40、`CLAUDE.md` 7、`team-overview` 46、`project-overview` 22；2nd MR 的 +1 行為文件通則第 5 項（DEC-27）。
+3. TEST-11：1st MR 的 STEP commit 在保留的 `AUTO-23290_f_DevProcess` 追溯（DEC-27.5）。
 
 ### 5.2 人工
 

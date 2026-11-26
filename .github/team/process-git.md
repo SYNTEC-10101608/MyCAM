@@ -29,6 +29,7 @@
    1. 讀者為團隊與 QA，直接描述做了什麼處理，不寫模組名稱。
    2. 數字條列，每條以 `新增`、`修改` 或 `刪除` 開頭，前綴與內容間空一格，不加冒號。
    3. 由 AI 產出以統一風格，寫入議題 `README.md` 的 Release Note 章節。
+   4. 同一議題有後續 MR 時，章節依 MR 分為 `Release Note（1st）`、`Release Note（2nd）`…，merge log 取本次 MR 的那一節。
 2. Merge log（MR 描述）由 release note 組合而成，不另存於議題文件：
 
    ```text

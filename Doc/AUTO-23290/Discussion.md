@@ -235,3 +235,12 @@
 
 1. **議題編號為 `AUTO-23290`**（使用者提供）：依 `process-docs.md` 第 1 節第 2 項更名資料夾與分支；`Review.md` 與本檔的歷史描述保留原本的 `AUTO-TBD`。
 2. **Release Note 收斂為 6 條**（使用者決定）：只寫大方向，細節由指引與「議題總結」說明。
+
+## DEC-27 2nd MR：結案報告與引用方向（2026-11-26）
+
+1. 考量：研發文件資訊量大，人難以專注閱讀；1st MR 合併後，使用者要求一份濃縮重點的結案報告，細節回到研發文件看。
+2. **結案報告 `Closure.md` 只用於本議題，不列為規範**（使用者決定）：是否需要依議題內容而定，尚無明確規則。
+3. **快照只引用持續維護的文件**（使用者決定，寫入團隊概觀的文件通則第 5 項）：結案報告、review 回合是某個時點的記錄，不再更新；持續維護的文件以它為內容來源會讀到過時內容，所以只以追溯編號指向它。README 的文件索引因此不列 `Closure.md`。
+4. **以 `origin/master` 開 `AUTO-23290_f_DevProcess_2nd`**（使用者決定），同時修正過時的記錄：README 狀態、TestPlan 第 5.1 節、TODO-4 的延後原因與時機。
+5. 1st MR 以 squash 合併，STEP-1～STEP-17 的 commit 只在保留的 `AUTO-23290_f_DevProcess`；`Check.ps1` 的 STEP 追溯一併查該分支。
+6. **後續 MR 的 Release Note 依 MR 分節**（REV-110，使用者決定）：章節標題為 `Release Note（1st）`、`Release Note（2nd）`…，merge log 取本次 MR 的那一節；寫入 `process-git.md` 第 4 節，與 release note 的其他規則放在一起。
