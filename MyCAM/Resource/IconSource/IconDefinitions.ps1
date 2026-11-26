@@ -14,7 +14,9 @@ function Burst( [double]$dX, [double]$dY, [double]$dOuter, [double]$dInner, [int
 		$dRadius = if( $i % 2 -eq 0 ) { $dOuter } else { $dInner }
 		$dAngle = [Math]::PI * $i / $nPoint - [Math]::PI / 2
 		$szCommand = if( $i -eq 0 ) { "M" } else { "L" }
-		$szPath += ( "{0}{1:0.##},{2:0.##} " -f $szCommand, ( $dX + $dRadius * [Math]::Cos( $dAngle ) ), ( $dY + $dRadius * [Math]::Sin( $dAngle ) ) )
+		# invariant culture: a decimal comma would mix with the coordinate separator
+		$szPath += [string]::Format( [Globalization.CultureInfo]::InvariantCulture, "{0}{1:0.##},{2:0.##} ", $szCommand,
+			( $dX + $dRadius * [Math]::Cos( $dAngle ) ), ( $dY + $dRadius * [Math]::Sin( $dAngle ) ) )
 	}
 	return $szPath + "Z"
 }

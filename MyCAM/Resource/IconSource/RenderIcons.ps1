@@ -44,7 +44,9 @@ function Head( [double]$dX1, [double]$dY1, [double]$dX2, [double]$dY2, [double]$
 	$dAy = $dY2 - $dLength * [Math]::Sin( $dAngle - $dSpread )
 	$dBx = $dX2 - $dLength * [Math]::Cos( $dAngle + $dSpread )
 	$dBy = $dY2 - $dLength * [Math]::Sin( $dAngle + $dSpread )
-	return ( "M{0:0.##},{1:0.##} L{2:0.##},{3:0.##} L{4:0.##},{5:0.##}" -f $dAx, $dAy, $dX2, $dY2, $dBx, $dBy )
+	# invariant culture: a decimal comma would mix with the coordinate separator
+	return [string]::Format( [Globalization.CultureInfo]::InvariantCulture, "M{0:0.##},{1:0.##} L{2:0.##},{3:0.##} L{4:0.##},{5:0.##}",
+		$dAx, $dAy, $dX2, $dY2, $dBx, $dBy )
 }
 
 # shape: "stroke|fill|width|dash|path"; text shape: "text|fill|size|x,y|content"
