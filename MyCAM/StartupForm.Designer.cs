@@ -1319,6 +1319,7 @@
 			this.Controls.Add(this.m_pnlBackGround);
 			this.Controls.Add(this.m_pnlToolBar);
 			this.Controls.Add(this.m_msMode);
+			this.Icon = global::MyCAM.Properties.Resources.AppIcon;
 			this.MainMenuStrip = this.m_msMode;
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "StartupForm";

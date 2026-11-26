@@ -61,6 +61,16 @@ namespace MyCAM.Properties {
         }
         
         /// <summary>
+        ///   查詢類型 System.Drawing.Icon 的當地語系化資源，與 (圖示) 類似。
+        /// </summary>
+        internal static System.Drawing.Icon AppIcon {
+            get {
+                object obj = ResourceManager.GetObject("AppIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
         internal static System.Drawing.Bitmap CAD_AcrCenter {
