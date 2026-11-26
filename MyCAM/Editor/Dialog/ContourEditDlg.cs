@@ -40,7 +40,6 @@ namespace MyCAM.Editor
 			m_lblDZ.Text = m_LanguageManager.TryGetString( "m_lblDZ", m_lblDZ.Text );
 			m_lblUnit.Text = m_LanguageManager.TryGetString( "m_lblUnit", m_lblUnit.Text );
 
-			m_lblRelativeCurrentPath.Text = m_LanguageManager.TryGetString( "m_lblRelativeCurrentPath", m_lblRelativeCurrentPath.Text );
 			m_lblTotalDiff.Text = m_LanguageManager.TryGetString( "m_lblTotalDiff", m_lblTotalDiff.Text );
 
 			m_btnAdd.Text = m_LanguageManager.TryGetString( "m_btnAdd", m_btnAdd.Text );
@@ -51,8 +50,9 @@ namespace MyCAM.Editor
 			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
 		}
 
-		// Refresh the dialog UI to reflect the given param.
-		// Pass null to indicate no point is selected.
+		#region Update UI
+
+		// Refresh the dialog UI, null indicate no point is selected
 		public void ResetParam( ContourEditParam param )
 		{
 			m_bSuppressValueChanged = true;
@@ -64,7 +64,6 @@ namespace MyCAM.Editor
 				m_tbxDX.Value = 0;
 				m_tbxDY.Value = 0;
 				m_tbxDZ.Value = 0;
-				m_lblRelativeCurrentPath.Visible = false;
 				m_bSuppressValueChanged = false;
 				return;
 			}
@@ -83,15 +82,15 @@ namespace MyCAM.Editor
 			m_rbtnToStart.Checked = m_Param.IsPathStartPoint == true;
 			m_rbtnToEnd.Checked = m_Param.IsPathStartPoint == false;
 
-			m_lblRelativeCurrentPath.Visible = m_Param.IsPathStartPoint.HasValue;
-
-			if( m_Param.IsPathStartPoint != null ) {
-				m_btnAdd.Enabled = false;
-				m_btnRemove.Enabled = false;
-			}
-
 			UpdateTotalDisplacement();
 			m_bSuppressValueChanged = false;
+		}
+
+		public void UpdateTotalDisplacement()
+		{
+			m_lblTotalDX.Text = ( m_Param?.TotalDX ?? 0 ).ToString( "F3" );
+			m_lblTotalDY.Text = ( m_Param?.TotalDY ?? 0 ).ToString( "F3" );
+			m_lblTotalDZ.Text = ( m_Param?.TotalDZ ?? 0 ).ToString( "F3" );
 		}
 
 		void SetInputEnabled( bool enabled )
@@ -108,12 +107,7 @@ namespace MyCAM.Editor
 			m_btnRemove.Enabled = enabled;
 		}
 
-		public void UpdateTotalDisplacement()
-		{
-			m_lblTotalDX.Text = ( m_Param?.TotalDX ?? 0 ).ToString( "F3" );
-			m_lblTotalDY.Text = ( m_Param?.TotalDY ?? 0 ).ToString( "F3" );
-			m_lblTotalDZ.Text = ( m_Param?.TotalDZ ?? 0 ).ToString( "F3" );
-		}
+		#endregion
 
 		#region UI Events
 
