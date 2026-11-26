@@ -1,12 +1,12 @@
 ﻿param(
 	[string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path,
-	[string]$Base = "a4b3826d",
+	[string]$Base = "bd0fa270",
 	[string]$Only = ""
 )
 # Issue-only check of the UI style unification (AUTO-23254): behavior comparison against
-# the version before the issue. The base is fixed to the commit the branch started from, so the result can be
-# reproduced after the merge. Appearance may change; everything below must stay the same unless listed in
-# BehaviorExceptions.txt.
+# the version before the issue. The base is fixed to the master commit the branch was rebased onto (the branch
+# started from a4b3826d before the rebase), so the result can be reproduced after the merge. Appearance may change;
+# everything below must stay the same unless listed in BehaviorExceptions.txt.
 #
 #   SameEvents  event subscriptions in the designer file
 #   SameRadioGroups  radio button groups (which radio buttons are exclusive to each other)

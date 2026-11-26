@@ -88,3 +88,4 @@ TypeReplace ToolVectorDlg m_swt* Panel -> ColorSwatch, same place and size; the 
 
 # axis points drawn by ColorSwatch (decision 2026-11-20 "資料色色塊"): the panel no longer paints them itself
 CodeState CNCInfoPanel m_pnlCoordinates the Paint handler is replaced by the ColorSwatch axis points m_swtX to m_swtC
+CodeState CNCInfoPanel m_swtC hiding the second rotary axis (master AUTO-23275) hides its ColorSwatch, as the removed Paint handler skipped hidden axes (rebase 2026-11-26)
