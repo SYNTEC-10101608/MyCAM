@@ -205,14 +205,15 @@
       4. 第 3 項依 REV-90 在 `bbd1b275` 以全新的無頭 session 重跑（2026-11-26，Claude Code CLI 2.1.330、計畫模式，兩句各開一個 session，第一句即測試語句）：「開議題」觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git` 後，第一步是開分支，停下詢問議題內容、編號與分支基準；「切換 session 要怎麼做」搜尋 `.github/` 後讀 `process-issue.md`，依第 5 節回答交接做法。開始與結束時 `git status` 只有未追蹤的 `REVIEW-REQUEST.md`。通過。
       5. 修改 `AddPathDlg.SetFaceSelected` 前依兩份索引讀 `team/coding-general.md`、`team/coding-csharp.md`、`project/coding-architecture.md`、`project/coding-general.md`，修改已還原。通過。
       6. 發現：`issue-start` 的 description 把開分支寫在分級之後（已修正，REV-87）；新分支的基準沒有寫明（REV-88）。
-   3. TEST-16：使用者在 VS 2026 Copilot Chat 於 worktree 方案執行，每項開新對話；結果依使用者提供的畫面記錄。
-      1. 附加 `VectorTool.cs` 要求為 `GetAngle_deg` 加 `gp_Vec` 多載：觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git`、`team/coding-general.md`、`coding-csharp.md`、`coding-architecture.md`、`project/coding-general.md`、`.editorconfig`；提出 S 級建議後停下等人確認。通過。
-      2. 附加 `VectorTool.cs` 問「寫法是否有不符合規範的地方」：觸發 `review`，讀兩份 `process-review` 後搜尋 `*.md`，讀入 `team/`、`project/` 全部 13 份與 `.editorconfig`，並讀 `Build.bat` 執行建置門檻。通過。
-      3. 輸入「開議題」：觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git`。通過。
-      4. 問「切換 session 要怎麼做」：讀兩份 `tool-claude-code.md`。通過。
+   3. TEST-16：DEC-24 後於 `b429d020` 重跑（2026-11-26，VS 2026 18.12，Agent 模式，模型 GPT-6.1 Sol），每項開新對話；結果依使用者提供的畫面記錄。
+      1. 附加 `VectorTool.cs` 要求為 `GetAngle_deg` 加 `gp_Vec` 多載：讀 `process-issue`、`team/coding-general.md`、`coding-csharp.md`、`coding-architecture.md`、`project/coding-general.md`、`env-build.md`、`.editorconfig`；提出 S 級建議後停下等人確認。通過。
+      2. 附加 `VectorTool.cs` 問「寫法有沒有不符規範的地方」：觸發 `review`，讀兩份 `process-review` 後讀入 `team/`、`project/` 全部文件與 `.editorconfig`，只檢視不修改。通過。
+      3. 輸入「開議題」：觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git`；詢問議題編號與內容，說明收到後先建立分支再盤點。通過。
+      4. 問「切換 session 要怎麼做」：讀 `process-issue.md`，依第 5 節回答 `SESSION.md` 交接。通過。
+      5. 「產出 release note」：待使用者執行。
    4. TEST-17：
       1. Claude Code 為施工方（2026-11-26，`aedc6f31`）：`-ListModels` 列出 15 個模型與各自的推理強度（在模擬 VS Agent 的環境變數下執行）；以 `gpt-6.2-sol`、推理強度 high 委託第 11 回合全範圍 review，約數分鐘完成，只改了 `Review.md` 與請求檔，回合資訊含受審 HEAD 與推理強度，處置為「待處置」；Claude Code 逐項分析後處理 REV-98～REV-102。通過。
-      2. VS 2026 Copilot 為施工方：待使用者執行。流程定案前已確認 VS Agent 清除繼承變數後可呼叫 CLI（DEC-25.7）。
+      2. VS 2026 Copilot 為施工方（2026-11-26，`b429d020`，VS 2026 18.12，GPT-6.1 Sol）：輸入「委託 AI Tools Review：對本分支做一回合增量 review，範圍 `5a5d5ce4..b429d020`，這是第 13 回合」。VS 觸發 `review` skill 並讀了 `process-ai-review.md`，但自己執行 review（寫入第 13 回合），沒有列模型、寫請求檔或呼叫腳本。不通過：`review` skill 的觸發說明涵蓋「review」，委託的說法被當成直接 review。
 
 ## 6. 待討論
 

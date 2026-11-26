@@ -313,3 +313,23 @@
 | --- | --- | --- | --- | --- | --- |
 | REV-103 | 3 | 建議 | `.github/scripts/Invoke-CopilotReview.ps1:166` | 新增的分支比對使用不區分大小寫的 `-eq`；模擬 HEAD 不變、分支由 `Feature` 改成 `feature` 時，腳本仍回傳 0。建議以 `-ceq` 比對分支，讓只改大小寫的分支異動也回傳失敗。 | 已修正（待人確認）：分支改以 `-ceq` 比對 |
 | REV-104 | 6 | 建議 | `.github/team/process-ai-review.md:47` | 範本已支援 S 級的報告位置，卻仍只指示讀取 `Discussion.md`；S 級依 `process-docs.md` 第 2 節把 DEC 放在 `README.md` 的「討論記錄」。Reviewer 可能漏讀決策，未依 DEC-25.5 將與既有決策衝突的發現列為「提問」。建議讓範本指向各級的討論記錄，並在 Reviewer 規則引用同一來源。 | 已修正（待人確認）：範本改為讀討論記錄（`Discussion.md`，沒有時為 `README.md` 的討論記錄章節），Reviewer 規則引用同一來源 |
+
+## 第 13 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `5a5d5ce4`；受審 HEAD `b429d020` |
+| 工具與模型 | Visual Studio 2026 GitHub Copilot |
+| 日期 | 2026-11-26 |
+
+1. 門檻：`Build.bat Debug` 與 `Build.bat Release` 均成功，各 6 個警告、0 個錯誤；未修改 C++，不需單獨建置。增量 `git diff --check 5a5d5ce4 b429d020` 通過。
+2. 新增本回合前執行 `powershell -NoProfile -ExecutionPolicy Bypass -File Doc\AUTO-TBD\Check.ps1 -Base 24c7276d -SkipPersonal`，9 PASS、1 FAIL（結束碼 1）。只有已知的 TEST-11 未通過：DoD 第 3、9、10 項未勾選及既有處置待人確認；TEST-12 依參數略過實際檢查。
+3. 僅審 `5a5d5ce4..b429d020`，並參照前回合處置及討論決策；根目錄請求檔仍為已完成的第 12 回合，本回合依使用者直接指定的範圍執行，未改寫舊請求。
+4. 功能正確性：Windows PowerShell 5.1 解析腳本無錯誤；從基準與受審版抽取實際 `Invoke-Review` 函式，以記憶體內模擬隔離 Git、請求檔與 reviewer 呼叫。基準版在分支只改大小寫時回傳 0，受審版改為 1；受審版的正常完成、一般分支異動、HEAD 異動、失敗原因含「完成」及 reviewer 非零結束碼五項回歸亦符合預期。未啟動額外的 Copilot CLI，這些模擬不取代 TEST-17 的完整委託驗證。
+5. 需求與範圍、規範、設計及文件：分支大小寫比對的修正已落實（REV-103）；請求範本已指向獨立的 `Discussion.md`，缺少時讀取 `README.md` 的討論記錄，且防推翻規則使用同一來源（REV-104）。異動與理由已記錄於第 12 回合，未見範圍外修改或新的不一致；既有待人確認與 VS 驗證狀態維持不變。
+
+無新發現；本回合沒有「必修」。
+
+註（施工方，2026-11-26）：本回合由 VS 2026 Copilot（18.12，GPT-6.1 Sol）自行執行，原意是 TEST-17 第 1.2 項的委託演練，VS 沒有委託而是直接 review（見 TestPlan 5.2）；VS 未記錄模型，依使用者畫面補記於此。
