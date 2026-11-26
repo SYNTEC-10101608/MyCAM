@@ -39,3 +39,11 @@
 | 機構參數 | `Machine/MachineData_<機型>Type.mac`（`Spindle` / `Table` / `Mix`） | `Custom/MachineData.mac` |
 | 機構模型 | `Machine/<機型>/*.stl` | `Custom/<機型>/`（程式依 `MachineData.mac` 的機型讀取對應資料夾） |
 | 客製後處理 | `PostConfig/CustPost.cpf` | `Custom/CustPost.cpf` |
+
+## 截圖環境
+
+UI 的執行時檢查（`Tools\UICheck\UICheck.bat runtime`）要在 1920×1080、縮放 100% 的主螢幕上執行，因為產品依螢幕的工作區域最大化主視窗、置中對話框。
+
+1. 主螢幕已符合時直接執行。
+2. 不符合時，在該開發機以系統管理員權限安裝一次虛擬螢幕驅動：`winget install Parsec.ParsecVDD`。之後檢查期間會自動建立虛擬螢幕、設為主螢幕與縮放 100%（直式旋轉為 1080×1920），結束後還原並移除，不需要再以系統管理員權限執行。
+3. 檢查期間工作列與新開的視窗會移到看不見的虛擬螢幕，結束後回到原螢幕；中途中斷時，驅動約一秒後自動移除虛擬螢幕，Windows 會把原螢幕設回主螢幕。
