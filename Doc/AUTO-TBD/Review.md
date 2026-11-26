@@ -250,3 +250,23 @@
 | REV-91 | 2 | 提問 | `.github/team/process-git.md:16` | DEC-24.6 已定案使用遠端 `master`，但本機的 `origin/master`（`24c7276d`）和 `github/master`（`7829c338`）不同，照規則仍可能從不同提交起枝。考量 DEC-2.7 不把雙遠端配置寫入團隊規範，是否在團隊流程只指定以專案確認的來源遠端為準，並以本議題使用的 `origin/master` 作為 MyCAM 的選擇範例？ | 不修正（使用者決定）：以哪個 remote 為基準屬於個人的 remote 配置（DEC-2.7），團隊規範不變；`CLAUDE.local.md` 改為開分支前先詢問以哪個 remote 的 `master` 為基準 |
 | REV-92 | 6 | 建議 | `Doc/AUTO-TBD/README.md:35` | 狀態列寫 TEST-15、TEST-16 均待重跑，TestPlan 卻已記錄 TEST-15 重跑、僅 TEST-16 尚未重跑；DoD 又把最終結果與門檻都勾成完成。應依實際證據更新狀態列及 DoD，直到最終測試和門檻通過才勾選。 | 已修正（使用者同意依建議）：位置實為 `README.md:8`；狀態列更新，DoD 第 3 項在 TEST-16 重跑前取消勾選 |
 | REV-93 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:670` | TEST-9 的通過條件要求 `env-worktree.md` 說明卸載 `FCLTool`，腳本只檢查 `FCLTool.dll`、`CopyRef.bat` 與 `.worktreeinclude`，刪掉卸載步驟仍會通過。應檢查該步驟存在，或在 TestPlan 將它列為人工抽查。 | 已修正（使用者同意依建議）：TEST-9 檢查清單加入「卸載」 |
+
+## 第 10 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `24c7276d`；受審 HEAD `04b8aaf8` |
+| 工具與模型 | GitHub Copilot CLI 1.0.116、gpt-6.2-sol |
+| 日期 | 2026-11-26 |
+
+1. 門檻：新增本回合前執行 `powershell -ExecutionPolicy Bypass -File Doc/AUTO-TBD/Check.ps1 -Base 24c7276d -SkipPersonal`，8 PASS、2 FAIL（結束碼 2）。TEST-5 僅因未追蹤的交接檔 `REVIEW-REQUEST.md` 失敗；TEST-11 因 DoD 第 3、9、10 項未勾選及既有 REV 處置待人確認而失敗。TEST-9 通過；TEST-12 列 PASS，但依參數略過。增量 `git diff --check` 無異常；依本次範圍未建置。
+2. 僅審查 `89f5d06f..04b8aaf8` 及其直接影響。REV-89 已補上不實際建分支的條件；REV-90 已補記兩個全新 session 的重跑結果；REV-91 依 DEC-2.7 維持不修正團隊規範，未檢查個人設定；REV-92 已更新重跑狀態並取消勾選 DoD 第 3 項；REV-93 已加入「卸載」檢查。仍有下列不一致。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-94 | 2 | 提問 | `Doc/AUTO-TBD/TestPlan.md:135` | REV-89 的處置保留不實際建立分支的演練方式，但修訂後同一句同時要求「停下」與「再盤點」，無法判斷未獲確認就繼續是否算通過。可否在不改變 DEC-23.5 開分支順序的前提下，明訂在分支確認點停下，以及用何種模擬確認繼續驗證盤點及分級？ | 已修正（待人確認）：通過條件改為說明分支名稱與基準、不實際建立，演練中視同人已確認，接著盤點與分級；嚴重度建議改為「建議」 |
+| REV-95 | 6 | 建議 | `Doc/AUTO-TBD/TestPlan.md:188` | REV-90 的第 3 項已用兩個全新 session 重跑，但結果總述仍稱第 3、4 項在同一 session 執行、以索引對應為依據，容易被誤讀為目前的通過證據。建議明示第 3 項以最新實測為準，並分開標示沿用的第 4 項結果。 | 已修正（待人確認）：總述註明方法第 3 項以全新 session 的重跑結果為準 |
+| REV-96 | 6 | 建議 | `Doc/AUTO-TBD/README.md:35` | REV-92 取消勾選最終測試結果後，門檻項仍勾選並宣稱 `Check.ps1` 通過，但本次 TEST-11 仍失敗。建議門檻通過前保持未勾選，並區分已通過的檢查與仍待補齊的條件。 | 已修正（待人確認）：未照建議取消勾選，因為 TEST-11 會檢查本項是否勾選，兩者會互相卡住；改為寫明門檻是 TEST-11 以外全部通過 |
+| REV-97 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:670` | REV-93 新增的「卸載」可偵測整項刪除，但改成只說「卸載狀態不會保留」、不指示卸載 `FCLTool` 時，現有關鍵字仍全數命中。建議檢查卸載動作與 `FCLTool` 的關聯，或把該操作要求列為人工抽查。 | 不修正（待人確認）：`Check.ps1` 的關鍵字只用來防止整段被刪除，語意是否正確由 review 文件段負責；加嚴關鍵字只會讓措辭修改誤判失敗 |

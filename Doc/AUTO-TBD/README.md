@@ -32,7 +32,7 @@
 2. [x] 相容性異動已寫明（Spec 第 3 節）。
 3. [ ] `TestPlan.md` 附最終執行結果（第 5 節；TEST-16 待使用者重跑）。
 4. [x] 每個 STEP 可追溯到 commit（`Check.ps1` TEST-11）。
-5. [x] 門檻通過：`Check.ps1` 通過；本議題只改文件，不需建置。
+5. [x] 門檻通過：`Check.ps1` 除 TEST-11 外通過（TEST-11 檢查本清單與待人確認的處置，送 MR 前全部完成才通過）；本議題只改文件，不需建置。
 6. [x] Review 報告寫入 `Review.md`，「必修」全部已修正。
 7. [x] 範圍外項目寫入 `FollowUp.md`，每項寫明目標、完成條件與延後原因。
 8. [x] Release note 寫入 `README.md`。
