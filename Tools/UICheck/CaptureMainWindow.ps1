@@ -21,13 +21,16 @@
 # designer shows them; use it with -Mode CNC, the page the designer shows. It opens no dialog.
 # The language is set in memory only; the setting file is not changed.
 # The runner works on a hidden desktop (HiddenDesktopRun.cs) so it does not take the screen; -Visible shows it.
-# On the hidden desktop the OpenGL 3D view stays empty.
-# -Screen runs on the specified screen of the product, 1920 x 1080 or 1080 x 1920 at 100 % scaling, made the
-# primary screen for the run (VirtualDisplayRun.cs: a virtual screen when this machine has none); the main window
-# stays maximized as the program shows it and -Width / -Height are ignored. Exit code 2 when the screen cannot be
-# prepared.
+# On the hidden desktop the OpenGL 3D view stays empty. The environment variable UICHECK_VISIBLE=1 does the same as
+# -Visible, for a test machine whose screen nobody uses, so UICheck.bat captures the 3D view too.
+# -Screen runs on the specified screen of the product, 1920 x 1080 or 1080 x 1920 at 100 % scaling (VirtualDisplayRun.cs:
+# an attached screen that is one, or else a virtual screen added for the run); the main window stays maximized there
+# as the program shows it and -Width / -Height are ignored. Exit code 2 when the screen cannot be prepared.
 
 $ErrorActionPreference = "Stop"
+if ($env:UICHECK_VISIBLE -eq "1") {
+	$Visible = $true
+}
 if (-not $Root) {
 	$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 }

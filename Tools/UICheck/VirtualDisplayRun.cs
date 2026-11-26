@@ -7,17 +7,21 @@ using System.Threading;
 
 namespace UICheck
 {
-	// Runs a command line while the primary screen is the specified screen of the product: 1920 x 1080 (landscape) or
+	// Runs a command line with a screen that is the specified screen of the product: 1920 x 1080 (landscape) or
 	// 1080 x 1920 (portrait) at 100 % scaling (96 DPI), so the main window is maximized, dialogs are centered and
-	// clamped on that screen as on the target machine. Compiled by the UICheck scripts into the build output folder;
-	// stdout / stderr are inherited and the exit code is passed through.
+	// clamped on that screen as on the target machine. The device name of the screen is passed to the command in the
+	// environment variable UICHECK_SCREEN; the runners put their windows on it. Compiled by the UICheck scripts into
+	// the build output folder; stdout / stderr are inherited and the exit code is passed through.
 	//
-	// A primary screen that already is the specified screen is used as it is. Otherwise a virtual screen of the
-	// Parsec Virtual Display Driver (winget install Parsec.ParsecVDD, administrator rights once) is added for the run:
-	// it is set to the specified mode and 100 % scaling and made the primary screen, so it gets the task bar; the
-	// other screens are moved to its right. Afterwards the screens are put back and the virtual screen is removed.
-	// The driver removes its screens about a second after this process stops pinging it, so a killed run does not
-	// leave the virtual screen behind; Windows then makes a real screen primary again.
+	// The screens that are already there are never changed: their attachment, position, mode and primary state stay
+	// as they are, because a screen may not take a change (a laptop panel with the lid closed cannot be attached again
+	// once it is detached).
+	//   1. the primary screen, or else another attached screen, that already is the specified screen is used
+	//   2. otherwise a virtual screen of the Parsec Virtual Display Driver (winget install Parsec.ParsecVDD,
+	//      administrator rights once) is added for the run, right of the other screens; only the virtual screen is
+	//      set to the mode (portrait is the landscape mode rotated) and 100 % scaling, and it is removed afterwards.
+	//      Any failure removes it and stops with exit code 2. The driver also removes it about a second after this
+	//      process stops pinging, so a killed run does not leave it behind.
 	//
 	// Usage: UICheckDisplay.exe <Landscape|Portrait> <exe> [args ...]
 	// Exit code 2 when the screen cannot be prepared.
@@ -49,10 +53,14 @@ namespace UICheck
 			int nWidth = isPortrait ? SPEC_SHORT_SIDE : SPEC_LONG_SIDE;
 			int nHeight = isPortrait ? SPEC_LONG_SIDE : SPEC_SHORT_SIDE;
 			List<DisplayState> originalList = GetAttachedDisplays();
-			DisplayState primary = originalList.Find( display => display.IsPrimary );
-			if( primary != null && IsSpecScreen( primary.DeviceName, nWidth, nHeight ) ) {
-				PrintScreen( "primary screen", primary.DeviceName );
-				return RunCommand( commandArray );
+
+			// the primary screen first, it also has the task bar
+			originalList.Sort( ( a, b ) => b.IsPrimary.CompareTo( a.IsPrimary ) );
+			foreach( DisplayState display in originalList ) {
+				if( IsSpecScreen( display.DeviceName, nWidth, nHeight ) ) {
+					PrintScreen( display.IsPrimary ? "primary screen" : "screen", display.DeviceName );
+					return RunCommand( commandArray, display.DeviceName );
+				}
 			}
 			return RunOnVirtualScreen( commandArray, nWidth, nHeight, isPortrait, originalList );
 		}
@@ -64,7 +72,7 @@ namespace UICheck
 
 			// the driver is not installed (or not running)
 			if( hDevice == INVALID_HANDLE_VALUE ) {
-				Console.Error.WriteLine( "[display] the primary screen is not " + nWidth + "x" + nHeight +
+				Console.Error.WriteLine( "[display] no screen is " + nWidth + "x" + nHeight +
 					" at 96 DPI and the Parsec Virtual Display Driver is not available;" );
 				Console.Error.WriteLine( "[display] install it once with: winget install Parsec.ParsecVDD" );
 				return 2;
@@ -91,12 +99,12 @@ namespace UICheck
 					Console.Error.WriteLine( "[display] the virtual screen did not appear" );
 					return 2;
 				}
-				string szError = MakeSpecPrimary( szDevice, nWidth, nHeight, isPortrait, originalList );
+				string szError = SetVirtualMode( szDevice, nWidth, nHeight, isPortrait, originalList );
 				if( szError == null ) {
 					szError = SetScale100( szDevice );
 				}
 
-				// the task bar moves to the new primary screen and the work area follows it
+				// the task bar of the screen and the work area follow the new mode
 				Thread.Sleep( SETTLE_TIME_MS );
 				if( szError == null && IsSpecScreen( szDevice, nWidth, nHeight ) == false ) {
 					szError = "the virtual screen is not " + nWidth + "x" + nHeight + " at 96 DPI";
@@ -109,12 +117,9 @@ namespace UICheck
 					return 2;
 				}
 				PrintScreen( "virtual screen", szDevice );
-				return RunCommand( commandArray );
+				return RunCommand( commandArray, szDevice );
 			}
 			finally {
-				if( szDevice != null ) {
-					RestoreDisplays( szDevice, originalList );
-				}
 				if( nDisplayIndex >= 0 ) {
 					// the index is passed as a 16 bit big-endian number
 					byte[] indexArray = { (byte)( ( nDisplayIndex >> 8 ) & 0xFF ), (byte)( nDisplayIndex & 0xFF ) };
@@ -124,13 +129,15 @@ namespace UICheck
 				m_isStopping = true;
 				keepAlive.Join();
 				CloseHandle( hDevice );
+				WarnIfChanged( originalList );
 			}
 		}
 
-		static int RunCommand( string[] commandArray )
+		static int RunCommand( string[] commandArray, string szScreenDevice )
 		{
 			ProcessStartInfo startInfo = new ProcessStartInfo( commandArray[ 0 ], BuildArguments( commandArray ) );
 			startInfo.UseShellExecute = false;
+			startInfo.EnvironmentVariables[ SCREEN_VARIABLE ] = szScreenDevice;
 			using( Process process = Process.Start( startInfo ) ) {
 				process.WaitForExit();
 				return process.ExitCode;
@@ -194,75 +201,54 @@ namespace UICheck
 			return null;
 		}
 
-		// the virtual screen at (0, 0) as primary, the original screens keep their arrangement to its right
-		static string MakeSpecPrimary( string szDevice, int nWidth, int nHeight, bool isPortrait,
+		// only the virtual screen is changed, in one request that is applied at once: placed right of the other
+		// screens so they keep their place, never primary
+		static string SetVirtualMode( string szDevice, int nWidth, int nHeight, bool isPortrait,
 			List<DisplayState> originalList )
 		{
+			int nRight = 0;
+			foreach( DisplayState display in originalList ) {
+				DEVMODE current = NewDevMode();
+				if( EnumDisplaySettings( display.DeviceName, ENUM_CURRENT_SETTINGS, ref current ) ) {
+					nRight = Math.Max( nRight, display.X + current.dmPelsWidth );
+				}
+			}
 			DEVMODE mode = NewDevMode();
 			EnumDisplaySettings( szDevice, ENUM_CURRENT_SETTINGS, ref mode );
 			mode.dmFields = DM_POSITION | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYORIENTATION;
-			mode.dmPositionX = 0;
+			mode.dmPositionX = nRight;
 			mode.dmPositionY = 0;
 			mode.dmPelsWidth = nWidth;
 			mode.dmPelsHeight = nHeight;
 
 			// portrait is the landscape mode rotated, as on a rotated monitor
 			mode.dmDisplayOrientation = isPortrait ? DMDO_90 : DMDO_DEFAULT;
-			int nResult = ChangeDisplaySettingsEx( szDevice, ref mode, IntPtr.Zero,
-				CDS_UPDATEREGISTRY | CDS_NORESET | CDS_SET_PRIMARY, IntPtr.Zero );
+			int nResult = ChangeDisplaySettingsEx( szDevice, ref mode, IntPtr.Zero, CDS_UPDATEREGISTRY, IntPtr.Zero );
 
 			// the driver has no rotation for this mode: ask for the portrait mode itself
 			if( nResult != DISP_CHANGE_SUCCESSFUL && isPortrait ) {
 				mode.dmDisplayOrientation = DMDO_DEFAULT;
-				nResult = ChangeDisplaySettingsEx( szDevice, ref mode, IntPtr.Zero,
-					CDS_UPDATEREGISTRY | CDS_NORESET | CDS_SET_PRIMARY, IntPtr.Zero );
+				nResult = ChangeDisplaySettingsEx( szDevice, ref mode, IntPtr.Zero, CDS_UPDATEREGISTRY, IntPtr.Zero );
 			}
-			if( nResult != DISP_CHANGE_SUCCESSFUL ) {
-				return "cannot set the virtual screen to " + nWidth + "x" + nHeight + " (" + nResult + ")";
-			}
-			int nMinX = int.MaxValue;
-			int nMinY = int.MaxValue;
-			foreach( DisplayState display in originalList ) {
-				nMinX = Math.Min( nMinX, display.X );
-				nMinY = Math.Min( nMinY, display.Y );
-			}
-			foreach( DisplayState display in originalList ) {
-				nResult = MoveDisplay( display.DeviceName, nWidth + display.X - nMinX, display.Y - nMinY, false );
-				if( nResult != DISP_CHANGE_SUCCESSFUL ) {
-					return "cannot move " + display.DeviceName + " (" + nResult + ")";
+			return nResult == DISP_CHANGE_SUCCESSFUL ? null :
+				"cannot set the virtual screen to " + nWidth + "x" + nHeight + " (" + nResult + ")";
+		}
+
+		// the other screens are never changed; a difference after the run is reported, not repaired
+		static void WarnIfChanged( List<DisplayState> originalList )
+		{
+			Thread.Sleep( SETTLE_TIME_MS );
+			List<DisplayState> currentList = GetAttachedDisplays();
+			foreach( DisplayState original in originalList ) {
+				DisplayState current = currentList.Find( display => display.DeviceName == original.DeviceName );
+				bool isSame = current != null && current.X == original.X && current.Y == original.Y &&
+					current.IsPrimary == original.IsPrimary;
+				if( isSame == false ) {
+					Console.Error.WriteLine( "[display] WARNING " + original.DeviceName +
+						" is no longer attached at its place after the run; check the display settings" );
 				}
 			}
-			nResult = ChangeDisplaySettingsEx( null, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero );
-			return nResult == DISP_CHANGE_SUCCESSFUL ? null : "cannot apply the screen layout (" + nResult + ")";
 		}
-
-		// the original primary screen back at (0, 0), the virtual screen right of all others until it is removed
-		static void RestoreDisplays( string szDevice, List<DisplayState> originalList )
-		{
-			int nRight = 0;
-			foreach( DisplayState display in originalList ) {
-				DEVMODE mode = NewDevMode();
-				EnumDisplaySettings( display.DeviceName, ENUM_CURRENT_SETTINGS, ref mode );
-				nRight = Math.Max( nRight, display.X + mode.dmPelsWidth );
-				MoveDisplay( display.DeviceName, display.X, display.Y, display.IsPrimary );
-			}
-			MoveDisplay( szDevice, nRight, 0, false );
-			int nResult = ChangeDisplaySettingsEx( null, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero );
-			if( nResult != DISP_CHANGE_SUCCESSFUL ) {
-				Console.Error.WriteLine( "[display] cannot restore the screen layout (" + nResult + ")" );
-			}
-		}
-
-		static int MoveDisplay( string szDevice, int nX, int nY, bool isPrimary )
-		{
-			DEVMODE mode = NewDevMode();
-			mode.dmFields = DM_POSITION;
-			mode.dmPositionX = nX;
-			mode.dmPositionY = nY;
-			uint nFlags = CDS_UPDATEREGISTRY | CDS_NORESET | ( isPrimary ? CDS_SET_PRIMARY : 0 );
-			return ChangeDisplaySettingsEx( szDevice, ref mode, IntPtr.Zero, nFlags, IntPtr.Zero );
-		}
-
 		static bool IsSpecScreen( string szDevice, int nWidth, int nHeight )
 		{
 			MONITORINFOEX info;
@@ -477,6 +463,7 @@ namespace UICheck
 
 		#endregion
 
+		const string SCREEN_VARIABLE = "UICHECK_SCREEN";
 		static readonly object m_IoLock = new object();
 		static IntPtr m_hDevice;
 		static volatile bool m_isStopping;
@@ -509,8 +496,6 @@ namespace UICheck
 		const int DMDO_DEFAULT = 0;
 		const int DMDO_90 = 1;
 		const uint CDS_UPDATEREGISTRY = 0x1;
-		const uint CDS_SET_PRIMARY = 0x10;
-		const uint CDS_NORESET = 0x10000000;
 		const int DISP_CHANGE_SUCCESSFUL = 0;
 		const uint QDC_ONLY_ACTIVE_PATHS = 0x2;
 		const int DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME = 1;
@@ -708,10 +693,6 @@ namespace UICheck
 
 		[DllImport( "user32.dll", CharSet = CharSet.Unicode )]
 		static extern int ChangeDisplaySettingsEx( string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd,
-			uint dwflags, IntPtr lParam );
-
-		[DllImport( "user32.dll", CharSet = CharSet.Unicode )]
-		static extern int ChangeDisplaySettingsEx( string lpszDeviceName, IntPtr lpDevMode, IntPtr hwnd,
 			uint dwflags, IntPtr lParam );
 
 		[DllImport( "user32.dll" )]
