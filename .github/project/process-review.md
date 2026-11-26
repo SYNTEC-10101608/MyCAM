@@ -5,5 +5,5 @@
 1. 門檻：
    1. `Build.bat Debug` 與 `Build.bat Release` 建置成功。
    2. 修改到 C++ 專案時，另外單獨建置該專案的 Debug 與 Release（`/p:Platform=x64`）。
-   3. 修改到畫面時，`Tools\UICheck\UICheck.bat` 全部通過；新增畫面或改動版面時另跑 `runtime`（見 [coding-ui-style.md](coding-ui-style.md) 的「檢查」）。
+   3. 修改到畫面時，`Tools\UICheck\UICheck.bat` 全部通過；新增畫面或改動版面時另跑 `runtime`（見 [tool-uicheck.md](tool-uicheck.md)）。
 2. 規範：修改的檔案符合 `project/` 下的程式規範（`coding-*`）。

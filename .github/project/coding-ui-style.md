@@ -122,10 +122,7 @@
 
 ## 10. 檢查（`Tools/UICheck`）
 
-| 指令 | 內容 |
-| --- | --- |
-| `Tools\UICheck\UICheck.bat` | 靜態檢查：只讀原始碼，不需建置 |
-| `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | 另以 Debug 建置結果開啟所有畫面，在 zh-TW、zh-CN 下檢查版面、數值框操作與主視窗 |
+指令與截圖環境見 [tool-uicheck.md](tool-uicheck.md)。
 
 1. 何時必須通過見 [process-review.md](process-review.md) 的門檻；修改畫面的過程中可隨時執行。
 2. 規則依檢查對象分四組，規則名稱與內容寫在各檔開頭：靜態（`CheckStatic.ps1`）、執行時版面（`LayoutRunner.cs`）、
@@ -133,5 +130,4 @@
 3. 規範改了，對應的檢查一起改；新增規則時故意做出違規，確認能檢出。
 4. 產品程式不放為了檢查而寫的程式；檢查需要的狀態以反射呼叫產品既有的方法觸發（精靈與多狀態畫面登錄在
    `LayoutRunner.cs` 的 `STATE_MAP`）。
-5. `runtime` 在規格螢幕（第 1 節第 4 項）上執行，橫式主視窗以最大化截圖、直式以高大於寬的視窗截圖，不以縮放代替；開發機沒有規格螢幕時的準備見
-   [env-build.md](env-build.md) 的截圖環境。
+5. `runtime` 在規格螢幕（第 1 節第 4 項）上執行，橫式主視窗以最大化截圖、直式以高大於寬的視窗截圖，不以縮放代替。
