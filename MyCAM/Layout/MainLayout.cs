@@ -337,10 +337,11 @@ namespace MyCAM.Layout
 		const float HORIZONTAL_TREE_PERCENT = 22F;
 		const float HORIZONTAL_COLUMN_SCALE = 1.1F;
 
-		// landscape: bottom area share of the height, larger on the machining page; at least a quarter with the panels
+		// landscape: bottom area share of the height, larger on the machining page; with the panels, the share that
+		// puts the top of the monitor cards level with the last card of the operation column on the specified screen
 		const float HORIZONTAL_BOTTOM_PERCENT = 15F;
 		const float HORIZONTAL_MACHINING_BOTTOM_PERCENT = 25F;
-		const double HORIZONTAL_MONITOR_ROW_RATIO = 0.25;
+		const double HORIZONTAL_MONITOR_ROW_RATIO = 0.265;
 
 		// landscape: log share of the messages height while CNC alarms are shown below it in a column,
 		// and of the messages width while they are shown beside it across the bottom

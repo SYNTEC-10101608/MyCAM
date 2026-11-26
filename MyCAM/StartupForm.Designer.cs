@@ -954,7 +954,7 @@
 			// 
 			this.m_pnlTreeView.Location = new System.Drawing.Point(4, 4);
 			this.m_pnlTreeView.Name = "m_pnlTreeView";
-			this.m_pnlTreeView.Size = new System.Drawing.Size(346, 670);
+			this.m_pnlTreeView.Size = new System.Drawing.Size(346, 661);
 			this.m_pnlTreeView.TabIndex = 0;
 			// 
 			// m_pnlLog
@@ -962,7 +962,7 @@
 			this.m_pnlLog.AutoScroll = true;
 			this.m_pnlLog.Location = new System.Drawing.Point(0, 0);
 			this.m_pnlLog.Name = "m_pnlLog";
-			this.m_pnlLog.Size = new System.Drawing.Size(371, 224);
+			this.m_pnlLog.Size = new System.Drawing.Size(371, 233);
 			this.m_pnlLog.TabIndex = 7;
 			// 
 			// m_pnlMessages
@@ -970,7 +970,7 @@
 			this.m_pnlMessages.Controls.Add(this.m_pnlLog);
 			this.m_pnlMessages.Location = new System.Drawing.Point(4, 4);
 			this.m_pnlMessages.Name = "m_pnlMessages";
-			this.m_pnlMessages.Size = new System.Drawing.Size(371, 224);
+			this.m_pnlMessages.Size = new System.Drawing.Size(371, 233);
 			this.m_pnlMessages.TabIndex = 0;
 			this.m_pnlMessages.SizeChanged += new System.EventHandler(this.OnMessagesSizeChanged);
 			// 
@@ -980,7 +980,7 @@
 			this.m_pnlViewer.Controls.Add(this.m_tsViewerToolBar);
 			this.m_pnlViewer.Location = new System.Drawing.Point(358, 4);
 			this.m_pnlViewer.Name = "m_pnlViewer";
-			this.m_pnlViewer.Size = new System.Drawing.Size(1250, 670);
+			this.m_pnlViewer.Size = new System.Drawing.Size(1250, 661);
 			this.m_pnlViewer.TabIndex = 1;
 			// 
 			// m_tsLayer
@@ -1285,7 +1285,7 @@
 			// 
 			this.m_pnlCNCInfo.Location = new System.Drawing.Point(375, -4);
 			this.m_pnlCNCInfo.Name = "m_pnlCNCInfo";
-			this.m_pnlCNCInfo.Size = new System.Drawing.Size(1241, 240);
+			this.m_pnlCNCInfo.Size = new System.Drawing.Size(1241, 249);
 			this.m_pnlCNCInfo.TabIndex = 9;
 			this.m_pnlCNCInfo.Visible = false;
 			// 
@@ -1293,9 +1293,9 @@
 			// 
 			this.m_pnlBottom.Controls.Add(this.m_pnlMessages);
 			this.m_pnlBottom.Controls.Add(this.m_pnlCNCInfo);
-			this.m_pnlBottom.Location = new System.Drawing.Point(0, 678);
+			this.m_pnlBottom.Location = new System.Drawing.Point(0, 669);
 			this.m_pnlBottom.Name = "m_pnlBottom";
-			this.m_pnlBottom.Size = new System.Drawing.Size(1612, 232);
+			this.m_pnlBottom.Size = new System.Drawing.Size(1612, 241);
 			this.m_pnlBottom.TabIndex = 10;
 			// 
 			// m_pnlBackGround
