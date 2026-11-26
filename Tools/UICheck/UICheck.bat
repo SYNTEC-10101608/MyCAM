@@ -27,8 +27,8 @@ if errorlevel 1 set "RESULT=1"
 REM main window screenshots go to the temp folder when no screenshot folder is given
 set "SHOTS=%~f2"
 if "%~2"=="" set "SHOTS=%TEMP%\UICheck"
-REM each language x page (CAD start page, CAM, CNC machining) x landscape / portrait, maximized on the specified screen
-REM (1920 x 1080 / 1080 x 1920 at 100 %; a virtual screen when this machine has none, see VirtualDisplayRun.cs)
+REM each language x page (CAD start page, CAM, CNC machining) x landscape (maximized) / portrait (1080 x 1880 window),
+REM on the specified screen 1920 x 1080 at 100 % (a virtual screen when this machine has none, see VirtualDisplayRun.cs)
 for %%L in (zh-TW zh-CN) do (
 	for %%M in (CAD CAM CNC) do (
 		echo ## main window: %%L %%M

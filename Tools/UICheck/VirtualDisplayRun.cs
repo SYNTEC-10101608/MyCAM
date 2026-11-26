@@ -7,11 +7,12 @@ using System.Threading;
 
 namespace UICheck
 {
-	// Runs a command line with a screen that is the specified screen of the product: 1920 x 1080 (landscape) or
-	// 1080 x 1920 (portrait) at 100 % scaling (96 DPI), so the main window is maximized, dialogs are centered and
-	// clamped on that screen as on the target machine. The device name of the screen is passed to the command in the
-	// environment variable UICHECK_SCREEN; the runners put their windows on it. Compiled by the UICheck scripts into
-	// the build output folder; stdout / stderr are inherited and the exit code is passed through.
+	// Runs a command line with a screen that is the specified screen of the product: 1920 x 1080 at 100 % scaling
+	// (96 DPI), so the main window is maximized, dialogs are centered and clamped on that screen as on the target
+	// machine. Portrait needs no screen of its own: MainLayout only looks at the aspect ratio of the main window, so
+	// the runner sizes the window taller than wide on this screen. The device name of the screen is passed to the
+	// command in the environment variable UICHECK_SCREEN; the runners put their windows on it. Compiled by the UICheck
+	// scripts into the build output folder; stdout / stderr are inherited and the exit code is passed through.
 	//
 	// The screens that are already there are never changed: their attachment, position, mode and primary state stay
 	// as they are, because a screen may not take a change (a laptop panel with the lid closed cannot be attached again
@@ -19,39 +20,26 @@ namespace UICheck
 	//   1. the primary screen, or else another attached screen, that already is the specified screen is used
 	//   2. otherwise a virtual screen of the Parsec Virtual Display Driver (winget install Parsec.ParsecVDD,
 	//      administrator rights once) is added for the run, right of the other screens; only the virtual screen is
-	//      set to the mode (portrait is the landscape mode rotated) and 100 % scaling, and it is removed afterwards.
-	//      Any failure removes it and stops with exit code 2. The driver also removes it about a second after this
-	//      process stops pinging, so a killed run does not leave it behind.
+	//      set to the mode and 100 % scaling, and it is removed afterwards. Any failure removes it and stops with exit
+	//      code 2. The driver also removes it about a second after this process stops pinging, so a killed run does
+	//      not leave it behind.
 	//
-	// Usage: UICheckDisplay.exe <Landscape|Portrait> <exe> [args ...]
+	// Usage: UICheckDisplay.exe <exe> [args ...]
 	// Exit code 2 when the screen cannot be prepared.
 	internal static class VirtualDisplayRun
 	{
 		static int Main( string[] args )
 		{
-			if( args.Length < 2 ) {
-				Console.Error.WriteLine( "usage: UICheckDisplay.exe <Landscape|Portrait> <exe> [args ...]" );
+			if( args.Length < 1 ) {
+				Console.Error.WriteLine( "usage: UICheckDisplay.exe <exe> [args ...]" );
 				return 2;
 			}
-			bool isPortrait;
-			if( string.Equals( args[ 0 ], "Portrait", StringComparison.OrdinalIgnoreCase ) ) {
-				isPortrait = true;
-			}
-			else if( string.Equals( args[ 0 ], "Landscape", StringComparison.OrdinalIgnoreCase ) ) {
-				isPortrait = false;
-			}
-			else {
-				Console.Error.WriteLine( "[display] unknown orientation " + args[ 0 ] +
-					", expected Landscape / Portrait" );
-				return 2;
-			}
-			string[] commandArray = new string[ args.Length - 1 ];
-			Array.Copy( args, 1, commandArray, 0, commandArray.Length );
+			string[] commandArray = args;
 
 			// monitor sizes and DPI are only reported unscaled to a per-monitor DPI aware process
 			SetProcessDpiAwarenessContext( new IntPtr( DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ) );
-			int nWidth = isPortrait ? SPEC_SHORT_SIDE : SPEC_LONG_SIDE;
-			int nHeight = isPortrait ? SPEC_LONG_SIDE : SPEC_SHORT_SIDE;
+			int nWidth = SPEC_WIDTH;
+			int nHeight = SPEC_HEIGHT;
 			List<DisplayState> originalList = GetAttachedDisplays();
 
 			// the primary screen first, it also has the task bar
@@ -59,13 +47,16 @@ namespace UICheck
 			foreach( DisplayState display in originalList ) {
 				if( IsSpecScreen( display.DeviceName, nWidth, nHeight ) ) {
 					PrintScreen( display.IsPrimary ? "primary screen" : "screen", display.DeviceName );
+					if( HasTaskBar( display.DeviceName ) == false ) {
+						return 2;
+					}
 					return RunCommand( commandArray, display.DeviceName );
 				}
 			}
-			return RunOnVirtualScreen( commandArray, nWidth, nHeight, isPortrait, originalList );
+			return RunOnVirtualScreen( commandArray, nWidth, nHeight, originalList );
 		}
 
-		static int RunOnVirtualScreen( string[] commandArray, int nWidth, int nHeight, bool isPortrait,
+		static int RunOnVirtualScreen( string[] commandArray, int nWidth, int nHeight,
 			List<DisplayState> originalList )
 		{
 			IntPtr hDevice = OpenParsecDevice();
@@ -99,7 +90,7 @@ namespace UICheck
 					Console.Error.WriteLine( "[display] the virtual screen did not appear" );
 					return 2;
 				}
-				string szError = SetVirtualMode( szDevice, nWidth, nHeight, isPortrait, originalList );
+				string szError = SetVirtualMode( szDevice, nWidth, nHeight, originalList );
 				if( szError == null ) {
 					szError = SetScale100( szDevice );
 				}
@@ -117,6 +108,9 @@ namespace UICheck
 					return 2;
 				}
 				PrintScreen( "virtual screen", szDevice );
+				if( HasTaskBar( szDevice ) == false ) {
+					return 2;
+				}
 				return RunCommand( commandArray, szDevice );
 			}
 			finally {
@@ -203,8 +197,7 @@ namespace UICheck
 
 		// only the virtual screen is changed, in one request that is applied at once: placed right of the other
 		// screens so they keep their place, never primary
-		static string SetVirtualMode( string szDevice, int nWidth, int nHeight, bool isPortrait,
-			List<DisplayState> originalList )
+		static string SetVirtualMode( string szDevice, int nWidth, int nHeight, List<DisplayState> originalList )
 		{
 			int nRight = 0;
 			foreach( DisplayState display in originalList ) {
@@ -215,21 +208,12 @@ namespace UICheck
 			}
 			DEVMODE mode = NewDevMode();
 			EnumDisplaySettings( szDevice, ENUM_CURRENT_SETTINGS, ref mode );
-			mode.dmFields = DM_POSITION | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYORIENTATION;
+			mode.dmFields = DM_POSITION | DM_PELSWIDTH | DM_PELSHEIGHT;
 			mode.dmPositionX = nRight;
 			mode.dmPositionY = 0;
 			mode.dmPelsWidth = nWidth;
 			mode.dmPelsHeight = nHeight;
-
-			// portrait is the landscape mode rotated, as on a rotated monitor
-			mode.dmDisplayOrientation = isPortrait ? DMDO_90 : DMDO_DEFAULT;
 			int nResult = ChangeDisplaySettingsEx( szDevice, ref mode, IntPtr.Zero, CDS_UPDATEREGISTRY, IntPtr.Zero );
-
-			// the driver has no rotation for this mode: ask for the portrait mode itself
-			if( nResult != DISP_CHANGE_SUCCESSFUL && isPortrait ) {
-				mode.dmDisplayOrientation = DMDO_DEFAULT;
-				nResult = ChangeDisplaySettingsEx( szDevice, ref mode, IntPtr.Zero, CDS_UPDATEREGISTRY, IntPtr.Zero );
-			}
 			return nResult == DISP_CHANGE_SUCCESSFUL ? null :
 				"cannot set the virtual screen to " + nWidth + "x" + nHeight + " (" + nResult + ")";
 		}
@@ -259,6 +243,21 @@ namespace UICheck
 			int nMonitorWidth = info.rcMonitor.Right - info.rcMonitor.Left;
 			int nMonitorHeight = info.rcMonitor.Bottom - info.rcMonitor.Top;
 			return nMonitorWidth == nWidth && nMonitorHeight == nHeight && nDpi == SPEC_DPI;
+		}
+
+		// the target machine shows the task bar on its screen; without one the maximized main window is higher
+		// than there
+		static bool HasTaskBar( string szDevice )
+		{
+			MONITORINFOEX info;
+			uint nDpi;
+			GetMonitor( szDevice, out info, out nDpi );
+			bool isWorkAreaSmaller = info.rcWork.Bottom - info.rcWork.Top < info.rcMonitor.Bottom - info.rcMonitor.Top;
+			if( isWorkAreaSmaller == false ) {
+				Console.Error.WriteLine( "[display] " + szDevice + " has no task bar; turn on Settings > " +
+					"Personalization > Taskbar > Taskbar behaviors > Show my taskbar on all displays" );
+			}
+			return isWorkAreaSmaller;
 		}
 
 		static void PrintScreen( string szKind, string szDevice )
@@ -468,8 +467,8 @@ namespace UICheck
 		static IntPtr m_hDevice;
 		static volatile bool m_isStopping;
 
-		const int SPEC_LONG_SIDE = 1920;
-		const int SPEC_SHORT_SIDE = 1080;
+		const int SPEC_WIDTH = 1920;
+		const int SPEC_HEIGHT = 1080;
 		const uint SPEC_DPI = 96;
 		const int APPEAR_TIMEOUT_MS = 10000;
 		const int POLL_INTERVAL_MS = 200;
@@ -490,11 +489,8 @@ namespace UICheck
 		const uint DISPLAY_DEVICE_PRIMARY_DEVICE = 0x4;
 		const int ENUM_CURRENT_SETTINGS = -1;
 		const int DM_POSITION = 0x20;
-		const int DM_DISPLAYORIENTATION = 0x80;
 		const int DM_PELSWIDTH = 0x80000;
 		const int DM_PELSHEIGHT = 0x100000;
-		const int DMDO_DEFAULT = 0;
-		const int DMDO_90 = 1;
 		const uint CDS_UPDATEREGISTRY = 0x1;
 		const int DISP_CHANGE_SUCCESSFUL = 0;
 		const uint QDC_ONLY_ACTIVE_PATHS = 0x2;

@@ -75,7 +75,7 @@ try {
 				$command = @( $hidden ) + $command
 			}
 			if (-not $CurrentScreen) {
-				$command = @( $display, "Landscape" ) + $command
+				$command = @( $display ) + $command
 			}
 			$commandArguments = @( $command | Select-Object -Skip 1 )
 			& $command[ 0 ] @commandArguments
