@@ -31,3 +31,31 @@
 | REV-9 | 6 | 建議 | 本回合的 commit | STEP-12 的前幾個 commit 標題沒有 `(STEP-12)` | 已修正：push 前改寫本機 commit 標題 |
 | REV-10 | 3 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs` | 第一版把虛擬螢幕設為主螢幕並移動其他螢幕；在闔蓋的筆電上移動面板失敗後，已寫入的配置仍被套用，面板被卸離且無法掛回，遠端畫面全黑 | 已修正：不更動既有螢幕，只加入並設定虛擬副螢幕，失敗只移除它；結束後檢查其他螢幕（DEC-13 第 4 項）。本機以 Parsec 虛擬螢幕恢復畫面 |
 | REV-11 | 5 | 建議 | `MyCAM/Layout/MainLayout.cs` | 使用者人工檢視：橫式加工頁的監控卡片上緣比右側「加工控制」卡片低 9 px | 已修正：底部列比例 0.25 → 0.265，Designer 與主視窗區域基準同步更新（DEC-14） |
+
+## 第 8 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-23254 |
+| 分支 | `AUTO-23254_f_UIStyleUnify` |
+| 比對基準 | `bd0fa270`；受審 HEAD `61fd9c20`（整個分支） |
+| 工具與模型 | GitHub Copilot CLI（`Invoke-CopilotReview.ps1`）、gpt-6.2-sol、推理強度 high |
+| 日期 | 2026-11-26 |
+
+| 門檻 | 結果 |
+| --- | --- |
+| `Build.bat Debug`、`Build.bat Release` | 施工方於受審 HEAD 執行通過，本回合未重跑 |
+| `Tools\UICheck\UICheck.bat` | Reviewer 重跑通過：34 個 Designer 檔、0 個問題 |
+| `Tools\UICheck\DesignerDiff.ps1 -Base bd0fa270 -Head 61fd9c20` | Reviewer 執行語意比對：39 個檔，38 個有語意差異、1 個僅格式差異 |
+| `Tools\UICheck\UICheck.bat runtime` | 施工方於受審 HEAD 使用 1920×1080 虛擬主螢幕執行通過；本回合依請求不執行可能更動顯示設定的指令，未重跑 |
+| `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | 施工方於受審 HEAD 執行通過，本回合未重跑 |
+
+靜態核對確認 `master` 的主從軸條件、三點校正的輸入通知、四軸時隱藏第二旋轉軸，以及主視窗與執行檔圖示均有保留；`TEST-19` 的人工操作與 CNC 實機確認仍待執行。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-12 | 3 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs:189` | 建立虛擬螢幕後，程式把首個不在初始清單的 GDI 裝置當成這次新增的 Parsec 螢幕，未核對裝置身分。若同時有其他螢幕重新掛載，解析度、位置與縮放可能寫到該螢幕，且清理只會移除本次新增的 Parsec 裝置，違反 DEC-13 不更動既有螢幕的要求。寫入前應確認目標是本次新增的虛擬螢幕，無法唯一確認就中止。 | 待處置 |
+| REV-13 | 3 | 必修 | `Tools/UICheck/LayoutRunner.cs:147` | 啟動程式以 `UICHECK_SCREEN` 傳入規格螢幕，但 `LayoutRunner` 沒有讀取，仍依預設位置顯示對話框，面板宿主也固定從 `(0,0)` 開啟。只有副螢幕合規時，視窗仍可能落在不合規的主螢幕，讓尺寸檢查及截圖偏離規格。應依指定螢幕定位，並確認視窗實際所在螢幕，保留 `-CurrentScreen` 的快速檢查模式。 | 待處置 |
+| REV-14 | 3 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs:447` | `GetOverlappedResultEx` 逾時並不會取消背景 I/O，但 `finally` 隨即關閉事件並釋放 `OVERLAPPED` 和緩衝區。仍在執行的 I/O 可能存取已釋放的記憶體，使檢查程式崩潰並中斷清理。應區分同步完成、立即失敗及待完成；逾時時取消該要求，等到 I/O 確實結束再釋放資源。 | 待處置 |
+| REV-15 | 3 | 必修 | `CncUI/Panel/CNCInfoPanel.cs:143` | 直式版面依 `Top` 分列，新加入的軸色塊比同軸標籤低 7 px，因此五個色塊各被排成一列。之後 `PlaceAxisMarkers` 把色塊移回標籤旁，卻留下五列空白，撐高座標卡片並擠壓下方卡片。建立列格線時應排除由 `PlaceAxisMarkers` 定位的色塊，並確認四軸及五軸的直式畫面。 | 待處置 |
+| REV-16 | 3 | 建議 | `MyCAM/Resource/IconSource/RenderIcons.ps1:47` | `Head` 用目前文化格式化路徑座標；在 `ru-RU` 實測，小數逗號與座標分隔逗號混用，WPF 無法解析路徑。重新產生圖示可能在部分 PNG 已覆蓋後中止，但不影響本分支已提交的圖示。應使用不隨文化變動的數字格式，並在使用小數逗號的環境驗證。 | 待處置 |
