@@ -101,7 +101,7 @@ namespace UICheck
 			}
 
 			// the screen VirtualDisplayRun prepared; the window is moved there before it is maximized or sized
-			Screen targetScreen = FindTargetScreen();
+			Screen targetScreen = LayoutRunner.FindTargetScreen();
 			if( targetScreen != null ) {
 				mainForm.WindowState = FormWindowState.Normal;
 				SetWindowPos( mainForm.Handle, IntPtr.Zero, targetScreen.Bounds.X, targetScreen.Bounds.Y, 0, 0,
@@ -174,22 +174,6 @@ namespace UICheck
 			Console.WriteLine( "[capture] {0}", szOutFile );
 			Console.WriteLine( "{0} problems", nProblemCount );
 			return nProblemCount == 0 ? 0 : 1;
-		}
-
-		// UICHECK_SCREEN names the screen VirtualDisplayRun prepared; null when the runner is started without it
-		static Screen FindTargetScreen()
-		{
-			string szDevice = Environment.GetEnvironmentVariable( "UICHECK_SCREEN" );
-			if( string.IsNullOrEmpty( szDevice ) ) {
-				return null;
-			}
-			foreach( Screen screen in Screen.AllScreens ) {
-				if( screen.DeviceName == szDevice ) {
-					return screen;
-				}
-			}
-			Console.WriteLine( "screen {0} from UICHECK_SCREEN not found, using the primary screen", szDevice );
-			return null;
 		}
 
 		// the regions MainLayout places, in client coordinates of the main window, so a layout change can be compared

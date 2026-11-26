@@ -90,13 +90,20 @@ namespace UICheck
 					Console.Error.WriteLine( "[display] the virtual screen did not appear" );
 					return 2;
 				}
-				string szError = SetVirtualMode( szDevice, nWidth, nHeight, originalList );
+				string szError = SetVirtualMode( szDevice, nWidth, nHeight );
 				if( szError == null ) {
 					szError = SetScale100( szDevice );
 				}
 
 				// the task bar of the screen and the work area follow the new mode
 				Thread.Sleep( SETTLE_TIME_MS );
+
+				// Windows applies the layout it saved for this set of screens, which can make the new screen primary
+				// and move the others; the check does not run on a changed desktop, removing the screen restores it
+				if( szError == null && IsUnchanged( originalList ) == false ) {
+					szError = "Windows rearranged the existing screens when the virtual screen was added (a saved " +
+						"display layout); arrange the screens once with the virtual screen to the right";
+				}
 				if( szError == null && IsSpecScreen( szDevice, nWidth, nHeight ) == false ) {
 					szError = "the virtual screen is not " + nWidth + "x" + nHeight + " at 96 DPI";
 				}
@@ -155,6 +162,7 @@ namespace UICheck
 		sealed class DisplayState
 		{
 			public string DeviceName;
+			public string AdapterName;
 			public bool IsPrimary;
 			public int X;
 			public int Y;
@@ -171,6 +179,7 @@ namespace UICheck
 				if( isAttached && EnumDisplaySettings( device.DeviceName, ENUM_CURRENT_SETTINGS, ref mode ) ) {
 					DisplayState display = new DisplayState();
 					display.DeviceName = device.DeviceName;
+					display.AdapterName = device.DeviceString;
 					display.IsPrimary = ( device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE ) != 0;
 					display.X = mode.dmPositionX;
 					display.Y = mode.dmPositionY;
@@ -181,41 +190,64 @@ namespace UICheck
 			return displayList;
 		}
 
+		// the screen this run added: new since the start and on the Parsec adapter; another screen attached at the
+		// same time could otherwise be taken for it and changed
 		static string WaitForNewDisplay( List<DisplayState> originalList )
 		{
 			for( int nWaited = 0; nWaited < APPEAR_TIMEOUT_MS; nWaited += POLL_INTERVAL_MS ) {
+				List<string> newList = new List<string>();
 				foreach( DisplayState display in GetAttachedDisplays() ) {
 					bool isNew = originalList.Find( original => original.DeviceName == display.DeviceName ) == null;
-					if( isNew ) {
-						return display.DeviceName;
+					if( isNew && display.AdapterName == PARSEC_ADAPTER_NAME ) {
+						newList.Add( display.DeviceName );
 					}
+				}
+
+				// more than one new Parsec screen: which one is ours cannot be told, nothing is changed
+				if( newList.Count > 1 ) {
+					Console.Error.WriteLine( "[display] more than one new virtual screen: " +
+						string.Join( ", ", newList ) );
+					return null;
+				}
+				if( newList.Count == 1 ) {
+					return newList[ 0 ];
 				}
 				Thread.Sleep( POLL_INTERVAL_MS );
 			}
 			return null;
 		}
 
-		// only the virtual screen is changed, in one request that is applied at once: placed right of the other
-		// screens so they keep their place, never primary
-		static string SetVirtualMode( string szDevice, int nWidth, int nHeight, List<DisplayState> originalList )
+		// only the virtual screen is changed, and only when it does not start in the mode: Windows already places a
+		// new screen beside the others without moving them, and it is never made primary
+		static string SetVirtualMode( string szDevice, int nWidth, int nHeight )
 		{
-			int nRight = 0;
-			foreach( DisplayState display in originalList ) {
-				DEVMODE current = NewDevMode();
-				if( EnumDisplaySettings( display.DeviceName, ENUM_CURRENT_SETTINGS, ref current ) ) {
-					nRight = Math.Max( nRight, display.X + current.dmPelsWidth );
-				}
-			}
 			DEVMODE mode = NewDevMode();
 			EnumDisplaySettings( szDevice, ENUM_CURRENT_SETTINGS, ref mode );
-			mode.dmFields = DM_POSITION | DM_PELSWIDTH | DM_PELSHEIGHT;
-			mode.dmPositionX = nRight;
-			mode.dmPositionY = 0;
+			bool isInMode = mode.dmPelsWidth == nWidth && mode.dmPelsHeight == nHeight;
+			if( isInMode ) {
+				return null;
+			}
+			mode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
 			mode.dmPelsWidth = nWidth;
 			mode.dmPelsHeight = nHeight;
 			int nResult = ChangeDisplaySettingsEx( szDevice, ref mode, IntPtr.Zero, CDS_UPDATEREGISTRY, IntPtr.Zero );
 			return nResult == DISP_CHANGE_SUCCESSFUL ? null :
 				"cannot set the virtual screen to " + nWidth + "x" + nHeight + " (" + nResult + ")";
+		}
+
+		// the screens that were there keep their attachment, place and primary state
+		static bool IsUnchanged( List<DisplayState> originalList )
+		{
+			List<DisplayState> currentList = GetAttachedDisplays();
+			foreach( DisplayState original in originalList ) {
+				DisplayState current = currentList.Find( display => display.DeviceName == original.DeviceName );
+				bool isSame = current != null && current.X == original.X && current.Y == original.Y &&
+					current.IsPrimary == original.IsPrimary;
+				if( isSame == false ) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		// the other screens are never changed; a difference after the run is reported, not repaired
@@ -441,12 +473,22 @@ namespace UICheck
 					NativeOverlapped overlapped = new NativeOverlapped();
 					overlapped.EventHandle = hEvent;
 					Marshal.StructureToPtr( overlapped, pOverlapped, false );
-					DeviceIoControl( m_hDevice, nCode, pInput, IO_INPUT_SIZE, pOutput, sizeof( int ), IntPtr.Zero,
-						pOverlapped );
+					bool isStarted = DeviceIoControl( m_hDevice, nCode, pInput, IO_INPUT_SIZE, pOutput, sizeof( int ),
+						IntPtr.Zero, pOverlapped );
+
+					// failed at once: no request is pending, the buffers can be freed
+					if( isStarted == false && Marshal.GetLastWin32Error() != ERROR_IO_PENDING ) {
+						return -1;
+					}
 					uint nTransferred;
 					bool isDone = GetOverlappedResultEx( m_hDevice, pOverlapped, out nTransferred, IO_TIMEOUT_MS,
 						false );
+
+					// timed out: the request still uses the buffers, so it is cancelled and waited for before they
+					// are freed
 					if( isDone == false ) {
+						CancelIoEx( m_hDevice, pOverlapped );
+						GetOverlappedResult( m_hDevice, pOverlapped, out nTransferred, true );
 						return -1;
 					}
 					return Marshal.ReadInt32( pOutput );
@@ -482,6 +524,8 @@ namespace UICheck
 		const uint IOCTL_ADD = 0x0022e004;
 		const uint IOCTL_REMOVE = 0x0022a008;
 		const uint IOCTL_UPDATE = 0x0022a00c;
+		const string PARSEC_ADAPTER_NAME = "Parsec Virtual Display Adapter";
+		const int ERROR_IO_PENDING = 997;
 
 		const int DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = -4;
 		const int MDT_EFFECTIVE_DPI = 0;
@@ -751,6 +795,13 @@ namespace UICheck
 		[DllImport( "kernel32.dll", SetLastError = true )]
 		static extern bool GetOverlappedResultEx( IntPtr hFile, IntPtr lpOverlapped,
 			out uint lpNumberOfBytesTransferred, uint dwMilliseconds, bool bAlertable );
+
+		[DllImport( "kernel32.dll", SetLastError = true )]
+		static extern bool GetOverlappedResult( IntPtr hFile, IntPtr lpOverlapped,
+			out uint lpNumberOfBytesTransferred, bool bWait );
+
+		[DllImport( "kernel32.dll", SetLastError = true )]
+		static extern bool CancelIoEx( IntPtr hFile, IntPtr lpOverlapped );
 
 		[DllImport( "kernel32.dll" )]
 		static extern bool CloseHandle( IntPtr hObject );

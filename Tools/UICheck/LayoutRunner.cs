@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using CommonUI.Controls;
+using CommonUI.Layout;
 using CommonUI.Theme;
 
 namespace UICheck
@@ -51,6 +52,14 @@ namespace UICheck
 			app.GetType( "MyCAM.App.MyApp" ).GetMethod( "Initialize" ).Invoke( null, null );
 			LanguageManager.LanguageManager.CurrentUILanguage = szLanguage;
 			ThemeFonts.Initialize( szLanguage );
+
+			// no main window registers the dialog area here: dialogs are centered and clamped on the screen
+			// VirtualDisplayRun prepared, as they are on the target machine
+			m_TargetScreen = FindTargetScreen();
+			if( m_TargetScreen != null ) {
+				Rectangle targetArea = m_TargetScreen.WorkingArea;
+				DialogPlacement.AreaProvider = () => targetArea;
+			}
 
 			int nProblemCount = 0;
 			int nCheckedCount = 0;
@@ -252,7 +261,7 @@ namespace UICheck
 			host.FormBorderStyle = FormBorderStyle.None;
 			host.ShowInTaskbar = false;
 			host.StartPosition = FormStartPosition.Manual;
-			host.Location = new Point( 0, 0 );
+			host.Location = m_TargetScreen != null ? m_TargetScreen.Bounds.Location : Point.Empty;
 			host.ClientSize = size;
 			host.Font = ThemeFonts.Body;
 			host.BackColor = ThemeColors.WINDOW;
@@ -262,6 +271,22 @@ namespace UICheck
 		}
 
 		#region Placeholder constructor arguments
+
+		// UICHECK_SCREEN names the screen VirtualDisplayRun prepared; null when the runner is started without it
+		internal static Screen FindTargetScreen()
+		{
+			string szDevice = Environment.GetEnvironmentVariable( "UICHECK_SCREEN" );
+			if( string.IsNullOrEmpty( szDevice ) ) {
+				return null;
+			}
+			foreach( Screen screen in Screen.AllScreens ) {
+				if( screen.DeviceName == szDevice ) {
+					return screen;
+				}
+			}
+			Console.WriteLine( "screen {0} from UICHECK_SCREEN not found, using the primary screen", szDevice );
+			return null;
+		}
 
 		internal static object CreateInstance( Type type )
 		{
@@ -480,6 +505,9 @@ namespace UICheck
 		const int TITLE_INDENT = ThemeMetrics.SECTION_PADDING + 3 + ThemeMetrics.CONTROL_GAP;
 		const int BUTTON_TEXT_PADDING = 12;
 		const int CHECK_GLYPH_WIDTH = 18;
+
+		// the screen VirtualDisplayRun prepared, null without it
+		static Screen m_TargetScreen;
 
 		// states of the wizards, each checked on a new instance: "Method arg arg ..." called before the check
 		static readonly Dictionary<string, string[]> STATE_MAP = new Dictionary<string, string[]>
