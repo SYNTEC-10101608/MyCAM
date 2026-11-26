@@ -149,7 +149,7 @@ namespace MyCAM.Editor
 
 			// show edit point marks
 			m_EditPointRenderer?.Remove();
-			m_EditPointRenderer = new EditPointRenderer( m_Viewer, m_CurrentPathID );
+			m_EditPointRenderer = new EditPointRenderer( m_Viewer, m_CurrentPathID, m_OrignalTrsfCADPointList );
 			m_EditPointRenderer.Show( true );
 			return true;
 		}
@@ -238,6 +238,12 @@ namespace MyCAM.Editor
 				m_Dlg.ResetParam( m_Param );
 				UpdateCoordinate();
 			}
+			else {
+				m_nSelectIndex = NULL_SELECT_INDEX;
+				m_Param = null;
+				m_Dlg.ResetParam( null );
+				UpdateCoordinate();
+			}
 		}
 
 		bool TryBuildContourEditParameter( RefCoordinateType refCoordinateType, int cadIndex, bool? isPathStartPoint )
@@ -249,14 +255,19 @@ namespace MyCAM.Editor
 			bool isModified = false;
 			ContourEditData data = new ContourEditData();
 
-			if( isPathStartPoint != null ) {
+			if( isPathStartPoint == true ) {
+				isModified = ( m_CraftData.StartPntContourEditData.StartPnt != null );
 
-				// startpoint always exists
-				isModified = true;
+				if( isModified ) {
+					data = m_CraftData.StartPntContourEditData.StartPnt;
+				}
+			}
+			else if( isPathStartPoint == false ) {
+				isModified = ( m_CraftData.StartPntContourEditData.EndPnt != null );
 
-				data = ( isPathStartPoint == true )
-					? m_CraftData.StartPntContourEditData.StartPnt
-					: m_CraftData.StartPntContourEditData.EndPnt;
+				if( isModified ) {
+					data = m_CraftData.StartPntContourEditData.EndPnt;
+				}
 			}
 			else {
 				isModified = m_CraftData.ContourEditMap.ContainsKey( cadIndex );
@@ -266,19 +277,48 @@ namespace MyCAM.Editor
 				}
 			}
 
+			if( !TryGetTotalDisplacement( cadIndex, refCoordinateType, out gp_Vec displayDisplacement ) ) {
+				return false;
+			}
+
 			m_BaseWorldDX = data.DX;
 			m_BaseWorldDY = data.DY;
 			m_BaseWorldDZ = data.DZ;
 
-			gp_Vec displayDisplacement = new gp_Vec( m_BaseWorldDX, m_BaseWorldDY, m_BaseWorldDZ );
-
-			if( refCoordinateType == RefCoordinateType.Local
-				&& TryConvertWorldToLocal( displayDisplacement, out gp_Vec localDisplacement ) ) {
-				displayDisplacement = localDisplacement;
-			}
-
 			m_Param = new ContourEditParam( refCoordinateType, isModified, isPathStartPoint, displayDisplacement.X(), displayDisplacement.Y(), displayDisplacement.Z() );
 
+			return true;
+		}
+
+		bool TryGetTotalDisplacement( int cadIndex, RefCoordinateType refCoordinateType, out gp_Vec totalDisplacement )
+		{
+			totalDisplacement = null;
+			List<CAMPoint> camPointList = m_PathCache.MainPathPointList;
+			int originalCADIndex = cadIndex;
+
+			// A closed path's end point shares the start point's CAD source.
+			if( SpecialPointIndex.IsClosedPointIndex( cadIndex ) && camPointList != null && camPointList.Count > 0 ) {
+				originalCADIndex = camPointList.First().InitPathIndex;
+			}
+
+			int trsfCADIndex = m_PathCache.OriginalIndexMap.IndexOf( originalCADIndex );
+			if( m_OrignalTrsfCADPointList == null || trsfCADIndex < 0
+				|| trsfCADIndex >= m_OrignalTrsfCADPointList.Count || !TryGetCAMPoint( cadIndex, out CAMPoint camPoint ) ) {
+				string szMessage = string.Format(
+					m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), m_CurrentPathID );
+				MyApp.Logger.ShowOnLogPanel( szMessage, MyApp.NoticeType.Warning );
+				return false;
+			}
+
+			gp_Vec worldDisplacement = new gp_Vec( m_OrignalTrsfCADPointList[ trsfCADIndex ], camPoint.Point );
+			if( refCoordinateType == RefCoordinateType.Local ) {
+				if( !TryConvertWorldToLocal( worldDisplacement, out totalDisplacement ) ) {
+					return false;
+				}
+			}
+			else {
+				totalDisplacement = worldDisplacement;
+			}
 			return true;
 		}
 
@@ -336,19 +376,15 @@ namespace MyCAM.Editor
 					m_CraftData.SetStartPntContourEdit( m_Param.IsPathStartPoint.Value, worldDX, worldDY, worldDZ );
 				}
 				else {
-					m_CraftData.SetContourEditPoint( m_nSelectIndex, worldDX, worldDY, worldDZ );
+					UpdateStartPointOffset( () =>
+						m_CraftData.SetContourEditPoint( m_nSelectIndex, worldDX, worldDY, worldDZ ) );
 				}
 
 				UpdatePath();
 			}
 
-			// convert the world displacement to local if needed 
-			gp_Vec displayDisplacement = new gp_Vec( worldDX, worldDY, worldDZ );
-			if( refCoordType == RefCoordinateType.Local ) {
-				if( !TryConvertWorldToLocal( displayDisplacement, out gp_Vec localDisplacement ) ) {
-					return;
-				}
-				displayDisplacement = localDisplacement;
+			if( !TryGetTotalDisplacement( m_nSelectIndex, refCoordType, out gp_Vec displayDisplacement ) ) {
+				return;
 			}
 
 			m_Param.TotalDX = displayDisplacement.X();
@@ -392,13 +428,31 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			ResetDisplacement();
-
 			if( m_Param.IsPathStartPoint == null ) {
-				m_CraftData.SetContourEditPoint( m_nSelectIndex, 0, 0, 0 );
+				ResetDisplacement();
+				UpdateStartPointOffset( () => m_CraftData.SetContourEditPoint( m_nSelectIndex, 0, 0, 0 ) );
 			}
 			else {
-				m_CraftData.SetStartPntContourEdit( m_Param.IsPathStartPoint.Value, 0, 0, 0 );
+				int cadIndex = m_nSelectIndex;
+				if( SpecialPointIndex.IsClosedPointIndex( cadIndex ) ) {
+					cadIndex = m_PathCache.MainPathPointList.First().InitPathIndex;
+				}
+
+				int trsfCADIndex = m_PathCache.OriginalIndexMap.IndexOf( cadIndex );
+				List<CADPoint> cadPointList = m_PathCache.TrsfCADPointList;
+				if( m_OrignalTrsfCADPointList == null || trsfCADIndex < 0
+					|| trsfCADIndex >= m_OrignalTrsfCADPointList.Count || trsfCADIndex >= cadPointList.Count ) {
+					string szMessage = string.Format(
+						m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), m_CurrentPathID );
+					MyApp.Logger.ShowOnLogPanel( szMessage, MyApp.NoticeType.Warning );
+					return;
+				}
+
+				gp_Vec displacement = new gp_Vec(
+					cadPointList[ trsfCADIndex ].Point, m_OrignalTrsfCADPointList[ trsfCADIndex ] );
+				ResetDisplacement();
+				m_CraftData.SetStartPntContourEdit(
+					m_Param.IsPathStartPoint.Value, displacement.X(), displacement.Y(), displacement.Z() );
 			}
 
 			UpdatePath();
@@ -416,44 +470,25 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			m_Param.IsModified = true;
+			// start point or end point
+			if( m_Param.IsPathStartPoint.HasValue ) {
+				m_CraftData.SetStartPntContourEdit( m_Param.IsPathStartPoint.Value, 0, 0, 0 );
 
-			int trsfCADIndex = m_PathCache.OriginalIndexMap.IndexOf( m_nSelectIndex );
-			if( !TryGetCAMPoint( m_nSelectIndex, out CAMPoint camPoint ) || trsfCADIndex == -1 ) {
+				UpdatePath();
+				UpdateCoordinate();
+
+				if( TryBuildContourEditParameter( m_Param.RefCoordinateType, m_nSelectIndex, IsStartOrEndPoint( m_nSelectIndex ) ) ) {
+					m_Dlg.ResetParam( m_Param );
+				}
 				return;
 			}
 
-			// displacement of control point
-			gp_Pnt currentPnt = camPoint.Point;
-			gp_Pnt orignalPnt = m_OrignalTrsfCADPointList[ trsfCADIndex ];
-			gp_Vec displacement = new gp_Vec( orignalPnt, currentPnt );
+			if( !TryGetTotalDisplacement( m_nSelectIndex, RefCoordinateType.World, out gp_Vec displacement ) ) {
+				return;
+			}
 
-			// displacement of start/end before adding
-			gp_Pnt orignalStartPnt = m_PathCache.MainPathPointList.First().Point;
-			gp_Pnt orignalEndPnt = m_PathCache.MainPathPointList.Last().Point;
-
-			m_CraftData.SetContourEditPoint( m_nSelectIndex, displacement.X(), displacement.Y(), displacement.Z() );
-
-			// displacement of start/end after adding
-			gp_Pnt currentStartPnt = m_PathCache.MainPathPointList.First().Point;
-			gp_Pnt currentEndPnt = m_PathCache.MainPathPointList.Last().Point;
-
-			// calibrate displacement of start/end  
-			gp_Vec startPointDisplacement = new gp_Vec( currentStartPnt, orignalStartPnt );
-			gp_Vec endPointDisplacement = new gp_Vec( currentEndPnt, orignalEndPnt );
-
-			ContourEditData startPntContourEditData = m_CraftData.StartPntContourEditData.StartPnt;
-			ContourEditData endPntContourEditData = m_CraftData.StartPntContourEditData.EndPnt;
-
-			m_CraftData.SetStartPntContourEdit( true,
-				startPntContourEditData.DX + startPointDisplacement.X(),
-				startPntContourEditData.DY + startPointDisplacement.Y(),
-				startPntContourEditData.DZ + startPointDisplacement.Z() );
-
-			m_CraftData.SetStartPntContourEdit( false,
-				endPntContourEditData.DX + endPointDisplacement.X(),
-				endPntContourEditData.DY + endPointDisplacement.Y(),
-				endPntContourEditData.DZ + endPointDisplacement.Z() );
+			UpdateStartPointOffset( () =>
+				m_CraftData.SetContourEditPoint( m_nSelectIndex, displacement.X(), displacement.Y(), displacement.Z() ) );
 
 			UpdatePath();
 			UpdateCoordinate();
@@ -474,7 +509,12 @@ namespace MyCAM.Editor
 
 			ResetDisplacement();
 
-			m_CraftData.RemoveContourEditPoint( m_nSelectIndex );
+			if( m_Param.IsPathStartPoint.HasValue ) {
+				m_CraftData.RemoveContourEditStartPoint( m_Param.IsPathStartPoint.Value );
+			}
+			else {
+				UpdateStartPointOffset( () => m_CraftData.RemoveContourEditPoint( m_nSelectIndex ) );
+			}
 
 			UpdatePath();
 			UpdateCoordinate();
@@ -482,6 +522,42 @@ namespace MyCAM.Editor
 			// refresh dialog
 			if( TryBuildContourEditParameter( m_Param?.RefCoordinateType ?? RefCoordinateType.World, m_nSelectIndex, IsStartOrEndPoint( m_nSelectIndex ) ) ) {
 				m_Dlg.ResetParam( m_Param );
+			}
+		}
+
+		void UpdateStartPointOffset( Action changeControlPoint )
+		{
+			StartPntContourEditParam startPntData = m_CraftData.StartPntContourEditData.Clone();
+			if( startPntData.StartPnt == null && startPntData.EndPnt == null ) {
+				changeControlPoint();
+				return;
+			}
+
+			List<CAMPoint> camPointList = m_PathCache.MainPathPointList;
+			gp_Pnt originalStartPnt = camPointList.First().Point;
+			gp_Pnt originalEndPnt = camPointList.Last().Point;
+
+			changeControlPoint();
+
+			camPointList = m_PathCache.MainPathPointList;
+			gp_Pnt currentStartPnt = camPointList.First().Point;
+			gp_Pnt currentEndPnt = camPointList.Last().Point;
+
+
+			if( startPntData.StartPnt != null ) {
+				gp_Vec startPntCorrection = new gp_Vec( currentStartPnt, originalStartPnt );
+				m_CraftData.SetStartPntContourEdit( true,
+					startPntData.StartPnt.DX + startPntCorrection.X(),
+					startPntData.StartPnt.DY + startPntCorrection.Y(),
+					startPntData.StartPnt.DZ + startPntCorrection.Z() );
+			}
+
+			if( startPntData.EndPnt != null ) {
+				gp_Vec endPntCorrection = new gp_Vec( currentEndPnt, originalEndPnt );
+				m_CraftData.SetStartPntContourEdit( false,
+					startPntData.EndPnt.DX + endPntCorrection.X(),
+					startPntData.EndPnt.DY + endPntCorrection.Y(),
+					startPntData.EndPnt.DZ + endPntCorrection.Z() );
 			}
 		}
 
@@ -514,6 +590,12 @@ namespace MyCAM.Editor
 			// closed point always maps to the last CAM point
 			if( SpecialPointIndex.IsClosedPointIndex( selectIndex ) ) {
 				camIndex = camPointList.Count - 1;
+				return true;
+			}
+
+			// Offset-generated points can share an index, so resolve the path start first.
+			if( selectIndex == camPointList.First().InitPathIndex ) {
+				camIndex = 0;
 				return true;
 			}
 			if( !m_PathCache.CADToCAMIndexMap.ContainsKey( selectIndex ) ) {
@@ -600,6 +682,9 @@ namespace MyCAM.Editor
 
 			// Build LocalCoord at the selected point
 			if( m_nSelectIndex == NULL_SELECT_INDEX || !TryGetLocalCoordinate( m_nSelectIndex, out gp_Ax3 localCoordinate ) ) {
+				string szMessage = string.Format(
+					m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), m_CurrentPathID );
+				MyApp.Logger.ShowOnLogPanel( szMessage, MyApp.NoticeType.Warning );
 				return false;
 			}
 
@@ -700,12 +785,7 @@ namespace MyCAM.Editor
 		// cahce of TrsfCADPointList before contour edit
 		IReadOnlyList<gp_Pnt> m_OrignalTrsfCADPointList = null;
 
-		const string NOT_CONTOUR_PATH = "路徑 {0} 不是輪廓路徑，無法編輯";
-		const string CANNOT_GET_PATH_CRAFT_INFO = "無法獲取路徑 {0} 的加工資訊";
-
 		// Point Selection
-
-		// point index control
 		int m_nSelectIndex = NULL_SELECT_INDEX;
 		CAMIndexSelectAction m_PointIndexAction = null;
 
@@ -730,6 +810,9 @@ namespace MyCAM.Editor
 		Viewer m_Viewer = null;
 		TreeView m_TreeView = null;
 		ViewManager m_ViewManager = null;
+
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ContourEditAction" );
+		const string NOT_CONTOUR_PATH = "路徑 {0} 不是輪廓路徑，無法編輯";
+		const string CANNOT_GET_PATH_CRAFT_INFO = "無法獲取路徑 {0} 的加工資訊";
 	}
 }

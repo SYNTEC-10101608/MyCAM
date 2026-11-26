@@ -45,7 +45,6 @@
 			this.m_lblTotalDX = new System.Windows.Forms.Label();
 			this.m_lblTotalDY = new System.Windows.Forms.Label();
 			this.m_lblTotalDZ = new System.Windows.Forms.Label();
-			this.m_lblRelativeCurrentPath = new System.Windows.Forms.Label();
 			this.m_gbxIndexParam.SuspendLayout();
 			this.m_pnlContourEdit.SuspendLayout();
 			this.m_flpnlData.SuspendLayout();
@@ -67,7 +66,7 @@
 			this.m_gbxIndexParam.Margin = new System.Windows.Forms.Padding(4);
 			this.m_gbxIndexParam.Name = "m_gbxIndexParam";
 			this.m_gbxIndexParam.Padding = new System.Windows.Forms.Padding(7, 8, 7, 8);
-			this.m_gbxIndexParam.Size = new System.Drawing.Size(438, 418);
+			this.m_gbxIndexParam.Size = new System.Drawing.Size(438, 386);
 			this.m_gbxIndexParam.TabIndex = 0;
 			this.m_gbxIndexParam.TabStop = false;
 			this.m_gbxIndexParam.Text = "控制點參數";
@@ -91,7 +90,7 @@
 			this.m_pnlContourEdit.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.m_pnlContourEdit.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
 			this.m_pnlContourEdit.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-			this.m_pnlContourEdit.Size = new System.Drawing.Size(418, 360);
+			this.m_pnlContourEdit.Size = new System.Drawing.Size(418, 328);
 			this.m_pnlContourEdit.TabIndex = 11;
 			// 
 			// m_flpnlData
@@ -102,7 +101,7 @@
 			this.m_flpnlData.Controls.Add(this.m_btnSave);
 			this.m_flpnlData.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_flpnlData.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-			this.m_flpnlData.Location = new System.Drawing.Point(3, 313);
+			this.m_flpnlData.Location = new System.Drawing.Point(3, 281);
 			this.m_flpnlData.Name = "m_flpnlData";
 			this.m_flpnlData.Size = new System.Drawing.Size(412, 44);
 			this.m_flpnlData.TabIndex = 11;
@@ -150,7 +149,7 @@
 			this.m_flpnlControlPoint.Controls.Add(this.m_btnAdd);
 			this.m_flpnlControlPoint.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_flpnlControlPoint.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-			this.m_flpnlControlPoint.Location = new System.Drawing.Point(3, 263);
+			this.m_flpnlControlPoint.Location = new System.Drawing.Point(3, 231);
 			this.m_flpnlControlPoint.Name = "m_flpnlControlPoint";
 			this.m_flpnlControlPoint.Size = new System.Drawing.Size(412, 44);
 			this.m_flpnlControlPoint.TabIndex = 10;
@@ -281,36 +280,35 @@
 			this.m_pnlParams.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
 			this.m_pnlParams.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
 			this.m_pnlParams.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150F));
-			this.m_pnlParams.Controls.Add(this.m_lblDX, 0, 2);
-			this.m_pnlParams.Controls.Add(this.m_tbxDX, 1, 2);
-			this.m_pnlParams.Controls.Add(this.m_lblDY, 0, 3);
-			this.m_pnlParams.Controls.Add(this.m_tbxDY, 1, 3);
-			this.m_pnlParams.Controls.Add(this.m_lblDZ, 0, 4);
-			this.m_pnlParams.Controls.Add(this.m_tbxDZ, 1, 4);
-			this.m_pnlParams.Controls.Add(this.m_lblUnit, 0, 5);
-			this.m_pnlParams.Controls.Add(this.m_lblTotalDiff, 2, 1);
-			this.m_pnlParams.Controls.Add(this.m_lblTotalDX, 2, 2);
-			this.m_pnlParams.Controls.Add(this.m_lblTotalDY, 2, 3);
-			this.m_pnlParams.Controls.Add(this.m_lblTotalDZ, 2, 4);
-			this.m_pnlParams.Controls.Add(this.m_lblRelativeCurrentPath, 2, 0);
+			this.m_pnlParams.Controls.Add(this.m_lblDX, 0, 1);
+			this.m_pnlParams.Controls.Add(this.m_tbxDX, 1, 1);
+			this.m_pnlParams.Controls.Add(this.m_lblDY, 0, 2);
+			this.m_pnlParams.Controls.Add(this.m_tbxDY, 1, 2);
+			this.m_pnlParams.Controls.Add(this.m_lblDZ, 0, 3);
+			this.m_pnlParams.Controls.Add(this.m_tbxDZ, 1, 3);
+			this.m_pnlParams.Controls.Add(this.m_lblUnit, 0, 4);
+			this.m_pnlParams.Controls.Add(this.m_lblTotalDiff, 2, 0);
+			this.m_pnlParams.Controls.Add(this.m_lblTotalDX, 2, 1);
+			this.m_pnlParams.Controls.Add(this.m_lblTotalDY, 2, 2);
+			this.m_pnlParams.Controls.Add(this.m_lblTotalDZ, 2, 3);
 			this.m_pnlParams.Location = new System.Drawing.Point(4, 74);
 			this.m_pnlParams.Margin = new System.Windows.Forms.Padding(4);
 			this.m_pnlParams.Name = "m_pnlParams";
-			this.m_pnlParams.RowCount = 6;
-			this.m_pnlParams.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.m_pnlParams.RowCount = 5;
 			this.m_pnlParams.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
 			this.m_pnlParams.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
 			this.m_pnlParams.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
 			this.m_pnlParams.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
 			this.m_pnlParams.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
-			this.m_pnlParams.Size = new System.Drawing.Size(410, 182);
+			this.m_pnlParams.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.m_pnlParams.Size = new System.Drawing.Size(410, 150);
 			this.m_pnlParams.TabIndex = 0;
 			// 
 			// m_lblDX
 			// 
 			this.m_lblDX.Anchor = System.Windows.Forms.AnchorStyles.Left;
 			this.m_lblDX.AutoSize = true;
-			this.m_lblDX.Location = new System.Drawing.Point(4, 72);
+			this.m_lblDX.Location = new System.Drawing.Point(4, 40);
 			this.m_lblDX.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblDX.Name = "m_lblDX";
 			this.m_lblDX.Size = new System.Drawing.Size(47, 15);
@@ -327,7 +325,7 @@
             0,
             0,
             131072});
-			this.m_tbxDX.Location = new System.Drawing.Point(64, 68);
+			this.m_tbxDX.Location = new System.Drawing.Point(64, 36);
 			this.m_tbxDX.Margin = new System.Windows.Forms.Padding(4);
 			this.m_tbxDX.Maximum = new decimal(new int[] {
             99999,
@@ -349,7 +347,7 @@
 			// 
 			this.m_lblDY.Anchor = System.Windows.Forms.AnchorStyles.Left;
 			this.m_lblDY.AutoSize = true;
-			this.m_lblDY.Location = new System.Drawing.Point(4, 104);
+			this.m_lblDY.Location = new System.Drawing.Point(4, 72);
 			this.m_lblDY.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblDY.Name = "m_lblDY";
 			this.m_lblDY.Size = new System.Drawing.Size(47, 15);
@@ -366,7 +364,7 @@
             0,
             0,
             131072});
-			this.m_tbxDY.Location = new System.Drawing.Point(64, 100);
+			this.m_tbxDY.Location = new System.Drawing.Point(64, 68);
 			this.m_tbxDY.Margin = new System.Windows.Forms.Padding(4);
 			this.m_tbxDY.Maximum = new decimal(new int[] {
             99999,
@@ -388,7 +386,7 @@
 			// 
 			this.m_lblDZ.Anchor = System.Windows.Forms.AnchorStyles.Left;
 			this.m_lblDZ.AutoSize = true;
-			this.m_lblDZ.Location = new System.Drawing.Point(4, 136);
+			this.m_lblDZ.Location = new System.Drawing.Point(4, 104);
 			this.m_lblDZ.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblDZ.Name = "m_lblDZ";
 			this.m_lblDZ.Size = new System.Drawing.Size(46, 15);
@@ -405,7 +403,7 @@
             0,
             0,
             131072});
-			this.m_tbxDZ.Location = new System.Drawing.Point(64, 132);
+			this.m_tbxDZ.Location = new System.Drawing.Point(64, 100);
 			this.m_tbxDZ.Margin = new System.Windows.Forms.Padding(4);
 			this.m_tbxDZ.Maximum = new decimal(new int[] {
             99999,
@@ -429,7 +427,7 @@
 			this.m_lblUnit.AutoSize = true;
 			this.m_pnlParams.SetColumnSpan(this.m_lblUnit, 2);
 			this.m_lblUnit.ForeColor = System.Drawing.SystemColors.GrayText;
-			this.m_lblUnit.Location = new System.Drawing.Point(4, 163);
+			this.m_lblUnit.Location = new System.Drawing.Point(4, 131);
 			this.m_lblUnit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblUnit.Name = "m_lblUnit";
 			this.m_lblUnit.Size = new System.Drawing.Size(84, 15);
@@ -440,7 +438,7 @@
 			// 
 			this.m_lblTotalDiff.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.m_lblTotalDiff.AutoSize = true;
-			this.m_lblTotalDiff.Location = new System.Drawing.Point(309, 40);
+			this.m_lblTotalDiff.Location = new System.Drawing.Point(309, 8);
 			this.m_lblTotalDiff.Name = "m_lblTotalDiff";
 			this.m_lblTotalDiff.Size = new System.Drawing.Size(52, 15);
 			this.m_lblTotalDiff.TabIndex = 7;
@@ -450,7 +448,7 @@
 			// 
 			this.m_lblTotalDX.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.m_lblTotalDX.AutoSize = true;
-			this.m_lblTotalDX.Location = new System.Drawing.Point(315, 72);
+			this.m_lblTotalDX.Location = new System.Drawing.Point(315, 40);
 			this.m_lblTotalDX.Name = "m_lblTotalDX";
 			this.m_lblTotalDX.Size = new System.Drawing.Size(39, 15);
 			this.m_lblTotalDX.TabIndex = 8;
@@ -460,7 +458,7 @@
 			// 
 			this.m_lblTotalDY.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.m_lblTotalDY.AutoSize = true;
-			this.m_lblTotalDY.Location = new System.Drawing.Point(315, 104);
+			this.m_lblTotalDY.Location = new System.Drawing.Point(315, 72);
 			this.m_lblTotalDY.Name = "m_lblTotalDY";
 			this.m_lblTotalDY.Size = new System.Drawing.Size(39, 15);
 			this.m_lblTotalDY.TabIndex = 9;
@@ -470,21 +468,11 @@
 			// 
 			this.m_lblTotalDZ.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.m_lblTotalDZ.AutoSize = true;
-			this.m_lblTotalDZ.Location = new System.Drawing.Point(315, 136);
+			this.m_lblTotalDZ.Location = new System.Drawing.Point(315, 104);
 			this.m_lblTotalDZ.Name = "m_lblTotalDZ";
 			this.m_lblTotalDZ.Size = new System.Drawing.Size(39, 15);
 			this.m_lblTotalDZ.TabIndex = 10;
 			this.m_lblTotalDZ.Text = "0.000";
-			// 
-			// m_lblRelativeCurrentPath
-			// 
-			this.m_lblRelativeCurrentPath.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.m_lblRelativeCurrentPath.AutoSize = true;
-			this.m_lblRelativeCurrentPath.Location = new System.Drawing.Point(271, 8);
-			this.m_lblRelativeCurrentPath.Name = "m_lblRelativeCurrentPath";
-			this.m_lblRelativeCurrentPath.Size = new System.Drawing.Size(127, 15);
-			this.m_lblRelativeCurrentPath.TabIndex = 11;
-			this.m_lblRelativeCurrentPath.Text = "（相對當前路徑）";
 			// 
 			// ContourEditDlg
 			// 
@@ -492,7 +480,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(521, 443);
+			this.ClientSize = new System.Drawing.Size(454, 403);
 			this.Controls.Add(this.m_gbxIndexParam);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Margin = new System.Windows.Forms.Padding(4);
@@ -552,6 +540,5 @@
 		private System.Windows.Forms.Button m_btnRemove;
 		private System.Windows.Forms.Button m_btnAdd;
 		private System.Windows.Forms.Button m_btnSave;
-		private System.Windows.Forms.Label m_lblRelativeCurrentPath;
 	}
 }

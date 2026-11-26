@@ -128,8 +128,8 @@ namespace MyCAM.Data
 
 		public StartPntContourEditParam()
 		{
-			StartPnt = new ContourEditData();
-			EndPnt = new ContourEditData();
+			StartPnt = null;
+			EndPnt = null;
 		}
 
 		public StartPntContourEditParam( ContourEditData startPntData, ContourEditData endPntData )
@@ -776,6 +776,22 @@ namespace MyCAM.Data
 
 			CADFactorChanged?.Invoke();
 		}
+		public void RemoveContourEditStartPoint( bool isStartPnt )
+		{
+			if( m_StartPntContourEditData == null ) {
+				m_StartPntContourEditData = new StartPntContourEditParam();
+			}
+
+			if( isStartPnt ) {
+				m_StartPntContourEditData.StartPnt = null;
+			}
+			else {
+				m_StartPntContourEditData.EndPnt = null;
+			}
+
+			CADFactorChanged?.Invoke();
+		}
+
 
 		public void ClearStartPntContourEditParam()
 		{

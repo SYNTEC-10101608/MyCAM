@@ -2568,30 +2568,25 @@ public class StartPntContourEditParamDTO
 	internal StartPntContourEditParamDTO( StartPntContourEditParam param )
 	{
 		if( param == null ) {
-			StartPnt = new ContourEditMapDTO();
-			EndPnt = new ContourEditMapDTO();
+			StartPnt = null;
+			EndPnt = null;
 			return;
 		}
 
-		if( param.StartPnt == null ) {
-			StartPnt = new ContourEditMapDTO();
-		}
-		else {
-			StartPnt = new ContourEditMapDTO( 0, param.StartPnt.DX, param.StartPnt.DY, param.StartPnt.DZ );
-		}
+		StartPnt = ( param.StartPnt == null )
+			? null
+			: new ContourEditMapDTO( 0, param.StartPnt.DX, param.StartPnt.DY, param.StartPnt.DZ );
 
-		if( param.EndPnt == null ) {
-			EndPnt = new ContourEditMapDTO();
-		}
-		else {
-			EndPnt = new ContourEditMapDTO( 0, param.EndPnt.DX, param.EndPnt.DY, param.EndPnt.DZ );
-		}
+
+		EndPnt = ( param.EndPnt == null )
+			? null
+			: new ContourEditMapDTO( 0, param.EndPnt.DX, param.EndPnt.DY, param.EndPnt.DZ );
 	}
 
 	internal StartPntContourEditParam ToStartPntContourEditParam()
 	{
-		ContourEditData startPnt = StartPnt == null ? new ContourEditData() : StartPnt.ToContourEditData();
-		ContourEditData endPnt = EndPnt == null ? new ContourEditData() : EndPnt.ToContourEditData();
+		ContourEditData startPnt = StartPnt == null ? null : StartPnt.ToContourEditData();
+		ContourEditData endPnt = EndPnt == null ? null : EndPnt.ToContourEditData();
 		return new StartPntContourEditParam( startPnt, endPnt );
 	}
 }
