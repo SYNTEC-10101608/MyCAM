@@ -5,7 +5,7 @@
 | 分支 | `AUTO-23254_f_UIStyleUnify` |
 | 分支起點 | `bd0fa270`（`master`，2026-11-26，rebase 後）；原起點 `a4b3826d`（2026-11-15），rebase 前的版本在本機分支 `backup/AUTO-23254_before_rebase` |
 | 級別 | L |
-| 狀態 | 已併入 `master` 並依新規範調整（STEP-12）、新增規格螢幕的截圖環境（STEP-13）；待安裝虛擬螢幕驅動後執行 `runtime`（TEST-18）、人工確認 `master` 修正（TEST-19）、待討論定案，再推送與發 MR |
+| 狀態 | 已併入 `master` 並依新規範調整（STEP-12）、新增規格螢幕的截圖環境（STEP-13），橫式 `runtime` 已在規格螢幕上通過；待直式 `runtime`、人工確認 `master` 修正（TEST-19）、待討論定案，再推送與發 MR |
 
 ## 文件
 
@@ -43,15 +43,23 @@
    1. 問題：`master` 在乾淨的 checkout 無法建置；本分支已修正，`master` 本身仍是錯的。
    2. 建議：另開 bug 先在 `master` 修正，不必等本議題合併。
    3. 另一可行選項：只隨本議題合併修正。
+4. 測試機（闔蓋、只以 AnyDesk 操作）的常駐顯示器：
+   1. 問題：筆電面板被卸離後闔蓋時無法掛回（REV-10），目前由背景程式維持的 Parsec 虛擬螢幕當主螢幕，24 小時後或重開機、登出後會消失；直式檢查要再加入一個 Parsec 副螢幕，同一驅動兩個控制程式並存時是否互相影響未驗證，所以尚未執行。
+   2. 建議：安裝驅動層級常駐的虛擬螢幕（VirtualDrivers 的 Virtual Display Driver，winget `VirtualDrivers.Virtual-Display-Driver`）設為 1920×1080、100% 當主螢幕，登入畫面也看得到；Parsec 只用於檢查時暫時加入直式副螢幕。需要透過 AnyDesk 按一次 UAC。
+   3. 另一可行選項：登入時以排程常駐 Parsec 虛擬螢幕，不需 UAC，但登入前沒有螢幕，重開機後 AnyDesk 可能看不到登入畫面。
+5. 測試機是否永久設定 `UICHECK_VISIBLE=1`：
+   1. 問題：設定後 `runtime` 的主視窗在可見桌面截圖，3D 畫面會呈現，但檢查期間視窗會出現在螢幕上。
+   2. 建議：這台測試機設定（使用者環境變數），一般開發機不設定。
+   3. 另一可行選項：不永久設定，需要時在命令列暫時設定。
 
 ## DoD
 
 1. [x] 每個 REQ 有 SPEC、每個 SPEC 有 TEST（`Spec.md` 第 4 節、`TestPlan.md` 第 9 節）。
 2. [x] 相容性異動已寫明。
-3. [ ] `TestPlan.md` 附最終執行結果：`runtime` 待規格螢幕（TEST-18），TEST-19 待人工確認。
+3. [ ] `TestPlan.md` 附最終執行結果：直式 `runtime`（TEST-18）待執行，TEST-19 待人工確認。
 4. [x] 每個 STEP 可追溯到 commit：STEP-1～STEP-11 依 `Implementation.md` 人工對照，STEP-12 之後以標題標示（DEC-12）。
-5. [ ] 門檻通過：`Build.bat Debug`、`Build.bat Release`、`UICheck.bat` 靜態檢查、`RunIssueChecks.bat` 已通過；`UICheck.bat runtime` 待規格螢幕。
-6. [ ] Review 報告寫入 `Review.md`，「必修」全部已修正：REV-1 待人確認，REV-7、REV-8 待回覆。
+5. [ ] 門檻通過：`Build.bat Debug`、`Build.bat Release`、`UICheck.bat` 靜態檢查、`RunIssueChecks.bat`、橫式 `runtime` 已通過；直式 `runtime` 待執行。
+6. [ ] Review 報告寫入 `Review.md`，「必修」全部已修正：REV-1 待人確認，REV-7（直式部分）、REV-8 待回覆。
 7. [x] 範圍外項目寫入 `FollowUp.md`。
 8. [x] Release note 寫入本文件。
 9. [ ] 各確認點分別經人確認：原範圍已於 2026-11-23 確認；rebase 與截圖環境（REQ-8、SPEC-19、SPEC-20）待確認。
