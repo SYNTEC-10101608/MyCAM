@@ -44,27 +44,27 @@
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
-| REV-9 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:329` | `-Base` 為不存在的 commit 時，`git diff` 失敗只印錯誤、回傳空清單，TEST-5 誤判通過（實測 `-Base deadbeef`：TEST-5 PASS）；應先以 `git rev-parse --verify` 檢查基準，失敗即中止 | 已修正（待人確認） |
-| REV-10 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:163` | TEST-1 的基準行數寫死 193，不隨 `-Base` 改變，與 STEP-1 第 1.2 項「`-Base` 供 TEST-1 比對」不符；改以 `git show <Base>:<檔案>` 計算基準，或在參數說明註明 TEST-1 不受 `-Base` 影響 | 已修正（待人確認） |
-| REV-11 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:594` | TEST-11 對非必修只檢查處置非空、對必修只檢查開頭為「已修正」，「待處置」與「已修正（待人確認）」都會通過，與 `review.md` 第 3 節第 4 項「送 MR 前不留未處置或待確認」不符 | 已修正（待人確認） |
-| REV-12 | 5 | 建議 | `Doc/AUTO-TBD/Check.ps1:640` | TEST-12 讀取執行者本人的 `~/.claude/CLAUDE.md` 與 `CLAUDE.local.md`，合併者或其他成員執行時必定 FAIL 或執行錯誤，門檻結果因人而異；建議偵測到檔案不存在時改為「略過」並輸出說明 | 已修正（待人確認） |
-| REV-13 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:331` | TEST-5 只檢查「異動都在清單內」，清單內檔案未異動不會發現；TEST-5 通過條件寫「一致」，建議補反向比對或把通過條件改為「異動不超出清單」 | 已修正（待人確認） |
+| REV-9 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:329` | `-Base` 為不存在的 commit 時，`git diff` 失敗只印錯誤、回傳空清單，TEST-5 誤判通過（實測 `-Base deadbeef`：TEST-5 PASS）；應先以 `git rev-parse --verify` 檢查基準，失敗即中止 | 已修正 |
+| REV-10 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:163` | TEST-1 的基準行數寫死 193，不隨 `-Base` 改變，與 STEP-1 第 1.2 項「`-Base` 供 TEST-1 比對」不符；改以 `git show <Base>:<檔案>` 計算基準，或在參數說明註明 TEST-1 不受 `-Base` 影響 | 已修正 |
+| REV-11 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:594` | TEST-11 對非必修只檢查處置非空、對必修只檢查開頭為「已修正」，「待處置」與「已修正（待人確認）」都會通過，與 `review.md` 第 3 節第 4 項「送 MR 前不留未處置或待確認」不符 | 已修正 |
+| REV-12 | 5 | 建議 | `Doc/AUTO-TBD/Check.ps1:640` | TEST-12 讀取執行者本人的 `~/.claude/CLAUDE.md` 與 `CLAUDE.local.md`，合併者或其他成員執行時必定 FAIL 或執行錯誤，門檻結果因人而異；建議偵測到檔案不存在時改為「略過」並輸出說明 | 已修正 |
+| REV-13 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:331` | TEST-5 只檢查「異動都在清單內」，清單內檔案未異動不會發現；TEST-5 通過條件寫「一致」，建議補反向比對或把通過條件改為「異動不超出清單」 | 已修正 |
 | REV-14 | 5 | 建議 | `.github/instructions/team-collaboration.instructions.md:32` | 流程索引的「執行或回應 review」只導向 `review.md` 與專案固定檢查項目；只做 review、不改程式碼時不會觸發「新增或修改程式碼」列，Claude 不會讀 `team-coding-style-<語言>`，第 4 段規範符合缺依據；建議該列加上「review 程式碼時加讀對應語言的 Coding Style」 | 已修正（回溯至 SPEC-1.5） |
 | REV-15 | 2 | 提問 | `.github/team/review.md:13` | 第 3 段列「UI 執行緒、角度單位（rad / deg）、座標系」，屬 CAD/CAM 與 WinForms 領域；團隊其他 repo 若不是同領域，違反 SPEC-1.2「團隊通用層不含專案內容」，應移到專案固定檢查項目。團隊其他 repo 是否同屬此領域？ | 已修正（回溯至 SPEC-7.1、SPEC-14.4） |
 | REV-16 | 6 | 提問 | `.github/team/issue-workflow.md:25` | S 級判斷依據只有「小 bug」，小型功能或純文字修改（如修正 UI 字串）讀者無法判斷屬 S 或 M；是否放寬為「影響範圍明確的小修改（含小 bug）」？ | 已修正（回溯至 SPEC-3.2） |
 | REV-17 | 5 | 建議 | `.github/team/git-workflow.md:26` | Commit 標示只定義施工 `(STEP-n)` 與 review `(REV-n)`；確認點文件（階段 1～5）與回溯修改的 commit 沒有規則，本分支有 8 個未標示的 commit、`bd826055` 自訂 `(DEC-11)`，`Check.ps1` 以「只動議題文件即豁免」默認處理。建議在規範寫明確認點文件不標示（或標示 `DEC-n`），與腳本一致 | 已修正（回溯至 SPEC-8.5.3：確認點文件的 commit 不標示） |
 | REV-18 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:264` | SPEC-12.2.1 協作原則（資深工程師角度、DEC-13 依重要性先問或先做）沒有對應的 REQ，SPEC-12 只標 REQ-3.1、REQ-3.2（載入時機）；DEC-13 回溯時未補需求來源。建議補一條 REQ 或在 REQ-4 下增列子項 | 已修正（回溯至 REQ-11、SPEC-12） |
 | REV-19 | 6 | 建議 | `.github/copilot-instructions.md:23` | 指引目錄寫各語言 Coding Style「Copilot 依 `applyTo`」，但 TEST-16 實測 VS 2026 Copilot 未依 `applyTo` 自動載入 `team-coding-style-csharp`；讀者會以為 Copilot 不需依索引讀取。建議改為「Copilot、Claude 皆依流程索引（Copilot 另有 `applyTo`）」，或由 TODO-5 處理 | 已修正 |
-| REV-20 | 6 | 建議 | `.github/team/issue-docs.md:29` | 規則寫「確認點文件的最後一節為『待討論』」，但 S 級範本的待討論之後還有 DoD 與 Release Note；M 級 `README.md` 承載確認點 1–2 的內容，骨架卻沒有待討論。建議改為「確認點內容之後列『待討論』」，並在 M、L 骨架補上 | 已修正（待人確認） |
-| REV-21 | 6 | 建議 | `Doc/AUTO-TBD/Goal.md:118` | `Goal.md` 是確認點 1、2 的文件，沒有「待討論」一節，不符 `issue-docs.md` 第 2 節第 2 項；Spec、TestPlan、Implementation 都有 | 已修正（待人確認） |
-| REV-22 | 6 | 建議 | `.github/project/build.md:50` | 與同檔第 30 行矛盾：第 30 行寫 `CopyRef.bat`「首次建置後執行一次」，第 50 行寫「第一次建置前執行」（腳本會自建目錄，兩者皆可）；同句「以 Visual Studio 開啟前先卸載 `FCLTool`」順序不可行，應為開啟後卸載（第 12 行已寫） | 已修正（待人確認） |
-| REV-23 | 6 | 建議 | `.github/team/git-workflow.md:10` | 「Push 與送 MR 由人決定」與常駐的 `collaboration` 協作原則第 2.1 項（合併、push 先由人決定）重複；建議只留本處的具體做法「AI push 前先詢問 remote 與分支」 | 已修正（待人確認） |
-| REV-24 | 6 | 建議 | `.github/team/review.md:11` | 門檻段要求計算常駐行數，但常駐的範圍（入口與 `applyTo: "**"`）定義在 `copilot-instructions.md` 維護方式第 3 項，`review.md` 沒有連結，reviewer 無法判斷要算哪些檔案 | 已修正（待人確認） |
+| REV-20 | 6 | 建議 | `.github/team/issue-docs.md:29` | 規則寫「確認點文件的最後一節為『待討論』」，但 S 級範本的待討論之後還有 DoD 與 Release Note；M 級 `README.md` 承載確認點 1–2 的內容，骨架卻沒有待討論。建議改為「確認點內容之後列『待討論』」，並在 M、L 骨架補上 | 已修正 |
+| REV-21 | 6 | 建議 | `Doc/AUTO-TBD/Goal.md:118` | `Goal.md` 是確認點 1、2 的文件，沒有「待討論」一節，不符 `issue-docs.md` 第 2 節第 2 項；Spec、TestPlan、Implementation 都有 | 已修正 |
+| REV-22 | 6 | 建議 | `.github/project/build.md:50` | 與同檔第 30 行矛盾：第 30 行寫 `CopyRef.bat`「首次建置後執行一次」，第 50 行寫「第一次建置前執行」（腳本會自建目錄，兩者皆可）；同句「以 Visual Studio 開啟前先卸載 `FCLTool`」順序不可行，應為開啟後卸載（第 12 行已寫） | 已修正 |
+| REV-23 | 6 | 建議 | `.github/team/git-workflow.md:10` | 「Push 與送 MR 由人決定」與常駐的 `collaboration` 協作原則第 2.1 項（合併、push 先由人決定）重複；建議只留本處的具體做法「AI push 前先詢問 remote 與分支」 | 已修正 |
+| REV-24 | 6 | 建議 | `.github/team/review.md:11` | 門檻段要求計算常駐行數，但常駐的範圍（入口與 `applyTo: "**"`）定義在 `copilot-instructions.md` 維護方式第 3 項，`review.md` 沒有連結，reviewer 無法判斷要算哪些檔案 | 已修正 |
 | REV-25 | 6 | 建議 | `.claude/skills/issue-start/SKILL.md:6` | 三個 skill 的本文句子與「必讀文件」清單列出相同文件，同一檔內重複；`review` skill 另重述流程索引已有的「加上專案固定檢查項目」。此格式來自 SPEC-16.2，精簡須改規格 | 不修正（本文說明各文件的用途，清單供 AI 依序讀檔；每檔只多兩三行，TEST-16 證明此格式有效） |
-| REV-26 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:134` | TEST-13 通過條件寫「含 SPEC-18.2 六項」，實際為五項（第 5 項依 TEST-16 結果結案），執行結果判定通過但條件字面不成立；建議改為「第 5 項依 TEST-16 結果決定」 | 已修正（待人確認） |
+| REV-26 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:134` | TEST-13 通過條件寫「含 SPEC-18.2 六項」，實際為五項（第 5 項依 TEST-16 結果結案），執行結果判定通過但條件字面不成立；建議改為「第 5 項依 TEST-16 結果決定」 | 已修正 |
 | REV-27 | 6 | 建議 | `Doc/AUTO-TBD/README.md:19` | 文件索引沒有 `Review.md`，`Review.md` 已存在；STEP-13 第 2 項列為收官工作，可於收官一併補上 | 已修正 |
 | REV-28 | 6 | 建議 | `Doc/AUTO-TBD/TestPlan.md:202` | 執行結果 TEST-11 仍寫「缺 `Review.md`、STEP-12、STEP-13 的 commit」，與目前狀態不符（現僅缺 DoD 與 Release Note）；`753ee71d` 更新了行數但未同步此項 | 已修正 |
-| REV-29 | 6 | 建議 | `Doc/AUTO-TBD/Implementation.md:61` | STEP-6 第 1 項「目標 40 行內」是取消行數上限（DEC-11）前的殘留；`Discussion.md:78` DEC-9.1「專案準備步驟留在 `project-overview`」已被 DEC-10.1 取代，未如 DEC-11 標示「取代」 | 已修正（待人確認） |
+| REV-29 | 6 | 建議 | `Doc/AUTO-TBD/Implementation.md:61` | STEP-6 第 1 項「目標 40 行內」是取消行數上限（DEC-11）前的殘留；`Discussion.md:78` DEC-9.1「專案準備步驟留在 `project-overview`」已被 DEC-10.1 取代，未如 DEC-11 標示「取代」 | 已修正 |
 
 ## 第 3 回合
 
@@ -82,7 +82,7 @@
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
 | REV-30 | 2 | 必修 | `.github/team/issue-workflow.md:45` | Session 交接、`SESSION.md`、Claude Code 的 worktree 位置與分支更名、`.worktreeinclude` 自動複製、`CLAUDE.local.md` 上層載入屬於使用 Claude 或 worktree 時的做法，散在通用流程與 `build.md`；Copilot 不同、成員也未必有此習慣 | 已修正（回溯至 REQ-5.1、SPEC-14，刪除 SPEC-3.8、SPEC-5.8，DEC-14：集中到 `claude-code.md`） |
-| REV-31 | 6 | 建議 | `CLAUDE.md:3` | 3 行說明可併為 1 行；`@` 引用 4 行保留 | 已修正（待人確認） |
+| REV-31 | 6 | 建議 | `CLAUDE.md:3` | 3 行說明可併為 1 行；`@` 引用 4 行保留 | 已修正 |
 | REV-32 | 5 | 建議 | `.github/team/review.md:14` | 規範段只列 Coding Style，流程索引的 review 列也另寫 Coding Style；之後新增 UI 等規範時兩處都要改，容易漏 | 已修正（回溯至 SPEC-1.5、SPEC-7.1，DEC-15） |
 
 ## 第 4 回合
@@ -101,24 +101,24 @@
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
-| REV-33 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:165` | DEC-15 的說明句插在 SPEC-7.1 表格第 4、5 列之間，第 5、6 段兩列脫離表格，無法正確顯示 | 已修正（待人確認） |
-| REV-34 | 6 | 建議 | `Doc/AUTO-TBD/TestPlan.md:211` | TEST-8 位置對照與目前檔案不符：`IW:21-34` 應為 `21-35`（待討論三部分在 33～35 行）、`RV:44-49` 應為 `44-50`（第 5 項回到門檻段）、5.3 的 `issue-docs.md:23` 應為 `:22` | 已修正（待人確認） |
-| REV-35 | 2 | 建議 | `Doc/AUTO-TBD/Implementation.md:68` | DEC-14 回溯未完整同步 STEP：STEP-7 沒有新增 `claude-code.md` 一項、索引只寫 `build.md`、專案固定檢查項目仍寫「四項」（REV-15 後為五項）；STEP-6.2 指引目錄漏列 `claude-code.md`；STEP-3 對應的 `.gitignore` 檢查應為 TEST-4.6 而非 4.5 | 已修正（待人確認） |
-| REV-36 | 6 | 建議 | `.claude/skills/review/SKILL.md:6` | 寫「門檻段與規範段加上專案固定檢查項目」，但專案固定檢查項目也涵蓋功能正確性段（第 5 項），讀者會漏看；改為不指定段，段的對應由 `project-overview` 說明 | 已修正（待人確認） |
-| REV-37 | 6 | 建議 | `Doc/AUTO-TBD/Review.md:84` | REV-30 處置寫「回溯至 SPEC-3.8、SPEC-5.8」，兩者已刪除，讀者找不到；改寫為「刪除 SPEC-3.8、SPEC-5.8」 | 已修正（待人確認） |
-| REV-38 | 6 | 建議 | `Doc/AUTO-TBD/Discussion.md:85` | DEC-9.6 的「硬上限」已由 DEC-11 取消，DEC-9.6 本身未標示；DEC-9.1 已有同類標示（REV-29） | 已修正（待人確認） |
+| REV-33 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:165` | DEC-15 的說明句插在 SPEC-7.1 表格第 4、5 列之間，第 5、6 段兩列脫離表格，無法正確顯示 | 已修正 |
+| REV-34 | 6 | 建議 | `Doc/AUTO-TBD/TestPlan.md:211` | TEST-8 位置對照與目前檔案不符：`IW:21-34` 應為 `21-35`（待討論三部分在 33～35 行）、`RV:44-49` 應為 `44-50`（第 5 項回到門檻段）、5.3 的 `issue-docs.md:23` 應為 `:22` | 已修正 |
+| REV-35 | 2 | 建議 | `Doc/AUTO-TBD/Implementation.md:68` | DEC-14 回溯未完整同步 STEP：STEP-7 沒有新增 `claude-code.md` 一項、索引只寫 `build.md`、專案固定檢查項目仍寫「四項」（REV-15 後為五項）；STEP-6.2 指引目錄漏列 `claude-code.md`；STEP-3 對應的 `.gitignore` 檢查應為 TEST-4.6 而非 4.5 | 已修正 |
+| REV-36 | 6 | 建議 | `.claude/skills/review/SKILL.md:6` | 寫「門檻段與規範段加上專案固定檢查項目」，但專案固定檢查項目也涵蓋功能正確性段（第 5 項），讀者會漏看；改為不指定段，段的對應由 `project-overview` 說明 | 已修正 |
+| REV-37 | 6 | 建議 | `Doc/AUTO-TBD/Review.md:84` | REV-30 處置寫「回溯至 SPEC-3.8、SPEC-5.8」，兩者已刪除，讀者找不到；改寫為「刪除 SPEC-3.8、SPEC-5.8」 | 已修正 |
+| REV-38 | 6 | 建議 | `Doc/AUTO-TBD/Discussion.md:85` | DEC-9.6 的「硬上限」已由 DEC-11 取消，DEC-9.6 本身未標示；DEC-9.1 已有同類標示（REV-29） | 已修正 |
 | REV-39 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:126` | SPEC-5.4 表格寫「STEP 與 commit 對應」，與 SPEC-8.5.4「`Implementation.md` 不記 commit hash」及 `issue-docs.md:22` 的「STEP」不一致；TEST-8 以措辭差異接受，但規格本身前後矛盾。建議改為「STEP」 | 已修正（使用者同意依建議修正） |
 | REV-40 | 2 | 建議 | `Doc/AUTO-TBD/Spec.md:18` | 規格未同步後續 review 的修正：SPEC-1.1 表格仍寫「Copilot 依 `applyTo` 載入；Claude 依流程索引」（REV-19 後指引目錄改為兩者皆依流程索引）；SPEC-8.6 仍寫「Push 與送 MR 由人決定」（REV-23 後 push 的決定權只寫在協作原則） | 已修正（使用者同意依建議修正） |
 | REV-41 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:85` | SPEC-6.4「刪除即跳號」與 Markdown 顯示衝突：有序清單只採用第一項的號碼，SPEC-3 的「9.」、SPEC-5 的「9.」在 GitLab / GitHub 顯示為「8.」，引用 SPEC-3.9 的讀者對不上。建議刪除的項目保留一行「8. （刪除，見 DEC-n）」 | 已修正（回溯至 SPEC-6.4，DEC-17；使用者同意依建議修正） |
 | REV-42 | 4 | 建議 | `.github/team/review.md:12` | 功能正確性段寫「專案指引的領域檢查項目」，`project-overview` 沒有此名稱，對應的是「專案固定檢查項目」第 5 項；SPEC-7.1 同文。建議改為「專案指引的專案固定檢查項目」 | 已修正（使用者同意依建議修正） |
 | REV-43 | 2 | 必修 | `.github/instructions/team-coding-style-general.instructions.md:26` | 團隊通用層含 `AUTO-` 前綴：`team-coding-style-general` 的 `// AUTO-<編號>`、`issue-docs.md:8` 的 `AUTO-TBD`、`git-workflow.md:14` 的範例 `AUTO-23201`。`AUTO-` 是團隊共用的議題系統前綴，還是 MyCAM 專屬？若為專屬，違反 SPEC-1.2，應改為「`<議題編號>`，前綴見專案指引」。使用者回覆：`AUTO-` 只有 MyCAM 使用，改為必修 | 已修正（回溯至 REQ-1.2、SPEC-5.2、SPEC-8.3.1、SPEC-10.2、SPEC-14.7，DEC-16） |
-| REV-44 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:649` | TEST-11 只擋空白、「待處置」與「待人確認」，其他文字（如「待人決定」、「待回覆」）都通過，與 `review.md` 第 2 節第 2 項「處置只有三種」不符；改為處置須以已修正、不修正或列後續開頭 | 已修正（待人確認） |
-| REV-45 | 6 | 建議 | `.github/copilot-instructions.md:38` | 使用者人工 review：維護方式第 3 項讀起來像「不適合改常駐檔、改了要注意行數」，沒講到重點；重點是常駐耗成本，維護時以通則與精簡為主；且不論常駐與否，修改指引文件都應說明並在 review 檢查 | 已修正（待人確認）：第 3 項改寫，新增第 4 項；`review.md` 文件段加「修改的指引文件是否寫明異動與理由」；SPEC-7.1、SPEC-15.1.4 同步 |
-| REV-46 | 6 | 建議 | `~/.claude/CLAUDE.md:4` | 使用者人工 review：個人設定「溝通與文件」第 2～4 項（待決三部分各一兩句、待確認列在回覆、編號附說明）是團隊可共用的 AI 溝通原則 | 已修正（待人確認）：移入 `team-collaboration` 協作原則第 3 項；個人檔留一行指向團隊規範（沒有該規範的 repo 照同樣原則）；SPEC-12.2.1、SPEC-17.2 同步 |
-| REV-47 | 6 | 建議 | `.github/instructions/team-collaboration.instructions.md:19` | 使用者人工 review：文件通則「精簡」一句太長 | 已修正（待人確認）：分為四個子項，內容不變 |
+| REV-44 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:649` | TEST-11 只擋空白、「待處置」與「待人確認」，其他文字（如「待人決定」、「待回覆」）都通過，與 `review.md` 第 2 節第 2 項「處置只有三種」不符；改為處置須以已修正、不修正或列後續開頭 | 已修正 |
+| REV-45 | 6 | 建議 | `.github/copilot-instructions.md:38` | 使用者人工 review：維護方式第 3 項讀起來像「不適合改常駐檔、改了要注意行數」，沒講到重點；重點是常駐耗成本，維護時以通則與精簡為主；且不論常駐與否，修改指引文件都應說明並在 review 檢查 | 已修正：第 3 項改寫，新增第 4 項；`review.md` 文件段加「修改的指引文件是否寫明異動與理由」；SPEC-7.1、SPEC-15.1.4 同步 |
+| REV-46 | 6 | 建議 | `~/.claude/CLAUDE.md:4` | 使用者人工 review：個人設定「溝通與文件」第 2～4 項（待決三部分各一兩句、待確認列在回覆、編號附說明）是團隊可共用的 AI 溝通原則 | 已修正：移入 `team-collaboration` 協作原則第 3 項；個人檔留一行指向團隊規範（沒有該規範的 repo 照同樣原則）；SPEC-12.2.1、SPEC-17.2 同步 |
+| REV-47 | 6 | 建議 | `.github/instructions/team-collaboration.instructions.md:19` | 使用者人工 review：文件通則「精簡」一句太長 | 已修正：分為四個子項，內容不變 |
 | REV-48 | 5 | 建議 | `.github/copilot-instructions.md:5` | 使用者人工 review：指引的四個面向中，通用 / 專案、常駐 / 細節、Claude / 通用在檔案結構上看不出來；`process/` 與 `project/` 命名軸不同、`instructions/` 未分層、Claude 限定內容只有專案層一份且混入通用的 session 交接；專案固定檢查項目只在 review 用到卻常駐 | 已修正（回溯至 SPEC-1.1、SPEC-13.6、SPEC-14、SPEC-15.1.2，DEC-18；使用者同意依建議） |
 | REV-49 | 1 | 必修 | `.github/project/claude-code.md:1` | 施工中曾把檔案命名為 `claude.md`，Windows 不分大小寫，Claude Code 立即把它當成 `CLAUDE.md` 自動載入，等於常駐 | 已修正：改名為 `claude-code.md`，維護方式寫明、TEST-4 檢查（DEC-18） |
-| REV-50 | 6 | 建議 | `Doc/AUTO-TBD/FollowUp.md:42` | 使用者要求：TODO-4 的建議做法只有一句，接手 UI 分支 rebase 的人不知道衝突點與步驟 | 已修正（待人確認）：新增第 4 節 rebase 指引，依子 session 的唯讀盤點撰寫 |
+| REV-50 | 6 | 建議 | `Doc/AUTO-TBD/FollowUp.md:42` | 使用者要求：TODO-4 的建議做法只有一句，接手 UI 分支 rebase 的人不知道衝突點與步驟 | 已修正：新增第 4 節 rebase 指引，依子 session 的唯讀盤點撰寫 |
 
 ## 第 5 回合
 
@@ -142,15 +142,15 @@
 | REV-51 | 1 | 必修 | `Doc/AUTO-TBD/Check.ps1:165` | `Get-BaseResidentLineCount` 以 `@( git show ... )` 取基準檔內容；主 session 驗證：在 PowerShell 主控台執行時基準為 193，經 Bash 呼叫（輸出被重導）時基準為 122，空行被丟掉。現況行數用 `Get-LineCount`，兩邊口徑不同，門檻報告會誤判常駐增量 | 已修正（使用者同意）：`git show` 對 blob 不理會 `--output`，改以 `Process` 直接讀標準輸出，與 `Get-LineCount` 同一口徑；PowerShell 主控台與經 Bash 呼叫皆為基準 193、差異 +9 |
 | REV-52 | 2 | 必修 | `.github/instructions/team-coding-style-cpp.instructions.md:7` | DEC-18 把語言 Coding Style 歸為團隊通用，內容卻有 MyCAM 專屬資訊，違反 SPEC-1.2：cpp 第 7 行「適用於 `PostTool`、`FCLTool`」、csharp 第 139 行 .NET Framework 4.8 / C# 7.3；TEST-2 未掃描這兩份 | 已修正（使用者同意依建議）：cpp 改為「適用於 C / C++ 原始碼」，C# 版本改為「依專案指引的技術棧」；TEST-2 掃描範圍加入兩份並新增 `.NET Framework`；SPEC-11、TODO-5.3 同步 |
 | REV-53 | 5 | 建議 | `.github/instructions/project-overview.instructions.md:57` | 四語系 XML 同步、Designer 可開、不改 `reference/` 是寫程式時就要遵守的規則，DEC-18 後只在 review 才讀的 `project/review.md`，AI 新增文字時讀不到 | 已修正（使用者同意依建議）：新增專案程式規範一類 `project-coding-*`，本議題新增 `project-coding-general` 放三項規則，流程索引與專案指引索引導向；功能正確性的領域項目只列名詞、無法照做，刪除；常駐 +3，合計 205（DEC-19） |
-| REV-54 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:23` | DEC-18 的說明句插進 SPEC-1.1 表格，「個人」列脫離表格；與 REV-33 同類 | 已修正（待人確認）：說明句移到「個人」列之後 |
+| REV-54 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:23` | DEC-18 的說明句插進 SPEC-1.1 表格，「個人」列脫離表格；與 REV-33 同類 | 已修正：說明句移到「個人」列之後 |
 | REV-55 | 2 | 必修 | `Doc/AUTO-TBD/TestPlan.md:238` | TEST-14～TEST-16 的結果是 DEC-18 改名與拆檔前跑的，5.3 卻以新檔名改寫，讀起來像已在最終結構驗證；REV-49 證明檔名會影響自動載入，需實測。子 session 重跑時因工作目錄在主 checkout，載入的是 master 的舊指引，TEST-14 無法判定、TEST-15 只完成靜態演練 | 已修正（使用者同意重跑）：TEST-14、TEST-15 在 worktree 重跑（`ff2f9b8f`），TEST-16 由使用者在 VS 2026 重跑（`f0cc1462`），5.3 依實測改寫，全部通過 |
-| REV-56 | 6 | 建議 | `Doc/AUTO-TBD/FollowUp.md:78` | 第 4.5.4 項只列 `ui-style` 連到 `coding-style-*`；`icon-design` 的連結與路徑字串、UI 版 `project-overview` 連到 `ui-style`、`Doc/AUTO-23254/` 的檔名也會失效且不提示衝突 | 已修正（待人確認）：改為一條 `git grep` 搜尋並列出已知位置，`project-overview` 的那一行改由專案指引索引指向 |
-| REV-57 | 6 | 建議 | `Doc/AUTO-TBD/FollowUp.md:60` | 第 4 節「重跑第 2 項的比對」應為第 1、3 項；衝突預估以 `99dcd2e7` 為對象未寫明；第 6 項補 BOM 不在步驟中 | 已修正（待人確認）：三處照改，步驟加入第 4 步補 BOM |
-| REV-58 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:314` | DEC-18 後議題文件仍用舊簡稱 `collaboration`：`Spec.md:314`、`TestPlan.md:238`、第 4 回合門檻說明與 REV-46 | 已修正（待人確認）：改為 `team-collaboration`；第 1、2 回合與 Discussion 的歷史描述保留原名 |
-| REV-59 | 2 | 建議 | `Doc/AUTO-TBD/Implementation.md:128` | SPEC 對照的 SPEC-13 漏了 STEP-7；實作架構表漏了 `team/claude-code.md` 與 `project/review.md` | 已修正（待人確認） |
-| REV-60 | 1 | 建議 | `.github/team/claude-code.md:7` | 檔尾沒有換行，違反 `.editorconfig` 的 `insert_final_newline`；TEST-6 不檢查檔尾換行 | 已修正（待人確認）：補換行，TEST-6 加入檔尾換行檢查 |
-| REV-61 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:267` | SPEC-11.2 寫 `team-coding-style-csharp`、`cpp` 是「未修改的檔案」，表格卻寫改名與更新連結；TODO-5.3 同 | 已修正（待人確認）：兩處改為「只改名與更新連結」 |
-| REV-62 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:166` | SPEC-7.1 門檻段寫「動到自動載入的檔案」，`team/review.md` 寫「常駐檔案」；DEC-18.4 寫 -9、第 4 回合寫 -10 | 已修正（待人確認）：SPEC-7.1 改為「常駐檔案」；DEC-18.4 註明淨 -9（移出 -10、索引 +1） |
+| REV-56 | 6 | 建議 | `Doc/AUTO-TBD/FollowUp.md:78` | 第 4.5.4 項只列 `ui-style` 連到 `coding-style-*`；`icon-design` 的連結與路徑字串、UI 版 `project-overview` 連到 `ui-style`、`Doc/AUTO-23254/` 的檔名也會失效且不提示衝突 | 已修正：改為一條 `git grep` 搜尋並列出已知位置，`project-overview` 的那一行改由專案指引索引指向 |
+| REV-57 | 6 | 建議 | `Doc/AUTO-TBD/FollowUp.md:60` | 第 4 節「重跑第 2 項的比對」應為第 1、3 項；衝突預估以 `99dcd2e7` 為對象未寫明；第 6 項補 BOM 不在步驟中 | 已修正：三處照改，步驟加入第 4 步補 BOM |
+| REV-58 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:314` | DEC-18 後議題文件仍用舊簡稱 `collaboration`：`Spec.md:314`、`TestPlan.md:238`、第 4 回合門檻說明與 REV-46 | 已修正：改為 `team-collaboration`；第 1、2 回合與 Discussion 的歷史描述保留原名 |
+| REV-59 | 2 | 建議 | `Doc/AUTO-TBD/Implementation.md:128` | SPEC 對照的 SPEC-13 漏了 STEP-7；實作架構表漏了 `team/claude-code.md` 與 `project/review.md` | 已修正 |
+| REV-60 | 1 | 建議 | `.github/team/claude-code.md:7` | 檔尾沒有換行，違反 `.editorconfig` 的 `insert_final_newline`；TEST-6 不檢查檔尾換行 | 已修正：補換行，TEST-6 加入檔尾換行檢查 |
+| REV-61 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:267` | SPEC-11.2 寫 `team-coding-style-csharp`、`cpp` 是「未修改的檔案」，表格卻寫改名與更新連結；TODO-5.3 同 | 已修正：兩處改為「只改名與更新連結」 |
+| REV-62 | 6 | 建議 | `Doc/AUTO-TBD/Spec.md:166` | SPEC-7.1 門檻段寫「動到自動載入的檔案」，`team/review.md` 寫「常駐檔案」；DEC-18.4 寫 -9、第 4 回合寫 -10 | 已修正：SPEC-7.1 改為「常駐檔案」；DEC-18.4 註明淨 -9（移出 -10、索引 +1） |
 | REV-63 | 1 | 建議 | `Doc/AUTO-TBD/Check.ps1:755` | TEST-15 演練中發現：TEST-11 只比對 commit 標題行結尾的 `(STEP/REV-n)`，`git-workflow.md:26` 寫「訊息結尾標示」；`2723da5a`、`ff2f9b8f` 把標示放在本文最後一段，被判為未標示。本分支其他 commit 都標在標題行 | 已修正（使用者同意依建議）：早期共識（DEC-9.3）為規範；考量手寫程式的成員不會逐一標示，改為建議、位置為標題行結尾，DoD 改為可追溯，TEST-11 未標示只提示；兩個 commit 不改寫（DEC-20） |
 
 ## 第 6 回合
@@ -226,7 +226,7 @@
 | REV-84 | 6 | 建議 | `.github/team/process-git.md:53` | 團隊 Git 規範導向 Claude 操作文件，Claude 文件又要求回讀 Git §5；團隊與專案的 `tool-claude-code.md` 亦互相指定必讀。`process-issue.md` 和 `process-review.md` 也互指對方作為施工與回溯入口。區分「切換到下一個流程」與「解釋本條規則所需的前置閱讀」；索引負責導覽，專案或工具補充只單向指向團隊規則，不讓通用文件反過來依賴工具。C++ 的「同 C#」也應改指共同權威來源，而非重列規則。 | 已修正（DEC-24.5；使用者同意依建議）：`process-git.md` 改指 `env-worktree.md`，工具文件只單向引用通用流程；`process-issue` 與 `process-review` 的互相引用是流程接續，不修正；C++ 的「同 C#」列後續（TODO-5） |
 | REV-85 | 6 | 建議 | `.github/team/coding-general.md:3` | 編碼、換行、tab 等已由 `.editorconfig` 定義，入口和 Coding Style 仍重述；例：通用文件將 120 字元寫成所有原始碼與設定檔的限制，但 `.editorconfig` 只對 C#、C/C++ 設這個值。C# 文件另列「方法保持短小」「變數在最小作用範圍」等一般建議，沒有團隊特有的判定條件。保留工具驗證不到的團隊慣例，格式只連到 `.editorconfig`；若沿用 TODO-5，明確列為尚未符合本次精簡與單一來源的項目。 | 列後續（TODO-5；使用者同意依建議）：TODO-5 本為 Coding Style 與 `.editorconfig` 的重複，完成條件加入 120 字元適用範圍與 C# 一般性建議 |
 | REV-86 | 6 | 建議 | `.github/team/process-issue.md:51` | FollowUp 的必填欄位在 DoD 與 `process-docs.md` §4 各寫一次，後者另外要求「建議做法」與「內容自足」。S 級文件範本又寫「所有內容都在 README」，與 §2 的 FollowUp 例外不符。DoD 只檢查是否符合 `process-docs.md` §2、§4，範本明列 FollowUp 例外，讓寫法只維護一處。 | 已修正（使用者同意依建議）：DoD 改為依 `process-docs.md` 第 4 節寫入，S 級範本註明 `FollowUp.md` 例外 |
-| REV-87 | 6 | 建議 | `.claude/skills/issue-start/SKILL.md:3` | TEST-15 重跑發現：description 依序寫「盤點現況、建議分級、開分支」，與 DEC-23.5 先開分支不一致，AI 可能以為分支在分級後才開 | 已修正（待人確認）：順序改為「開分支、盤點現況、建議分級」 |
+| REV-87 | 6 | 建議 | `.claude/skills/issue-start/SKILL.md:3` | TEST-15 重跑發現：description 依序寫「盤點現況、建議分級、開分支」，與 DEC-23.5 先開分支不一致，AI 可能以為分支在分級後才開 | 已修正：順序改為「開分支、盤點現況、建議分級」 |
 | REV-88 | 2 | 提問 | `.github/team/process-git.md:12` | TEST-15 重跑發現：第 2 節沒有寫新議題分支以哪個分支為基準（目標版本分支或 `master`）；本機沒有目標版本分支時 AI 只能推測 | 已修正（DEC-24.6；使用者決定）：補「新議題分支以遠端的 `master` 為基準」，與現行做法一致 |
 
 ## 第 9 回合
@@ -288,11 +288,11 @@
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
-| REV-98 | 2 | 必修 | `Doc/AUTO-TBD/TestPlan.md:160` | TEST-17 的 VS 案例只跑 `-ListModels`，而列模型走 ACP，不能證明 VS Agent 能從同一對話啟動 reviewer 並收回報告（REQ-12.3、SPEC-20.7）；第 5 節也未記錄定案後的 TEST-17 結果。建議在 VS 端用最終腳本實跑一次完整委託，並分別記錄兩種施工方的結果或未驗狀態。 | 已修正（待人確認）：TEST-17 的 VS 案例改為由 VS 完整委託一回合增量 review，待使用者執行；第 5 節記錄 Claude Code 案例的結果 |
-| REV-99 | 3 | 必修 | `.github/scripts/Invoke-CopilotReview.ps1:167` | 腳本以子字串辨識完成狀態，CLI 回傳 0 時，合法的失敗回報「狀態：失敗：無法完成指定檢查」也會讓腳本回傳成功。建議啟動前與結束後都比對完整狀態列，只接受各階段約定的值，並以包含「完成」的失敗原因驗證非零結束碼。 | 已修正（待人確認）：執行前後都比對完整狀態列，只接受 `狀態：待 review` 與 `狀態：完成` |
-| REV-100 | 5 | 建議 | `.github/scripts/Invoke-CopilotReview.ps1:151` | `--allow-all` 將工具、路徑與網址一律開放，超過讀取受審內容、執行指定檢查及更新兩個檔案的需要；事後的 `git status --short` 無法察覺已提交或工作目錄外的異動。建議保留非互動執行，但縮小工具、路徑與網路權限，並比對執行前後的分支、HEAD 及工作樹異動。 | 已修正（待人確認）：保留 `--allow-all`（使用者決定全自動，記入 DEC-25.11）；腳本加上執行前後的 HEAD 與分支比對，變動時回傳失敗 |
-| REV-101 | 6 | 提問 | `.github/team/process-ai-review.md:52` | DEC-25.3 與請求範本固定在 `Review.md` 新增 `##` 回合，但 `process-review.md` 第 2 節要求 S 級在 `README.md` 的 Review 章節新增 `###` 回合，套用範本會產生錯誤的報告位置。是否讓範本依議題級別帶入報告路徑與標題層級，或明示委託流程不適用於 S 級？ | 已修正（待人確認）：範本的報告檔註明 S 級為 `README.md` 的 Review 章節，reviewer 規則依 `process-review.md` 第 2 節決定標題層級 |
-| REV-102 | 6 | 建議 | `Doc/AUTO-TBD/README.md:42` | Release Note 仍只涵蓋原有 review 規範與 skill，沒有本分支新增的委託流程、Copilot CLI 輔助腳本及部署指引。建議補一條「新增」，讓團隊與 QA 能從 MR 說明辨識這項選用功能。 | 已修正（待人確認）：Release Note 加入第 14、15 項 |
+| REV-98 | 2 | 必修 | `Doc/AUTO-TBD/TestPlan.md:160` | TEST-17 的 VS 案例只跑 `-ListModels`，而列模型走 ACP，不能證明 VS Agent 能從同一對話啟動 reviewer 並收回報告（REQ-12.3、SPEC-20.7）；第 5 節也未記錄定案後的 TEST-17 結果。建議在 VS 端用最終腳本實跑一次完整委託，並分別記錄兩種施工方的結果或未驗狀態。 | 已修正：TEST-17 的 VS 案例改為由 VS 完整委託一回合增量 review，待使用者執行；第 5 節記錄 Claude Code 案例的結果 |
+| REV-99 | 3 | 必修 | `.github/scripts/Invoke-CopilotReview.ps1:167` | 腳本以子字串辨識完成狀態，CLI 回傳 0 時，合法的失敗回報「狀態：失敗：無法完成指定檢查」也會讓腳本回傳成功。建議啟動前與結束後都比對完整狀態列，只接受各階段約定的值，並以包含「完成」的失敗原因驗證非零結束碼。 | 已修正：執行前後都比對完整狀態列，只接受 `狀態：待 review` 與 `狀態：完成` |
+| REV-100 | 5 | 建議 | `.github/scripts/Invoke-CopilotReview.ps1:151` | `--allow-all` 將工具、路徑與網址一律開放，超過讀取受審內容、執行指定檢查及更新兩個檔案的需要；事後的 `git status --short` 無法察覺已提交或工作目錄外的異動。建議保留非互動執行，但縮小工具、路徑與網路權限，並比對執行前後的分支、HEAD 及工作樹異動。 | 已修正：保留 `--allow-all`（使用者決定全自動，記入 DEC-25.11）；腳本加上執行前後的 HEAD 與分支比對，變動時回傳失敗 |
+| REV-101 | 6 | 提問 | `.github/team/process-ai-review.md:52` | DEC-25.3 與請求範本固定在 `Review.md` 新增 `##` 回合，但 `process-review.md` 第 2 節要求 S 級在 `README.md` 的 Review 章節新增 `###` 回合，套用範本會產生錯誤的報告位置。是否讓範本依議題級別帶入報告路徑與標題層級，或明示委託流程不適用於 S 級？ | 已修正：範本的報告檔註明 S 級為 `README.md` 的 Review 章節，reviewer 規則依 `process-review.md` 第 2 節決定標題層級 |
+| REV-102 | 6 | 建議 | `Doc/AUTO-TBD/README.md:42` | Release Note 仍只涵蓋原有 review 規範與 skill，沒有本分支新增的委託流程、Copilot CLI 輔助腳本及部署指引。建議補一條「新增」，讓團隊與 QA 能從 MR 說明辨識這項選用功能。 | 已修正：Release Note 加入第 14、15 項 |
 
 ## 第 12 回合
 
@@ -311,8 +311,8 @@
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
-| REV-103 | 3 | 建議 | `.github/scripts/Invoke-CopilotReview.ps1:166` | 新增的分支比對使用不區分大小寫的 `-eq`；模擬 HEAD 不變、分支由 `Feature` 改成 `feature` 時，腳本仍回傳 0。建議以 `-ceq` 比對分支，讓只改大小寫的分支異動也回傳失敗。 | 已修正（待人確認）：分支改以 `-ceq` 比對 |
-| REV-104 | 6 | 建議 | `.github/team/process-ai-review.md:47` | 範本已支援 S 級的報告位置，卻仍只指示讀取 `Discussion.md`；S 級依 `process-docs.md` 第 2 節把 DEC 放在 `README.md` 的「討論記錄」。Reviewer 可能漏讀決策，未依 DEC-25.5 將與既有決策衝突的發現列為「提問」。建議讓範本指向各級的討論記錄，並在 Reviewer 規則引用同一來源。 | 已修正（待人確認）：範本改為讀討論記錄（`Discussion.md`，沒有時為 `README.md` 的討論記錄章節），Reviewer 規則引用同一來源 |
+| REV-103 | 3 | 建議 | `.github/scripts/Invoke-CopilotReview.ps1:166` | 新增的分支比對使用不區分大小寫的 `-eq`；模擬 HEAD 不變、分支由 `Feature` 改成 `feature` 時，腳本仍回傳 0。建議以 `-ceq` 比對分支，讓只改大小寫的分支異動也回傳失敗。 | 已修正：分支改以 `-ceq` 比對 |
+| REV-104 | 6 | 建議 | `.github/team/process-ai-review.md:47` | 範本已支援 S 級的報告位置，卻仍只指示讀取 `Discussion.md`；S 級依 `process-docs.md` 第 2 節把 DEC 放在 `README.md` 的「討論記錄」。Reviewer 可能漏讀決策，未依 DEC-25.5 將與既有決策衝突的發現列為「提問」。建議讓範本指向各級的討論記錄，並在 Reviewer 規則引用同一來源。 | 已修正：範本改為讀討論記錄（`Discussion.md`，沒有時為 `README.md` 的討論記錄章節），Reviewer 規則引用同一來源 |
 
 ## 第 13 回合
 
@@ -350,11 +350,11 @@
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
-| REV-105 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:135` | TEST-15 的通過條件改為四個 skill 都須讀取必讀清單，方法卻仍只呼叫 `issue-start`、`review`、`release-note`。照既定步驟無法驗證第四個入口，且 SPEC-2 的對照未列已納入該入口的 TEST-17。建議讓 TEST-15 只驗其方法列出的三個入口，並在 SPEC-2 下補列 TEST-17。 | 已修正（待人確認）：TEST-15 條件改回三個入口，SPEC-2 對照補 TEST-17 |
-| REV-106 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:211` | TEST-16 第 3 項的重跑結果在詢問議題編號與內容時就停止，僅記錄「收到後先建立分支再盤點」的說明；第 153 行還要求驗證先開分支、盤點後停於分級確認點，現有紀錄不足以支持「通過」。建議依實際證據區分已驗證的觸發與尚未驗證的流程，並同步第 199 行仍稱下列為前一次結果的總述。 | 已修正（待人確認）：TEST-16 第 3 小項區分已驗證與未驗證部分，更新過時總述 |
-| REV-107 | 3 | 建議 | `.claude/skills/ai-tools-review/SKILL.md:3` | 把「用 Copilot CLI review」直接列為委託觸發語句，未區分請目前的 Copilot CLI 自己審查與請施工方另啟 Copilot CLI。前一種請求可能被導向委託流程，與 DEC-25.12 要分開直接 review 和委託的目的不符。建議改用明確的委託例句，例如「請另啟 Copilot CLI review」。 | 已修正（待人確認）：改為「另啟 Copilot CLI review」 |
-| REV-108 | 4 | 建議 | `.claude/skills/ai-tools-review/SKILL.md:9` | 新 skill 將 `tool-copilot-cli.md` 列為無條件必讀，團隊概觀第 43 行卻只要求 reviewer 為 Copilot CLI 時加讀。選用其他 reviewer 時，skill 與直接依索引進入會讀到不同的文件，且前者會提前導入不適用的工具步驟。建議在清單標明僅當 reviewer 為 Copilot CLI 時加讀。 | 已修正（待人確認）：標明 reviewer 為 Copilot CLI 時才讀 |
-| REV-109 | 6 | 建議 | `Doc/AUTO-TBD/Implementation.md:126` | STEP-17 新增第四個 skill，並把 `Check.ps1` 的 TEST-3 最低 skill 數量從三改為四，但步驟的 TEST 清單沒有 TEST-3。依 STEP 追查本次靜態檢查時會漏掉這項擴充，建議在 STEP-17 補列並說明它對應新增的 skill。 | 已修正（待人確認）：STEP-17 補列 TEST-3 |
+| REV-105 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:135` | TEST-15 的通過條件改為四個 skill 都須讀取必讀清單，方法卻仍只呼叫 `issue-start`、`review`、`release-note`。照既定步驟無法驗證第四個入口，且 SPEC-2 的對照未列已納入該入口的 TEST-17。建議讓 TEST-15 只驗其方法列出的三個入口，並在 SPEC-2 下補列 TEST-17。 | 已修正：TEST-15 條件改回三個入口，SPEC-2 對照補 TEST-17 |
+| REV-106 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:211` | TEST-16 第 3 項的重跑結果在詢問議題編號與內容時就停止，僅記錄「收到後先建立分支再盤點」的說明；第 153 行還要求驗證先開分支、盤點後停於分級確認點，現有紀錄不足以支持「通過」。建議依實際證據區分已驗證的觸發與尚未驗證的流程，並同步第 199 行仍稱下列為前一次結果的總述。 | 已修正：TEST-16 第 3 小項區分已驗證與未驗證部分，更新過時總述 |
+| REV-107 | 3 | 建議 | `.claude/skills/ai-tools-review/SKILL.md:3` | 把「用 Copilot CLI review」直接列為委託觸發語句，未區分請目前的 Copilot CLI 自己審查與請施工方另啟 Copilot CLI。前一種請求可能被導向委託流程，與 DEC-25.12 要分開直接 review 和委託的目的不符。建議改用明確的委託例句，例如「請另啟 Copilot CLI review」。 | 已修正：改為「另啟 Copilot CLI review」 |
+| REV-108 | 4 | 建議 | `.claude/skills/ai-tools-review/SKILL.md:9` | 新 skill 將 `tool-copilot-cli.md` 列為無條件必讀，團隊概觀第 43 行卻只要求 reviewer 為 Copilot CLI 時加讀。選用其他 reviewer 時，skill 與直接依索引進入會讀到不同的文件，且前者會提前導入不適用的工具步驟。建議在清單標明僅當 reviewer 為 Copilot CLI 時加讀。 | 已修正：標明 reviewer 為 Copilot CLI 時才讀 |
+| REV-109 | 6 | 建議 | `Doc/AUTO-TBD/Implementation.md:126` | STEP-17 新增第四個 skill，並把 `Check.ps1` 的 TEST-3 最低 skill 數量從三改為四，但步驟的 TEST 清單沒有 TEST-3。依 STEP 追查本次靜態檢查時會漏掉這項擴充，建議在 STEP-17 補列並說明它對應新增的 skill。 | 已修正：STEP-17 補列 TEST-3 |
 
 本回合沒有「必修」。
 
