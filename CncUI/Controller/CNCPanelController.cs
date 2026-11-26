@@ -345,7 +345,8 @@ namespace CncUI
 
 		void OnJogPressed( string axis, bool positive )
 		{
-			if( !CanExecuteCommand() || !IsMachiningReady() || m_JogActive || m_Manager.Axes.Count != 5 ) {
+			if( !CanExecuteCommand() || !IsMachiningReady() || m_JogActive ||
+				( m_Manager.Axes.Count != 4 && m_Manager.Axes.Count != 5 ) ) {
 				return;
 			}
 			int slot;
@@ -615,7 +616,8 @@ namespace CncUI
 			m_Panel.SetButtonEnabled( CNCButton.Follow, enabled );
 			m_Panel.SetButtonEnabled( CNCButton.Focus, enabled );
 			m_Panel.SetButtonEnabled( CNCButton.Calibration, enabled );
-			m_Panel.SetJogEnabled( enabled && m_Manager.Axes.Count == 5 && m_Client.IsConnected );
+			bool valid = m_Manager.Axes.Count == 4 || m_Manager.Axes.Count == 5;
+			m_Panel.SetJogEnabled( enabled && valid && m_Client.IsConnected, m_Manager.Axes.Count );
 		}
 
 		void OnAxesChanged()
@@ -624,8 +626,10 @@ namespace CncUI
 				return;
 			}
 			m_Panel.CancelJog();
-			bool valid = m_Manager.Axes.Count == 5;
-			m_Panel.SetRotaryAxisNames( valid ? m_Manager.Axes[ 3 ].Name : null, valid ? m_Manager.Axes[ 4 ].Name : null );
+			CncAxis first = m_Manager.Axes.Count > 3 ? m_Manager.Axes[ 3 ] : null;
+			CncAxis second = m_Manager.Axes.Count > 4 ? m_Manager.Axes[ 4 ] : null;
+			m_Panel.SetRotaryAxisNames( first?.Name, second?.Name );
+			m_Panel.SetSecondRotaryAxisVisible( m_Manager.Axes.Count != 4 );
 			UpdateManualControlsEnabled();
 		}
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="Title" Content="程式座標偏置" />
 	<Message ID="SetZero" Content="設為 0" />
@@ -6,5 +6,7 @@
 	<Message ID="Error_Unavailable" Content="偏置設定視窗無法使用。" />
 	<Message ID="Error_UIThread" Content="請在 WinForms UI 執行緒初始化偏置設定視窗。" />
 	<Message ID="Error_Subscription" Content="無法初始化偏置座標訂閱。" />
+	<Message ID="Error_CoordinateSubscription" Content="偏置座標訂閱更新失敗：{0}" />
 	<Message ID="Error_Operation" Content="{0}失敗，偏置可能尚未完整更新：{1}" />
+	<Message ID="Error_Display" Content="偏置座標更新失敗：{0}" />
 </ResMap>

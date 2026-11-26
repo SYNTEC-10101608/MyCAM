@@ -45,12 +45,8 @@ namespace CncUI
 				UpdateMachiningStatus();
 				AddSubscription( m_Resources.MainProgramPool.Subscribe( CncConstants.FIRST_COORD_ID, value => PostToUI( UpdateMainProgram ) ) );
 				UpdateMainProgram();
-				for( int id = 1; id <= m_CoordinateFields.Length; id++ ) {
-					AddSubscription( m_Resources.SystemVarPool.Subscribe( CncConstants.SYSTEM_VAR_PROGRAM_BASE + id, OnCoordinateChanged ) );
-					AddSubscription( m_Resources.RPool.Subscribe( CncConstants.R_MACHINE_COORDINATE_BASE + id,
-						value => PostToUI( UpdateCoordinates ) ) );
-				}
-				OnAxesChanged();
+				RefreshCoordinateSubscriptions();
+				UpdateAxesDisplay();
 				SubscribeR( CncConstants.R_CAPACITANCE, CNCInfoField.Capacitance, 1m, "F0" );
 				SubscribeR( CncConstants.R_HEIGHT_AXIS_POSITION, CNCInfoField.HeightAxisPosition );
 				SubscribeR( CncConstants.R_FOLLOW_HEIGHT, CNCInfoField.FollowHeight );
@@ -83,6 +79,7 @@ namespace CncUI
 			if( m_Manager != null ) {
 				m_Manager.AxesChanged -= OnAxesChanged;
 			}
+			ClearCoordinateSubscriptions();
 			foreach( IDisposable subscription in m_Subscriptions ) {
 				subscription.Dispose();
 			}
@@ -137,10 +134,65 @@ namespace CncUI
 			if( !CanUpdate() ) {
 				return;
 			}
-			bool valid = m_Manager.Axes.Count == m_CoordinateFields.Length;
-			m_Panel.SetRotaryAxisNames( valid ? m_Manager.Axes[ 3 ].Name : null, valid ? m_Manager.Axes[ 4 ].Name : null );
-			m_Panel.SetRotaryAxisRoles( valid ? m_Manager.Axes[ 3 ].Role : null, valid ? m_Manager.Axes[ 4 ].Role : null );
+			try {
+				RefreshCoordinateSubscriptions();
+			}
+			catch( Exception ex ) {
+				System.Diagnostics.Trace.TraceError( "CNC coordinate subscription update failed: {0}", ex );
+				m_Manager.Report( string.Format( CNCUIManager.Language.TryGetString(
+					"Error_CoordinateSubscription", COORDINATE_SUBSCRIPTION_ERROR ), ex.Message ), true );
+			}
+			UpdateAxesDisplay();
+		}
+
+		void UpdateAxesDisplay()
+		{
+			CncAxis first = m_Manager.Axes.Count > 3 ? m_Manager.Axes[ 3 ] : null;
+
+			// five axis machine
+			CncAxis second = m_Manager.Axes.Count > 4 ? m_Manager.Axes[ 4 ] : null;
+			m_Panel.SetRotaryAxisNames( first?.Name, second?.Name );
+			m_Panel.SetRotaryAxisRoles( first?.Role, second?.Role );
+			m_Panel.SetSecondRotaryAxisVisible( m_Manager.Axes.Count != 4 );
 			UpdateCoordinates();
+		}
+
+		void RefreshCoordinateSubscriptions()
+		{
+			// Coordinate subscriptions follow the current axes, independently of other monitor resources.
+			ClearCoordinateSubscriptions();
+			try {
+				foreach( CncAxis axis in m_Manager.Axes ) {
+					AddCoordinateSubscription( m_Resources.SystemVarPool.Subscribe(
+						CncConstants.SYSTEM_VAR_PROGRAM_BASE + axis.ID, OnCoordinateChanged ) );
+					AddCoordinateSubscription( m_Resources.RPool.Subscribe(
+						CncConstants.R_MACHINE_COORDINATE_BASE + axis.ID, value => PostToUI( UpdateCoordinates ) ) );
+				}
+				m_bCoordinateSubscriptionsReady = true;
+			}
+			catch {
+				// Do not retain a partially established set of coordinate subscriptions.
+				ClearCoordinateSubscriptions();
+				throw;
+			}
+		}
+
+		void AddCoordinateSubscription( IDisposable subscription )
+		{
+			if( subscription == null ) {
+				throw new InvalidOperationException(
+					CNCUIManager.Language.TryGetString( "Error_MonitorSubscription", MONITOR_SUBSCRIPTION ) );
+			}
+			m_CoordinateSubscriptionList.Add( subscription );
+		}
+
+		void ClearCoordinateSubscriptions()
+		{
+			m_bCoordinateSubscriptionsReady = false;
+			foreach( IDisposable subscription in m_CoordinateSubscriptionList ) {
+				subscription.Dispose();
+			}
+			m_CoordinateSubscriptionList.Clear();
 		}
 
 		void OnCoordinateChanged( ResourceValue<double?> value )
@@ -152,7 +204,7 @@ namespace CncUI
 		{
 			for( int i = 0; i < m_CoordinateFields.Length; i++ ) {
 				double? value = null;
-				if( m_Manager.IsConnected && m_Manager.Axes.Count == m_CoordinateFields.Length ) {
+				if( m_bCoordinateSubscriptionsReady && m_Manager.IsConnected && i < m_Manager.Axes.Count ) {
 					int axisID = m_Manager.Axes[ i ].ID;
 					value = m_MachineCoordinates ? GetMachineCoordinate( axisID )
 						: GetValue( m_Resources.SystemVarPool, CncConstants.SYSTEM_VAR_PROGRAM_BASE + axisID );
@@ -161,7 +213,7 @@ namespace CncUI
 			}
 		}
 
-		private double? GetMachineCoordinate( int axisID )
+		 double? GetMachineCoordinate( int axisID )
 		{
 			return m_Resources.RPool.TryGetValue( CncConstants.R_MACHINE_COORDINATE_BASE + axisID, out ResourceValue<int?> value )
 				&& value.IsValid && value.Value.HasValue
@@ -258,6 +310,8 @@ namespace CncUI
 		readonly CNCUIManager m_Manager;
 		readonly CNCInfoField[] m_CoordinateFields = { CNCInfoField.X, CNCInfoField.Y, CNCInfoField.Z, CNCInfoField.B, CNCInfoField.C };
 		readonly List<IDisposable> m_Subscriptions = new List<IDisposable>();
+		readonly List<IDisposable> m_CoordinateSubscriptionList = new List<IDisposable>();
+		bool m_bCoordinateSubscriptionsReady;
 		SynchronizationContext m_Context;
 		bool m_MachineCoordinates;
 		volatile bool m_Initialized;
@@ -268,5 +322,6 @@ namespace CncUI
 		const string MONITOR_INITIALIZED = "CNC 監控面板已初始化。";
 		const string MONITOR_UI_THREAD = "請在 WinForms UI 執行緒初始化 CNC 監控面板。";
 		const string MONITOR_SUBSCRIPTION = "無法初始化 CNC 監控面板資源訂閱。";
+		const string COORDINATE_SUBSCRIPTION_ERROR = "CNC 座標訂閱更新失敗：{0}";
 	}
 }

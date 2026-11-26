@@ -213,6 +213,15 @@ namespace CncUI
 
 		internal event Action CoordinateModeClicked;
 
+		internal void SetSecondRotaryAxisVisible( bool visible )
+		{
+			m_lblCTitle.Visible = visible;
+			m_lblCNote.Visible = visible;
+			m_lblCValue.Visible = visible;
+			m_lblCUnit.Visible = visible;
+			m_grpCoordinates.Invalidate();
+		}
+
 		internal void SetRotaryAxisNames( string first, string second )
 		{
 			m_lblBTitle.Text = first ?? "—";
@@ -302,6 +311,9 @@ namespace CncUI
 		{
 			e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 			foreach( var axis in m_AxisColors ) {
+				if( !axis.Key.Visible ) {
+					continue;
+				}
 				using( SolidBrush brush = new SolidBrush( axis.Value ) ) {
 					e.Graphics.FillEllipse( brush, axis.Key.Left - AXIS_MARKER_OFFSET, axis.Key.Top + ( axis.Key.Height - 7 ) / 2F, 7, 7 );
 				}

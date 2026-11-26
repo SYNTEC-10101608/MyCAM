@@ -216,13 +216,20 @@ namespace CncUI
 			m_pnlCommands.Enabled = enabled;
 		}
 
-		internal void SetJogEnabled( bool enabled )
+		internal void SetJogEnabled( bool enabled, int axisCount = 5 )
 		{
-			foreach( var buttons in m_JogButtons.Values ) {
-				foreach( Button button in buttons ) {
-					button.Enabled = enabled;
+			foreach( var axis in m_JogButtons ) {
+				bool available = axis.Key == "Rotary2" ? axisCount > 4 : axisCount > 3;
+				foreach( Button button in axis.Value ) {
+					button.Enabled = enabled && available;
 				}
 			}
+		}
+
+		internal void SetSecondRotaryAxisVisible( bool visible )
+		{
+			m_btnCPlus.Visible = visible;
+			m_btnCMinus.Visible = visible;
 		}
 
 		internal void SetRotaryAxisNames( string first, string second )

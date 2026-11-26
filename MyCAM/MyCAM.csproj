@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>AppIcon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Clipper2Lib">
       <HintPath>..\reference\Clipper2Lib.dll</HintPath>
@@ -644,6 +647,9 @@
     <Compile Include="Helper\FileIO\CadFileReader.cs" />
     <Compile Include="Data\LoadingBar\LoadingBarInfo.cs" />
     <Compile Include="LoadingManager\LoadingBarManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AppIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
