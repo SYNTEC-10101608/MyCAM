@@ -761,15 +761,15 @@ function Test-11()
 		$failList += "README.md 的 DoD 未全部勾選（已勾 $nChecked、未勾 $nUnchecked）"
 	}
 	$readmeSectionList = Get-Sections ( $szReadme -split "\r?\n" )
-	$release = $readmeSectionList | Where-Object { $_.Title -match 'Release Note' } | Select-Object -First 1
-	if( $null -ne $release ) {
+	# 有後續 MR 時依 MR 分節（Release Note（1st）、（2nd）…），每節都檢查
+	foreach( $release in @( $readmeSectionList | Where-Object { $_.Title -match 'Release Note' } ) ) {
 		$noteLineArray = @( $release.Lines | Where-Object { $_ -match '^\d+\.\s' } )
 		if( $noteLineArray.Count -eq 0 ) {
-			$failList += 'Release Note 沒有條列'
+			$failList += "$( $release.Title ) 沒有條列"
 		}
 		foreach( $szLine in $noteLineArray ) {
 			if( $szLine -notmatch '^\d+\.\s(新增|修改|刪除) \S' ) {
-				$failList += "Release Note 前綴不符：$szLine"
+				$failList += "$( $release.Title ) 前綴不符：$szLine"
 			}
 		}
 	}
@@ -808,6 +808,16 @@ function Test-11()
 
 	# 11.3 標示為建議（DEC-20）：未標示只提示；每個 STEP 仍須有標示的 commit
 	$hashArray = @( git log --format=%H "$Base..HEAD" )
+
+	# 1st MR 以 squash 合併，STEP-1～STEP-17 的 commit 只在保留的議題分支
+	foreach( $szRef in @( 'AUTO-23290_f_DevProcess', 'origin/AUTO-23290_f_DevProcess' ) ) {
+		git rev-parse --verify --quiet "$szRef^{commit}" | Out-Null
+		if( $LASTEXITCODE -eq 0 ) {
+			$hashArray += @( git log --format=%H "$Base..$szRef" )
+			break
+		}
+	}
+	$hashArray = @( $hashArray | Select-Object -Unique )
 	$stepSet = @{}
 	foreach( $szHash in $hashArray ) {
 		$szSubject = ( git log -1 --format=%s $szHash ).Trim()
