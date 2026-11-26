@@ -5,7 +5,7 @@
 | 分支 | `AUTO-23254_f_UIStyleUnify` |
 | 分支起點 | `bd0fa270`（`master`，2026-11-26，rebase 後）；原起點 `a4b3826d`（2026-11-15），rebase 前的版本在本機分支 `backup/AUTO-23254_before_rebase` |
 | 級別 | L |
-| 狀態 | 已併入 `master` 並依新規範調整（STEP-12）、新增規格螢幕的截圖環境（STEP-13），`runtime` 已在規格螢幕上全部通過，待討論已確認；待 VS Copilot 整體 review（第 8 回合）與人工確認 `master` 修正（TEST-19），再推送與發 MR |
+| 狀態 | 已併入 `master` 並依新規範調整（STEP-12）、新增規格螢幕的截圖環境（STEP-13），`runtime` 已在規格螢幕上全部通過，待討論已確認；第 8 回合（Copilot 整體 review）已處置；待第 9 回合（增量）與人工確認 `master` 修正（TEST-19），再推送與發 MR |
 
 ## 文件
 
@@ -40,7 +40,7 @@
 3. [ ] `TestPlan.md` 附最終執行結果：TEST-19 待人工確認，其餘已附。
 4. [x] 每個 STEP 可追溯到 commit：STEP-1～STEP-11 依 `Implementation.md` 人工對照，STEP-12 之後以標題標示（DEC-12）。
 5. [x] 門檻通過：`Build.bat Debug`、`Build.bat Release`、`UICheck.bat runtime`（含靜態檢查）、`RunIssueChecks.bat`。
-6. [ ] Review 報告寫入 `Review.md`，「必修」全部已修正：第 7 回合已處置完畢；第 8 回合（VS Copilot 整體 review）待執行。
+6. [ ] Review 報告寫入 `Review.md`，「必修」全部已修正：第 7、8 回合已處置完畢；第 9 回合（增量）待執行。
 7. [x] 範圍外項目寫入 `FollowUp.md`。
 8. [x] Release note 寫入本文件。
 9. [x] 各確認點分別經人確認：原範圍 2026-11-23；rebase 與截圖環境（REQ-8、SPEC-19、SPEC-20）2026-11-26（DEC-14）。
