@@ -333,3 +333,44 @@
 無新發現；本回合沒有「必修」。
 
 註（施工方，2026-11-26）：本回合由 VS 2026 Copilot（18.12，GPT-6.1 Sol）自行執行，原意是 TEST-17 第 1.2 項的委託演練，VS 沒有委託而是直接 review（見 TestPlan 5.2）；VS 未記錄模型，依使用者畫面補記於此。
+
+## 第 14 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `b429d0201747adfc7624d261d35097a4a9c6d583`；受審 HEAD `27fb1eb8cc640f5be181d4f0c44a6142f11d807f` |
+| 工具與模型 | GitHub Copilot CLI 1.0.116、gpt-6.2-sol、推理強度 high |
+| 日期 | 2026-11-26 |
+
+1. 門檻：新增本回合前執行 `powershell -NoProfile -ExecutionPolicy Bypass -File Doc\AUTO-TBD\Check.ps1 -Base 24c7276d -SkipPersonal`，9 PASS、1 FAIL（結束碼 1）。僅已知的 TEST-11 未通過：DoD 第 3、9、10 項未勾選及既有處置待人確認；TEST-12 列為 PASS，但依參數略過實際檢查。腳本讀取工作樹，其中 `README.md` 已有未提交的 Release Note 異動；該異動未納入審查。`git diff --check b429d020 27fb1eb8` 通過；依請求不重建，第 13 回合已記錄 Debug、Release 建置成功。
+2. 只審指定增量及直接影響，`README.md` 以受審提交為準。DEC-25.12 新增的委託入口、直接 review 的排除說明與 STEP-17 已落實；未改動常駐指引或委託腳本。
+3. TEST-17 的 VS 施工方案例重跑：本回合可直接確認獨立 Copilot CLI reviewer 收到第 14 回合請求並產出報告。未見 VS 端的 skill 觸發、模型清單、輔助腳本結束狀態或施工方分析，不能據此判定整個案例通過；未另啟 VS 或 CLI 演練，也未改寫測試結果。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-105 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:135` | TEST-15 的通過條件改為四個 skill 都須讀取必讀清單，方法卻仍只呼叫 `issue-start`、`review`、`release-note`。照既定步驟無法驗證第四個入口，且 SPEC-2 的對照未列已納入該入口的 TEST-17。建議讓 TEST-15 只驗其方法列出的三個入口，並在 SPEC-2 下補列 TEST-17。 | 已修正（待人確認）：TEST-15 條件改回三個入口，SPEC-2 對照補 TEST-17 |
+| REV-106 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:211` | TEST-16 第 3 項的重跑結果在詢問議題編號與內容時就停止，僅記錄「收到後先建立分支再盤點」的說明；第 153 行還要求驗證先開分支、盤點後停於分級確認點，現有紀錄不足以支持「通過」。建議依實際證據區分已驗證的觸發與尚未驗證的流程，並同步第 199 行仍稱下列為前一次結果的總述。 | 已修正（待人確認）：TEST-16 第 3 小項區分已驗證與未驗證部分，更新過時總述 |
+| REV-107 | 3 | 建議 | `.claude/skills/ai-tools-review/SKILL.md:3` | 把「用 Copilot CLI review」直接列為委託觸發語句，未區分請目前的 Copilot CLI 自己審查與請施工方另啟 Copilot CLI。前一種請求可能被導向委託流程，與 DEC-25.12 要分開直接 review 和委託的目的不符。建議改用明確的委託例句，例如「請另啟 Copilot CLI review」。 | 已修正（待人確認）：改為「另啟 Copilot CLI review」 |
+| REV-108 | 4 | 建議 | `.claude/skills/ai-tools-review/SKILL.md:9` | 新 skill 將 `tool-copilot-cli.md` 列為無條件必讀，團隊概觀第 43 行卻只要求 reviewer 為 Copilot CLI 時加讀。選用其他 reviewer 時，skill 與直接依索引進入會讀到不同的文件，且前者會提前導入不適用的工具步驟。建議在清單標明僅當 reviewer 為 Copilot CLI 時加讀。 | 已修正（待人確認）：標明 reviewer 為 Copilot CLI 時才讀 |
+| REV-109 | 6 | 建議 | `Doc/AUTO-TBD/Implementation.md:126` | STEP-17 新增第四個 skill，並把 `Check.ps1` 的 TEST-3 最低 skill 數量從三改為四，但步驟的 TEST 清單沒有 TEST-3。依 STEP 追查本次靜態檢查時會漏掉這項擴充，建議在 STEP-17 補列並說明它對應新增的 skill。 | 已修正（待人確認）：STEP-17 補列 TEST-3 |
+
+本回合沒有「必修」。
+
+### 施工方驗證與分析（2026-11-26）
+
+1. 已確認 HEAD 與分支未變，reviewer 只新增本回合並將請求狀態改為完成；CLI 與輔助腳本結束碼均為 0。既有 `README.md` 異動前後的 Git blob 均為 `8456d5cc9d31fb78605e9cb7b314300a5bdb28cd`，內容未變；報告的 `git diff --check` 通過。
+2. 施工方可補足 reviewer 看不到的 TEST-17 證據：VS 對話第一個動作觸發 `ai-tools-review`，依序讀兩份必讀文件，以 `-ListModels` 列出 15 個模型、費用與推理強度；使用者指定 `gpt-6.2-sol / high` 後，寫請求檔、以腳本啟動獨立 CLI、收回報告並完成以下逐項分析。本次委託流程已完成；VS 次版本未在本對話重新確認，未自行改寫 `TestPlan.md` 的最終結果。
+3. 逐項分析（非處置）：
+   1. REV-105（TEST-15 四個入口與三個方法不一致）：同意，TEST-15 保留三個入口，SPEC-2 補列由 TEST-17 驗證委託入口即可，避免重複演練。
+   2. REV-106（TEST-16 通過證據不足）：同意應區分觸發成功與完整流程尚未驗證，並更新過時總述；現有記錄不足不等於功能失敗。
+   3. REV-107（Copilot CLI 觸發語句有歧義）：同意作為預防性措辭建議，但本回合未實測重現誤觸發；加上「另啟」可更明確表達委託意圖。
+   4. REV-108（工具文件無條件必讀）：同意，標明 Copilot CLI reviewer 才加讀，與既有流程索引一致。
+   5. REV-109（STEP-17 漏列 TEST-3）：同意，補列實際修改到的檢查項即可。
+4. 待討論：
+   1. 問題：五項皆為建議，仍需決定是否採納；處置維持「待處置」，未修改規範、未 commit 或 push。
+   2. 建議：採納上述五項；涉及觸發說明與必讀條件的調整，待使用者同意後處理。
+   3. 另一可行選項：逐項指定不修正並附理由，或列入後續；本回合沒有必修，不自行再開一回合。
+
+使用者決定五項都採納，並保留 VS 依 `release-note` skill 改寫的 Release Note（2026-11-26）；修正由 Claude Code 完成。本回合沒有「必修」，委託 review 依 `process-ai-review.md` 第 3 節結束。

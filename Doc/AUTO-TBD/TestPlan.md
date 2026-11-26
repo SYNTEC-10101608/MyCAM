@@ -132,7 +132,7 @@
    3. 另開新 session，只輸入「開議題」；問「切換 session 要怎麼做」。
    4. 要求修改任一 `.cs` 檔的一個方法，修改不保留。
 2. 通過條件：
-   1. 四個 skill 讀取各自的必讀清單；`/review` 讀入 `team/`、`project/` 全部文件。
+   1. `issue-start`、`review`、`release-note` 讀取各自的必讀清單（`ai-tools-review` 由 TEST-17 驗證）；`/review` 讀入 `team/`、`project/` 全部文件。
    2. `/issue-start` 第一個動作是開分支（DEC-23.5）：說明分支名稱與基準，不實際建立（方法第 1 項）；演練中視同人已確認分支，接著盤點並產出符合 S 級範本的 `README.md`，提出分級建議後停下。
    3. Release note 與 merge log 符合格式，目標版本留空。
    4. 「開議題」與「切換 session」經流程索引讀到對應文件；切換 session 讀到 `process-issue.md` 的交接（DEC-24）。
@@ -169,7 +169,7 @@
 | SPEC | TEST |
 | --- | --- |
 | SPEC-1 規範分層、載入與文件通則 | TEST-1、TEST-2、TEST-3、TEST-4、TEST-6、TEST-7、TEST-10、TEST-14、TEST-16 |
-| SPEC-2 觸發入口 | TEST-3、TEST-7、TEST-15、TEST-16 |
+| SPEC-2 觸發入口 | TEST-3、TEST-7、TEST-15、TEST-16、TEST-17 |
 | SPEC-3 議題分級、階段與確認點 | TEST-7、TEST-15 |
 | SPEC-4 完成定義 | TEST-7、TEST-11、TEST-15 |
 | SPEC-5 議題文件組合與內容歸屬 | TEST-7、TEST-15 |
@@ -196,7 +196,7 @@
 
 1. TEST-13：`FollowUp.md` 含 SPEC-18 各項（TODO-1～TODO-5），每項有目標、完成條件、延後原因、建議做法；TODO-2 列出 TEST-2 為候選。通過。
 2. TEST-10：於 Review 第 2 回合文件段執行（獨立 session），發現列為 REV-20～REV-29，全部有處置。通過。
-3. TEST-15 已依 DEC-23.5、DEC-24 的新條件重跑；TEST-16 待使用者重跑（REV-81、REV-82），以下 TEST-16 為前一次結果。TEST-14～TEST-16：DEC-21 調整結構後重跑（2026-11-25，`8b513b37`）；前一次（DEC-19 之後）三項皆通過，並確認 VS 2026 Copilot 可讀取 `.claude/skills/`。
+3. TEST-15 已依 DEC-23.5、DEC-24 的新條件重跑；TEST-16 已於 DEC-24 後重跑（第 3 小項）。TEST-14～TEST-16：DEC-21 調整結構後重跑（2026-11-25，`8b513b37`）；前一次（DEC-19 之後）三項皆通過，並確認 VS 2026 Copilot 可讀取 `.claude/skills/`。
    1. TEST-14：在 worktree 開新 session，載入 worktree 的 `CLAUDE.md`、`copilot-instructions.md`、`team-overview`、`project-overview`，以及個人層 `~/.claude/CLAUDE.md`、主 checkout 的 `CLAUDE.local.md` 與 auto memory 的 `MEMORY.md`；沒有載入 `team/`、`project/` 的檔案，主 checkout 的 `CLAUDE.md` 及其 `@` 引用（master 的 `coding-style-*.instructions.md`）也沒有載入。通過。
    2. TEST-15：DEC-24 後在 `b558e814` 重跑（2026-11-26，Claude Code、Opus 5.5，worktree 子 session）；方法第 3 項當時在同一 session 內執行、只以索引的對應關係判斷，現以第 4 小項的全新 session 重跑結果為準（REV-90）。開始與結束時 `git status` 皆乾淨。
       1. `/issue-start`：讀 `process-issue`、`process-docs`、`process-git`；第一個動作是開分支，fetch 逾時時依 `process-git.md` 第 2 節的 fetch 規則停下確認，說明分支名稱與基準後未實際建立；之後讀 `coding-architecture`、`project/coding-general` 盤點，在 scratchpad 產出符合 S 級範本的 `README.md`，提出分級建議後停下。通過。
@@ -208,12 +208,13 @@
    3. TEST-16：DEC-24 後於 `b429d020` 重跑（2026-11-26，VS 2026 18.12，Agent 模式，模型 GPT-6.1 Sol），每項開新對話；結果依使用者提供的畫面記錄。
       1. 附加 `VectorTool.cs` 要求為 `GetAngle_deg` 加 `gp_Vec` 多載：讀 `process-issue`、`team/coding-general.md`、`coding-csharp.md`、`coding-architecture.md`、`project/coding-general.md`、`env-build.md`、`.editorconfig`；提出 S 級建議後停下等人確認。通過。
       2. 附加 `VectorTool.cs` 問「寫法有沒有不符規範的地方」：觸發 `review`，讀兩份 `process-review` 後讀入 `team/`、`project/` 全部文件與 `.editorconfig`，只檢視不修改。通過。
-      3. 輸入「開議題」：觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git`；詢問議題編號與內容，說明收到後先建立分支再盤點。通過。
+      3. 輸入「開議題」：觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git`；詢問議題編號與內容，說明收到後先建立分支再盤點。觸發與第一步通過；未提供議題內容，開分支後盤點並停在分級確認點的部分未在 VS 驗證，以 TEST-15 第 1 小項（Claude Code）佐證（REV-106）。
       4. 問「切換 session 要怎麼做」：讀 `process-issue.md`，依第 5 節回答 `SESSION.md` 交接。通過。
-      5. 「產出 release note」：待使用者執行。
+      5. 「產出 release note」（2026-11-26，`27fb1eb8`）：觸發 `release-note` skill，讀 `process-git.md`，依第 4 節改寫 `README.md` 的 Release Note 章節（12 條，前綴與格式符合，內容與規範一致）。通過。
    4. TEST-17：
       1. Claude Code 為施工方（2026-11-26，`aedc6f31`）：`-ListModels` 列出 15 個模型與各自的推理強度（在模擬 VS Agent 的環境變數下執行）；以 `gpt-6.2-sol`、推理強度 high 委託第 11 回合全範圍 review，約數分鐘完成，只改了 `Review.md` 與請求檔，回合資訊含受審 HEAD 與推理強度，處置為「待處置」；Claude Code 逐項分析後處理 REV-98～REV-102。通過。
       2. VS 2026 Copilot 為施工方（2026-11-26，`b429d020`，VS 2026 18.12，GPT-6.1 Sol）：輸入「委託 AI Tools Review：對本分支做一回合增量 review，範圍 `5a5d5ce4..b429d020`，這是第 13 回合」。VS 觸發 `review` skill 並讀了 `process-ai-review.md`，但自己執行 review（寫入第 13 回合），沒有列模型、寫請求檔或呼叫腳本。不通過：`review` skill 的觸發說明涵蓋「review」，委託的說法被當成直接 review。
+      3. 第 2 小項於新增 `ai-tools-review` skill 後重跑（2026-11-26，`27fb1eb8`，同一台 VS 2026）：第一個動作觸發 `ai-tools-review`，依序讀兩份必讀文件；以 `-ListModels` 列出 15 個模型、費用與推理強度後向人要模型；人指定 `gpt-6.2-sol`、high 後寫請求檔、以腳本啟動 CLI，完成第 14 回合增量 review（REV-105～REV-109）；VS 確認 HEAD、分支與異動範圍後逐項分析，處置留給人。人只在 VS 對話中操作。通過。
 
 ## 6. 待討論
 

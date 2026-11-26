@@ -123,7 +123,7 @@
 2. Goal（REQ-12）、Spec、TestPlan（TEST-17）與 `Check.ps1`（TEST-4、TEST-5、TEST-9）同步。
 3. 以腳本跑一回合委託 review 驗收；VS 端由使用者執行 TEST-17 第 1.2 項。
 4. VS 案例第一次未通過後，新增 `ai-tools-review` skill，`review` skill 的觸發說明排除委託（DEC-25.12）。
-5. SPEC：SPEC-1、SPEC-2、SPEC-7、SPEC-11、SPEC-20。TEST：TEST-4、TEST-5、TEST-7、TEST-9、TEST-17。
+5. SPEC：SPEC-1、SPEC-2、SPEC-7、SPEC-11、SPEC-20。TEST：TEST-3（skill 數量下限改為 4）、TEST-4、TEST-5、TEST-7、TEST-9、TEST-17。
 
 ## 3. SPEC 對照
 
