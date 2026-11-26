@@ -5,7 +5,7 @@
 | 分支 | `AUTO-TBD_f_DevProcess` |
 | 分支起點 | `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23） |
 | 級別 | L |
-| 狀態 | 收官：STEP-1～STEP-17、Review 第 11 回合處置完成；TEST-16、TEST-17 的 VS 案例待使用者執行，待人工確認 |
+| 狀態 | 收官：STEP-1～STEP-17、Review 第 12 回合處置完成；TEST-16、TEST-17 的 VS 案例待使用者執行，待人工確認 |
 
 ## 文件
 

@@ -293,3 +293,23 @@
 | REV-100 | 5 | 建議 | `.github/scripts/Invoke-CopilotReview.ps1:151` | `--allow-all` 將工具、路徑與網址一律開放，超過讀取受審內容、執行指定檢查及更新兩個檔案的需要；事後的 `git status --short` 無法察覺已提交或工作目錄外的異動。建議保留非互動執行，但縮小工具、路徑與網路權限，並比對執行前後的分支、HEAD 及工作樹異動。 | 已修正（待人確認）：保留 `--allow-all`（使用者決定全自動，記入 DEC-25.11）；腳本加上執行前後的 HEAD 與分支比對，變動時回傳失敗 |
 | REV-101 | 6 | 提問 | `.github/team/process-ai-review.md:52` | DEC-25.3 與請求範本固定在 `Review.md` 新增 `##` 回合，但 `process-review.md` 第 2 節要求 S 級在 `README.md` 的 Review 章節新增 `###` 回合，套用範本會產生錯誤的報告位置。是否讓範本依議題級別帶入報告路徑與標題層級，或明示委託流程不適用於 S 級？ | 已修正（待人確認）：範本的報告檔註明 S 級為 `README.md` 的 Review 章節，reviewer 規則依 `process-review.md` 第 2 節決定標題層級 |
 | REV-102 | 6 | 建議 | `Doc/AUTO-TBD/README.md:42` | Release Note 仍只涵蓋原有 review 規範與 skill，沒有本分支新增的委託流程、Copilot CLI 輔助腳本及部署指引。建議補一條「新增」，讓團隊與 QA 能從 MR 說明辨識這項選用功能。 | 已修正（待人確認）：Release Note 加入第 14、15 項 |
+
+## 第 12 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `24c7276d`；受審 HEAD `5a5d5ce4` |
+| 工具與模型 | GitHub Copilot CLI 1.0.116、gpt-6.2-sol、推理強度 high |
+| 日期 | 2026-11-26 |
+
+1. 門檻：新增本回合前執行 `powershell -ExecutionPolicy Bypass -File Doc\AUTO-TBD\Check.ps1 -Base 24c7276d -SkipPersonal`，9 PASS、1 FAIL（結束碼 1）。只有已知的 TEST-11 未通過：DoD 第 3、9、10 項未勾選，既有處置待人確認；TEST-12 依參數略過。增量 `git diff --check` 無異常；依請求未建置。
+2. 僅審 `aedc6f31..5a5d5ce4`。TEST-17 已要求 VS 執行完整委託，並分別記錄 Claude Code 已通過、VS 尚未執行；Release Note 已補委託流程與部署說明。
+3. 以 Windows PowerShell 5.1 模擬執行：完成狀態回傳 0，失敗原因含「完成」及一般分支異動都回傳 1。依 DEC-25.11 保留 `--allow-all`；新增的分支比對及 S 級範本各有一項缺口。
+4. 施工方改寫請求檔時誤把 Reviewer 規則第 1 項的 `狀態：完成` 換成 `狀態：待 review`，reviewer 照規則保留首行，腳本因此回傳失敗；報告本身完整，施工方確認後手動更正請求檔。本回合沒有「必修」，依 `process-ai-review.md` 第 3 節結束委託。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-103 | 3 | 建議 | `.github/scripts/Invoke-CopilotReview.ps1:166` | 新增的分支比對使用不區分大小寫的 `-eq`；模擬 HEAD 不變、分支由 `Feature` 改成 `feature` 時，腳本仍回傳 0。建議以 `-ceq` 比對分支，讓只改大小寫的分支異動也回傳失敗。 | 已修正（待人確認）：分支改以 `-ceq` 比對 |
+| REV-104 | 6 | 建議 | `.github/team/process-ai-review.md:47` | 範本已支援 S 級的報告位置，卻仍只指示讀取 `Discussion.md`；S 級依 `process-docs.md` 第 2 節把 DEC 放在 `README.md` 的「討論記錄」。Reviewer 可能漏讀決策，未依 DEC-25.5 將與既有決策衝突的發現列為「提問」。建議讓範本指向各級的討論記錄，並在 Reviewer 規則引用同一來源。 | 已修正（待人確認）：範本改為讀討論記錄（`Discussion.md`，沒有時為 `README.md` 的討論記錄章節），Reviewer 規則引用同一來源 |

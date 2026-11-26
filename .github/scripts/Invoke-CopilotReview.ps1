@@ -163,7 +163,7 @@ function Invoke-Review( [string]$Exe )
 	Write-Output ''
 	Write-Output '=== 工作樹異動（應只有報告檔與請求檔）==='
 	git status --short
-	$isSameHead = ( ( git rev-parse HEAD ).Trim() -eq $szHeadBefore ) -and ( ( git branch --show-current ).Trim() -eq $szBranchBefore )
+	$isSameHead = ( ( git rev-parse HEAD ).Trim() -eq $szHeadBefore ) -and ( ( git branch --show-current ).Trim() -ceq $szBranchBefore )
 	if( -not $isSameHead ) {
 		Write-Output "=== HEAD 或分支已變動：執行前 $szBranchBefore $szHeadBefore ==="
 	}
