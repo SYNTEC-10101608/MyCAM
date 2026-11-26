@@ -141,6 +141,11 @@ namespace CncUI
 				contents.Apply( card );
 				SortedDictionary<int, List<Control>> rows = new SortedDictionary<int, List<Control>>();
 				foreach( Control control in card.Controls ) {
+					// the axis markers are placed beside their axis names by PlaceAxisMarkers, they make no row
+					bool isAxisMarker = control is ColorSwatch && m_AxisMarkers.ContainsValue( (ColorSwatch)control );
+					if( isAxisMarker ) {
+						continue;
+					}
 					if( !rows.TryGetValue( control.Top, out List<Control> row ) ) {
 						row = new List<Control>();
 						rows.Add( control.Top, row );
