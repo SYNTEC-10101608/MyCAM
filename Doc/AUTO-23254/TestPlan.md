@@ -11,7 +11,7 @@
 | 類 | 維護週期 | 時機 | 執行者 | 入口 | 測試項目 | 結果 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2 | 長期 | 靜態 | 自動 | `Tools\UICheck\UICheck.bat` | TEST-1–TEST-5 | 34 個 Designer 檔，0 個問題 |
-| 3 | 長期 | 動態 | 自動 | `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | TEST-6–TEST-10、TEST-18 | 橫式（常駐 1920×1080 虛擬主螢幕）：版面 zh-TW、zh-CN 各 45 個畫面狀態、數值框 46 個案例、主視窗 6 組截圖與 Designer 10 個區域，皆 0 個問題，客戶區 1920×1009。**直式待執行**（需加入虛擬副螢幕，見 README 的待討論） |
+| 3 | 長期 | 動態 | 自動 | `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | TEST-6–TEST-10、TEST-18 | 在常駐 1920×1080 虛擬主螢幕上（`UICHECK_VISIBLE=1`）：版面 zh-TW、zh-CN 各 45 個畫面狀態、數值框 46 個案例、主視窗 12 組截圖（橫式客戶區 1920×1009）與 Designer 10 個區域，皆 0 個問題；加入虛擬副螢幕的路徑另以失敗情境驗證會移除副螢幕且不影響主螢幕 |
 | 4 | 議題限定 | 靜態 | 自動 | `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | TEST-11–TEST-13 | 行為比對 0 個差異；程式碼風格 350 個檔案 0 個問題 |
 | 5 | 議題限定 | 動態 | 自動 | 同上 | TEST-14 | 12 個情境、152 行，0 個差異 |
 | 6 | 議題限定 | — | 人工 | — | TEST-15–TEST-17、TEST-19 | TEST-15–TEST-17：2026-11-23 確認（`c4e6dd64`）；TEST-19 待確認 |
@@ -37,9 +37,9 @@
 | TEST-6 | 文字與控制項在實際字型下不截斷、不重疊、不超出，開啟後版面等於 Designer，文字取自語系檔 | `LayoutRunner.cs`：`TextClipped`、`TextOverflow`、`TitleOverflow`、`ControlOverlap`、`ControlOutside`、`LoadLayout`、`LanguageText` | 所有對話框與 CNC 面板；精靈與多狀態畫面逐一狀態（`STATE_MAP`，含四軸控制器隱藏第二旋轉軸） | REQ-1、REQ-5、SPEC-3、SPEC-14 |
 | TEST-7 | 數值框的操作約定 | `ControlRunner.cs`：`NumRejectInput`、`NumDebounce`、`NumStep`、`NumSilentRestore` | `DebouncedNumericUpDown`（不開視窗） | REQ-1、REQ-4、SPEC-5 |
 | TEST-8 | 對話框置中 | `MainWindowRunner.cs`：`DialogCenter`、`PortraitCamArea` | `Show` 開啟的 3 個與 `ShowDialog` 開啟的 2 個對話框，橫式與直式 | REQ-1、SPEC-2、SPEC-13 |
-| TEST-9 | 主視窗的字族、語系文字與 CNC 面板 | `MainWindowRunner.cs`：`MainFontFamily`、`MenuLanguageText`、`PanelInWindow` | 主視窗 CAD / CAM / CNC 頁面 × 橫式 1920×1080 / 直式 1080×1920 螢幕，最大化 | REQ-1、SPEC-6、SPEC-7、SPEC-14 |
+| TEST-9 | 主視窗的字族、語系文字與 CNC 面板 | `MainWindowRunner.cs`：`MainFontFamily`、`MenuLanguageText`、`PanelInWindow` | 主視窗 CAD / CAM / CNC 頁面 × 橫式（1920×1080 螢幕最大化）/ 直式（同一螢幕上 1080×1880 的視窗） | REQ-1、SPEC-6、SPEC-7、SPEC-14 |
 | TEST-10 | 主視窗 Designer 如實呈現 | `MainWindowRunner.cs`：`MainDesignerRegion` | 以 Designer 的客戶區 1920×1009 開加工頁，比對 10 個區域 | REQ-5、SPEC-12 |
-| TEST-18 | 規格螢幕 | `VirtualDisplayRun.cs`：沒有符合的螢幕時加入虛擬副螢幕，`[display]` 一行列出螢幕大小、DPI 與工作區域，不符規格時中止（exit 2）；主視窗的 `main window maximized` 一行列出客戶區 | 橫式 1920×1080、直式 1080×1920，96 DPI；通過條件：螢幕與 DPI 符合規格、橫式最大化的客戶區等於 Designer 的 1920×1009、執行前後其他螢幕維持原狀、加入的虛擬螢幕已移除 | REQ-8、SPEC-20 |
+| TEST-18 | 規格螢幕 | `VirtualDisplayRun.cs`：沒有符合的螢幕時加入虛擬副螢幕，`[display]` 一行列出螢幕大小、DPI 與工作區域，不符規格或沒有工作列時中止（exit 2）；主視窗的 `main window maximized` 一行列出客戶區 | 1920×1080、96 DPI；通過條件：螢幕與 DPI 符合規格、有工作列、橫式最大化的客戶區等於 Designer 的 1920×1009、執行前後其他螢幕維持原狀、加入的虛擬螢幕已移除 | REQ-8、SPEC-20 |
 
 截圖：對話框與 CNC 面板 `<語系>\<畫面>[_<狀態>].png`、主視窗 `MainWindow_<語系>_<頁面>_<Landscape|Portrait>.png`
 （紅色虛線框為置中區域）、`MainWindow_Designer.png`；截圖資料夾不進版控。
