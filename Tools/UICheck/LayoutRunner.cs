@@ -493,8 +493,12 @@ namespace UICheck
 				"DisplayState Drawing true false false false true 3 0 false false null false false",
 				"DisplayState Workpiece true false true false false 3 1 false true null false false",
 				"DisplayState Calculation true false true true false 3 0 false false 0.05 true true" } },
-			// null: as it opens (offline); then the machining buttons enabled, as when connected
-			{ "CNCPanel", new[] { null, "SetCommandsEnabled true; SetJogEnabled true" } }
+			// null: as it opens (offline); then the machining buttons enabled, as when connected to a five-axis and a
+			// four-axis controller (the second rotary axis hidden)
+			{ "CNCPanel", new[] { null, "SetCommandsEnabled true; SetJogEnabled true 5",
+				"SetSecondRotaryAxisVisible false; SetCommandsEnabled true; SetJogEnabled true 4" } },
+			{ "CNCInfoPanel", new[] { null, "SetSecondRotaryAxisVisible false" } },
+			{ "CNCOffsetDialog", new[] { null, "SetAxisVisible 4" } }
 		};
 
 		// the main window is checked by screenshots; the remote screen only hosts the VNC view
