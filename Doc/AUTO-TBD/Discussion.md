@@ -215,3 +215,16 @@
 4. **Session 交接改為通用規則**（取代 DEC-14.1 把交接歸為 Claude 專用的前提）：寫入 `process-issue.md` 第 5 節，流程索引「切換 session 或對話」指向該檔；`team/tool-claude-code.md` 只留 Claude Code 的 worktree 機制。
 5. **工具文件只單向引用通用流程**：`process-git.md` 第 5 節改指 `project/env-worktree.md`，不再導向 Claude 文件；`process-issue.md` 與 `process-review.md` 的互相引用是流程接續，保留。
 6. **新議題分支以遠端 `master` 為基準**（REV-88，使用者決定）：現行做法不會先切目標版本分支，一律由 `master` 開分支；寫入 `process-git.md` 第 2 節。
+
+## DEC-25 委託 AI Tools Review（2026-11-26）
+
+1. 考量：使用者希望 Claude Code 是唯一的對話窗口，由它委託另一個 AI 工具 review、分析結果、處理後再委託下一回合，人不需要另外操作 reviewer 的工具。以 Copilot CLI（`gpt-6.2-sol`）試跑 Review 第 9 回合（全範圍）與第 10 回合（增量），流程可行：兩回合都只改了允許的兩處，各約 2 分鐘、1 個 premium request；但第 9 回合有 1 項誤讀（REV-89），第 10 回合有 1 項建議照做會讓 DoD 與 TEST-11 互相卡住（REV-96），每回合也會挑上一回合修正的措辭。
+2. **命名為「委託 AI Tools Review」，定位為建議**：要不要委託由人決定；本 MR 回溯處理（使用者決定，依 `process-issue.md` 第 3.2 節）。
+3. **交接以單一請求檔完成**：施工方在工作目錄根目錄寫 `REVIEW-REQUEST.md`（列入 `.gitignore`），內含對象、範圍、已知的門檻失敗與 reviewer 規則，reviewer 只讀它與 `review` skill 就能照做，不限 reviewer 工具。Reviewer 只在 `Review.md` 新增一回合並更新請求檔狀態；處置、修正與 commit 由施工方在人決定後處理。
+4. **模型與推理強度由人在請求時決定**：AI 列出可用清單（含費用等級與各模型支援的推理強度）並建議（與施工方不同家族、可用的最高等級）；回合資訊表記錄模型與推理強度。Copilot CLI 的可用清單可由 `--acp` 模式的 `session/new` 回應取得，模型名稱不寫進規範。
+5. **終止與防推翻**：全範圍一回合加增量一回合，增量回合沒有「必修」就結束，要再跑由人決定；與既有 DEC 或前回合「不修正」衝突的發現只能列「提問」並附新理由。
+6. **部署分必要與建議**：必要為 VS 2026 18.5 以上的 GitHub Copilot（Agent 模式）；建議為 Copilot CLI（委託 review 用）；Claude Code 為選用，不是團隊必備工具。寫在新增的 `team/env-ai-tools.md`，個人的安裝路徑寫在個人設定。
+7. **VS Copilot 也能委託**：VS 的 Agent 本身是內建的 Copilot CLI，會把 `COPILOT_HOME`、`XDG_*` 等變數傳給子程序，直接呼叫另裝的 CLI 會找不到登入資訊；清除這些變數後實測成功（2026-11-26，VS 18.12）。
+8. **檔案配置**：流程寫在新增的 `team/process-ai-review.md`（建議，與規範分檔）；Copilot CLI 的執行、列模型、清除繼承變數與範圍檢查寫在新增的 `team/tool-copilot-cli.md`；`process-review.md` 的回合資訊表加「受審 HEAD」，「工具與模型」含推理強度；團隊概觀的流程索引加兩列。
+9. **輔助腳本與指引分開放**（使用者決定）：腳本放 `.github/scripts/`，指引目錄只放文件；`tool-copilot-cli.md` 連到腳本。
+10. 確認點 2～5 由使用者授權一次寫到施工完成，最後統一確認（2026-11-26）。
