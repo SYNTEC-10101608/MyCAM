@@ -13,6 +13,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $REQUEST_FILE = 'REVIEW-REQUEST.md'
+$STATUS_PENDING = '狀態：待 review'
+$STATUS_DONE = '狀態：完成'
 $REVIEW_PROMPT = '請讀取工作目錄根目錄的 REVIEW-REQUEST.md，並完全依照其中的對象、範圍與 Reviewer 規則執行 review。'
 $ACP_TIMEOUT_MS = 60000
 
@@ -138,9 +140,9 @@ function Invoke-Review( [string]$Exe )
 	if( -not ( Test-Path -LiteralPath $REQUEST_FILE ) ) {
 		throw "工作目錄沒有 $REQUEST_FILE，範本見 .github/team/process-ai-review.md 第 4 節"
 	}
-	$szStatus = Get-Content -LiteralPath $REQUEST_FILE -TotalCount 1 -Encoding UTF8
-	if( $szStatus -notmatch '待 review' ) {
-		throw "$REQUEST_FILE 第一行不是「狀態：待 review」：$szStatus"
+	$szStatus = ( Get-Content -LiteralPath $REQUEST_FILE -TotalCount 1 -Encoding UTF8 ).Trim()
+	if( $szStatus -ne $STATUS_PENDING ) {
+		throw "$REQUEST_FILE 第一行不是「$STATUS_PENDING」：$szStatus"
 	}
 	if( [string]::IsNullOrEmpty( $Model ) ) {
 		throw '缺少 -Model；先以 -ListModels 列出可用模型，由人決定'
@@ -152,19 +154,27 @@ function Invoke-Review( [string]$Exe )
 	if( -not [string]::IsNullOrEmpty( $Effort ) ) {
 		$argList += @( '--reasoning-effort', $Effort )
 	}
+	$szHeadBefore = ( git rev-parse HEAD ).Trim()
+	$szBranchBefore = ( git branch --show-current ).Trim()
 	& $Exe @argList
 	$nExitCode = $LASTEXITCODE
 
-	# reviewer 只能改 Review.md 與請求檔，其餘異動由施工方處理
+	# reviewer 只能改報告檔與請求檔，不能 commit 或切換分支；其餘異動由施工方處理
 	Write-Output ''
-	Write-Output '=== 工作樹異動（應只有 Review.md 與請求檔）==='
+	Write-Output '=== 工作樹異動（應只有報告檔與請求檔）==='
 	git status --short
-	$szStatus = Get-Content -LiteralPath $REQUEST_FILE -TotalCount 1 -Encoding UTF8
-	Write-Output "=== $REQUEST_FILE：$szStatus ==="
+	$isSameHead = ( ( git rev-parse HEAD ).Trim() -eq $szHeadBefore ) -and ( ( git branch --show-current ).Trim() -eq $szBranchBefore )
+	if( -not $isSameHead ) {
+		Write-Output "=== HEAD 或分支已變動：執行前 $szBranchBefore $szHeadBefore ==="
+	}
+	$szStatus = ( Get-Content -LiteralPath $REQUEST_FILE -TotalCount 1 -Encoding UTF8 ).Trim()
+	Write-Output "=== ${REQUEST_FILE}：$szStatus ==="
 	if( $nExitCode -ne 0 ) {
 		exit $nExitCode
 	}
-	if( $szStatus -notmatch '完成' ) {
+
+	# 只接受約定的完成狀態；「失敗：<原因>」的原因可能含「完成」二字
+	if( ( $szStatus -ne $STATUS_DONE ) -or -not $isSameHead ) {
 		exit 1
 	}
 }

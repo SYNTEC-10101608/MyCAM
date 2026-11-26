@@ -270,3 +270,26 @@
 | REV-95 | 6 | 建議 | `Doc/AUTO-TBD/TestPlan.md:188` | REV-90 的第 3 項已用兩個全新 session 重跑，但結果總述仍稱第 3、4 項在同一 session 執行、以索引對應為依據，容易被誤讀為目前的通過證據。建議明示第 3 項以最新實測為準，並分開標示沿用的第 4 項結果。 | 已修正（使用者同意依建議）：總述註明方法第 3 項以全新 session 的重跑結果為準 |
 | REV-96 | 6 | 建議 | `Doc/AUTO-TBD/README.md:35` | REV-92 取消勾選最終測試結果後，門檻項仍勾選並宣稱 `Check.ps1` 通過，但本次 TEST-11 仍失敗。建議門檻通過前保持未勾選，並區分已通過的檢查與仍待補齊的條件。 | 已修正（使用者同意依建議）：未照建議取消勾選，因為 TEST-11 會檢查本項是否勾選，兩者會互相卡住；改為寫明門檻是 TEST-11 以外全部通過 |
 | REV-97 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:670` | REV-93 新增的「卸載」可偵測整項刪除，但改成只說「卸載狀態不會保留」、不指示卸載 `FCLTool` 時，現有關鍵字仍全數命中。建議檢查卸載動作與 `FCLTool` 的關聯，或把該操作要求列為人工抽查。 | 不修正（使用者同意依建議）：`Check.ps1` 的關鍵字只用來防止整段被刪除，語意是否正確由 review 文件段負責；加嚴關鍵字只會讓措辭修改誤判失敗 |
+
+## 第 11 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `24c7276d`；受審 HEAD `aedc6f31` |
+| 工具與模型 | GitHub Copilot CLI 1.0.116、gpt-6.2-sol、推理強度 high |
+| 日期 | 2026-11-26 |
+
+1. 門檻：新增本回合前執行 `powershell -ExecutionPolicy Bypass -File Doc\AUTO-TBD\Check.ps1 -Base 24c7276d -SkipPersonal`，9 PASS、1 FAIL（結束碼 1）。只有 TEST-11 未通過，原因為 DoD 第 3、9、10 項未勾選及既有處置待人確認；TEST-12 列為 PASS，但依參數略過。全分支 `git diff --check` 無異常；依本次範圍未建置。
+2. 審查範圍為 `24c7276d..aedc6f31`，重點為委託流程定案後的修改。REQ-1～REQ-12 均有 SPEC，現存 SPEC 均有對應 TEST 與 STEP；未見範圍外異動。新增的兩項常駐內容均為按時機導向詳細文件的索引。
+3. 新增腳本以 Windows PowerShell 5.1 解析無錯誤，並以同一比對式重現失敗狀態被當成成功（REV-99）；未另啟動 Copilot 或 VS 執行 TEST-17。
+4. 本回合依 `process-ai-review.md` 由 Claude Code 以 `Invoke-CopilotReview.ps1` 委託（TEST-17 第 1.1 項）；處置由 Claude Code 分析後先行修正，待使用者確認。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-98 | 2 | 必修 | `Doc/AUTO-TBD/TestPlan.md:160` | TEST-17 的 VS 案例只跑 `-ListModels`，而列模型走 ACP，不能證明 VS Agent 能從同一對話啟動 reviewer 並收回報告（REQ-12.3、SPEC-20.7）；第 5 節也未記錄定案後的 TEST-17 結果。建議在 VS 端用最終腳本實跑一次完整委託，並分別記錄兩種施工方的結果或未驗狀態。 | 已修正（待人確認）：TEST-17 的 VS 案例改為由 VS 完整委託一回合增量 review，待使用者執行；第 5 節記錄 Claude Code 案例的結果 |
+| REV-99 | 3 | 必修 | `.github/scripts/Invoke-CopilotReview.ps1:167` | 腳本以子字串辨識完成狀態，CLI 回傳 0 時，合法的失敗回報「狀態：失敗：無法完成指定檢查」也會讓腳本回傳成功。建議啟動前與結束後都比對完整狀態列，只接受各階段約定的值，並以包含「完成」的失敗原因驗證非零結束碼。 | 已修正（待人確認）：執行前後都比對完整狀態列，只接受 `狀態：待 review` 與 `狀態：完成` |
+| REV-100 | 5 | 建議 | `.github/scripts/Invoke-CopilotReview.ps1:151` | `--allow-all` 將工具、路徑與網址一律開放，超過讀取受審內容、執行指定檢查及更新兩個檔案的需要；事後的 `git status --short` 無法察覺已提交或工作目錄外的異動。建議保留非互動執行，但縮小工具、路徑與網路權限，並比對執行前後的分支、HEAD 及工作樹異動。 | 已修正（待人確認）：保留 `--allow-all`（使用者決定全自動，記入 DEC-25.11）；腳本加上執行前後的 HEAD 與分支比對，變動時回傳失敗 |
+| REV-101 | 6 | 提問 | `.github/team/process-ai-review.md:52` | DEC-25.3 與請求範本固定在 `Review.md` 新增 `##` 回合，但 `process-review.md` 第 2 節要求 S 級在 `README.md` 的 Review 章節新增 `###` 回合，套用範本會產生錯誤的報告位置。是否讓範本依議題級別帶入報告路徑與標題層級，或明示委託流程不適用於 S 級？ | 已修正（待人確認）：範本的報告檔註明 S 級為 `README.md` 的 Review 章節，reviewer 規則依 `process-review.md` 第 2 節決定標題層級 |
+| REV-102 | 6 | 建議 | `Doc/AUTO-TBD/README.md:42` | Release Note 仍只涵蓋原有 review 規範與 skill，沒有本分支新增的委託流程、Copilot CLI 輔助腳本及部署指引。建議補一條「新增」，讓團隊與 QA 能從 MR 說明辨識這項選用功能。 | 已修正（待人確認）：Release Note 加入第 14、15 項 |

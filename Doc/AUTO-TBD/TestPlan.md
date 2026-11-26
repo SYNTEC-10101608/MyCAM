@@ -157,9 +157,9 @@
 
 1. 方法：
    1. Claude Code 為施工方：以腳本 `-ListModels` 列出模型，依 `process-ai-review.md` 寫請求檔，以腳本執行一回合全範圍 review，再逐項分析。
-   2. VS 2026 Copilot 為施工方（使用者執行）：在 Agent 模式要求它依流程索引委託 AI Tools Review，列出模型清單。
+   2. VS 2026 Copilot 為施工方（使用者執行）：在 Agent 模式要求它依流程索引委託 AI Tools Review，由它列出模型、寫請求檔、以腳本執行一回合增量 review 並回報分析；記錄 VS 版本。
 2. 通過條件：
-   1. 模型清單含費用等級與各模型支援的推理強度；在 Copilot Agent 的子程序中也能執行。
+   1. 模型清單含費用等級與各模型支援的推理強度；VS 為施工方時，人只在 VS 的對話中操作就完成一回合。
    2. Reviewer 只改 `Review.md` 與請求檔；回合資訊含受審 HEAD 與推理強度，處置為「待處置」。
    3. 施工方確認異動範圍並逐項分析，處置由人決定。
 3. Review 第 9、10 回合是流程定案前的試跑（DEC-25.1）。
@@ -210,6 +210,9 @@
       2. 附加 `VectorTool.cs` 問「寫法是否有不符合規範的地方」：觸發 `review`，讀兩份 `process-review` 後搜尋 `*.md`，讀入 `team/`、`project/` 全部 13 份與 `.editorconfig`，並讀 `Build.bat` 執行建置門檻。通過。
       3. 輸入「開議題」：觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git`。通過。
       4. 問「切換 session 要怎麼做」：讀兩份 `tool-claude-code.md`。通過。
+   4. TEST-17：
+      1. Claude Code 為施工方（2026-11-26，`aedc6f31`）：`-ListModels` 列出 15 個模型與各自的推理強度（在模擬 VS Agent 的環境變數下執行）；以 `gpt-6.2-sol`、推理強度 high 委託第 11 回合全範圍 review，約數分鐘完成，只改了 `Review.md` 與請求檔，回合資訊含受審 HEAD 與推理強度，處置為「待處置」；Claude Code 逐項分析後處理 REV-98～REV-102。通過。
+      2. VS 2026 Copilot 為施工方：待使用者執行。流程定案前已確認 VS Agent 清除繼承變數後可呼叫 CLI（DEC-25.7）。
 
 ## 6. 待討論
 
