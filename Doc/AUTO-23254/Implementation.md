@@ -47,7 +47,7 @@ Tools/UICheck（可持續檢查）、Tests/（本議題檢查）──> 建置�
 | STEP-10 | 人工確認的修正 | 新增類圖示補「+」、區域與 CNC 卡片間距統一、橫式警報左右並排、監控卡片對齊 3D 畫布 | SPEC-6、SPEC-7 | TEST-14、TEST-17 |
 | STEP-11 | 文件與檢查整理 | 專案指引精簡、檢查規則改以名稱識別、程式註解不引用文件、議題文件依新分類重整 | SPEC-17、SPEC-18 | TEST-12 |
 | STEP-12 | 併入 `master` 與依新規範調整 | rebase 到 `bd0fa270` 並解衝突（DEC-12）；主視窗圖示改由專案資源檔指定、修正 `ApplicationIcon` 路徑；指引移到 `project/`、專案指引索引與專案規範；`IconSource` 腳本補 BOM；議題檢查基準改為 `bd0fa270`；議題文件依 `process-docs.md` 重整 | SPEC-19 | TEST-11、TEST-12、TEST-19 |
-| STEP-13 | 規格螢幕的截圖環境 | `VirtualDisplayRun.cs`；主視窗 runner 的最大化模式；`CaptureMainWindow.ps1 -Screen`、`CheckRuntimeLayout.ps1` 在規格螢幕上執行；`STATE_MAP` 依 `master` 的新簽章與四軸狀態；`env-build.md` 的截圖環境（DEC-13） | SPEC-20 | TEST-6、TEST-18 |
+| STEP-13 | 規格螢幕的截圖環境 | `VirtualDisplayRun.cs`；主視窗 runner 的最大化模式；`CaptureMainWindow.ps1 -Screen`、`CheckRuntimeLayout.ps1` 在規格螢幕上執行；`STATE_MAP` 依 `master` 的新簽章與四軸狀態；`project/tool-uicheck.md`（DEC-13、DEC-14） | SPEC-20 | TEST-6、TEST-18 |
 
 每一步的程式、測試、文件分開提交；逐檔異動以 `git diff bd0fa270` 與 `Tools/UICheck/DesignerDiff.ps1 -Base bd0fa270 -Head HEAD`
 查閱。STEP-1～STEP-11 的 commit 在新規範之前，標題沒有 `(STEP-n)`，依上表的內容人工對照（DEC-12）；STEP-12 之後依新規範標示。
@@ -63,7 +63,7 @@ Tools/UICheck（可持續檢查）、Tests/（本議題檢查）──> 建置�
 | 語系 | 所有語系 XML 依新 ID 修改；兩個語系檔改名；新增 `CommonUI_<語系>.xml` |
 | 資源 | 60 個工具列圖示重新產生為透明背景 PNG（檔名不變），新增「加工 / 不加工」2 個 |
 | 刪除 | `GroupPanel`、`PanelButton`、`MyCAM` 內的 `DebouncedNumericUpDown`、`SupportPositionRow`、`MultiSelectTreeView`、`CncUI/Helper/ResponsiveLayout`；`TextRole.Title` |
-| 指引 | 新增 `project/coding-ui-style.md`、`project/coding-icon-design.md`；修改專案概觀的專案指引索引、`project/coding-architecture.md`（`CommonUI`）、`project/coding-general.md`（語系措辭、Designer）、`project/process-review.md`（門檻加入 `UICheck`）、`project/env-build.md`（截圖環境）。理由：UI 規範依新分類屬依時機讀取的專案程式規範，不常駐（DEC-12、DEC-13） |
+| 指引 | 新增 `project/coding-ui-style.md`、`project/coding-icon-design.md`；修改專案概觀的專案指引索引、`project/coding-architecture.md`（`CommonUI`）、`project/coding-general.md`（語系措辭、Designer）、`project/process-review.md`（門檻加入 `UICheck`）；新增 `project/tool-uicheck.md`（UICheck 指令與截圖環境）；團隊概觀協作原則第 2 項補第 4 點。理由：UI 規範依新分類屬依時機讀取的專案程式規範，不常駐；截圖環境屬使用工具時的做法（DEC-12～DEC-14） |
 | 檢查工具 | `Tools/UICheck` 新增 `VirtualDisplayRun.cs`；`MainWindowRunner.cs`、`LayoutRunner.cs`、`CaptureMainWindow.ps1`、`CheckRuntimeLayout.ps1`、`UICheck.bat` 改在規格螢幕上執行 |
 
 ## 4. SPEC 對照

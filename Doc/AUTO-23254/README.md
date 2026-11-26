@@ -5,7 +5,7 @@
 | 分支 | `AUTO-23254_f_UIStyleUnify` |
 | 分支起點 | `bd0fa270`（`master`，2026-11-26，rebase 後）；原起點 `a4b3826d`（2026-11-15），rebase 前的版本在本機分支 `backup/AUTO-23254_before_rebase` |
 | 級別 | L |
-| 狀態 | 已併入 `master` 並依新規範調整（STEP-12）、新增規格螢幕的截圖環境（STEP-13），`runtime` 已在規格螢幕上全部通過；待人工確認 `master` 修正（TEST-19）、待討論定案，再推送與發 MR |
+| 狀態 | 已併入 `master` 並依新規範調整（STEP-12）、新增規格螢幕的截圖環境（STEP-13），`runtime` 已在規格螢幕上全部通過，待討論已確認；待 VS Copilot 整體 review（第 8 回合）與人工確認 `master` 修正（TEST-19），再推送與發 MR |
 
 ## 文件
 
@@ -19,8 +19,8 @@
 | [Discussion.md](Discussion.md) | 討論記錄：依主題整理的共識與決策（DEC） |
 | [FollowUp.md](FollowUp.md) | 範圍外的後續處理（TODO）與議題清單 |
 
-專案指引：`.github/project/coding-ui-style.md`、`.github/project/coding-icon-design.md`；截圖環境見
-`.github/project/env-build.md`。
+專案指引：`.github/project/coding-ui-style.md`、`.github/project/coding-icon-design.md`；UI 檢查工具與截圖環境見
+`.github/project/tool-uicheck.md`。
 
 ## 測試程式
 
@@ -31,19 +31,7 @@
 
 ## 待討論
 
-1. DEC-12 依 rebase 指引的建議做法先執行的項目（直接 rebase、指引與議題文件的轉換方式、舊 commit 不補 `STEP`、檢查基準改為 `bd0fa270`、`UICheck` 加入專案門檻）：
-   1. 問題：這些是 `Doc/AUTO-23290/FollowUp.md` 第 4 節第 8 項列為「開工時先由人決定」的事項，已先依其建議執行。
-   2. 建議：維持，理由見 DEC-12。
-   3. 另一可行選項：逐項否決後調整；若要改為 squash 需重做，`backup/AUTO-23254_before_rebase` 保留原狀。
-2. 四軸時 `CNCOffsetDialog` 卡片底部的空白列（REV-8）：
-   1. 問題：`master`（AUTO-23275）四軸時隱藏第五列，對話框大小不變，卡片底部留一列空白。
-   2. 建議：維持現狀，與 `CNCInfoPanel` 隱藏 C 軸後的呈現一致，對話框大小不隨控制器改變。
-   3. 另一可行選項：以 `SectionStack` 依軸數縮短卡片並上移按鈕列，畫面較緊湊，但對話框大小會隨控制器改變。
-3. `master` 的 `ApplicationIcon` 路徑錯誤（REV-1）：
-   1. 問題：`master` 在乾淨的 checkout 無法建置；本分支已修正，`master` 本身仍是錯的。
-   2. 建議：另開 bug 先在 `master` 修正，不必等本議題合併。
-   3. 另一可行選項：只隨本議題合併修正。
-4. 測試機的常駐顯示器與 `UICHECK_VISIBLE`：已決議（DEC-13 第 8 項）。
+無。前一輪的待討論已於 2026-11-26 確認（DEC-14）。
 
 ## DoD
 
@@ -52,11 +40,11 @@
 3. [ ] `TestPlan.md` 附最終執行結果：TEST-19 待人工確認，其餘已附。
 4. [x] 每個 STEP 可追溯到 commit：STEP-1～STEP-11 依 `Implementation.md` 人工對照，STEP-12 之後以標題標示（DEC-12）。
 5. [x] 門檻通過：`Build.bat Debug`、`Build.bat Release`、`UICheck.bat runtime`（含靜態檢查）、`RunIssueChecks.bat`。
-6. [ ] Review 報告寫入 `Review.md`，「必修」全部已修正：REV-1 待人確認，REV-8 待回覆。
+6. [ ] Review 報告寫入 `Review.md`，「必修」全部已修正：第 7 回合已處置完畢；第 8 回合（VS Copilot 整體 review）待執行。
 7. [x] 範圍外項目寫入 `FollowUp.md`。
 8. [x] Release note 寫入本文件。
-9. [ ] 各確認點分別經人確認：原範圍已於 2026-11-23 確認；rebase 與截圖環境（REQ-8、SPEC-19、SPEC-20）待確認。
-10. [x] 長期有效的結論已提升到指引規範（`project/coding-ui-style.md`、`project/coding-icon-design.md`、`project/env-build.md`）。
+9. [x] 各確認點分別經人確認：原範圍 2026-11-23；rebase 與截圖環境（REQ-8、SPEC-19、SPEC-20）2026-11-26（DEC-14）。
+10. [x] 長期有效的結論已提升到指引規範（`project/coding-ui-style.md`、`project/coding-icon-design.md`、`project/tool-uicheck.md`）。
 
 ## Release Note
 

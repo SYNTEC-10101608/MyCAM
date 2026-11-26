@@ -133,7 +133,7 @@
 
 ## DEC-12 併入 `master` 與依新規範調整（2026-11-26）
 
-依 `Doc/AUTO-23290/FollowUp.md` 的 TODO-4 與其 rebase 指引進行；以下第 1～7 項依指引的建議做法執行，待人確認（見 [README.md](README.md) 的待討論）。
+依 `Doc/AUTO-23290/FollowUp.md` 的 TODO-4 與其 rebase 指引進行；以下第 1～7 項先依指引的建議做法執行，2026-11-26 經使用者確認（DEC-14）。
 
 1. **直接 rebase，保留本議題的 commit**（73 個，其中只改舊指引目錄的 1 個在採用 `master` 版本後成為空 commit 而略過）；rebase 前的版本留在本機備份分支 `backup/AUTO-23254_before_rebase`，議題文件記錄的舊 hash（如人工確認的 `c4e6dd64`）在該分支上。
 2. 衝突的處理：
@@ -157,4 +157,19 @@
 6. 對話框與 CNC 面板的執行時檢查（`LayoutRunner.cs`）**也在規格螢幕上執行**：原以為 `DrawToBitmap` 不受螢幕影響，實測在 1366×768 上高於螢幕的 `DesignSupportBracketDlg` 被 Form 限制成螢幕高度而誤報 `ControlOutside`。`-CurrentScreen` 保留在目前螢幕上快速執行的選項。
 7. **直式不需要 1080×1920 的螢幕**（使用者 2026-11-26 指出）：`MainLayout` 只看主視窗外框的長寬比，直式在同一個 1920×1080 螢幕上把主視窗設成 1080×1880 即可。曾嘗試以 Parsec 的旋轉與自訂模式（`HKLM\SOFTWARE\Parsec\vdd\0`）提供 1080×1920，皆無法設定，因此虛擬螢幕只提供 1920×1080，移除旋轉。
 8. 闔蓋、只以 AnyDesk 操作的測試機（2026-11-26 決議）：**安裝常駐的 VirtualDrivers VDD 當 1920×1080、100% 主螢幕**，它同時就是規格螢幕，登入畫面也看得到；**這台固定設定 `UICHECK_VISIBLE=1`**，一般工作電腦不設定，維持隱藏桌面。
-9. 同仁的通用對策寫入 `project/env-build.md` 的截圖環境：有符合的螢幕就用，沒有就裝 Parsec VDD 一次；使用的螢幕必須有工作列，否則中止並說明設定；遠端桌面（RDP）工作階段看不到虛擬螢幕，要在本機或 AnyDesk 類工具上執行。
+9. 同仁的通用對策寫入 `project/tool-uicheck.md` 的截圖環境（原寫在 `env-build.md`，與建置無關，依分類改為 `tool-`，DEC-14）：有符合的螢幕就用，沒有就裝 Parsec VDD 一次；使用的螢幕必須有工作列，否則中止並說明設定；遠端桌面（RDP）工作階段看不到虛擬螢幕，要在本機或 AnyDesk 類工具上執行。
+
+## DEC-14 rebase 後待討論事項的確認（2026-11-26）
+
+施工方先執行後才列出、未依協作原則先由人決定的事項，經使用者逐項確認。
+
+1. **維持**：直接 rebase；舊 commit 不補 `STEP`；舊的 `R/S/T` 全部換成 `REQ/SPEC/TEST`（偏離 rebase 指引「舊編號保留」的建議，整份文件只有一種編號）；既有後續處理只補 `TODO` 編號；檢查基準改為 `bd0fa270`；`UICheck` 列入專案門檻；目標版本與 remote 在 push 前決定；人工確認只做衝突涉及的畫面（TEST-19）。
+2. 後續處理 22 項是分 8 類的獨立項目，另整理為 10 張建議議題單，**維持**。
+3. **獨立 review 改為在新的 session 委託 VS Copilot，以 GPT 6.2 SOL、推理強度 high 審整個分支**，不限於 rebase。
+4. 衝突的解法**維持**：主視窗圖示由專案資源檔指定（圖檔沿用 `master` 的 `AppIcon.ico`）；`CNCInfoPanel` 四軸時一併隱藏 C 軸色塊；四軸時 `CNCOffsetDialog` 卡片底部的空白列維持現狀。
+5. `master` 的 `ApplicationIcon` 路徑錯誤**另開 bug 修 `master`**（TODO-23）。
+6. UICheck 的指令與截圖環境**移到 `project/tool-uicheck.md`**：截圖環境與建置無關，屬於使用該工具時的做法。
+7. **REQ-8、SPEC-20 納入本議題**。
+8. 團隊概觀協作原則第 2 項**補第 4 點**：工具的權限設定只決定執行前是否詢問，不改變需先由人決定的範圍。起因是施工方把「工具權限全自動」誤當成決策也不必先問。
+9. 試驗留下的 `HKLM\SOFTWARE\Parsec\vdd\0` **清除**；兩處 `settings.local.json` 的 `bypassPermissions` 與全域 `CLAUDE.md` 的機台說明**保留**。
+10. 使用者人工檢視時發現橫式加工頁的監控卡片比右側「加工控制」卡片低 9 px，**調整底部列比例對齊**（REV-11），主視窗區域基準因此改記錄。
