@@ -17,9 +17,9 @@
 | 輔助腳本 | `.github/scripts/Invoke-CopilotReview.ps1` | SPEC-20 |
 | 觸發入口 | `.claude/skills/{issue-start,review,release-note,ai-tools-review}/SKILL.md` | SPEC-2 |
 | 設定 | `.gitignore`、`.editorconfig` | SPEC-11 |
-| 檢查腳本 | `Doc/AUTO-TBD/Check.ps1` | TestPlan 第 1 節 |
+| 檢查腳本 | `Doc/AUTO-23290/Check.ps1` | TestPlan 第 1 節 |
 | 個人設定（不進版控） | `~/.claude/CLAUDE.md`、`~/.claude/issue-workflow.md`、主 checkout 的 `CLAUDE.local.md` | SPEC-17 |
-| 議題文件 | `Doc/AUTO-TBD/*` | SPEC-18、SPEC-19 |
+| 議題文件 | `Doc/AUTO-23290/*` | SPEC-18、SPEC-19 |
 
 1. 依賴順序：檢查腳本 → 流程 → 入口與概觀（引用流程的路徑）→ 專案層 → 觸發入口 → 個人設定 → 驗證與收官。
 2. 每完成一個 STEP 就執行 `Check.ps1`，該 STEP 對應的 TEST 須通過。

@@ -128,7 +128,7 @@
 | `.claude/skills/{issue-start,review,release-note,ai-tools-review}/SKILL.md` | 觸發入口 | 新增 |
 | `.gitignore` | 版控設定 | 加入 `/SESSION.md`、`/REVIEW-REQUEST.md` |
 | `.editorconfig` | 格式設定 | 加入 `[*.ps1] charset = utf-8-bom`，更新註解路徑 |
-| `Doc/AUTO-TBD/*` | 議題文件 | 新增 |
+| `Doc/AUTO-23290/*` | 議題文件 | 新增 |
 
 1. 檔案格式依 `.editorconfig`；本議題新增與修改的規範檔使用數字條列，`team/coding-csharp.md`、`coding-cpp.md` 的條列留待 TODO-5。
 2. `team/`、`project/` 不加 `applyTo`；檔名不用 `claude.md`。

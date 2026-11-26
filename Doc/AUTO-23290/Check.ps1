@@ -1,5 +1,5 @@
-﻿# AUTO-TBD 議題限定檢查：執行 TestPlan.md 中標「自動」的 TEST
-# 用法：在 repo 任一位置執行 powershell -ExecutionPolicy Bypass -File Doc\AUTO-TBD\Check.ps1 [-Base <commit>]
+﻿# AUTO-23290 議題限定檢查：執行 TestPlan.md 中標「自動」的 TEST
+# 用法：在 repo 任一位置執行 powershell -ExecutionPolicy Bypass -File Doc\AUTO-23290\Check.ps1 [-Base <commit>]
 # 有失敗時 exit code 為失敗的 TEST 數
 
 [CmdletBinding()]
@@ -436,7 +436,7 @@ function Test-5()
 	$changedList = @( git diff --name-only $Base )
 	$changedList += @( git ls-files --others --exclude-standard )
 	foreach( $szFile in ( $changedList | Sort-Object -Unique ) ) {
-		$isAllowed = ( $allowArray -contains $szFile ) -or $szFile.StartsWith( 'Doc/AUTO-TBD/' )
+		$isAllowed = ( $allowArray -contains $szFile ) -or $szFile.StartsWith( 'Doc/AUTO-23290/' )
 		if( -not $isAllowed ) {
 			$failList += "清單外的異動：$szFile"
 		}
@@ -459,7 +459,7 @@ function Test-6()
 {
 	$failList = @()
 	$noteList = @()
-	$fileList = @( Get-GuideFiles ) + @( Get-Files 'Doc/AUTO-TBD' '*.md' ) + @( 'Doc/AUTO-TBD/Check.ps1' )
+	$fileList = @( Get-GuideFiles ) + @( Get-Files 'Doc/AUTO-23290' '*.md' ) + @( 'Doc/AUTO-23290/Check.ps1' )
 
 	# 只在簡體中文出現的常用字
 	$simplifiedArray = @( '这', '们', '说', '时', '为', '发', '会', '过', '对', '还', '进', '个', '来', '实', '规', '档' )
@@ -562,7 +562,7 @@ function Test-7()
 {
 	$failList = @()
 	$fileList = @( Get-Files '.github' '*.md' -Recurse ) + @( 'CLAUDE.md' ) +
-		@( Get-Files '.claude/skills' 'SKILL.md' -Recurse ) + @( Get-Files 'Doc/AUTO-TBD' '*.md' )
+		@( Get-Files '.claude/skills' 'SKILL.md' -Recurse ) + @( Get-Files 'Doc/AUTO-23290' '*.md' )
 	foreach( $szFile in $fileList ) {
 		$szText = Read-Text $szFile
 		$szDir = Split-Path $szFile -Parent
@@ -585,7 +585,7 @@ function Test-7()
 			$refList += $match.Groups[ 1 ].Value
 		}
 		# Review 與 Discussion 是歷史記錄，路徑為當時的檔名，改名後不回頭改寫（DEC-21）
-		$isHistory = $szFile -match '^Doc/AUTO-TBD/(Review|Discussion)\.md$'
+		$isHistory = $szFile -match '^Doc/AUTO-23290/(Review|Discussion)\.md$'
 
 		# review 報告的位置寫成 `檔案:行號`，只檢查檔案部分
 		foreach( $match in [regex]::Matches( $szText, '`(\.github/[^`\s:]+)(:[0-9-]+)?`' ) ) {
@@ -745,11 +745,11 @@ function Test-11()
 
 	# 11.1
 	foreach( $szDoc in @( 'README', 'Goal', 'Spec', 'TestPlan', 'Implementation', 'Review', 'Discussion', 'FollowUp' ) ) {
-		if( -not ( Test-Path -LiteralPath ( Join-Path $Root "Doc/AUTO-TBD/$szDoc.md" ) ) ) {
-			$failList += "缺少 Doc/AUTO-TBD/$szDoc.md"
+		if( -not ( Test-Path -LiteralPath ( Join-Path $Root "Doc/AUTO-23290/$szDoc.md" ) ) ) {
+			$failList += "缺少 Doc/AUTO-23290/$szDoc.md"
 		}
 	}
-	$szReadme = Read-Text 'Doc/AUTO-TBD/README.md'
+	$szReadme = Read-Text 'Doc/AUTO-23290/README.md'
 	foreach( $szHead in @( '文件', 'DoD', 'Release Note' ) ) {
 		if( $szReadme -notmatch "(?m)^##\s.*$( [regex]::Escape( $szHead ) )" ) {
 			$failList += "README.md 缺少「$szHead」章節"
@@ -775,7 +775,7 @@ function Test-11()
 	}
 
 	# 11.2
-	$szReview = Read-Text 'Doc/AUTO-TBD/Review.md'
+	$szReview = Read-Text 'Doc/AUTO-23290/Review.md'
 	if( $null -ne $szReview ) {
 		foreach( $szField in @( '議題', '分支', '比對基準', '工具與模型', '日期' ) ) {
 			if( -not $szReview.Contains( $szField ) ) {
@@ -812,7 +812,7 @@ function Test-11()
 	foreach( $szHash in $hashArray ) {
 		$szSubject = ( git log -1 --format=%s $szHash ).Trim()
 		$fileArray = @( git diff-tree --no-commit-id --name-only -r $szHash )
-		$isDocOnly = @( $fileArray | Where-Object { $_ -notmatch '^Doc/AUTO-TBD/[^/]+\.md$' } ).Count -eq 0
+		$isDocOnly = @( $fileArray | Where-Object { $_ -notmatch '^Doc/AUTO-23290/[^/]+\.md$' } ).Count -eq 0
 		$tagMatch = [regex]::Match( $szSubject, '\(((STEP|REV)-\d+(,\s*(STEP|REV)-\d+)*)\)$' )
 		if( $tagMatch.Success ) {
 			foreach( $stepMatch in [regex]::Matches( $tagMatch.Value, 'STEP-(\d+)' ) ) {
@@ -823,7 +823,7 @@ function Test-11()
 			$noteList += "commit $( $szHash.Substring( 0, 8 ) ) 標題行未標示 STEP 或 REV：$szSubject"
 		}
 	}
-	$nStepCount = ( [regex]::Matches( ( Read-Text 'Doc/AUTO-TBD/Implementation.md' ), '(?m)^###\s+STEP-\d+' ) ).Count
+	$nStepCount = ( [regex]::Matches( ( Read-Text 'Doc/AUTO-23290/Implementation.md' ), '(?m)^###\s+STEP-\d+' ) ).Count
 	for( $i = 1; $i -le $nStepCount; $i++ ) {
 		if( -not $stepSet.ContainsKey( $i ) ) {
 			$failList += "STEP-$i 沒有 commit"

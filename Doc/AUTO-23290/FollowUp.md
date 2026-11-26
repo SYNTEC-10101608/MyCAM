@@ -22,9 +22,9 @@
    1. 本機檢查腳本：長期維護的檢查（常駐行數、格式與數字條列、連結有效、團隊通用層不含專案內容）以 PowerShell 腳本放在 repo，成員送 MR 前可執行。
    2. CI：GitLab CI 在 MR 上執行建置與檢查腳本，失敗時不可合併。
    3. 測試專案：建立 C# 測試專案，核心演算法有自動測試。
-3. 延後原因：本議題以成文化現有機制為主；議題限定的檢查已在 `Doc/AUTO-TBD/Check.ps1`，長期維護版需要另行設計與團隊同意。
+3. 延後原因：本議題以成文化現有機制為主；議題限定的檢查已在 `Doc/AUTO-23290/Check.ps1`，長期維護版需要另行設計與團隊同意。
 4. 建議做法：
-   1. 以 `Doc/AUTO-TBD/Check.ps1` 為起點，抽出長期維護的檢查。
+   1. 以 `Doc/AUTO-23290/Check.ps1` 為起點，抽出長期維護的檢查。
    2. 第一個候選：團隊通用層（`team-overview.instructions.md`、`team/coding-general.md`、`.github/team/*.md`）不得含專案專屬字詞（`MyCAM`、`Build.bat`、`CopyRef`、`FCLTool`、`PostTool`、`OCC`、`LanguageManager`、`Designer`、`reference/`、`.worktreeinclude`、`CustPost`、`zh-TW`、`AUTO-`），對應本議題 TEST-2。
    3. 每建立一項自動檢查，就把規範中對應的文字規則縮為一行指引。
 
@@ -64,7 +64,7 @@ TODO-4 的做法。盤點日期 2026-11-25，依本機 ref（當時 `git fetch o
    1. 分支只在本機（worktree `.claude/worktrees/ui-style-unify`），未 push；起點 `a4b3826d`，73 個 commit、無 merge commit，對 `origin/master`（`24c7276d`）ahead 73、behind 11。
    2. 修改 356 檔：Production Code 91、`Language/` XML 128、`*.Designer.cs` 36、議題文件 14、指引 5（改 `copilot-instructions.md`、`project-overview`、`CLAUDE.md`，新增 `ui-style.instructions.md`、`icon-design.instructions.md`）、`Tools/UICheck/` 14、圖示與資源 68。
    3. 議題文件在 `Doc/AUTO-23254/`，用舊編號 `R` / `S` / `T` 與數字檔名前綴；沒有 DoD 勾選清單、Release Note、`Review.md`；commit 沒有 `STEP` / `REV` 標示。依新規範屬 L 級。
-2. 時機：等本議題以 squash 合併進目標版本分支後，再把 UI 分支 rebase 到該版本分支；先 rebase 到 `AUTO-TBD_f_DevProcess` 會帶入本議題的全部 commit。
+2. 時機：等本議題以 squash 合併進目標版本分支後，再把 UI 分支 rebase 到該版本分支；先 rebase 到 `AUTO-23290_f_DevProcess` 會帶入本議題的全部 commit。
 3. 預估衝突（以本議題 `99dcd2e7`（DEC-18 之前）為對象逐 commit 模擬，停 6 次；實際 rebase 到版本分支時會不同，以重跑結果為準）：
    1. 指引：`CLAUDE.md`、`copilot-instructions.md`、`project-overview.instructions.md`（`origin/master` 與本議題都改過）。
    2. 程式：`MyCAM/Editor/Dialog/LockMSAxisDlg.cs`、`CNCThreePointDlg.cs`（`origin/master` 的 `AUTO-23220`、`AUTO-23240` 修正）。

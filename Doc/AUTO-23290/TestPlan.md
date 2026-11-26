@@ -10,7 +10,7 @@
 | 週期 | 長期維護 | 之後修改規範時仍要執行，屬於 review 對應段的檢查 |
 | 時機 | 靜態 | 檢查檔案內容與 git 記錄 |
 | 時機 | 動態 | 在 Claude Code 或 VS 2026 Copilot 實際操作 |
-| 執行者 | 自動 | 由 `Doc/AUTO-TBD/Check.ps1` 執行並輸出每條 TEST 的結果（DEC-7.1） |
+| 執行者 | 自動 | 由 `Doc/AUTO-23290/Check.ps1` 執行並輸出每條 TEST 的結果（DEC-7.1） |
 | 執行者 | 人工 | 需要人判斷，或需要 AI 無法啟動的工具環境 |
 
 ## 2. 總表
@@ -74,12 +74,12 @@
 
 #### TEST-6 格式與數字條列
 
-1. 方法：檢查本議題新增與修改的規範檔及 `Doc/AUTO-TBD/`。
+1. 方法：檢查本議題新增與修改的規範檔及 `Doc/AUTO-23290/`。
 2. 通過條件：編碼、換行、檔尾換行符合 `.editorconfig`；程式碼區塊外沒有無序號條列，有序清單不跳號（DEC-17）；檔名英文、內容繁體中文。
 
 #### TEST-7 連結與引用有效
 
-1. 方法：擷取 `.github/`、`CLAUDE.md`、`.claude/skills/`、`Doc/AUTO-TBD/` 的相對連結、`@` 路徑與反引號內的 `.github/...` 路徑，逐一確認存在；`Review.md`、`Discussion.md` 是歷史記錄，只檢查連結（DEC-21）。
+1. 方法：擷取 `.github/`、`CLAUDE.md`、`.claude/skills/`、`Doc/AUTO-23290/` 的相對連結、`@` 路徑與反引號內的 `.github/...` 路徑，逐一確認存在；`Review.md`、`Discussion.md` 是歷史記錄，只檢查連結（DEC-21）。
 2. 通過條件：全部存在，大小寫一致。Spec 每條 SPEC 的位置連結因此都指向實際的規則檔。
 
 #### TEST-9 專案指引與 Coding Style 修訂
@@ -99,7 +99,7 @@
 
 #### TEST-11 本議題文件與 commit
 
-1. 方法：檢查 `Doc/AUTO-TBD/`、`README.md`、`Review.md` 與 `git log 24c7276d..HEAD`。
+1. 方法：檢查 `Doc/AUTO-23290/`、`README.md`、`Review.md` 與 `git log 24c7276d..HEAD`。
 2. 通過條件：
    1. 有 L 級八份文件；`README.md` 含文件索引、L 級 DoD（全部勾選）、Release Note。
    2. `Review.md` 表頭五欄、發現表格六欄；處置以已修正、不修正、列後續開頭，沒有待人確認。

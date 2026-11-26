@@ -63,7 +63,7 @@
 ## DEC-7 範圍外（2026-11-24）
 
 1. **CI、測試專案與長期維護的檢查腳本不在本議題實作**，列後續並寫明目標與完成條件；本議題以成文化現有機制為主。
-   議題範疇內驗證需要的腳本屬於本議題：review 每輪修正後都要重跑門檻段，**議題限定的檢查以 PowerShell 腳本 `Doc/AUTO-TBD/Check.ps1` 執行**，隨議題保留；團隊電腦都有 PowerShell，Python 未必在 PATH。
+   議題範疇內驗證需要的腳本屬於本議題：review 每輪修正後都要重跑門檻段，**議題限定的檢查以 PowerShell 腳本 `Doc/AUTO-23290/Check.ps1` 執行**，隨議題保留；團隊電腦都有 PowerShell，Python 未必在 PATH。
 2. **GitLab MR 的建立自動化列後續**：可行方式為 `git push` 的 push options（不需額外環境）或 `glab` CLI / GitLab API（需安裝工具與 access token）。
 3. 使用手冊維護、既有分支（`AUTO-23254_f_UIStyleUnify`）依新規範調整，列後續；`ArchInventory-Doc/` 是殘留檔，不處理。
 
@@ -230,3 +230,8 @@
 10. 確認點 2～5 由使用者授權一次寫到施工完成，最後統一確認（2026-11-26）。
 11. **Reviewer 以全部允許的權限執行**（使用者決定）：逐項核准會讓 CLI 一再詢問，無法在背景執行；以請求檔的規則限制範圍，腳本在結束後檢查 HEAD、分支與工作樹異動（REV-100）。
 12. **新增 `ai-tools-review` skill**（使用者決定，2026-11-26）：TEST-17 VS 案例中，「委託 AI Tools Review」被 `review` skill 的觸發說明涵蓋，VS 自己做了 review。委託符合 skill 原則（人主動發起、要讀多份文件），新增 skill 並在 `review` skill 的觸發說明排除委託，讓兩者不互相搶觸發。
+
+## DEC-26 議題編號與 Release Note（2026-11-26）
+
+1. **議題編號為 `AUTO-23290`**（使用者提供）：依 `process-docs.md` 第 1 節第 2 項更名資料夾與分支；`Review.md` 與本檔的歷史描述保留原本的 `AUTO-TBD`。
+2. **Release Note 收斂為 6 條**（使用者決定）：只寫大方向，細節由指引與「議題總結」說明。

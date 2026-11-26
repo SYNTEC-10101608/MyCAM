@@ -1,8 +1,8 @@
-# AUTO-TBD 團隊與 AI 協作開發流程規範
+# AUTO-23290 團隊與 AI 協作開發流程規範
 
 | 項目 | 內容 |
 | --- | --- |
-| 分支 | `AUTO-TBD_f_DevProcess` |
+| 分支 | `AUTO-23290_f_DevProcess` |
 | 分支起點 | `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23） |
 | 級別 | L |
 | 狀態 | 完成：STEP-1～STEP-17、Review 第 14 回合處置完成，人工全域 review 通過；待送 MR |
@@ -144,7 +144,7 @@ Doc/<議題編號>/                   議題文件
    1. `project-overview.instructions.md`：產品簡介、議題編號前綴與分支範例、專案指引索引。
    2. `project/` 至少要有團隊層引用的三份：`process-review.md`（固定檢查項目）、`env-worktree.md`、`coding-architecture.md`；專案慣例寫在 `coding-general.md`；其他依需要新增，並在專案概觀的索引加列。
 4. 設定檔：`.gitignore` 加入第 3.1 節列出的排除項；`.editorconfig` 加入 `[*.ps1] charset = utf-8-bom`；有成員用 Claude Code 時，依專案列出 `.worktreeinclude`。
-5. 不要搬：`Doc/AUTO-TBD/Check.ps1` 與本議題文件；Check.ps1 只檢查本議題，通用檢查另見 TODO-2。
+5. 不要搬：`Doc/AUTO-23290/Check.ps1` 與本議題文件；Check.ps1 只檢查本議題，通用檢查另見 TODO-2。
 6. 驗證：
    1. 在 `team/`、`.claude/skills/` 搜尋舊專案名稱與議題前綴（如 `MyCAM`、`AUTO-`），應該沒有結果。
    2. VS Copilot 說「開議題」時，應讀到 `issue-start` 的必讀清單。
@@ -174,15 +174,9 @@ Doc/<議題編號>/                   議題文件
 
 ## Release Note
 
-1. 新增 團隊與 AI 共用的協作原則、文件通則與流程索引，將個人開發流程移入版控，由 Copilot 與 Claude Code 共用同一份規範。
-2. 新增 議題處理流程，定義 S、M、L 分級、階段確認點、完成定義（DoD）、範圍變動與回溯規則。
-3. 新增 議題文件規範，統一各級文件組合、項目編號、追溯方式與 README 範本；各級後續處理皆獨立成檔，規範類議題的規格只寫決策與規則位置。
-4. 新增 Review 規範，定義六段檢查、人與 AI 的分工、報告格式與發現的處置方式。
-5. 新增 Git 流程規範，統一版本與分支命名、合併方式、commit 追溯、release note 與 merge log 格式。
-6. 新增 開議題、review、產出 release note、委託 AI Tools Review 四個 skill 入口，提供各動作所需的必讀文件清單。
-7. 新增 專案程式規範與 Review 固定檢查項目，涵蓋四語系同步、Designer、第三方檔案與建置門檻。
-8. 修改 指引依入口、團隊、專案與個人分層，常駐內容精簡為入口與概觀；程式規範、架構、環境與工具做法依索引按需讀取，Review 時讀入全部規範，並明定指引與 skill 的維護原則。
-9. 修改 Coding Style，新增與修改的程式碼採新規範，同一方法新舊混用到難以閱讀時可整體調整，格式調整獨立 commit；Production Code 不引用文件、測試或規範條目。
-10. 新增 不限 AI 工具的 Session 交接與新 worktree 環境準備說明，worktree 為選用；Claude Code 專屬機制另列工具指引。
-11. 新增 委託 AI Tools Review 的建議流程，以單一請求檔交接，由人決定模型、推理強度與發現的處置；提供 Copilot CLI 輔助腳本與增量 review 的終止條件。
-12. 新增 AI 工具部署說明，VS 2026 18.5 以上的 Copilot 為必要，Copilot CLI 為建議，Claude Code 為選用。
+1. 新增 團隊與 AI 共用的開發規範，Copilot 與 Claude Code 讀同一份，依團隊、專案、個人分層並依需要載入。
+2. 新增 議題處理流程，涵蓋分級、確認點、完成定義、議題文件、review 與 Git 規範。
+3. 新增 專案程式規範、review 固定檢查項目，以及建置與 worktree 的環境說明。
+4. 新增 開議題、review、產出 release note、委託 AI Tools Review 的 skill 入口。
+5. 新增 委託其他 AI 工具 review 的建議流程與 AI 工具部署說明。
+6. 修改 Coding Style，新增與修改的程式碼採新規範，程式註解不引用文件。
