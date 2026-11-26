@@ -43,20 +43,18 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StartupForm));
 			this.m_msMode = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiFile = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiCAD = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSimulation = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCNC = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsbSetting = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsbCNCConnection = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiLanguage = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsbController = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiCNC = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiLanguage = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsCAMFunction = new System.Windows.Forms.ToolStrip();
-			this.m_tsMachiningFunction = new System.Windows.Forms.ToolStrip();
-			this.m_tsbSetOffset = new System.Windows.Forms.ToolStripButton();
-			this.m_tsbProcessSettings = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddPath = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbDeletePath = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAutoOrder = new System.Windows.Forms.ToolStripButton();
@@ -65,13 +63,13 @@
 			this.m_tsbReverse = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbEntryAndExitSetting = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSetTraverseData = new System.Windows.Forms.ToolStripButton();
-			this.m_tsbFlyCut = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSetLead = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbOverCut = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMicroJoint = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbRCorner = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbExtendedGCode = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbToolVec = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbFlyCut = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbFixedToolVec = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbToolVecReverse = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbOptimizeIK = new System.Windows.Forms.ToolStripButton();
@@ -80,7 +78,10 @@
 			this.m_tsbPathCompensation = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbContourEdit = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMeasureCAM = new System.Windows.Forms.ToolStripButton();
+			this.m_tsMachiningFunction = new System.Windows.Forms.ToolStrip();
+			this.m_tsbSetOffset = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbCalibrationPnt = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbProcessSettings = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbConvertNC = new System.Windows.Forms.ToolStripButton();
 			this.m_tscLevel1Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsSimuFunc = new System.Windows.Forms.ToolStrip();
@@ -123,9 +124,6 @@
 			this.m_pnlLog = new System.Windows.Forms.Panel();
 			this.m_pnlMessages = new System.Windows.Forms.Panel();
 			this.m_panViewer = new System.Windows.Forms.Panel();
-			this.m_panCNC = new System.Windows.Forms.Panel();
-			this.m_panCNCInfo = new System.Windows.Forms.Panel();
-			this.m_tlpBottom = new System.Windows.Forms.TableLayoutPanel();
 			this.m_tsLayer = new System.Windows.Forms.ToolStrip();
 			this.m_tsbLayer1 = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbLayer2 = new System.Windows.Forms.ToolStripButton();
@@ -153,6 +151,9 @@
 			this.m_tsbShowOrientation = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowTraverse = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowMarker = new System.Windows.Forms.ToolStripButton();
+			this.m_panCNC = new System.Windows.Forms.Panel();
+			this.m_panCNCInfo = new System.Windows.Forms.Panel();
+			this.m_tlpBottom = new System.Windows.Forms.TableLayoutPanel();
 			this.m_panBackGround = new System.Windows.Forms.TableLayoutPanel();
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.m_msMode.SuspendLayout();
@@ -165,12 +166,13 @@
 			this.m_tsCADFunction.SuspendLayout();
 			this.m_tscLevel2Container.SuspendLayout();
 			this.m_tscLevel3Container.SuspendLayout();
+			this.m_panCNCVertical.SuspendLayout();
+			this.m_pnlMessages.SuspendLayout();
 			this.m_panViewer.SuspendLayout();
 			this.m_tsLayer.SuspendLayout();
 			this.m_tsViewerToolBar.SuspendLayout();
-			this.m_panBackGround.SuspendLayout();
 			this.m_tlpBottom.SuspendLayout();
-			this.m_pnlMessages.SuspendLayout();
+			this.m_panBackGround.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// m_msMode
@@ -182,7 +184,7 @@
             this.m_tsmiCAM,
             this.m_tsmiSimulation,
             this.m_tsmiCNC,
-            this.m_tsbSetting} );
+            this.m_tsbSetting});
 			this.m_msMode.Location = new System.Drawing.Point(0, 0);
 			this.m_msMode.Name = "m_msMode";
 			this.m_msMode.Size = new System.Drawing.Size(1596, 24);
@@ -217,12 +219,20 @@
 			this.m_tsmiSimulation.Text = "模擬";
 			this.m_tsmiSimulation.Click += new System.EventHandler(this.m_tsmiSimulation_Click);
 			// 
+			// m_tsmiCNC
+			// 
+			this.m_tsmiCNC.Enabled = false;
+			this.m_tsmiCNC.Name = "m_tsmiCNC";
+			this.m_tsmiCNC.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiCNC.Text = "加工";
+			this.m_tsmiCNC.Click += new System.EventHandler(this.m_tsmiCNC_Click);
+			// 
 			// m_tsbSetting
 			// 
 			this.m_tsbSetting.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsbCNCConnection,
-			this.m_tsbController,
-			this.m_tsmiLanguage});
+            this.m_tsbController,
+            this.m_tsmiLanguage});
 			this.m_tsbSetting.Name = "m_tsbSetting";
 			this.m_tsbSetting.Size = new System.Drawing.Size(43, 20);
 			this.m_tsbSetting.Text = "設定";
@@ -230,37 +240,29 @@
 			// m_tsbCNCConnection
 			// 
 			this.m_tsbCNCConnection.Name = "m_tsbCNCConnection";
-			this.m_tsbCNCConnection.Size = new System.Drawing.Size(148, 22);
+			this.m_tsbCNCConnection.Size = new System.Drawing.Size(158, 22);
 			this.m_tsbCNCConnection.Text = "CNC連線設定";
 			this.m_tsbCNCConnection.Click += new System.EventHandler(this.m_tsbCNCConnection_Click);
-			// 
-			// m_tsmiLanguage
-			// 
-			this.m_tsmiLanguage.Name = "m_tsmiLanguage";
-			this.m_tsmiLanguage.Size = new System.Drawing.Size(148, 22);
-			this.m_tsmiLanguage.Text = "語系切換";
 			// 
 			// m_tsbController
 			// 
 			this.m_tsbController.Name = "m_tsbController";
-			this.m_tsbController.Size = new System.Drawing.Size(55, 20);
+			this.m_tsbController.Size = new System.Drawing.Size(158, 22);
 			this.m_tsbController.Text = "控制器進階設定";
 			this.m_tsbController.Click += new System.EventHandler(this.m_tsbController_Click);
-			//
-			// m_tsmiCNC
-			//
-			this.m_tsmiCNC.Enabled = false;
-			this.m_tsmiCNC.Name = "m_tsmiCNC";
-			this.m_tsmiCNC.Size = new System.Drawing.Size( 54, 23 );
-			this.m_tsmiCNC.Text = "加工";
-			this.m_tsmiCNC.Click += new System.EventHandler( this.m_tsmiCNC_Click );
+			// 
+			// m_tsmiLanguage
+			// 
+			this.m_tsmiLanguage.Name = "m_tsmiLanguage";
+			this.m_tsmiLanguage.Size = new System.Drawing.Size(158, 22);
+			this.m_tsmiLanguage.Text = "語系切換";
 			// 
 			// m_tsCAMFunction
 			// 
 			this.m_tsCAMFunction.BackColor = System.Drawing.SystemColors.Control;
 			this.m_tsCAMFunction.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_tsCAMFunction.ImageScalingSize = new System.Drawing.Size( 40, 40 );
-			this.m_tsCAMFunction.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
+			this.m_tsCAMFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
+			this.m_tsCAMFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsbAddPath,
             this.m_tsbDeletePath,
             this.m_tsbAutoOrder,
@@ -275,7 +277,7 @@
             this.m_tsbRCorner,
             this.m_tsbExtendedGCode,
             this.m_tsbToolVec,
-			this.m_tsbFlyCut,
+            this.m_tsbFlyCut,
             this.m_tsbFixedToolVec,
             this.m_tsbToolVecReverse,
             this.m_tsbOptimizeIK,
@@ -289,44 +291,6 @@
 			this.m_tsCAMFunction.Size = new System.Drawing.Size(1596, 50);
 			this.m_tsCAMFunction.TabIndex = 2;
 			this.m_tsCAMFunction.Text = "toolStrip1";
-			//
-			// m_tsMachiningFunction
-			//
-			this.m_tsMachiningFunction.BackColor = System.Drawing.SystemColors.Control;
-			this.m_tsMachiningFunction.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_tsMachiningFunction.ImageScalingSize = new System.Drawing.Size( 40, 40 );
-			this.m_tsMachiningFunction.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
-			this.m_tsbSetOffset,
-			this.m_tsbCalibrationPnt,
-			this.m_tsbProcessSettings,
-			this.m_tsbConvertNC} );
-			this.m_tsMachiningFunction.Location = new System.Drawing.Point( 0, 0 );
-			this.m_tsMachiningFunction.Name = "m_tsMachiningFunction";
-			this.m_tsMachiningFunction.Size = new System.Drawing.Size( 1596, 50 );
-			this.m_tsMachiningFunction.TabIndex = 4;
-			this.m_tsMachiningFunction.Text = "加工";
-			//
-			// m_tsbSetOffset
-			//
-			this.m_tsbSetOffset.Image = global::MyCAM.Properties.Resources.CAM_SetOffset;
-			this.m_tsbSetOffset.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbSetOffset.Name = "m_tsbSetOffset";
-			this.m_tsbSetOffset.Size = new System.Drawing.Size( 73, 47 );
-			this.m_tsbSetOffset.Text = "設定偏置";
-			this.m_tsbSetOffset.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_tsbSetOffset.ToolTipText = "設定程式座標偏置";
-			this.m_tsbSetOffset.Click += new System.EventHandler( this.m_tsbSetOffset_Click );
-			//
-			// m_tsbProcessSettings
-			//
-			this.m_tsbProcessSettings.Image = global::MyCAM.Properties.Resources.CAM_ProcessSetting;
-			this.m_tsbProcessSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbProcessSettings.Name = "m_tsbProcessSettings";
-			this.m_tsbProcessSettings.Size = new System.Drawing.Size( 73, 47 );
-			this.m_tsbProcessSettings.Text = "工藝設置";
-			this.m_tsbProcessSettings.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_tsbProcessSettings.ToolTipText = "開啟控制器工藝設置";
-			this.m_tsbProcessSettings.Click += new System.EventHandler( this.m_tsbProcessSettings_Click );
 			// 
 			// m_tsbAddPath
 			// 
@@ -416,17 +380,6 @@
 			this.m_tsbSetTraverseData.ToolTipText = "調整選擇路徑的空移方式";
 			this.m_tsbSetTraverseData.Click += new System.EventHandler(this.m_tsbSetTraverseData_Click);
 			// 
-			// m_tsbFlyCut
-			// 
-			this.m_tsbFlyCut.Image = global::MyCAM.Properties.Resources.CAM_FlyCut;
-			this.m_tsbFlyCut.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbFlyCut.Name = "m_tsbFlyCut";
-			this.m_tsbFlyCut.Size = new System.Drawing.Size( 44, 47 );
-			this.m_tsbFlyCut.Text = "飛切";
-			this.m_tsbFlyCut.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_tsbFlyCut.ToolTipText = "將一組路徑的空移方式轉為飛切";
-			this.m_tsbFlyCut.Click += new System.EventHandler( this.m_tsbFlyCut_Click );
-			// 
 			// m_tsbSetLead
 			// 
 			this.m_tsbSetLead.Image = global::MyCAM.Properties.Resources.CAM_Lead;
@@ -492,6 +445,17 @@
 			this.m_tsbToolVec.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbToolVec.ToolTipText = "調整飛邊路徑的姿態";
 			this.m_tsbToolVec.Click += new System.EventHandler(this.m_tsbToolVec_Click);
+			// 
+			// m_tsbFlyCut
+			// 
+			this.m_tsbFlyCut.Image = global::MyCAM.Properties.Resources.CAM_FlyCut;
+			this.m_tsbFlyCut.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbFlyCut.Name = "m_tsbFlyCut";
+			this.m_tsbFlyCut.Size = new System.Drawing.Size(44, 47);
+			this.m_tsbFlyCut.Text = "飛切";
+			this.m_tsbFlyCut.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbFlyCut.ToolTipText = "將一組路徑的空移方式轉為飛切";
+			this.m_tsbFlyCut.Click += new System.EventHandler(this.m_tsbFlyCut_Click);
 			// 
 			// m_tsbFixedToolVec
 			// 
@@ -581,6 +545,33 @@
 			this.m_tsbMeasureCAM.ToolTipText = "量測距離或角度";
 			this.m_tsbMeasureCAM.Click += new System.EventHandler(this.m_tsbMeasureCAM_Click);
 			// 
+			// m_tsMachiningFunction
+			// 
+			this.m_tsMachiningFunction.BackColor = System.Drawing.SystemColors.Control;
+			this.m_tsMachiningFunction.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_tsMachiningFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
+			this.m_tsMachiningFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbSetOffset,
+            this.m_tsbCalibrationPnt,
+            this.m_tsbProcessSettings,
+            this.m_tsbConvertNC});
+			this.m_tsMachiningFunction.Location = new System.Drawing.Point(0, 0);
+			this.m_tsMachiningFunction.Name = "m_tsMachiningFunction";
+			this.m_tsMachiningFunction.Size = new System.Drawing.Size(1596, 50);
+			this.m_tsMachiningFunction.TabIndex = 4;
+			this.m_tsMachiningFunction.Text = "加工";
+			// 
+			// m_tsbSetOffset
+			// 
+			this.m_tsbSetOffset.Image = global::MyCAM.Properties.Resources.CAM_SetOffset;
+			this.m_tsbSetOffset.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSetOffset.Name = "m_tsbSetOffset";
+			this.m_tsbSetOffset.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbSetOffset.Text = "設定偏置";
+			this.m_tsbSetOffset.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbSetOffset.ToolTipText = "設定程式座標偏置";
+			this.m_tsbSetOffset.Click += new System.EventHandler(this.m_tsbSetOffset_Click);
+			// 
 			// m_tsbCalibrationPnt
 			// 
 			this.m_tsbCalibrationPnt.Enabled = false;
@@ -592,6 +583,17 @@
 			this.m_tsbCalibrationPnt.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbCalibrationPnt.ToolTipText = "設定加工檔的三點校正資訊";
 			this.m_tsbCalibrationPnt.Click += new System.EventHandler(this.m_tsbCalibrationPnt_Click);
+			// 
+			// m_tsbProcessSettings
+			// 
+			this.m_tsbProcessSettings.Image = global::MyCAM.Properties.Resources.CAM_ProcessSetting;
+			this.m_tsbProcessSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbProcessSettings.Name = "m_tsbProcessSettings";
+			this.m_tsbProcessSettings.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbProcessSettings.Text = "工藝設置";
+			this.m_tsbProcessSettings.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbProcessSettings.ToolTipText = "開啟控制器工藝設置";
+			this.m_tsbProcessSettings.Click += new System.EventHandler(this.m_tsbProcessSettings_Click);
 			// 
 			// m_tsbConvertNC
 			// 
@@ -610,7 +612,7 @@
 			// m_tscLevel1Container.ContentPanel
 			// 
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCAMFunction);
-			this.m_tscLevel1Container.ContentPanel.Controls.Add( this.m_tsMachiningFunction );
+			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsMachiningFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsSimuFunc);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsFileFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
@@ -1036,20 +1038,20 @@
 			// 
 			// m_panCNCVertical
 			// 
-			this.m_panCNCVertical.BackColor = System.Drawing.Color.FromArgb( 238, 239, 244 );
-			this.m_panCNCVertical.Controls.Add( this.m_panVerticalAlarm );
-			this.m_panBackGround.SetColumnSpan( this.m_panCNCVertical, 3 );
+			this.m_panCNCVertical.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(239)))), ((int)(((byte)(244)))));
+			this.m_panBackGround.SetColumnSpan(this.m_panCNCVertical, 3);
+			this.m_panCNCVertical.Controls.Add(this.m_panVerticalAlarm);
 			this.m_panCNCVertical.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panCNCVertical.Location = new System.Drawing.Point( 3, 478 );
+			this.m_panCNCVertical.Location = new System.Drawing.Point(3, 589);
 			this.m_panCNCVertical.Name = "m_panCNCVertical";
-			this.m_panCNCVertical.Size = new System.Drawing.Size( 1590, 418 );
+			this.m_panCNCVertical.Size = new System.Drawing.Size(1590, 310);
 			this.m_panCNCVertical.TabIndex = 4;
-			//
+			// 
 			// m_panVerticalAlarm
-			//
-			this.m_panVerticalAlarm.Location = new System.Drawing.Point( 3, 296 );
+			// 
+			this.m_panVerticalAlarm.Location = new System.Drawing.Point(3, 296);
 			this.m_panVerticalAlarm.Name = "m_panVerticalAlarm";
-			this.m_panVerticalAlarm.Size = new System.Drawing.Size( 630, 119 );
+			this.m_panVerticalAlarm.Size = new System.Drawing.Size(630, 119);
 			this.m_panVerticalAlarm.TabIndex = 0;
 			// 
 			// m_panTreeView
@@ -1058,29 +1060,28 @@
 			this.m_panTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_panTreeView.Location = new System.Drawing.Point(3, 3);
 			this.m_panTreeView.Name = "m_panTreeView";
-			this.m_panTreeView.Size = new System.Drawing.Size(233, 417);
+			this.m_panTreeView.Size = new System.Drawing.Size(233, 526);
 			this.m_panTreeView.TabIndex = 0;
 			// 
 			// m_pnlLog
 			// 
 			this.m_pnlLog.AutoScroll = true;
 			this.m_pnlLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(239)))), ((int)(((byte)(244)))));
-			this.m_panBackGround.SetColumnSpan(this.m_pnlLog, 2);
-			this.m_pnlLog.Dock = System.Windows.Forms.DockStyle.None;
 			this.m_pnlLog.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_pnlLog.Location = new System.Drawing.Point( 0, 0 );
+			this.m_pnlLog.Location = new System.Drawing.Point(0, 0);
 			this.m_pnlLog.Name = "m_pnlLog";
-			this.m_pnlLog.Size = new System.Drawing.Size( 353, 47 );
+			this.m_pnlLog.Size = new System.Drawing.Size(353, 47);
 			this.m_pnlLog.TabIndex = 7;
-			//
+			// 
 			// m_pnlMessages
-			//
-			this.m_pnlMessages.Controls.Add( this.m_pnlLog );
+			// 
+			this.m_pnlMessages.Controls.Add(this.m_pnlLog);
 			this.m_pnlMessages.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_pnlMessages.Location = new System.Drawing.Point( 3, 3 );
+			this.m_pnlMessages.Location = new System.Drawing.Point(3, 3);
 			this.m_pnlMessages.Name = "m_pnlMessages";
-			this.m_pnlMessages.Size = new System.Drawing.Size( 353, 47 );
-			this.m_pnlMessages.SizeChanged += new System.EventHandler( this.OnMessagesSizeChanged );
+			this.m_pnlMessages.Size = new System.Drawing.Size(352, 48);
+			this.m_pnlMessages.TabIndex = 0;
+			this.m_pnlMessages.SizeChanged += new System.EventHandler(this.OnMessagesSizeChanged);
 			// 
 			// m_panViewer
 			// 
@@ -1090,48 +1091,8 @@
 			this.m_panViewer.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_panViewer.Location = new System.Drawing.Point(242, 3);
 			this.m_panViewer.Name = "m_panViewer";
-			this.m_panViewer.Size = new System.Drawing.Size(1351, 417);
+			this.m_panViewer.Size = new System.Drawing.Size(951, 526);
 			this.m_panViewer.TabIndex = 1;
-			// 
-			// m_panCNC
-			// 
-			this.m_panCNC.BackColor = System.Drawing.Color.FromArgb( ( (int)( ( (byte)( 238 ) ) ) ), ( (int)( ( (byte)( 239 ) ) ) ), ( (int)( ( (byte)( 244 ) ) ) ) );
-			this.m_panCNC.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panBackGround.SetRowSpan( this.m_panCNC, 2 );
-			this.m_panCNC.Location = new System.Drawing.Point( 1358, 3 );
-			this.m_panCNC.Name = "m_panCNC";
-			this.m_panCNC.Size = new System.Drawing.Size( 235, 416 );
-			this.m_panCNC.TabIndex = 8;
-			this.m_panCNC.Visible = false;
-			//
-			// m_panCNCInfo
-			//
-			this.m_panCNCInfo.BackColor = System.Drawing.Color.FromArgb( 238, 239, 244 );
-			this.m_panCNCInfo.AutoScroll = false;
-			this.m_panCNCInfo.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panCNCInfo.Location = new System.Drawing.Point( 1200, 425 );
-			this.m_panCNCInfo.Margin = new System.Windows.Forms.Padding( 3, 3, 0, 3 );
-			this.m_panCNCInfo.Name = "m_panCNCInfo";
-			this.m_panCNCInfo.Size = new System.Drawing.Size( 390, 47 );
-			this.m_panCNCInfo.TabIndex = 9;
-			this.m_panCNCInfo.Visible = false;
-			//
-			// m_tlpBottom
-			//
-			this.m_tlpBottom.ColumnCount = 2;
-			this.m_tlpBottom.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 30F ) );
-			this.m_tlpBottom.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 70F ) );
-			this.m_tlpBottom.Controls.Add( this.m_pnlMessages, 0, 0 );
-			this.m_tlpBottom.Controls.Add( this.m_panCNCInfo, 1, 0 );
-			this.m_panBackGround.SetColumnSpan( this.m_tlpBottom, 2 );
-			this.m_tlpBottom.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_tlpBottom.Location = new System.Drawing.Point( 0, 422 );
-			this.m_tlpBottom.Margin = new System.Windows.Forms.Padding( 0 );
-			this.m_tlpBottom.Name = "m_tlpBottom";
-			this.m_tlpBottom.RowCount = 1;
-			this.m_tlpBottom.RowStyles.Add( new System.Windows.Forms.RowStyle( System.Windows.Forms.SizeType.Percent, 100F ) );
-			this.m_tlpBottom.Size = new System.Drawing.Size( 1197, 53 );
-			this.m_tlpBottom.TabIndex = 10;
 			// 
 			// m_tsLayer
 			// 
@@ -1151,9 +1112,9 @@
             this.m_tsbLayer10,
             this.m_tsbLayerNone,
             this.m_tsbNeedProcess});
-			this.m_tsLayer.Location = new System.Drawing.Point(1319, 0);
+			this.m_tsLayer.Location = new System.Drawing.Point(926, 0);
 			this.m_tsLayer.Name = "m_tsLayer";
-			this.m_tsLayer.Size = new System.Drawing.Size(32, 417);
+			this.m_tsLayer.Size = new System.Drawing.Size(25, 526);
 			this.m_tsLayer.TabIndex = 3;
 			this.m_tsLayer.Text = "toolStrip1";
 			// 
@@ -1308,7 +1269,7 @@
 			this.m_tsViewerToolBar.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
 			this.m_tsViewerToolBar.Location = new System.Drawing.Point(0, 0);
 			this.m_tsViewerToolBar.Name = "m_tsViewerToolBar";
-			this.m_tsViewerToolBar.Size = new System.Drawing.Size(25, 417);
+			this.m_tsViewerToolBar.Size = new System.Drawing.Size(25, 526);
 			this.m_tsViewerToolBar.TabIndex = 2;
 			this.m_tsViewerToolBar.Text = "toolStrip1";
 			// 
@@ -1454,17 +1415,56 @@
 			this.m_tsbShowMarker.Size = new System.Drawing.Size(22, 24);
 			this.m_tsbShowMarker.CheckedChanged += new System.EventHandler(this.m_tsbShowMarker_CheckedChanged);
 			// 
+			// m_panCNC
+			// 
+			this.m_panCNC.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(239)))), ((int)(((byte)(244)))));
+			this.m_panCNC.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_panCNC.Location = new System.Drawing.Point(1199, 3);
+			this.m_panCNC.Name = "m_panCNC";
+			this.m_panBackGround.SetRowSpan(this.m_panCNC, 2);
+			this.m_panCNC.Size = new System.Drawing.Size(394, 580);
+			this.m_panCNC.TabIndex = 8;
+			this.m_panCNC.Visible = false;
+			// 
+			// m_panCNCInfo
+			// 
+			this.m_panCNCInfo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(239)))), ((int)(((byte)(244)))));
+			this.m_panCNCInfo.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_panCNCInfo.Location = new System.Drawing.Point(361, 3);
+			this.m_panCNCInfo.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
+			this.m_panCNCInfo.Name = "m_panCNCInfo";
+			this.m_panCNCInfo.Size = new System.Drawing.Size(835, 48);
+			this.m_panCNCInfo.TabIndex = 9;
+			this.m_panCNCInfo.Visible = false;
+			// 
+			// m_tlpBottom
+			// 
+			this.m_tlpBottom.ColumnCount = 2;
+			this.m_panBackGround.SetColumnSpan(this.m_tlpBottom, 2);
+			this.m_tlpBottom.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
+			this.m_tlpBottom.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70F));
+			this.m_tlpBottom.Controls.Add(this.m_pnlMessages, 0, 0);
+			this.m_tlpBottom.Controls.Add(this.m_panCNCInfo, 1, 0);
+			this.m_tlpBottom.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_tlpBottom.Location = new System.Drawing.Point(0, 532);
+			this.m_tlpBottom.Margin = new System.Windows.Forms.Padding(0);
+			this.m_tlpBottom.Name = "m_tlpBottom";
+			this.m_tlpBottom.RowCount = 1;
+			this.m_tlpBottom.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.m_tlpBottom.Size = new System.Drawing.Size(1196, 54);
+			this.m_tlpBottom.TabIndex = 10;
+			// 
 			// m_panBackGround
 			// 
 			this.m_panBackGround.ColumnCount = 3;
 			this.m_panBackGround.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
-			this.m_panBackGround.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 60F ) );
-			this.m_panBackGround.ColumnStyles.Add( new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Percent, 25F ) );
-			this.m_panBackGround.Controls.Add( this.m_panCNCVertical, 0, 2 );
+			this.m_panBackGround.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
+			this.m_panBackGround.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this.m_panBackGround.Controls.Add(this.m_panCNCVertical, 0, 2);
 			this.m_panBackGround.Controls.Add(this.m_panTreeView, 0, 0);
-			this.m_panBackGround.Controls.Add( this.m_tlpBottom, 0, 1 );
+			this.m_panBackGround.Controls.Add(this.m_tlpBottom, 0, 1);
 			this.m_panBackGround.Controls.Add(this.m_panViewer, 1, 0);
-			this.m_panBackGround.Controls.Add( this.m_panCNC, 2, 0 );
+			this.m_panBackGround.Controls.Add(this.m_panCNC, 2, 0);
 			this.m_panBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_panBackGround.Location = new System.Drawing.Point(0, 153);
 			this.m_panBackGround.Name = "m_panBackGround";
@@ -1492,6 +1492,7 @@
 			this.Controls.Add(this.m_tscLevel2Container);
 			this.Controls.Add(this.m_tscLevel1Container);
 			this.Controls.Add(this.m_msMode);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.m_msMode;
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "StartupForm";
@@ -1502,7 +1503,7 @@
 			this.m_msMode.PerformLayout();
 			this.m_tsCAMFunction.ResumeLayout(false);
 			this.m_tsCAMFunction.PerformLayout();
-			this.m_tsMachiningFunction.ResumeLayout( false );
+			this.m_tsMachiningFunction.ResumeLayout(false);
 			this.m_tsMachiningFunction.PerformLayout();
 			this.m_tscLevel1Container.ContentPanel.ResumeLayout(false);
 			this.m_tscLevel1Container.ContentPanel.PerformLayout();
@@ -1518,15 +1519,16 @@
 			this.m_tscLevel2Container.PerformLayout();
 			this.m_tscLevel3Container.ResumeLayout(false);
 			this.m_tscLevel3Container.PerformLayout();
+			this.m_panCNCVertical.ResumeLayout(false);
+			this.m_pnlMessages.ResumeLayout(false);
 			this.m_panViewer.ResumeLayout(false);
 			this.m_panViewer.PerformLayout();
 			this.m_tsLayer.ResumeLayout(false);
 			this.m_tsLayer.PerformLayout();
 			this.m_tsViewerToolBar.ResumeLayout(false);
 			this.m_tsViewerToolBar.PerformLayout();
+			this.m_tlpBottom.ResumeLayout(false);
 			this.m_panBackGround.ResumeLayout(false);
-			this.m_tlpBottom.ResumeLayout( false );
-			this.m_pnlMessages.ResumeLayout( false );
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

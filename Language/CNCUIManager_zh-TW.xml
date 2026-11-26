@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="Error_Unavailable" Content="CNC UI 模組無法使用。" />
 	<Message ID="Error_AlreadyInitialized" Content="CNC UI 模組已初始化。" />
@@ -30,6 +30,7 @@
 	<Message ID="Error_MonitorInitialized" Content="CNC 監控面板已初始化。" />
 	<Message ID="Error_MonitorUIThread" Content="請在 WinForms UI 執行緒初始化 CNC 監控面板。" />
 	<Message ID="Error_MonitorSubscription" Content="無法初始化 CNC 監控面板資源訂閱。" />
+	<Message ID="Error_CoordinateSubscription" Content="CNC 座標訂閱更新失敗：{0}" />
 	<Message ID="Error_AlarmUnavailable" Content="CNC 警報監控無法使用。" />
 	<Message ID="Error_AlarmUIThread" Content="請在 WinForms UI 執行緒初始化 CNC 警報監控。" />
 </ResMap>

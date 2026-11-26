@@ -42,15 +42,27 @@ namespace CncUI.Dialog
 
 		internal void SetCommandsEnabled( bool enabled )
 		{
-			foreach( PanelButton button in m_ZeroButtons ) {
-				button.Enabled = enabled;
+			for( int nIndex = 0; nIndex < m_ZeroButtons.Length; nIndex++ ) {
+				m_ZeroButtons[ nIndex ].Enabled = enabled && nIndex < m_nAxisCount;
 			}
 			m_btnClear.Enabled = enabled;
+		}
+
+		internal void SetAxisVisible( int nAxisCount )
+		{
+			m_nAxisCount = nAxisCount;
+			for( int nIndex = 0; nIndex < m_AxisNames.Length; nIndex++ ) {
+				bool bVisible = nAxisCount == 0 || nIndex < nAxisCount;
+				m_AxisNames[ nIndex ].Visible = bVisible;
+				m_Coordinates[ nIndex ].Visible = bVisible;
+				m_ZeroButtons[ nIndex ].Visible = bVisible;
+			}
 		}
 
 		readonly Label[] m_AxisNames;
 		readonly Label[] m_Coordinates;
 		readonly PanelButton[] m_ZeroButtons;
+		int m_nAxisCount;
 
 		const string TITLE = "程式座標偏置";
 		internal const string SET_ZERO = "設為 0";

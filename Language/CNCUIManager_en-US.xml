@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="Error_Unavailable" Content="The CNC UI module is not available." />
 	<Message ID="Error_AlreadyInitialized" Content="The CNC UI module is already initialized." />
@@ -30,6 +30,7 @@
 	<Message ID="Error_MonitorInitialized" Content="The CNC information panel is already initialized." />
 	<Message ID="Error_MonitorUIThread" Content="Initialize the CNC information panel on the WinForms UI thread." />
 	<Message ID="Error_MonitorSubscription" Content="Unable to initialize CNC information panel resource subscriptions." />
+	<Message ID="Error_CoordinateSubscription" Content="Unable to update CNC coordinate subscriptions: {0}" />
 	<Message ID="Error_AlarmUnavailable" Content="The CNC alarm monitor is not available." />
 	<Message ID="Error_AlarmUIThread" Content="Initialize the CNC alarm monitor on the WinForms UI thread." />
 </ResMap>

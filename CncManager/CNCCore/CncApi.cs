@@ -191,15 +191,34 @@ namespace CncManager.CNCCore
 
 		#region Axis
 
+		/// <summary>
+		/// Reads configured axes without accessing parameters for absent rotary axes.
+		/// </summary>
+		/// <returns>The configured axes and their rotary roles.</returns>
 		public static Task<CncResult<CncAxis[]>> ReadAxesAsync()
 		{
 			return ExecuteResourceAsync( () =>
 			{
-				string firstName = CncAxis.GetRotaryName( CncConstants.PR_ROTARY_AXIS_1_NAME, Cnc.Param[ CncConstants.PR_ROTARY_AXIS_1_NAME ] );
-				string secondName = CncAxis.GetRotaryName( CncConstants.PR_ROTARY_AXIS_2_NAME, Cnc.Param[ CncConstants.PR_ROTARY_AXIS_2_NAME ] );
-				CncAxisRole firstRole;
-				CncAxisRole secondRole;
 				int machineType = Cnc.Param[ CncConstants.PR_MACHINE_TYPE ];
+				if( machineType < 1 || machineType > 5 ) {
+					throw new InvalidOperationException( CncMessages.InvalidMachineParameter( CncConstants.PR_MACHINE_TYPE, machineType ) );
+				}
+				string firstName = CncAxis.GetRotaryName( CncConstants.PR_ROTARY_AXIS_1_NAME, Cnc.Param[ CncConstants.PR_ROTARY_AXIS_1_NAME ] );
+				CncAxisRole firstRole;
+
+				// Four-axis machines do not require a second rotary-axis parameter.
+				if( machineType == 4 || machineType == 5 ) {
+					firstRole = machineType == 4 ? CncAxisRole.Head : CncAxisRole.Table;
+					return new CncAxis[] {
+						new CncAxis( "X", 1 ),
+						new CncAxis( "Y", 2 ),
+						new CncAxis( "Z", 3 ),
+						new CncAxis( firstName, 4, firstRole )
+					};
+				}
+
+				string secondName = CncAxis.GetRotaryName( CncConstants.PR_ROTARY_AXIS_2_NAME, Cnc.Param[ CncConstants.PR_ROTARY_AXIS_2_NAME ] );
+				CncAxisRole secondRole;
 				switch( machineType ) {
 					case 1:
 						firstRole = secondRole = CncAxisRole.Head;
@@ -450,14 +469,29 @@ namespace CncManager.CNCCore
 			}, reportFailure: false );
 		}
 
-		public static Task<CncResult<bool>> ClearProgramOffsetsAsync( CancellationToken cancellationToken )
+		/// "axisIDArray" Array of axis IDs to clear offsets
+		/// "cancellationToken" Cancellation token for the operation
+		public static Task<CncResult<bool>> ClearProgramOffsetsAsync(
+			int[] axisIDArray, CancellationToken cancellationToken )
 		{
+			if( axisIDArray == null ) {
+				throw new ArgumentNullException( nameof( axisIDArray ) );
+			}
+			int[] snapshotArray = (int[])axisIDArray.Clone();
+			if( snapshotArray.Length == 0 || snapshotArray.Length > 5 ) {
+				throw new ArgumentOutOfRangeException( nameof( axisIDArray ) );
+			}
+			foreach( int nAxisID in snapshotArray ) {
+				if( nAxisID < 1 || nAxisID > 5 ) {
+					throw new ArgumentOutOfRangeException( nameof( axisIDArray ) );
+				}
+			}
 			CncApi current = m_Current;
 			return ExecuteResourceAsync( () =>
 			{
-				for( int axisID = 1; axisID <= 5; axisID++ ) {
+				foreach( int nAxisID in snapshotArray ) {
 					CheckOffsetOperation( current, cancellationToken );
-					int index = CncConstants.SYSTEM_VAR_PROGRAM_OFFSET_BASE + axisID;
+					int index = CncConstants.SYSTEM_VAR_PROGRAM_OFFSET_BASE + nAxisID;
 					try {
 						Cnc.SystemVar[ CncConstants.FIRST_COORD_ID, index ] = 0d;
 					}
