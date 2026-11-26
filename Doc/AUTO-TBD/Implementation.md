@@ -15,7 +15,7 @@
 | 環境 `env-` | `team/env-ai-tools.md`、`project/env-build.md`、`project/env-worktree.md` | SPEC-11、SPEC-20 |
 | 工具 `tool-` | `team/tool-claude-code.md`、`team/tool-copilot-cli.md` | SPEC-11、SPEC-20 |
 | 輔助腳本 | `.github/scripts/Invoke-CopilotReview.ps1` | SPEC-20 |
-| 觸發入口 | `.claude/skills/{issue-start,review,release-note}/SKILL.md` | SPEC-2 |
+| 觸發入口 | `.claude/skills/{issue-start,review,release-note,ai-tools-review}/SKILL.md` | SPEC-2 |
 | 設定 | `.gitignore`、`.editorconfig` | SPEC-11 |
 | 檢查腳本 | `Doc/AUTO-TBD/Check.ps1` | TestPlan 第 1 節 |
 | 個人設定（不進版控） | `~/.claude/CLAUDE.md`、`~/.claude/issue-workflow.md`、主 checkout 的 `CLAUDE.local.md` | SPEC-17 |
@@ -122,14 +122,15 @@
 1. 新增 `team/process-ai-review.md`、`team/tool-copilot-cli.md`、`team/env-ai-tools.md` 與 `.github/scripts/Invoke-CopilotReview.ps1`；`process-review.md` 報告格式加註受審 HEAD 與推理強度；團隊概觀的流程索引加兩列；`copilot-instructions.md` 的檔案分類加入 `scripts/`；`.gitignore` 加入 `/REVIEW-REQUEST.md`。
 2. Goal（REQ-12）、Spec、TestPlan（TEST-17）與 `Check.ps1`（TEST-4、TEST-5、TEST-9）同步。
 3. 以腳本跑一回合委託 review 驗收；VS 端由使用者執行 TEST-17 第 1.2 項。
-4. SPEC：SPEC-1、SPEC-7、SPEC-11、SPEC-20。TEST：TEST-4、TEST-5、TEST-7、TEST-9、TEST-17。
+4. VS 案例第一次未通過後，新增 `ai-tools-review` skill，`review` skill 的觸發說明排除委託（DEC-25.12）。
+5. SPEC：SPEC-1、SPEC-2、SPEC-7、SPEC-11、SPEC-20。TEST：TEST-4、TEST-5、TEST-7、TEST-9、TEST-17。
 
 ## 3. SPEC 對照
 
 | SPEC | STEP |
 | --- | --- |
 | SPEC-1 規範分層、載入與文件通則 | STEP-6、STEP-7、STEP-14、STEP-15、STEP-17 |
-| SPEC-2 觸發入口 | STEP-9、STEP-14、STEP-16 |
+| SPEC-2 觸發入口 | STEP-9、STEP-14、STEP-16、STEP-17 |
 | SPEC-3 議題分級、階段與確認點 | STEP-2、STEP-15、STEP-16 |
 | SPEC-4 完成定義 | STEP-2、STEP-13、STEP-15、STEP-16 |
 | SPEC-5 議題文件組合與內容歸屬 | STEP-3、STEP-14、STEP-15 |

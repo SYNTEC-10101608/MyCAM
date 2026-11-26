@@ -276,7 +276,7 @@ function Test-3()
 
 	# SKILL.md 本文只能是指向 team/ 的說明與必讀清單
 	$skillList = @( Get-Files '.claude/skills' 'SKILL.md' -Recurse )
-	if( $skillList.Count -lt 3 ) {
+	if( $skillList.Count -lt 4 ) {
 		$failList += ".claude/skills/ 只有 $( $skillList.Count ) 個 SKILL.md"
 	}
 	foreach( $szSkill in $skillList ) {
@@ -428,7 +428,8 @@ function Test-5()
 		'.editorconfig',
 		'.claude/skills/issue-start/SKILL.md',
 		'.claude/skills/review/SKILL.md',
-		'.claude/skills/release-note/SKILL.md'
+		'.claude/skills/release-note/SKILL.md',
+		'.claude/skills/ai-tools-review/SKILL.md'
 	)
 
 	# 已提交、未提交與未追蹤的檔案都要納入

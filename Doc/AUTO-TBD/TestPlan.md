@@ -132,7 +132,7 @@
    3. 另開新 session，只輸入「開議題」；問「切換 session 要怎麼做」。
    4. 要求修改任一 `.cs` 檔的一個方法，修改不保留。
 2. 通過條件：
-   1. 三個 skill 讀取各自的必讀清單；`/review` 讀入 `team/`、`project/` 全部文件。
+   1. 四個 skill 讀取各自的必讀清單；`/review` 讀入 `team/`、`project/` 全部文件。
    2. `/issue-start` 第一個動作是開分支（DEC-23.5）：說明分支名稱與基準，不實際建立（方法第 1 項）；演練中視同人已確認分支，接著盤點並產出符合 S 級範本的 `README.md`，提出分級建議後停下。
    3. Release note 與 merge log 符合格式，目標版本留空。
    4. 「開議題」與「切換 session」經流程索引讀到對應文件；切換 session 讀到 `process-issue.md` 的交接（DEC-24）。
@@ -157,7 +157,7 @@
 
 1. 方法：
    1. Claude Code 為施工方：以腳本 `-ListModels` 列出模型，依 `process-ai-review.md` 寫請求檔，以腳本執行一回合全範圍 review，再逐項分析。
-   2. VS 2026 Copilot 為施工方（使用者執行）：在 Agent 模式要求它依流程索引委託 AI Tools Review，由它列出模型、寫請求檔、以腳本執行一回合增量 review 並回報分析；記錄 VS 版本。
+   2. VS 2026 Copilot 為施工方（使用者執行）：在 Agent 模式要求它委託 AI Tools Review（觸發 `ai-tools-review` skill），由它列出模型、寫請求檔、以腳本執行一回合增量 review 並回報分析；記錄 VS 版本。
 2. 通過條件：
    1. 模型清單含費用等級與各模型支援的推理強度；VS 為施工方時，人只在 VS 的對話中操作就完成一回合。
    2. Reviewer 只改 `Review.md` 與請求檔；回合資訊含受審 HEAD 與推理強度，處置為「待處置」。

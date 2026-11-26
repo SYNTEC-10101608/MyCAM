@@ -5,7 +5,7 @@
 | 分支 | `AUTO-TBD_f_DevProcess` |
 | 分支起點 | `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23） |
 | 級別 | L |
-| 狀態 | 收官：STEP-1～STEP-17、Review 第 12 回合處置完成；TEST-16、TEST-17 的 VS 案例待使用者執行，待人工確認 |
+| 狀態 | 收官：STEP-1～STEP-17、Review 第 12 回合處置完成，新增 `ai-tools-review` skill；TEST-16、TEST-17 的 VS 案例待使用者執行，待人工確認 |
 
 ## 文件
 
@@ -46,7 +46,7 @@
 3. 新增 議題文件規範：各級文件組合（後續處理各級都獨立成檔）、項目編號與追溯方式、README 範本。
 4. 新增 Review 規範：六段檢查、報告格式與處置規則。
 5. 新增 Git 流程規範：版本與分支命名、commit 標示、release note 與 merge log 格式，worktree 改為選用。
-6. 新增 開議題、review、產出 release note 三個 AI 入口指令，Claude Code 與 VS 2026（18.5 以上）Copilot 皆可使用。
+6. 新增 開議題、review、產出 release note、委託 AI Tools Review 四個 AI 入口指令，Claude Code 與 VS 2026（18.5 以上）Copilot 皆可使用。
 7. 新增 專案程式規範與專案固定檢查項目，專案架構、慣例與多語系同步、Designer、第三方檔案的規則在寫程式時讀取，review 另查建置門檻。
 8. 修改 專案概觀只留產品簡介、議題編號格式與專案指引索引，架構、慣例與建置說明改為需要時才讀取。
 9. 修改 Coding Style 通用規則，修改既有程式碼時以方法為單位套用新規範，程式碼不引用文件編號。

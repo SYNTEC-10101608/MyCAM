@@ -22,7 +22,7 @@
 
 位置：`.claude/skills/`；原則在 [copilot-instructions.md](../../.github/copilot-instructions.md) 維護方式第 3 項。
 
-1. 三個 skill：`issue-start`（開議題）、`review`、`release-note`，各自依序列出必讀文件；`review` 讀入 `team/`、`project/` 全部文件。
+1. 四個 skill：`issue-start`（開議題）、`review`、`release-note`、`ai-tools-review`（委託 AI Tools Review），各自依序列出必讀文件；`review` 讀入 `team/`、`project/` 全部文件，觸發說明排除委託（DEC-25.12）。
 2. Skill 只是入口，規則寫在指引檔；沒有 skill 時直接說出動作，由流程索引導向相同文件。
 3. VS 2026 Copilot 也讀取 `.claude/skills/`（TEST-16）；最低支援 18.5，官方文件寫明 Agent 模式會自動找 skill（DEC-24.2）。
 
@@ -103,6 +103,7 @@
 5. 報告的比對基準加註受審 HEAD，工具與模型加註推理強度；既有回合不改。
 6. 部署：必要為 VS 2026 18.5 以上的 Copilot（Agent 模式）；建議為 Copilot CLI；Claude Code 為選用。
 7. 腳本清除 Copilot Agent 傳給子程序的環境變數，VS Copilot 也能當施工方委託。
+8. 觸發入口為 `ai-tools-review` skill（SPEC-2.1）。
 
 ## 2. 檔案配置
 
@@ -124,7 +125,7 @@
 | `.github/project/process-review.md` | 專案流程 | 新增：專案固定檢查項目 |
 | `.github/project/env-build.md` | 專案環境 | 新增：由 `project-overview` 搬入建置與執行環境 |
 | `.github/project/env-worktree.md` | 專案環境 | 新增：新 worktree 要複製的檔案、`CopyRef.bat`、卸載 `FCLTool`，不限工具（DEC-24） |
-| `.claude/skills/{issue-start,review,release-note}/SKILL.md` | 觸發入口 | 新增 |
+| `.claude/skills/{issue-start,review,release-note,ai-tools-review}/SKILL.md` | 觸發入口 | 新增 |
 | `.gitignore` | 版控設定 | 加入 `/SESSION.md`、`/REVIEW-REQUEST.md` |
 | `.editorconfig` | 格式設定 | 加入 `[*.ps1] charset = utf-8-bom`，更新註解路徑 |
 | `Doc/AUTO-TBD/*` | 議題文件 | 新增 |
