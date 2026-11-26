@@ -189,7 +189,7 @@
       1. `/issue-start`：讀 `process-issue`、`process-docs`、`process-git`；第一個動作是開分支，fetch 逾時時依 `process-git.md` 第 2 節的 fetch 規則停下確認，說明分支名稱與基準後未實際建立；之後讀 `coding-architecture`、`project/coding-general` 盤點，在 scratchpad 產出符合 S 級範本的 `README.md`，提出分級建議後停下。通過。
       2. `/release-note`：讀 `process-git` 第 4 節；13 條 release note 符合前綴與格式，merge log 由 release note 組合、目標版本留空。通過。
       3. `/review`：讀兩份 `process-review`，再讀 `team/` 8 份、`project/` 5 份；門檻段執行 `Check.ps1`，依六段進行（未寫入 `Review.md`）。通過。
-      4. 「開議題」符合 `issue-start` 的 description；「切換 session 或對話」經流程索引指向 `process-issue.md` 第 5 節的交接。通過。
+      4. 第 3 項依 REV-90 在 `bbd1b275` 以全新的無頭 session 重跑（2026-11-26，Claude Code CLI 2.1.330、計畫模式，兩句各開一個 session，第一句即測試語句）：「開議題」觸發 `issue-start`，讀 `process-issue`、`process-docs`、`process-git` 後，第一步是開分支，停下詢問議題內容、編號與分支基準；「切換 session 要怎麼做」搜尋 `.github/` 後讀 `process-issue.md`，依第 5 節回答交接做法。開始與結束時 `git status` 只有未追蹤的 `REVIEW-REQUEST.md`。通過。
       5. 修改 `AddPathDlg.SetFaceSelected` 前依兩份索引讀 `team/coding-general.md`、`team/coding-csharp.md`、`project/coding-architecture.md`、`project/coding-general.md`，修改已還原。通過。
       6. 發現：`issue-start` 的 description 把開分支寫在分級之後（已修正，REV-87）；新分支的基準沒有寫明（REV-88）。
    3. TEST-16：使用者在 VS 2026 Copilot Chat 於 worktree 方案執行，每項開新對話；結果依使用者提供的畫面記錄。

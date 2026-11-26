@@ -246,7 +246,7 @@
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
 | REV-89 | 2 | 必修 | `Doc/AUTO-TBD/TestPlan.md:130` | REV-82 修訂後的 TEST-15 方法明令不建立分支，通過條件卻要求先開分支再盤點；重跑僅遇到 fetch 逾時，仍把未開分支後繼續盤點判為通過。應在隔離的測試環境以現行規範驗證實際基準及開分支順序，並將 fetch 失敗的情境獨立記錄。 | 已修正（待人確認）：方法第 1 項的「說明名稱與基準後停下、不實際建立」即通過條件的「第一個動作是開分支」，兩者不矛盾；通過條件補寫這句以免誤讀，嚴重度建議降為「建議」 |
-| REV-90 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:188` | TEST-15 未依方法另開 session，且自然語句「開議題」只核對 description、「切換 session」只核對索引，不能證明在未預讀規範時實際觸發或讀取。應用全新 session 實測這兩種入口，或把現有結果標為靜態抽查。 | 已修正（使用者同意依建議；待重跑）：第 3、4 項以全新 session 重跑，結果記入 TestPlan 5.2 |
+| REV-90 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:188` | TEST-15 未依方法另開 session，且自然語句「開議題」只核對 description、「切換 session」只核對索引，不能證明在未預讀規範時實際觸發或讀取。應用全新 session 實測這兩種入口，或把現有結果標為靜態抽查。 | 已修正（使用者同意依建議）：第 3 項以全新的無頭 session 重跑並通過，結果記入 TestPlan 5.2；第 4 項（修改 `.cs`）沒有要求另開 session，不重跑 |
 | REV-91 | 2 | 提問 | `.github/team/process-git.md:16` | DEC-24.6 已定案使用遠端 `master`，但本機的 `origin/master`（`24c7276d`）和 `github/master`（`7829c338`）不同，照規則仍可能從不同提交起枝。考量 DEC-2.7 不把雙遠端配置寫入團隊規範，是否在團隊流程只指定以專案確認的來源遠端為準，並以本議題使用的 `origin/master` 作為 MyCAM 的選擇範例？ | 不修正（使用者決定）：以哪個 remote 為基準屬於個人的 remote 配置（DEC-2.7），團隊規範不變；`CLAUDE.local.md` 改為開分支前先詢問以哪個 remote 的 `master` 為基準 |
 | REV-92 | 6 | 建議 | `Doc/AUTO-TBD/README.md:35` | 狀態列寫 TEST-15、TEST-16 均待重跑，TestPlan 卻已記錄 TEST-15 重跑、僅 TEST-16 尚未重跑；DoD 又把最終結果與門檻都勾成完成。應依實際證據更新狀態列及 DoD，直到最終測試和門檻通過才勾選。 | 已修正（使用者同意依建議）：位置實為 `README.md:8`；狀態列更新，DoD 第 3 項在 TEST-16 重跑前取消勾選 |
 | REV-93 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:670` | TEST-9 的通過條件要求 `env-worktree.md` 說明卸載 `FCLTool`，腳本只檢查 `FCLTool.dll`、`CopyRef.bat` 與 `.worktreeinclude`，刪掉卸載步驟仍會通過。應檢查該步驟存在，或在 TestPlan 將它列為人工抽查。 | 已修正（使用者同意依建議）：TEST-9 檢查清單加入「卸載」 |
