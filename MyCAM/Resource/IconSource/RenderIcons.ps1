@@ -1,4 +1,4 @@
-# Renders the toolbar icon set (IconDefinitions.ps1) to PNG files in MyCAM/Resource.
+﻿# Renders the toolbar icon set (IconDefinitions.ps1) to PNG files in MyCAM/Resource.
 # Usage: powershell -NoProfile -STA -File RenderIcons.ps1 [-OutDir <dir>] [-Size 40]
 # Icons are authored on a 24 x 24 grid with WPF path markup (same syntax as SVG path data).
 param(

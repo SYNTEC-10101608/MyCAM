@@ -1,4 +1,4 @@
-# Toolbar icon definitions, rendered by RenderIcons.ps1.
+﻿# Toolbar icon definitions, rendered by RenderIcons.ps1.
 # Grid 24 x 24. Shape format: "stroke|fill|width|dash|path" (dash: d = dashed, - = solid),
 # text: "text|fill|size|x,y|content". Colors are palette keys defined in RenderIcons.ps1:
 # k ink, a accent, t accent tint, g guide, r red, y amber, w white, f faint, h / H view highlight.
