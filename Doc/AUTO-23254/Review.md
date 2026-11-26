@@ -66,3 +66,30 @@
 | --- | --- | --- | --- | --- | --- |
 | REV-17 | 3 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs` | 加入的虛擬副螢幕本來就是 1920×1080，程式仍重設模式與位置，被 Windows 拒絕（`DISP_CHANGE_FAILED`）；「加入虛擬副螢幕」的路徑因此從未成功過，先前的驗證都走主螢幕路徑而沒發現 | 已修正：已是規格模式時不下設定，只在不符時改模式（DEC-15） |
 | REV-18 | 3 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs` | Windows 依記住的螢幕組合配置，在加入虛擬螢幕時把它設為主螢幕並移動既有螢幕，工具本身沒有下設定也會發生，違反 DEC-13 不更動既有螢幕的前提 | 已修正：加入後既有螢幕的位置或主螢幕有變動就中止並移除虛擬螢幕，Windows 隨即還原（DEC-15） |
+
+## 第 9 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-23254 |
+| 分支 | `AUTO-23254_f_UIStyleUnify` |
+| 比對基準 | `bd0fa270`；受審 HEAD `419fad57`（僅審 `61fd9c20` → `419fad57` 的差異） |
+| 工具與模型 | GitHub Copilot CLI（`Invoke-CopilotReview.ps1`）、gpt-6.2-sol、推理強度 high |
+| 日期 | 2026-11-26 |
+
+| 門檻 | 結果 |
+| --- | --- |
+| `Build.bat Debug` | 施工方於受審 HEAD 執行通過，本回合未重跑 |
+| `Build.bat Release` | 上一回合受審 HEAD 通過；本回合受審 HEAD 未提供結果，未重跑 |
+| `Tools\UICheck\UICheck.bat` | Reviewer 重跑通過：34 個 Designer 檔、0 個問題；本輪未改 Designer 或 C++ 檔 |
+| `Tools\UICheck\UICheck.bat runtime` | 施工方於受審 HEAD 在 1920×1080 主螢幕執行通過，本回合依請求未重跑；此結果不涵蓋新增虛擬副螢幕的路徑 |
+| `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | 施工方於受審 HEAD 執行通過，本回合未重跑 |
+
+已符合 1920×1080 的虛擬螢幕不會再重設顯示模式。`CNCInfoPanel` 只在直式分列時略過色塊，橫式仍使用原版面快照，四軸仍隱藏 C 軸標籤與色塊。`Head` 與 `Burst` 在 `en-US`、`ru-RU` 產生相同路徑，並確認 WPF 可剖析，未覆寫圖檔。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-19 | 3 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs:212` | 輪詢一看到唯一新掛載的 Parsec 螢幕就採用，並未核對它是否由本次 `IOCTL_ADD` 建立。若另一個 Parsec 用戶端的螢幕先掛載、本次新增的螢幕尚未就緒，解析度或縮放就可能寫到另一個螢幕，違反 DEC-13 不對其他螢幕下設定的決策。寫入前應將顯示目標與本次新增請求回傳的索引核對，不能確認就中止。 | 待處置 |
+| REV-20 | 3 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs:244` | 新增的變更檢查只比對 GDI 裝置名稱、位置與主螢幕狀態，未比對既有螢幕的解析度、方向、更新率或縮放。若 Windows 套用記住的配置時只改了顯示模式或縮放，檢查仍會繼續，違反 DEC-15「Windows 改動既有螢幕即中止」。應在新增前記錄既有螢幕的模式與 DPI，並在設定虛擬螢幕前及啟動檢查前確認未變。 | 待處置 |
+| REV-21 | 3 | 必修 | `Tools/UICheck/LayoutRunner.cs:287` | 明確指定 `UICHECK_SCREEN` 卻找不到該螢幕時，版面工具只記訊息並回到預設位置；顯示視窗後也未驗證實際所在的螢幕。指定螢幕若在啟動過程中消失，對話框和 CNC 面板可能在不符規格的螢幕上檢查並回報通過，違反 SPEC-20 要求在規格螢幕開啟。僅未指定目標時保留 `-CurrentScreen` 的預設行為；有指定時，找不到目標或視窗落在其他螢幕都應判為失敗。 | 待處置 |
+| REV-22 | 3 | 建議 | `Tools/UICheck/VirtualDisplayRun.cs:491` | 等待逾時與取消之間，I/O 仍可能正常完成，但程式忽略最後一次 `GetOverlappedResult` 的結果，一律回傳失敗。若完成的是 `IOCTL_ADD`，程式會丟掉已建立螢幕的索引，跳過明確的移除，只能依賴驅動程式逾時回收。應以最後的完成狀態為準，成功就保留結果並納入清理。 | 待處置 |
