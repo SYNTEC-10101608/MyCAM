@@ -353,7 +353,7 @@ namespace MyCAM
 		readonly Color DEFAULT_BtnColor = SystemColors.Control;
 		readonly Color ON_ButtonColor = Color.FromArgb( 233, 180, 159 );
 
-		const string SOFTWARE_Version = "0.48.0";
+		const string SOFTWARE_Version = "0.49.0";
 		const string SOFTWARE_Name = "飛切特別版 " + SOFTWARE_Version;
 
 		string m_currentImportedFileName = string.Empty;
