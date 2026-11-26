@@ -132,7 +132,7 @@
    4. 要求修改任一 `.cs` 檔的一個方法，修改不保留。
 2. 通過條件：
    1. 三個 skill 讀取各自的必讀清單；`/review` 讀入 `team/`、`project/` 全部文件。
-   2. `/issue-start` 第一個動作是開分支（DEC-23.5），再盤點並產出符合 S 級範本的 `README.md`，提出分級建議後停下。
+   2. `/issue-start` 第一個動作是開分支（DEC-23.5）：說明分支名稱與基準後停下，不實際建立（方法第 1 項）；再盤點並產出符合 S 級範本的 `README.md`，提出分級建議後停下。
    3. Release note 與 merge log 符合格式，目標版本留空。
    4. 「開議題」與「切換 session」經流程索引讀到對應文件；切換 session 讀到 `process-issue.md` 的交接（DEC-24）。
    5. 修改 `.cs` 前經索引讀取 `team/coding-general.md`、`team/coding-csharp.md`、`project/coding-architecture.md`、`project/coding-general.md`。

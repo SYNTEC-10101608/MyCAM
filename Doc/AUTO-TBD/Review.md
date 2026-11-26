@@ -228,3 +228,25 @@
 | REV-86 | 6 | 建議 | `.github/team/process-issue.md:51` | FollowUp 的必填欄位在 DoD 與 `process-docs.md` §4 各寫一次，後者另外要求「建議做法」與「內容自足」。S 級文件範本又寫「所有內容都在 README」，與 §2 的 FollowUp 例外不符。DoD 只檢查是否符合 `process-docs.md` §2、§4，範本明列 FollowUp 例外，讓寫法只維護一處。 | 已修正（使用者同意依建議）：DoD 改為依 `process-docs.md` 第 4 節寫入，S 級範本註明 `FollowUp.md` 例外 |
 | REV-87 | 6 | 建議 | `.claude/skills/issue-start/SKILL.md:3` | TEST-15 重跑發現：description 依序寫「盤點現況、建議分級、開分支」，與 DEC-23.5 先開分支不一致，AI 可能以為分支在分級後才開 | 已修正（待人確認）：順序改為「開分支、盤點現況、建議分級」 |
 | REV-88 | 2 | 提問 | `.github/team/process-git.md:12` | TEST-15 重跑發現：第 2 節沒有寫新議題分支以哪個分支為基準（目標版本分支或 `master`）；本機沒有目標版本分支時 AI 只能推測 | 已修正（DEC-24.6；使用者決定）：補「新議題分支以遠端的 `master` 為基準」，與現行做法一致 |
+
+## 第 9 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-TBD |
+| 分支 | `AUTO-TBD_f_DevProcess` |
+| 比對基準 | `24c7276d`；受審 HEAD `89f5d06f` |
+| 工具與模型 | GitHub Copilot CLI 1.0.116、gpt-6.2-sol |
+| 日期 | 2026-11-26 |
+
+1. 門檻：新增報告前執行 `Check.ps1 -Base 24c7276d -SkipPersonal`，結果為 8 PASS、2 FAIL（結束碼 2）。TEST-5 唯一的失敗原因是根目錄未追蹤的交接檔 `REVIEW-REQUEST.md`，不在受審 commit；TEST-11 因 DoD 第 9、10 項未勾選及前回合處置待人確認而未通過。TEST-12 列為 PASS，但依參數略過實際檢查。受審分支的 `git diff --check` 通過；本議題只改文件與設定，未建置。
+2. 本回合重點為 `5e05f844..89f5d06f`。已確認 VS 18.5 下限、Agent 模式和 release-note 案例已寫入，TEST-16 仍待使用者重跑；不限工具的 worktree 環境準備與 session 交接、編碼規範後續項目、FollowUp 例外及開議題 skill 的順序已同步。新分支基準已寫為遠端 `master`，但尚未定義如何在多個遠端之間選擇。
+3. 本回合由 Claude Code 在背景以 Copilot CLI 非互動執行，交接檔為根目錄的 `REVIEW-REQUEST.md`；處置（2026-11-26）由 Claude Code 依使用者決定填寫。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-89 | 2 | 必修 | `Doc/AUTO-TBD/TestPlan.md:130` | REV-82 修訂後的 TEST-15 方法明令不建立分支，通過條件卻要求先開分支再盤點；重跑僅遇到 fetch 逾時，仍把未開分支後繼續盤點判為通過。應在隔離的測試環境以現行規範驗證實際基準及開分支順序，並將 fetch 失敗的情境獨立記錄。 | 已修正（待人確認）：方法第 1 項的「說明名稱與基準後停下、不實際建立」即通過條件的「第一個動作是開分支」，兩者不矛盾；通過條件補寫這句以免誤讀，嚴重度建議降為「建議」 |
+| REV-90 | 2 | 建議 | `Doc/AUTO-TBD/TestPlan.md:188` | TEST-15 未依方法另開 session，且自然語句「開議題」只核對 description、「切換 session」只核對索引，不能證明在未預讀規範時實際觸發或讀取。應用全新 session 實測這兩種入口，或把現有結果標為靜態抽查。 | 已修正（使用者同意依建議；待重跑）：第 3、4 項以全新 session 重跑，結果記入 TestPlan 5.2 |
+| REV-91 | 2 | 提問 | `.github/team/process-git.md:16` | DEC-24.6 已定案使用遠端 `master`，但本機的 `origin/master`（`24c7276d`）和 `github/master`（`7829c338`）不同，照規則仍可能從不同提交起枝。考量 DEC-2.7 不把雙遠端配置寫入團隊規範，是否在團隊流程只指定以專案確認的來源遠端為準，並以本議題使用的 `origin/master` 作為 MyCAM 的選擇範例？ | 不修正（使用者決定）：以哪個 remote 為基準屬於個人的 remote 配置（DEC-2.7），團隊規範不變；`CLAUDE.local.md` 改為開分支前先詢問以哪個 remote 的 `master` 為基準 |
+| REV-92 | 6 | 建議 | `Doc/AUTO-TBD/README.md:35` | 狀態列寫 TEST-15、TEST-16 均待重跑，TestPlan 卻已記錄 TEST-15 重跑、僅 TEST-16 尚未重跑；DoD 又把最終結果與門檻都勾成完成。應依實際證據更新狀態列及 DoD，直到最終測試和門檻通過才勾選。 | 已修正（使用者同意依建議）：位置實為 `README.md:8`；狀態列更新，DoD 第 3 項在 TEST-16 重跑前取消勾選 |
+| REV-93 | 3 | 建議 | `Doc/AUTO-TBD/Check.ps1:670` | TEST-9 的通過條件要求 `env-worktree.md` 說明卸載 `FCLTool`，腳本只檢查 `FCLTool.dll`、`CopyRef.bat` 與 `.worktreeinclude`，刪掉卸載步驟仍會通過。應檢查該步驟存在，或在 TestPlan 將它列為人工抽查。 | 已修正（使用者同意依建議）：TEST-9 檢查清單加入「卸載」 |

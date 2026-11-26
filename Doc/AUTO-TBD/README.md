@@ -5,7 +5,7 @@
 | 分支 | `AUTO-TBD_f_DevProcess` |
 | 分支起點 | `24c7276d`（`origin/master`，RLS_0.48.0，2026-11-23） |
 | 級別 | L |
-| 狀態 | 收官：STEP-1～STEP-16、Review 第 8 回合處置完成；TEST-15、TEST-16 待重跑，待人工確認 |
+| 狀態 | 收官：STEP-1～STEP-16、Review 第 9 回合處置完成；TEST-16 待使用者重跑，待人工確認 |
 
 ## 文件
 
@@ -24,13 +24,13 @@
 個人設定不進版控，依 SPEC-17 於 2026-11-24 完成，TEST-12 通過：
 
 1. 刪除 `~/.claude/issue-workflow.md`；`~/.claude/CLAUDE.md` 移除「開發議題處理流程」章節、數字條列規則與回覆方式（2026-11-25，DEC-23）。
-2. 主 checkout 的 `CLAUDE.local.md` 刪除議題資料夾位置與 push 章節，新增 `origin`、`github` 的 remote 用法。
+2. 主 checkout 的 `CLAUDE.local.md` 刪除議題資料夾位置與 push 章節，新增 `origin`、`github` 的 remote 用法；開分支前先詢問以哪個 remote 的 `master` 為基準（REV-91）。
 
 ## 完成清單（DoD）
 
 1. [x] 每個 REQ 有 SPEC、每個 SPEC 有 TEST（Spec 第 4 節、TestPlan 第 4 節）。
 2. [x] 相容性異動已寫明（Spec 第 3 節）。
-3. [x] `TestPlan.md` 附最終執行結果（第 5 節）。
+3. [ ] `TestPlan.md` 附最終執行結果（第 5 節；TEST-16 待使用者重跑）。
 4. [x] 每個 STEP 可追溯到 commit（`Check.ps1` TEST-11）。
 5. [x] 門檻通過：`Check.ps1` 通過；本議題只改文件，不需建置。
 6. [x] Review 報告寫入 `Review.md`，「必修」全部已修正。

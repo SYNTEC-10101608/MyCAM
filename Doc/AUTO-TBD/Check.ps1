@@ -667,7 +667,7 @@ function Test-9()
 	# 9.2 交接寫在 process-issue（不限工具）；新 worktree 準備寫在 env-worktree（不限工具）；Claude 文件不含交接（DEC-24）
 	$needMap = [ordered]@{
 		'.github/team/process-issue.md' = @( 'SESSION.md' )
-		'.github/project/env-worktree.md' = @( 'FCLTool.dll', 'CopyRef.bat', '.worktreeinclude' )
+		'.github/project/env-worktree.md' = @( 'FCLTool.dll', 'CopyRef.bat', '.worktreeinclude', '卸載' )
 		'.github/team/tool-claude-code.md' = @( '.worktreeinclude' )
 	}
 	foreach( $szFile in $needMap.Keys ) {
