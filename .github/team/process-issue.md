@@ -1,0 +1,69 @@
+# 議題處理流程
+
+開始議題、分級、進入下一階段、切換 session 或對話時讀本文件。議題文件的組合與寫法見 [process-docs.md](process-docs.md)。
+
+## 1. 處理階段
+
+開始議題時先開分支，議題文件提交在該分支；做法見 [process-git.md](process-git.md)。
+
+1. 盤點現況。
+2. 明訂需求與目標（REQ）；BUG 明訂問題現象與重現方式。
+3. 明訂規格（SPEC），含相容性異動；BUG 明訂修正後的預期行為。
+4. 明訂測試規劃（TEST），含現有測試的異動；BUG 須含重現測試。
+5. 明訂實作架構與步驟（STEP），含程式、測試、研發文件、指引規範。
+6. 施工：
+   1. 施工前依流程索引讀取程式規範；依 STEP 施工，遇到預料外的狀況先停下討論，不自行擴大範圍。
+   2. BUG 先完成重現測試並確認修正前失敗；無法自動化時寫明人工重現步驟與預期結果。
+   3. 執行測試，迭代修正直到通過。
+   4. 自我 review，做法見 [process-review.md](process-review.md)。
+   5. 提交，規則見 [process-git.md](process-git.md)。
+7. Review：與人合作 review、產出 release note 與 merge log、處理同事的 review 意見；每次修正後回到 6.3。
+8. 收官：全域自我 review，長期有效的結論提升到指引規範。
+
+## 2. 分級與確認點
+
+| 級別 | 判斷依據 | 確認點（階段編號） |
+| --- | --- | --- |
+| S | 影響範圍明確、無規格與相容性異動的小修改（含小 bug） | 1–5 合併為「分析與規劃」、7 |
+| M | 一般功能、跨模組 bug | 1–2、3–4、5、7 |
+| L | 新功能、規範或相容性異動 | 1、2、3、4、5、7 各自確認 |
+
+1. 分級由實作者確認；使用 AI 時，AI 在盤點後提出建議並等人確認。合併者在 review 時認為級別不足，可要求升級並補齊文件。
+2. 每個確認點先出草案，最後列「待討論」（格式見[團隊概觀](../instructions/team-overview.instructions.md)的協作原則第 3 項）；人確認沒有待決問題後，才進入下一段。
+
+## 3. 範圍變動
+
+1. 重新分級：發現範圍超出原級別時先停下提出；升級後補齊新級別要求的檔案與完成清單項目，已完成的內容搬入對應檔案，已確認的確認點不重做。
+2. 回溯：後段（含 review）發現前段內容要修改時：
+   1. 原範圍內的修正：修改最早受影響的文件，依級別重做該段確認點，往下更新 TEST、STEP、程式與測試，review 從門檻段重來。
+   2. 新需求或擴大範圍：列 `TODO`，以後續 MR 處理；必須在本 MR 處理時，走重新分級。
+   3. 觸發回溯的 review 發現，處置寫「已修正（回溯至 SPEC-x）」；需求或決策的修改記入討論記錄。
+
+## 4. 完成定義（DoD）
+
+議題的 `README.md` 放該級別的 DoD 勾選清單，全部勾選才送 MR。
+
+1. S 級：
+   1. `README.md` 寫明問題現象與重現方式、修正方式、測試結果。
+   2. 重現測試修正前失敗、修正後通過；無法自動化時附人工步驟與結果。
+   3. 門檻通過（見 [process-review.md](process-review.md) 第 1 節）。
+   4. Review 完成，每項發現都有處置。
+   5. 有範圍外項目時，依 [process-docs.md](process-docs.md) 第 4 節寫入 `FollowUp.md`。
+   6. Release note 寫入 `README.md`。
+2. M 級：
+   1. 每個 REQ 有 SPEC、每個 SPEC 有 TEST。
+   2. 相容性異動已寫明，沒有異動寫「無」。
+   3. `TestPlan.md` 附最終執行結果。
+   4. 每個 STEP 可追溯到 commit（commit 標示見 [process-git.md](process-git.md)，或在 review 時人工對照）。
+   5. 門檻通過（見 [process-review.md](process-review.md) 第 1 節）。
+   6. Review 報告寫入 `Review.md`，「必修」全部已修正。
+   7. 範圍外項目同 S 級第 5 項。
+   8. Release note 寫入 `README.md`。
+3. L 級：M 級全部項目，再加：
+   1. 各確認點分別經人確認。
+   2. 長期有效的結論已提升到指引規範。
+
+## 5. 交接
+
+1. AI 在適合切換 session 或對話時提出建議（多在確認點）；切換前在工作目錄（主 checkout 或 worktree）根目錄的 `SESSION.md` 更新交接 prompt。
+2. `SESSION.md` 以 `.gitignore` 排除，只放交接 prompt 與暫時筆記；狀態與決策寫在提交的議題文件。

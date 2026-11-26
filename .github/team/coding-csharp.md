@@ -1,10 +1,6 @@
----
-applyTo: "**/*.cs"
----
-
 # Coding Style：C#
 
-另須遵守 [通用規則](coding-style-general.instructions.md)。
+另須遵守 [通用規則](coding-general.md)。
 
 ## 格式
 
@@ -136,4 +132,4 @@ if( nItemCount > 0 ) { ... }
 - 只在初始化時賦值的欄位加 `readonly`。
 - Expression-bodied（`=>`）只用於單行屬性 / 存取子 / lambda，方法與建構子使用區塊。
 - `using` 放在 `namespace` 外，`System.*` 排最前面。
-- 專案為 .NET Framework 4.8 / 4.8.1，C# 語言版本 7.3：不使用 C# 8 以後的語法（nullable reference types、`switch` 運算式、`using` 宣告、範圍運算子 `..`、檔案範圍 namespace 等）。
+- 語言版本依 [project/coding-architecture.md](../project/coding-architecture.md) 的技術棧，不使用超出該版本的語法（如 C# 7.3 不使用 C# 8 以後的 nullable reference types、`switch` 運算式、`using` 宣告、範圍運算子 `..`、檔案範圍 namespace 等）。
