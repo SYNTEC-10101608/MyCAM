@@ -13,7 +13,9 @@ namespace UICheck
 	// Main window screenshot, dialog placement and main window layout check.
 	// Compiled by CaptureMainWindow.ps1 into the build output folder together with LayoutRunner.cs.
 	//
-	// Landscape / portrait only depends on the main window's aspect ratio, so a portrait window larger than a
+	// A width and height of 0 keep the window maximized as the program shows it; CaptureMainWindow.ps1 -Screen runs it
+	// so on the specified screen (VirtualDisplayRun.cs), and the picture is the part the screen shows. Other sizes are
+	// set on the window: landscape / portrait only depends on its aspect ratio, so a portrait window larger than a
 	// landscape screen is checked by sizing the window beyond the screen (the part outside is still rendered).
 	//
 	//   DialogCenter        dialog not centered in DialogPlacement's area (whole window in landscape, CAM area in
@@ -88,24 +90,37 @@ namespace UICheck
 
 		static int Run( Form mainForm, string szMenuName, Size windowSize, string szOutFile, string[] dialogNameArray )
 		{
-			// Form clamps its size to the screen; raising MaximumSize lets the native resize go beyond it
-			mainForm.WindowState = FormWindowState.Normal;
-
 			// MainDesignerRegion runs with the client size of the designer, so the frame is added to it
 			Dictionary<string, Rectangle> designerMap = null;
 			if( m_szDesignerFile != null ) {
 				Size designerClient;
 				designerMap = ReadDesignerBounds( m_szDesignerFile, out designerClient );
+				mainForm.WindowState = FormWindowState.Normal;
 				Size frameSize = mainForm.Size - mainForm.ClientSize;
 				windowSize = designerClient + frameSize;
 			}
-			mainForm.MaximumSize = windowSize;
-			SetWindowPos( mainForm.Handle, IntPtr.Zero, 0, 0, windowSize.Width, windowSize.Height,
-				SWP_NOZORDER | SWP_NOACTIVATE );
-			Wait( 3000 );
-			if( mainForm.Size != windowSize ) {
-				Console.WriteLine( "FAIL  main window is {0}, expected {1}", mainForm.Size, windowSize );
-				return 1;
+
+			// no size given: the window stays maximized as the program shows it, on the screen it was opened on
+			bool isMaximized = windowSize.IsEmpty;
+			if( isMaximized ) {
+				mainForm.WindowState = FormWindowState.Maximized;
+				Wait( 3000 );
+				Screen screen = Screen.FromControl( mainForm );
+				Console.WriteLine( "main window maximized on {0} {1}x{2}, work area {3}x{4}, client {5}x{6}",
+					screen.DeviceName, screen.Bounds.Width, screen.Bounds.Height, screen.WorkingArea.Width,
+					screen.WorkingArea.Height, mainForm.ClientSize.Width, mainForm.ClientSize.Height );
+			}
+			else {
+				// Form clamps its size to the screen; raising MaximumSize lets the native resize go beyond it
+				mainForm.WindowState = FormWindowState.Normal;
+				mainForm.MaximumSize = windowSize;
+				SetWindowPos( mainForm.Handle, IntPtr.Zero, 0, 0, windowSize.Width, windowSize.Height,
+					SWP_NOZORDER | SWP_NOACTIVATE );
+				Wait( 3000 );
+				if( mainForm.Size != windowSize ) {
+					Console.WriteLine( "FAIL  main window is {0}, expected {1}", mainForm.Size, windowSize );
+					return 1;
+				}
 			}
 
 			// switch the page the way the user does, after resizing so the layout already matches the orientation
@@ -134,7 +149,17 @@ namespace UICheck
 						nProblemCount += CheckDialog( mainForm, dialogNameArray[ i ], area, i == 0 ? graphics : null );
 					}
 				}
-				bitmap.Save( szOutFile, ImageFormat.Png );
+				// a maximized frame lies partly outside the screen; the picture is what the screen shows
+				if( isMaximized ) {
+					Rectangle visible = Rectangle.Intersect( mainForm.Bounds, Screen.FromControl( mainForm ).Bounds );
+					visible.Offset( -mainForm.Left, -mainForm.Top );
+					using( Bitmap screenPart = bitmap.Clone( visible, bitmap.PixelFormat ) ) {
+						screenPart.Save( szOutFile, ImageFormat.Png );
+					}
+				}
+				else {
+					bitmap.Save( szOutFile, ImageFormat.Png );
+				}
 			}
 			Console.WriteLine( "[capture] {0}", szOutFile );
 			Console.WriteLine( "{0} problems", nProblemCount );

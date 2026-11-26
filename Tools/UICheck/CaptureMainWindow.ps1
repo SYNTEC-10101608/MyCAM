@@ -8,6 +8,7 @@
 	[ValidateSet( "CAD", "CAM", "CNC" )][string]$Mode = "CAD",
 	[string[]]$Dialogs = @( "AddPathDlg", "OverCutDlg", "StartPointDlg" ),
 	[string[]]$ModalDialogs = @( "ConnectDlg", "GlassDXFImportDlg" ),
+	[ValidateSet( "", "Landscape", "Portrait" )][string]$Screen = "",
 	[switch]$Visible,
 	[switch]$DesignerLayout
 )
@@ -21,6 +22,10 @@
 # The language is set in memory only; the setting file is not changed.
 # The runner works on a hidden desktop (HiddenDesktopRun.cs) so it does not take the screen; -Visible shows it.
 # On the hidden desktop the OpenGL 3D view stays empty.
+# -Screen runs on the specified screen of the product, 1920 x 1080 or 1080 x 1920 at 100 % scaling, made the
+# primary screen for the run (VirtualDisplayRun.cs: a virtual screen when this machine has none); the main window
+# stays maximized as the program shows it and -Width / -Height are ignored. Exit code 2 when the screen cannot be
+# prepared.
 
 $ErrorActionPreference = "Stop"
 if (-not $Root) {
@@ -44,6 +49,7 @@ $references = @( "System.dll", "System.Core.dll", "System.Drawing.dll", "System.
 	(Join-Path $binDir "CommonUI.dll"), (Join-Path $binDir "LanguageManager.dll") ) | ForEach-Object { "/r:$_" }
 $sources = @( (Join-Path $PSScriptRoot "MainWindowRunner.cs"), (Join-Path $PSScriptRoot "LayoutRunner.cs") )
 $hidden = Join-Path $binDir "UICheckHidden.exe"
+$display = Join-Path $binDir "UICheckDisplay.exe"
 # the runners only live in the build output while they run, so they are never shipped with it; the cleanup also
 # covers a failed compile or preparation
 try {
@@ -56,6 +62,16 @@ try {
 	if ($LASTEXITCODE -ne 0) {
 		Write-Host "[UICheck] failed to compile HiddenDesktopRun.cs"
 		exit 2
+	}
+	if ($Screen) {
+		& $csc /nologo /target:exe /platform:anycpu /out:$display (Join-Path $PSScriptRoot "VirtualDisplayRun.cs")
+		if ($LASTEXITCODE -ne 0) {
+			Write-Host "[UICheck] failed to compile VirtualDisplayRun.cs"
+			exit 2
+		}
+		# the runner keeps the window maximized when it gets no size
+		$Width = 0
+		$Height = 0
 	}
 
 	$outPath = $OutFile
@@ -71,12 +87,15 @@ try {
 	}
 	Push-Location $binDir
 	try {
-		if ($Visible) {
-			& $runner $Language $Mode $Width $Height $outPath @dialogArguments
+		$command = @( $runner, $Language, $Mode, $Width, $Height, $outPath ) + $dialogArguments
+		if (-not $Visible) {
+			$command = @( $hidden ) + $command
 		}
-		else {
-			& $hidden $runner $Language $Mode $Width $Height $outPath @dialogArguments
+		if ($Screen) {
+			$command = @( $display, $Screen ) + $command
 		}
+		$arguments = @( $command | Select-Object -Skip 1 )
+		& $command[ 0 ] @arguments
 		$result = $LASTEXITCODE
 	}
 	finally {
@@ -84,6 +103,6 @@ try {
 	}
 }
 finally {
-	Remove-Item $runner, $hidden -ErrorAction SilentlyContinue
+	Remove-Item $runner, $hidden, $display -ErrorAction SilentlyContinue
 }
 exit $result

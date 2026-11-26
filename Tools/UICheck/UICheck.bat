@@ -27,20 +27,21 @@ if errorlevel 1 set "RESULT=1"
 REM main window screenshots go to the temp folder when no screenshot folder is given
 set "SHOTS=%~f2"
 if "%~2"=="" set "SHOTS=%TEMP%\UICheck"
-REM each language x page (CAD start page, CAM, CNC machining) x landscape / portrait
+REM each language x page (CAD start page, CAM, CNC machining) x landscape / portrait, maximized on the specified screen
+REM (1920 x 1080 / 1080 x 1920 at 100 %; a virtual screen when this machine has none, see VirtualDisplayRun.cs)
 for %%L in (zh-TW zh-CN) do (
 	for %%M in (CAD CAM CNC) do (
 		echo ## main window: %%L %%M
-		powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Language %%L -Mode %%M -Width 1920 -Height 1040 -OutFile "%SHOTS%\MainWindow_%%L_%%M_Landscape.png"
+		powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Language %%L -Mode %%M -Screen Landscape -OutFile "%SHOTS%\MainWindow_%%L_%%M_Landscape.png"
 		if errorlevel 1 set "RESULT=1"
-		powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Language %%L -Mode %%M -Width 1080 -Height 1880 -OutFile "%SHOTS%\MainWindow_%%L_%%M_Portrait.png"
+		powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Language %%L -Mode %%M -Screen Portrait -OutFile "%SHOTS%\MainWindow_%%L_%%M_Portrait.png"
 		if errorlevel 1 set "RESULT=1"
 	)
 )
 
 REM MainDesignerRegion: the regions at the client size and page of the designer are where the designer shows them
 echo ## main window: designer layout
-powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Mode CNC -DesignerLayout -OutFile "%SHOTS%\MainWindow_Designer.png"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Mode CNC -Screen Landscape -DesignerLayout -OutFile "%SHOTS%\MainWindow_Designer.png"
 if errorlevel 1 set "RESULT=1"
 
 :report
