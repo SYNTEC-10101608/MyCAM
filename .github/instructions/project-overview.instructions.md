@@ -17,6 +17,8 @@ MyCAM 是雷射五軸切割的 CAD/CAM 桌面軟體：匯入 3D 模型、產生�
 | 時機 | 必讀文件 |
 | --- | --- |
 | 盤點現況、新增或修改程式碼與設定檔 | `.github/project/coding-architecture.md`（技術棧、方案與主程式結構）、`.github/project/coding-general.md`（慣例與專案規則） |
+| 新增或修改畫面（`*.Designer.cs`、`*.resx`、畫面的 `*.cs`）與 `CommonUI` | `.github/project/coding-ui-style.md` |
+| 新增或修改工具列圖示（`MyCAM/Resource/IconSource/**`） | `.github/project/coding-icon-design.md` |
 | 執行或回應 review | 依流程索引讀全部文件；專案固定檢查項目在 `.github/project/process-review.md` |
 | 建置、準備執行環境 | `.github/project/env-build.md` |
 | 建立或準備新 worktree（不限工具） | `.github/project/env-worktree.md` |

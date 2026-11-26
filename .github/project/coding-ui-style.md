@@ -1,11 +1,8 @@
----
-applyTo: "**/*.cs"
----
-
 # UI 風格
 
-適用於 `MyCAM`、`CncUI`、`CommonUI` 的所有畫面（主視窗、嵌入式面板、對話框）。另須遵守
-[通用規則](coding-style-general.instructions.md) 與 [C#](coding-style-csharp.instructions.md)。
+新增或修改畫面（`*.Designer.cs`、`*.resx`、畫面的 `*.cs`）與 `CommonUI` 時讀本文件，與團隊的
+[通用規則](../team/coding-general.md)、[C#](../team/coding-csharp.md) 一起遵守。
+適用於 `MyCAM`、`CncUI`、`CommonUI` 的所有畫面（主視窗、嵌入式面板、對話框）。
 不在範圍：`MessageBox`、開檔 / 存檔對話框、授權視窗（`FALicenseChecker`）。本規範由議題 AUTO-23254（UI 風格統一）制定。
 
 本文件只寫原則與共識的特例；token 的數值、元件的用法、檢查規則的細節以程式與其註解為準。
@@ -90,7 +87,7 @@ applyTo: "**/*.cs"
 3. 相鄰區域相距 `SECTION_GAP`；CNC 面板的卡片就是所在區域的可見邊緣，面板自己的邊距不疊加到間距上。
 4. 嵌入式面板與對話框共用 token 與卡片規則，差別只有面板邊距與唯讀數值列的高度與間距（`ThemeMetrics`）。
    Designer 尺寸就是面板的偏好尺寸，執行時以 `ResponsiveLayout` 縮放：卡片之間與標題列不縮放，只縮放卡片內容。
-5. 選單與工具列的字型與繪製由 `MainWindowBase` 負責；圖示依 [圖示設計](icon-design.instructions.md)。
+5. 選單與工具列的字型與繪製由 `MainWindowBase` 負責；圖示依 [圖示設計](coding-icon-design.md)。
 
 ## 7. 多語系
 
@@ -130,7 +127,7 @@ applyTo: "**/*.cs"
 | `Tools\UICheck\UICheck.bat` | 靜態檢查：只讀原始碼，不需建置 |
 | `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | 另以 Debug 建置結果開啟所有畫面，在 zh-TW、zh-CN 下檢查版面、數值框操作與主視窗 |
 
-1. 修改畫面後跑 `UICheck.bat`，全部通過才提交；新增畫面或改動版面時另跑 `runtime`。
+1. 何時必須通過見 [process-review.md](process-review.md) 的門檻；修改畫面的過程中可隨時執行。
 2. 規則依檢查對象分四組，規則名稱與內容寫在各檔開頭：靜態（`CheckStatic.ps1`）、執行時版面（`LayoutRunner.cs`）、
    數值框操作（`ControlRunner.cs`）、主視窗（`MainWindowRunner.cs`）。
 3. 規範改了，對應的檢查一起改；新增規則時故意做出違規，確認能檢出。

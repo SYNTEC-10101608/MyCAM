@@ -18,7 +18,7 @@
 | `OCCViewer` | OCCT 3D 檢視器（`Viewer`） |
 | `CommonData` | 共用資料定義（`CustPost` 客製後處理設定） |
 | `FileTranslator` | 檔案格式轉換（`CustPost.cpf` → `CustPost`） |
-| `CommonUI` | 共用 WinForms 控制項（`GroupPanel`、`LoadingBar`） |
+| `CommonUI` | 共用 UI：主題、控制項（`SectionPanel`、`ThemedButton`、`DebouncedNumericUpDown` 等）、對話框與面板基底、版面與語系套用；規範見 [coding-ui-style.md](coding-ui-style.md) |
 | `LanguageManager` | 多語系字串管理 |
 | `CncManager` / `CncUI` | CNC 控制器連線（Syntec OpenCNC）與其 UI |
 | `FALicenseChecker` | 授權驗證 |

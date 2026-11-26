@@ -1,9 +1,6 @@
----
-applyTo: "MyCAM/Resource/IconSource/**"
----
-
 # 圖示設計
 
+新增或修改工具列圖示（`MyCAM/Resource/IconSource/**`）時讀本文件。
 適用於主視窗選單與工具列的圖示（`MyCAM/Resource/IconSource`）。圖示一律是 40×40 透明背景 PNG：
 功能工具列以原尺寸顯示，選單、圖層列、視角列由 `ImageScalingSize` 縮小為 20×20。
 本規範由議題 AUTO-23254（UI 風格統一）制定。
@@ -59,7 +56,7 @@ applyTo: "MyCAM/Resource/IconSource/**"
 提示中指明本規範、要放的族群、功能說明與參考的既有圖示，例：
 
 ```text
-依 .github/instructions/icon-design.instructions.md，在 IconDefinitions.ps1 的 <族群> 區新增 <名稱>，
+依 .github/project/coding-icon-design.md，在 IconDefinitions.ps1 的 <族群> 區新增 <名稱>，
 表示「<功能說明>」，參考同族群的 <相似圖示>。以 RenderIcons.ps1 -Only <名稱> 產生，
 並提供 40×40 與 20×20 的預覽。
 ```
