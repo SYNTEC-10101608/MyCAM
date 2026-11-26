@@ -1,10 +1,6 @@
----
-applyTo: "**/*.{c,cpp,h,hpp}"
----
-
 # Coding Style：C / C++
 
-適用於 `PostTool`、`FCLTool`。另須遵守 [通用規則](coding-style-general.instructions.md)。
+適用於 C / C++ 原始碼。另須遵守 [通用規則](coding-general.md)。
 
 ## 格式
 

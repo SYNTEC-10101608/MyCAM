@@ -1,0 +1,910 @@
+﻿# AUTO-23290 議題限定檢查：執行 TestPlan.md 中標「自動」的 TEST
+# 用法：在 repo 任一位置執行 powershell -ExecutionPolicy Bypass -File Doc\AUTO-23290\Check.ps1 [-Base <commit>]
+# 有失敗時 exit code 為失敗的 TEST 數
+
+[CmdletBinding()]
+param(
+	[string]$Base = '24c7276d',
+
+	# 個人設定只存在實作者的電腦，其他成員執行時略過 TEST-12
+	[switch]$SkipPersonal
+)
+
+$ErrorActionPreference = 'Stop'
+$Root = (git rev-parse --show-toplevel).Trim()
+Set-Location $Root
+$Results = New-Object System.Collections.Generic.List[object]
+
+# 比對基準不存在時 git diff 只會回傳空清單，各 TEST 會誤判通過
+git rev-parse --verify --quiet "$Base^{commit}" | Out-Null
+if( $LASTEXITCODE -ne 0 ) {
+	Write-Output "比對基準 $Base 不是有效的 commit"
+	exit 100
+}
+
+# ============================================================
+# 共用函式
+# ============================================================
+
+function Add-Result( [string]$Id, [string[]]$Failures, [string[]]$Notes = @() )
+{
+	$isPass = ( $Failures.Count -eq 0 )
+	$Results.Add( [pscustomobject]@{ Id = $Id; Pass = $isPass; Failures = $Failures; Notes = $Notes } )
+}
+
+function Read-Text( [string]$RelPath )
+{
+	$szFull = Join-Path $Root $RelPath
+	if( -not ( Test-Path -LiteralPath $szFull ) ) {
+		return $null
+	}
+	return [System.IO.File]::ReadAllText( $szFull, [System.Text.Encoding]::UTF8 )
+}
+
+function Read-Lines( [string]$RelPath )
+{
+	$szText = Read-Text $RelPath
+	if( $null -eq $szText ) {
+		return $null
+	}
+	return $szText -split "\r?\n"
+}
+
+function Get-LineCount( [string]$RelPath )
+{
+	$lineArray = Read-Lines $RelPath
+	if( $null -eq $lineArray ) {
+		return 0
+	}
+
+	# split 在結尾換行後多出一個空字串
+	if( $lineArray.Count -gt 0 -and $lineArray[ -1 ] -eq '' ) {
+		return $lineArray.Count - 1
+	}
+	return $lineArray.Count
+}
+
+function Test-ApplyToAll( [string]$RelPath )
+{
+	$szText = Read-Text $RelPath
+	if( $null -eq $szText ) {
+		return $false
+	}
+	return $szText -match '(?s)\A---\s*\r?\n.*?applyTo:\s*"\*\*".*?\r?\n---'
+}
+
+function Test-HasFrontmatterApplyTo( [string]$RelPath )
+{
+	$szText = Read-Text $RelPath
+	if( $null -eq $szText ) {
+		return $false
+	}
+	return $szText -match '(?s)\A---\s*\r?\n.*?applyTo:.*?\r?\n---'
+}
+
+function Get-RelPath( [string]$FullPath )
+{
+	$szRel = $FullPath.Substring( $Root.Length ).TrimStart( '\', '/' )
+	return $szRel -replace '\\', '/'
+}
+
+function Get-Files( [string]$RelDir, [string]$Filter, [switch]$Recurse )
+{
+	$szDir = Join-Path $Root $RelDir
+	if( -not ( Test-Path -LiteralPath $szDir ) ) {
+		return @()
+	}
+	$itemArray = Get-ChildItem -LiteralPath $szDir -Filter $Filter -File -Recurse:$Recurse
+	return @( $itemArray | ForEach-Object { Get-RelPath $_.FullName } )
+}
+
+# 規範檔：本議題新增與修改、需符合新規範的檔案
+function Get-GuideFiles()
+{
+	$fileList = @(
+		'.github/copilot-instructions.md',
+		'CLAUDE.md',
+		'.github/instructions/team-overview.instructions.md',
+		'.github/instructions/project-overview.instructions.md'
+	)
+	# 各語言 Coding Style 本議題只改名與更新連結，條列格式由 TODO-5 處理
+	$fileList += Get-Files '.github/team' '*.md' | Where-Object { $_ -notmatch '/coding-(csharp|cpp)\.md$' }
+	$fileList += Get-Files '.github/project' '*.md'
+	$fileList += Get-Files '.claude/skills' 'SKILL.md' -Recurse
+	return $fileList
+}
+
+# 以檔案實際名稱逐層比對，確認存在且大小寫一致
+function Test-PathExact( [string]$RelPath )
+{
+	$szCurrent = $Root
+	foreach( $szPart in ( $RelPath -split '[\\/]' ) ) {
+		if( $szPart -eq '' -or $szPart -eq '.' ) {
+			continue
+		}
+		if( $szPart -eq '..' ) {
+			$szCurrent = Split-Path $szCurrent -Parent
+			continue
+		}
+		$item = Get-ChildItem -LiteralPath $szCurrent -Force | Where-Object { $_.Name -ceq $szPart }
+		if( $null -eq $item ) {
+			return $false
+		}
+		$szCurrent = Join-Path $szCurrent $szPart
+	}
+	return $true
+}
+
+# 依標題切分 Markdown，回傳 @{ Title; Lines }
+function Get-Sections( [string[]]$LineArray )
+{
+	$sectionList = New-Object System.Collections.Generic.List[object]
+	$current = [pscustomobject]@{ Title = ''; Lines = New-Object System.Collections.Generic.List[string] }
+	foreach( $szLine in $LineArray ) {
+		if( $szLine -match '^#{1,6}\s+(.*)$' ) {
+			$sectionList.Add( $current )
+			$current = [pscustomobject]@{ Title = $Matches[ 1 ]; Lines = New-Object System.Collections.Generic.List[string] }
+			continue
+		}
+		$current.Lines.Add( $szLine )
+	}
+	$sectionList.Add( $current )
+	return $sectionList
+}
+
+# ============================================================
+# TEST-1 常駐行數
+# ============================================================
+
+function Get-BaseResidentLineCount()
+{
+	# 比對基準的常駐內容：入口文件與當時 applyTo: "**" 的指引
+	$fileList = @( '.github/copilot-instructions.md', 'CLAUDE.md' )
+	$fileList += @( git ls-tree --name-only "$Base" '.github/instructions/' ) | Where-Object { $_ -like '*.md' }
+	$nTotal = 0
+
+	# PowerShell 5.1 收集原生命令輸出時，在輸出被重導的環境（如經 Bash 呼叫）會丟掉空行；
+	# 改以 Process 直接讀 git 的標準輸出，與 Get-LineCount 同一口徑計算
+	foreach( $szFile in ( $fileList | Sort-Object -Unique ) ) {
+		$szText = Get-GitBlobText "${Base}:$szFile"
+		$lineArray = $szText -split "\r?\n"
+		$nLineCount = $lineArray.Count
+		if( $nLineCount -gt 0 -and $lineArray[ -1 ] -eq '' ) {
+			$nLineCount--
+		}
+		$isEntry = ( $szFile -eq 'CLAUDE.md' ) -or ( $szFile -eq '.github/copilot-instructions.md' )
+		$isResident = $szText -match '(?s)\A---\s*\r?\n.*?applyTo:\s*"\*\*".*?\n---'
+		if( $isEntry -or $isResident ) {
+			$nTotal += $nLineCount
+		}
+	}
+	return $nTotal
+}
+
+function Get-GitBlobText( [string]$Spec )
+{
+	$startInfo = New-Object System.Diagnostics.ProcessStartInfo
+	$startInfo.FileName = 'git'
+	$startInfo.Arguments = "show `"$Spec`""
+	$startInfo.WorkingDirectory = $Root
+	$startInfo.UseShellExecute = $false
+	$startInfo.RedirectStandardOutput = $true
+	$startInfo.StandardOutputEncoding = New-Object System.Text.UTF8Encoding( $false )
+	$process = [System.Diagnostics.Process]::Start( $startInfo )
+	$szText = $process.StandardOutput.ReadToEnd()
+	$process.WaitForExit()
+
+	# BOM 不算內容
+	return $szText.TrimStart( [char]0xFEFF )
+}
+
+function Test-1()
+{
+	$failList = @()
+	$residentList = @( '.github/copilot-instructions.md', 'CLAUDE.md' )
+	$residentList += @( Get-Files '.github/instructions' '*.md' | Where-Object { Test-ApplyToAll $_ } )
+
+	$nTotal = 0
+	$noteList = @()
+	foreach( $szFile in $residentList ) {
+		$nLines = Get-LineCount $szFile
+		$nTotal += $nLines
+		$noteList += "$szFile = $nLines"
+	}
+	# 行數只是觀察指標（DEC-11）：輸出與基準的差異，增加時由人在 Review.md 確認理由
+	$nBaseTotal = Get-BaseResidentLineCount
+	$nDiff = $nTotal - $nBaseTotal
+	$noteList += "總計 = $nTotal（基準 $nBaseTotal，差異 $nDiff）"
+	if( $nDiff -gt 0 ) {
+		$noteList += '常駐總行數增加，Review.md 須寫明增加量與理由'
+	}
+
+	$szCollab = '.github/instructions/team-overview.instructions.md'
+	if( -not ( Test-Path -LiteralPath ( Join-Path $Root $szCollab ) ) ) {
+		$failList += "缺少 $szCollab"
+	}
+	Add-Result 'TEST-1' $failList $noteList
+}
+
+# ============================================================
+# TEST-2 團隊通用層不含專案內容
+# ============================================================
+
+function Test-2()
+{
+	$failList = @()
+	$termArray = @( 'MyCAM', 'Build.bat', 'CopyRef', 'FCLTool', 'PostTool', 'OCC', 'LanguageManager',
+		'Designer', 'reference/', 'CustPost', 'zh-TW', 'AUTO-', '.NET Framework' )
+	$fileList = @( '.github/instructions/team-overview.instructions.md' ) + @( Get-Files '.github/team' '*.md' )
+	foreach( $szFile in $fileList ) {
+		$lineArray = Read-Lines $szFile
+		if( $null -eq $lineArray ) {
+			$failList += "缺少 $szFile"
+			continue
+		}
+		for( $i = 0; $i -lt $lineArray.Count; $i++ ) {
+			foreach( $szTerm in $termArray ) {
+				if( $lineArray[ $i ].Contains( $szTerm ) ) {
+					$failList += "${szFile}:$( $i + 1 ) 含 '$szTerm'"
+				}
+			}
+		}
+	}
+	if( ( Get-Files '.github/team' '*.md' ).Count -lt 5 ) {
+		$failList += '.github/team/ 不足五份文件'
+	}
+	Add-Result 'TEST-2' $failList
+}
+
+# ============================================================
+# TEST-3 規則只寫一處
+# ============================================================
+
+function Test-3()
+{
+	$failList = @()
+	$noteList = @()
+	$signatureArray = @( '1–5 合併', '必修 / 建議 / 提問', '_Alt2', '前綴與內容間空一格', '完成定義' )
+	$fileList = @( Get-Files '.github' '*.md' -Recurse ) + @( 'CLAUDE.md' ) + @( Get-Files '.claude/skills' 'SKILL.md' -Recurse )
+	foreach( $szSig in $signatureArray ) {
+		$hitList = @( $fileList | Where-Object { ( Read-Text $_ ).Contains( $szSig ) } )
+		$noteList += "'$szSig' → $( $hitList -join ', ' )"
+		if( $hitList.Count -ne 1 ) {
+			$failList += "'$szSig' 出現在 $( $hitList.Count ) 個檔案"
+		}
+	}
+
+	# SKILL.md 本文只能是指向 team/ 的說明與必讀清單
+	$skillList = @( Get-Files '.claude/skills' 'SKILL.md' -Recurse )
+	if( $skillList.Count -lt 4 ) {
+		$failList += ".claude/skills/ 只有 $( $skillList.Count ) 個 SKILL.md"
+	}
+	foreach( $szSkill in $skillList ) {
+		$szBody = ( Read-Text $szSkill ) -replace '(?s)\A---.*?\r?\n---\s*', ''
+		$bodyLineArray = @( $szBody -split "\r?\n" | Where-Object { $_.Trim() -ne '' } )
+		if( -not $szBody.Contains( '.github/team/' ) ) {
+			$failList += "$szSkill 本文沒有指向 .github/team/"
+		}
+		if( $bodyLineArray.Count -gt 10 ) {
+			$failList += "$szSkill 本文 $( $bodyLineArray.Count ) 行，疑似含規則內容"
+		}
+	}
+	Add-Result 'TEST-3' $failList $noteList
+}
+
+# ============================================================
+# TEST-4 載入設定與檔案位置
+# ============================================================
+
+function Test-4()
+{
+	$failList = @()
+	$szCollab = '.github/instructions/team-overview.instructions.md'
+
+	# 4.1
+	if( -not ( Test-ApplyToAll $szCollab ) ) {
+		$failList += "$szCollab 的 frontmatter 不是 applyTo: `"**`""
+	}
+
+	# 4.2
+	$onDemandList = @( Get-Files '.github/team' '*.md' ) + @( Get-Files '.github/project' '*.md' )
+	foreach( $szFile in $onDemandList ) {
+		if( -not ( Test-Path -LiteralPath ( Join-Path $Root $szFile ) ) ) {
+			$failList += "缺少 $szFile"
+		}
+		elseif( Test-HasFrontmatterApplyTo $szFile ) {
+			$failList += "$szFile 不應有 applyTo"
+		}
+	}
+	if( $onDemandList.Count -lt 8 ) {
+		$failList += "team/、project/ 只有 $( $onDemandList.Count ) 份文件"
+	}
+
+	# 4.2 instructions/ 只放常駐的概觀，每層一份
+	$instructionArray = @( Get-Files '.github/instructions' '*.md' | Sort-Object )
+	$expectInstruction = @( '.github/instructions/project-overview.instructions.md', '.github/instructions/team-overview.instructions.md' )
+	if( $null -ne ( Compare-Object -ReferenceObject $expectInstruction -DifferenceObject $instructionArray ) ) {
+		$failList += "instructions/ 應只有 team-overview、project-overview：$( $instructionArray -join ', ' )"
+	}
+	foreach( $szFile in $instructionArray ) {
+		if( -not ( Test-ApplyToAll $szFile ) ) {
+			$failList += "$szFile 的 frontmatter 不是 applyTo: `"**`""
+		}
+	}
+
+	# 4.2 team/、project/ 的檔名以分類開頭，並由該層概觀的索引指出
+	$indexMap = @{ 'team' = '.github/instructions/team-overview.instructions.md'; 'project' = '.github/instructions/project-overview.instructions.md' }
+	foreach( $szFile in $onDemandList ) {
+		$szName = Split-Path $szFile -Leaf
+		$szLayer = ( $szFile -split '/' )[ 1 ]
+		if( $szName -notmatch '^(process|coding|env|tool)-' ) {
+			$failList += "$szFile 檔名不是 process-、coding-、env-、tool- 開頭"
+		}
+
+		# 各語言 Coding Style 以 coding-<語言> 一列涵蓋
+		$isLanguageStyle = ( $szLayer -eq 'team' ) -and ( $szName -match '^coding-(csharp|cpp)\.md$' )
+		$szIndexText = Read-Text $indexMap[ $szLayer ]
+		$isIndexed = $isLanguageStyle -or $szIndexText.Contains( ".github/$szLayer/$szName" )
+		if( -not $isIndexed ) {
+			$failList += "$szFile 沒有列在 $szLayer 層概觀的索引"
+		}
+	}
+
+	# 4.2 Windows 不分大小寫，claude.md 會被當成 CLAUDE.md 自動載入
+	foreach( $szFile in @( Get-Files '.github' '*.md' -Recurse ) ) {
+		if( ( Split-Path $szFile -Leaf ) -eq 'claude.md' ) {
+			$failList += "$szFile 會被 Claude Code 當成 CLAUDE.md 載入"
+		}
+	}
+
+	# 4.3
+	$expectArray = @( '.github/copilot-instructions.md', '.github/instructions/team-overview.instructions.md',
+		'.github/instructions/project-overview.instructions.md' )
+	$refArray = @( Read-Lines 'CLAUDE.md' | Where-Object { $_ -match '^@' } | ForEach-Object { $_.Substring( 1 ).Trim() } )
+	$diff = Compare-Object -ReferenceObject $expectArray -DifferenceObject $refArray
+	if( $null -ne $diff ) {
+		$failList += "CLAUDE.md 的 @ 引用不符：$( $refArray -join ', ' )"
+	}
+
+	# 4.4
+	$szCopilot = Read-Text '.github/copilot-instructions.md'
+	$needArray = @( 'team-overview.instructions.md', 'project-overview.instructions.md',
+		'`process-`', '`coding-`', '`env-`', '`tool-`', '團隊通用', '常駐', '依時機讀取', 'Skill' )
+	foreach( $szNeed in $needArray ) {
+		if( -not $szCopilot.Contains( $szNeed ) ) {
+			$failList += "copilot-instructions.md 缺少 '$szNeed'"
+		}
+	}
+
+	# 4.5
+	$szCollabText = Read-Text $szCollab
+	if( $null -eq $szCollabText -or -not $szCollabText.Contains( '新增或修改程式碼' ) ) {
+		$failList += "$szCollab 的流程索引缺少「新增或修改程式碼」"
+	}
+
+	# 4.6
+	foreach( $szName in @( 'SESSION.md', 'REVIEW-REQUEST.md' ) ) {
+		$szIgnore = ( git check-ignore -v $szName 2>$null ) -join ''
+		if( $szIgnore -notmatch "^\.gitignore:\d+:/$( [regex]::Escape( $szName ) )" ) {
+			$failList += "$szName 未由 .gitignore 的 /$szName 排除（$szIgnore）"
+		}
+	}
+	Add-Result 'TEST-4' $failList
+}
+
+# ============================================================
+# TEST-5 異動範圍符合清單
+# ============================================================
+
+function Test-5()
+{
+	$failList = @()
+	$allowArray = @(
+		'.github/instructions/team-overview.instructions.md',
+		'.github/team/process-issue.md',
+		'.github/team/process-docs.md',
+		'.github/team/process-review.md',
+		'.github/team/process-git.md',
+		'.github/team/tool-claude-code.md',
+		'.github/team/process-ai-review.md',
+		'.github/team/tool-copilot-cli.md',
+		'.github/team/env-ai-tools.md',
+		'.github/scripts/Invoke-CopilotReview.ps1',
+		'.github/instructions/project-overview.instructions.md',
+		'.github/project/coding-general.md',
+		'.github/project/process-review.md',
+		'.github/project/env-build.md',
+		'.github/project/env-worktree.md',
+		'.github/project/coding-architecture.md',
+		'.github/team/coding-general.md',
+		'.github/team/coding-csharp.md',
+		'.github/team/coding-cpp.md',
+
+		# 改名且內容大改，git 判為刪除舊檔、新增新檔
+		'.github/instructions/coding-style-general.instructions.md',
+		'.github/copilot-instructions.md',
+		'CLAUDE.md',
+		'.gitignore',
+		'.editorconfig',
+		'.claude/skills/issue-start/SKILL.md',
+		'.claude/skills/review/SKILL.md',
+		'.claude/skills/release-note/SKILL.md',
+		'.claude/skills/ai-tools-review/SKILL.md'
+	)
+
+	# 已提交、未提交與未追蹤的檔案都要納入
+	$changedList = @( git diff --name-only $Base )
+	$changedList += @( git ls-files --others --exclude-standard )
+	foreach( $szFile in ( $changedList | Sort-Object -Unique ) ) {
+		$isAllowed = ( $allowArray -contains $szFile ) -or $szFile.StartsWith( 'Doc/AUTO-23290/' )
+		if( -not $isAllowed ) {
+			$failList += "清單外的異動：$szFile"
+		}
+	}
+
+	# 反向：清單內的檔案都要有異動
+	foreach( $szFile in $allowArray ) {
+		if( $changedList -notcontains $szFile ) {
+			$failList += "清單內的檔案沒有異動：$szFile"
+		}
+	}
+	Add-Result 'TEST-5' $failList
+}
+
+# ============================================================
+# TEST-6 格式與數字條列
+# ============================================================
+
+function Test-6()
+{
+	$failList = @()
+	$noteList = @()
+	$fileList = @( Get-GuideFiles ) + @( Get-Files 'Doc/AUTO-23290' '*.md' ) + @( 'Doc/AUTO-23290/Check.ps1' )
+
+	# 只在簡體中文出現的常用字
+	$simplifiedArray = @( '这', '们', '说', '时', '为', '发', '会', '过', '对', '还', '进', '个', '来', '实', '规', '档' )
+
+	foreach( $szFile in $fileList ) {
+		$szFull = Join-Path $Root $szFile
+		if( -not ( Test-Path -LiteralPath $szFull ) ) {
+			$failList += "缺少 $szFile"
+			continue
+		}
+
+		# 6.1 編碼：.md 無 BOM、.ps1 有 BOM
+		$byteArray = [System.IO.File]::ReadAllBytes( $szFull )
+		$hasBom = $byteArray.Count -ge 3 -and $byteArray[ 0 ] -eq 0xEF -and $byteArray[ 1 ] -eq 0xBB -and $byteArray[ 2 ] -eq 0xBF
+		$isPs1 = $szFile.EndsWith( '.ps1' )
+		if( $isPs1 -and -not $hasBom ) {
+			$failList += "$szFile 應為 UTF-8 with BOM"
+		}
+		elseif( -not $isPs1 -and $hasBom ) {
+			$failList += "$szFile 應為 UTF-8 without BOM"
+		}
+
+		# 6.1 換行：以 index 與 attr 判定
+		$szEol = ( git ls-files --eol -- $szFile ) -join ''
+		if( $szEol -eq '' ) {
+			$noteList += "$szFile 未追蹤，換行待提交後檢查"
+		}
+		elseif( $szEol -notmatch 'i/lf' -or $szEol -notmatch 'eol=crlf' ) {
+			$failList += "$szFile 換行設定不符：$szEol"
+		}
+
+		# 6.1 檔尾換行（.editorconfig insert_final_newline）
+		$hasFinalNewline = $byteArray.Count -gt 0 -and $byteArray[ $byteArray.Count - 1 ] -eq 0x0A
+		if( -not $hasFinalNewline ) {
+			$failList += "$szFile 檔尾缺少換行"
+		}
+
+		# 6.3 檔名
+		$szName = Split-Path $szFile -Leaf
+		if( $szName -notmatch '^[A-Za-z0-9_.\-]+$' ) {
+			$failList += "$szFile 檔名不是英文"
+		}
+
+		if( $isPs1 ) {
+			continue
+		}
+
+		# 6.2 程式碼區塊外沒有無序號條列；6.3 沒有簡體字
+		$lineArray = Read-Lines $szFile
+		$isInCode = $false
+
+		# 各縮排層的上一個條列號碼；Markdown 會依序重排有序清單，跳號會讓顯示的號碼與引用對不上
+		$lastNumMap = @{}
+		for( $i = 0; $i -lt $lineArray.Count; $i++ ) {
+			$szLine = $lineArray[ $i ]
+			if( $szLine -match '^\s*```' ) {
+				$isInCode = -not $isInCode
+				continue
+			}
+			if( $isInCode ) {
+				continue
+			}
+			if( $szLine -match '^\s*[-*]\s' ) {
+				$failList += "${szFile}:$( $i + 1 ) 無序號條列"
+			}
+
+			# 6.2 有序清單不跳號（SPEC-6）
+			if( $szLine -match '^#' ) {
+				$lastNumMap = @{}
+			}
+			elseif( $szLine -match '^(\s*)(\d+)\.\s' ) {
+				$nIndent = $Matches[ 1 ].Length
+				$nNum = [int]$Matches[ 2 ]
+				foreach( $nKey in @( $lastNumMap.Keys ) ) {
+					if( $nKey -gt $nIndent ) {
+						$lastNumMap.Remove( $nKey )
+					}
+				}
+				$hasLast = $lastNumMap.ContainsKey( $nIndent )
+				if( $hasLast -and $nNum -ne $lastNumMap[ $nIndent ] + 1 ) {
+					$failList += "${szFile}:$( $i + 1 ) 條列跳號（$( $lastNumMap[ $nIndent ] ) → $nNum）"
+				}
+				$lastNumMap[ $nIndent ] = $nNum
+			}
+			foreach( $szChar in $simplifiedArray ) {
+				if( $szLine.Contains( $szChar ) ) {
+					$failList += "${szFile}:$( $i + 1 ) 含簡體字 '$szChar'"
+				}
+			}
+		}
+	}
+	Add-Result 'TEST-6' $failList $noteList
+}
+
+# ============================================================
+# TEST-7 連結與引用有效
+# ============================================================
+
+function Test-7()
+{
+	$failList = @()
+	$fileList = @( Get-Files '.github' '*.md' -Recurse ) + @( 'CLAUDE.md' ) +
+		@( Get-Files '.claude/skills' 'SKILL.md' -Recurse ) + @( Get-Files 'Doc/AUTO-23290' '*.md' )
+	foreach( $szFile in $fileList ) {
+		$szText = Read-Text $szFile
+		$szDir = Split-Path $szFile -Parent
+
+		# 相對連結：以檔案所在目錄為基準
+		foreach( $match in [regex]::Matches( $szText, '\]\(([^)\s]+)\)' ) ) {
+			$szLink = $match.Groups[ 1 ].Value -replace '#.*$', ''
+			if( $szLink -eq '' -or $szLink -match '^[a-z]+:' ) {
+				continue
+			}
+			$szTarget = if( $szDir ) { "$szDir/$szLink" } else { $szLink }
+			if( -not ( Test-PathExact $szTarget ) ) {
+				$failList += "${szFile}：連結 $szLink 不存在"
+			}
+		}
+
+		# @ 引用與反引號內的 .github/ 路徑：以 repo 根目錄為基準
+		$refList = @()
+		foreach( $match in [regex]::Matches( $szText, '(?m)^@(\S+)' ) ) {
+			$refList += $match.Groups[ 1 ].Value
+		}
+		# Review 與 Discussion 是歷史記錄，路徑為當時的檔名，改名後不回頭改寫（DEC-21）
+		$isHistory = $szFile -match '^Doc/AUTO-23290/(Review|Discussion)\.md$'
+
+		# review 報告的位置寫成 `檔案:行號`，只檢查檔案部分
+		foreach( $match in [regex]::Matches( $szText, '`(\.github/[^`\s:]+)(:[0-9-]+)?`' ) ) {
+			if( -not $isHistory ) {
+				$refList += $match.Groups[ 1 ].Value
+			}
+		}
+		foreach( $szRef in $refList ) {
+			# 範例路徑（含萬用字元、佔位符、省略號）不檢查
+			if( $szRef -match '[*<>]|\.\.\.' ) {
+				continue
+			}
+			if( -not ( Test-PathExact $szRef ) ) {
+				$failList += "${szFile}：路徑 $szRef 不存在"
+			}
+		}
+	}
+	Add-Result 'TEST-7' ( @( $failList | Sort-Object -Unique ) )
+}
+
+# ============================================================
+# TEST-9 專案指引與 Coding Style 修訂
+# ============================================================
+
+function Test-9()
+{
+	$failList = @()
+	$szOverview = '.github/instructions/project-overview.instructions.md'
+	$lineArray = Read-Lines $szOverview
+	$szText = Read-Text $szOverview
+
+	# 9.1
+	if( $szText -match '(?m)^#+\s*Git 流程' ) {
+		$failList += "$szOverview 仍有「Git 流程」章節"
+	}
+	foreach( $szTerm in @( 'FakeDebug', 'vswhere', 'MachineData' ) ) {
+		if( $szText.Contains( $szTerm ) ) {
+			$failList += "$szOverview 仍有建置細節 '$szTerm'"
+		}
+	}
+	# 9.1 架構與慣例只在寫程式時需要，不常駐（索引涵蓋由 TEST-4.2 檢查）
+	foreach( $szTerm in @( 'OCCT', '`MyCAM.sln`', 'LanguageManager', 'ShowOnLogPanel' ) ) {
+		if( $szText.Contains( $szTerm ) ) {
+			$failList += "$szOverview 仍有架構或慣例內容 '$szTerm'"
+		}
+	}
+	$sectionList = Get-Sections $lineArray
+
+	# 9.1 專案固定檢查項目只在 review 時讀取，不常駐
+	if( $szText -match '(?m)^#+\s*專案固定檢查項目' ) {
+		$failList += "$szOverview 仍有「專案固定檢查項目」章節"
+	}
+	$reviewLineArray = Read-Lines '.github/project/process-review.md'
+	if( $null -eq $reviewLineArray ) {
+		$failList += '缺少 .github/project/review.md'
+	}
+	else {
+		$nItemCount = @( $reviewLineArray | Where-Object { $_ -match '^\d+\.\s' } ).Count
+		if( $nItemCount -ne 2 ) {
+			$failList += "project/process-review.md 有 $nItemCount 項，應為 2 項"
+		}
+	}
+
+	# 9.1 議題編號前綴只寫在專案指引
+	$issueId = $sectionList | Where-Object { $_.Title -match '議題編號' } | Select-Object -First 1
+	if( $null -eq $issueId -or -not ( ( $issueId.Lines -join "`n" ).Contains( 'AUTO-TBD' ) ) ) {
+		$failList += "$szOverview 沒有含 AUTO-TBD 的「議題編號」章節"
+	}
+
+	# 9.2
+	$szBuild = Read-Text '.github/project/env-build.md'
+	if( $null -eq $szBuild ) {
+		$failList += '缺少 .github/project/build.md'
+	}
+	else {
+		foreach( $szHead in @( 'FCLTool', '命令列建置', '執行期檔案' ) ) {
+			if( $szBuild -notmatch "(?m)^#+\s.*$( [regex]::Escape( $szHead ) )" ) {
+				$failList += "env-build.md 缺少「$szHead」章節"
+			}
+		}
+		if( $szBuild -match '(?i)worktree' ) {
+			$failList += 'env-build.md 仍有 worktree 相關內容'
+		}
+	}
+
+	# 9.2 交接寫在 process-issue（不限工具）；新 worktree 準備寫在 env-worktree（不限工具）；Claude 文件不含交接（DEC-24）
+	$needMap = [ordered]@{
+		'.github/team/process-issue.md' = @( 'SESSION.md' )
+		'.github/project/env-worktree.md' = @( 'FCLTool.dll', 'CopyRef.bat', '.worktreeinclude', '卸載' )
+		'.github/team/tool-claude-code.md' = @( '.worktreeinclude' )
+		'.github/team/process-ai-review.md' = @( 'REVIEW-REQUEST.md', '推理強度', '增量', '提問' )
+		'.github/team/tool-copilot-cli.md' = @( 'Invoke-CopilotReview.ps1', '-ListModels', 'COPILOT_HOME' )
+		'.github/team/env-ai-tools.md' = @( '18.5', 'Agent', 'copilot login' )
+	}
+	foreach( $szFile in $needMap.Keys ) {
+		$szDoc = Read-Text $szFile
+		if( $null -eq $szDoc ) {
+			$failList += "缺少 $szFile"
+			continue
+		}
+		foreach( $szNeed in $needMap[ $szFile ] ) {
+			if( -not $szDoc.Contains( $szNeed ) ) {
+				$failList += "$szFile 缺少 '$szNeed' 的說明"
+			}
+		}
+	}
+	$szClaudeDoc = Read-Text '.github/team/tool-claude-code.md'
+	if( $null -ne $szClaudeDoc -and $szClaudeDoc.Contains( 'SESSION.md' ) ) {
+		$failList += 'team/tool-claude-code.md 仍有 SESSION.md 交接'
+	}
+	if( Test-Path '.github/project/tool-claude-code.md' ) {
+		$failList += 'project/tool-claude-code.md 應已刪除'
+	}
+
+	# 9.3 三項規則寫在 project/coding-general.md，不出現在 project-overview
+	$szCoding = Read-Text '.github/project/coding-general.md'
+	if( $null -eq $szCoding ) {
+		$failList += '缺少 .github/project/coding-general.md'
+	}
+	else {
+		foreach( $szNeed in @( '四個語系', 'Designer', 'reference/' ) ) {
+			if( -not $szCoding.Contains( $szNeed ) ) {
+				$failList += "project/coding-general.md 缺少 '$szNeed'"
+			}
+		}
+	}
+	$ruleMap = [ordered]@{ '四語系同步' = '語系.*同步|同步.*語系'; 'Designer 可開' = 'Designer.*開啟'; '不修改 reference/' = 'reference/.*修改|修改.*reference/' }
+	foreach( $section in $sectionList ) {
+		foreach( $szKey in $ruleMap.Keys ) {
+			if( @( $section.Lines | Where-Object { $_ -match $ruleMap[ $szKey ] } ).Count -gt 0 ) {
+				$failList += "「$szKey」重複出現在「$( $section.Title )」"
+			}
+		}
+	}
+
+	# 9.4
+	$szGeneral = Read-Text '.github/team/coding-general.md'
+	if( $szGeneral.Contains( '維持該方法內既有的命名方式' ) ) {
+		$failList += 'team/coding-general.md 仍有「維持該方法內既有的命名方式」'
+	}
+	foreach( $szNeed in @( '採新規範', '整個方法', '獨立 commit', '沒有動到的方法', '<議題編號>:' ) ) {
+		if( -not $szGeneral.Contains( $szNeed ) ) {
+			$failList += "team/coding-general.md 缺少 '$szNeed'"
+		}
+	}
+	Add-Result 'TEST-9' $failList
+}
+
+# ============================================================
+# TEST-11 本議題文件與 commit
+# ============================================================
+
+function Test-11()
+{
+	$failList = @()
+	$noteList = @()
+
+	# 11.1
+	foreach( $szDoc in @( 'README', 'Goal', 'Spec', 'TestPlan', 'Implementation', 'Review', 'Discussion', 'FollowUp' ) ) {
+		if( -not ( Test-Path -LiteralPath ( Join-Path $Root "Doc/AUTO-23290/$szDoc.md" ) ) ) {
+			$failList += "缺少 Doc/AUTO-23290/$szDoc.md"
+		}
+	}
+	$szReadme = Read-Text 'Doc/AUTO-23290/README.md'
+	foreach( $szHead in @( '文件', 'DoD', 'Release Note' ) ) {
+		if( $szReadme -notmatch "(?m)^##\s.*$( [regex]::Escape( $szHead ) )" ) {
+			$failList += "README.md 缺少「$szHead」章節"
+		}
+	}
+	$nChecked = ( [regex]::Matches( $szReadme, '(?m)^\s*\d+\.\s\[x\]' ) ).Count
+	$nUnchecked = ( [regex]::Matches( $szReadme, '(?m)^\s*\d+\.\s\[ \]' ) ).Count
+	if( $nChecked -eq 0 -or $nUnchecked -gt 0 ) {
+		$failList += "README.md 的 DoD 未全部勾選（已勾 $nChecked、未勾 $nUnchecked）"
+	}
+	$readmeSectionList = Get-Sections ( $szReadme -split "\r?\n" )
+	$release = $readmeSectionList | Where-Object { $_.Title -match 'Release Note' } | Select-Object -First 1
+	if( $null -ne $release ) {
+		$noteLineArray = @( $release.Lines | Where-Object { $_ -match '^\d+\.\s' } )
+		if( $noteLineArray.Count -eq 0 ) {
+			$failList += 'Release Note 沒有條列'
+		}
+		foreach( $szLine in $noteLineArray ) {
+			if( $szLine -notmatch '^\d+\.\s(新增|修改|刪除) \S' ) {
+				$failList += "Release Note 前綴不符：$szLine"
+			}
+		}
+	}
+
+	# 11.2
+	$szReview = Read-Text 'Doc/AUTO-23290/Review.md'
+	if( $null -ne $szReview ) {
+		foreach( $szField in @( '議題', '分支', '比對基準', '工具與模型', '日期' ) ) {
+			if( -not $szReview.Contains( $szField ) ) {
+				$failList += "Review.md 表頭缺少「$szField」"
+			}
+		}
+		if( $szReview -notmatch '\|\s*REV\s*\|\s*段\s*\|\s*嚴重度\s*\|\s*位置\s*\|\s*說明\s*\|\s*處置\s*\|' ) {
+			$failList += 'Review.md 發現表格欄位不是 REV、段、嚴重度、位置、說明、處置'
+		}
+		foreach( $match in [regex]::Matches( $szReview, '(?m)^\|\s*REV-\d+\s*\|.*$' ) ) {
+			$cellArray = $match.Value.Trim( '|' ) -split '\|' | ForEach-Object { $_.Trim() }
+			$szSeverity = $cellArray[ 2 ]
+			$szAction = $cellArray[ -1 ]
+			if( $szAction -eq '' -or $szAction -eq '待處置' ) {
+				$failList += "$( $cellArray[ 0 ] ) 沒有處置"
+			}
+			elseif( $szAction.Contains( '待人確認' ) ) {
+				$failList += "$( $cellArray[ 0 ] ) 的處置待人確認"
+			}
+
+			# review.md 的處置只有三種，其他文字視為尚未處置
+			elseif( -not ( $szAction.StartsWith( '已修正' ) -or $szAction.StartsWith( '不修正' ) -or $szAction.StartsWith( '列後續' ) ) ) {
+				$failList += "$( $cellArray[ 0 ] ) 的處置不是已修正、不修正或列後續（$szAction）"
+			}
+			elseif( $szSeverity -eq '必修' -and -not $szAction.StartsWith( '已修正' ) ) {
+				$failList += "$( $cellArray[ 0 ] ) 為必修但處置不是已修正"
+			}
+		}
+	}
+
+	# 11.3 標示為建議（DEC-20）：未標示只提示；每個 STEP 仍須有標示的 commit
+	$hashArray = @( git log --format=%H "$Base..HEAD" )
+	$stepSet = @{}
+	foreach( $szHash in $hashArray ) {
+		$szSubject = ( git log -1 --format=%s $szHash ).Trim()
+		$fileArray = @( git diff-tree --no-commit-id --name-only -r $szHash )
+		$isDocOnly = @( $fileArray | Where-Object { $_ -notmatch '^Doc/AUTO-23290/[^/]+\.md$' } ).Count -eq 0
+		$tagMatch = [regex]::Match( $szSubject, '\(((STEP|REV)-\d+(,\s*(STEP|REV)-\d+)*)\)$' )
+		if( $tagMatch.Success ) {
+			foreach( $stepMatch in [regex]::Matches( $tagMatch.Value, 'STEP-(\d+)' ) ) {
+				$stepSet[ [int]$stepMatch.Groups[ 1 ].Value ] = $true
+			}
+		}
+		elseif( -not $isDocOnly ) {
+			$noteList += "commit $( $szHash.Substring( 0, 8 ) ) 標題行未標示 STEP 或 REV：$szSubject"
+		}
+	}
+	$nStepCount = ( [regex]::Matches( ( Read-Text 'Doc/AUTO-23290/Implementation.md' ), '(?m)^###\s+STEP-\d+' ) ).Count
+	for( $i = 1; $i -le $nStepCount; $i++ ) {
+		if( -not $stepSet.ContainsKey( $i ) ) {
+			$failList += "STEP-$i 沒有 commit"
+		}
+	}
+	$noteList += '純格式調整是否獨立 commit 由人工確認'
+	Add-Result 'TEST-11' $failList $noteList
+}
+
+# ============================================================
+# TEST-12 個人設定收斂
+# ============================================================
+
+function Test-12()
+{
+	$failList = @()
+	$szHomeClaude = Join-Path $env:USERPROFILE '.claude'
+	if( $SkipPersonal ) {
+		Add-Result 'TEST-12' @() @( '略過：-SkipPersonal（個人設定只在實作者的電腦檢查）' )
+		return
+	}
+
+	# 12.1
+	if( Test-Path -LiteralPath ( Join-Path $szHomeClaude 'issue-workflow.md' ) ) {
+		$failList += '~/.claude/issue-workflow.md 仍存在'
+	}
+	$szGlobal = [System.IO.File]::ReadAllText( ( Join-Path $szHomeClaude 'CLAUDE.md' ), [System.Text.Encoding]::UTF8 )
+	foreach( $szTerm in @( '開發議題處理流程', 'issue-workflow.md', '數字標號' ) ) {
+		if( $szGlobal.Contains( $szTerm ) ) {
+			$failList += "~/.claude/CLAUDE.md 仍有 '$szTerm'"
+		}
+	}
+
+	# 12.2 主 checkout 為 git worktree list 的第一筆
+	$szMainLine = @( git worktree list --porcelain ) | Where-Object { $_ -match '^worktree ' } | Select-Object -First 1
+	$szMain = $szMainLine.Substring( 'worktree '.Length )
+	$szLocalPath = Join-Path $szMain 'CLAUDE.local.md'
+	if( -not ( Test-Path -LiteralPath $szLocalPath ) ) {
+		$failList += "找不到 $szLocalPath"
+	}
+	else {
+		$szLocal = [System.IO.File]::ReadAllText( $szLocalPath, [System.Text.Encoding]::UTF8 )
+		foreach( $szTerm in @( '議題資料夾放在', '推送前一律先問我' ) ) {
+			if( $szLocal.Contains( $szTerm ) ) {
+				$failList += "CLAUDE.local.md 仍有 '$szTerm'"
+			}
+		}
+		foreach( $szTerm in @( 'origin', 'github' ) ) {
+			if( -not $szLocal.Contains( $szTerm ) ) {
+				$failList += "CLAUDE.local.md 缺少 '$szTerm' 的 remote 用法"
+			}
+		}
+	}
+	Add-Result 'TEST-12' $failList
+}
+
+# ============================================================
+# 執行與輸出
+# ============================================================
+
+$testArray = @( 'Test-1', 'Test-2', 'Test-3', 'Test-4', 'Test-5', 'Test-6', 'Test-7', 'Test-9', 'Test-11', 'Test-12' )
+foreach( $szTest in $testArray ) {
+	try {
+		& $szTest
+	}
+	catch {
+		Add-Result ( $szTest.ToUpper() ) @( "執行錯誤：$( $_.Exception.Message )" )
+	}
+}
+
+Write-Output "比對基準：$Base"
+foreach( $result in $Results ) {
+	$szState = if( $result.Pass ) { 'PASS' } else { 'FAIL' }
+	Write-Output "$( $result.Id ) $szState"
+	foreach( $szFail in $result.Failures ) {
+		Write-Output "    x $szFail"
+	}
+	foreach( $szNote in $result.Notes ) {
+		Write-Output "    i $szNote"
+	}
+}
+$nFailCount = @( $Results | Where-Object { -not $_.Pass } ).Count
+Write-Output "總結：$( $Results.Count - $nFailCount ) PASS、$nFailCount FAIL"
+exit $nFailCount

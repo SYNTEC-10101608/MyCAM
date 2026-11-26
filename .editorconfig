@@ -1,5 +1,5 @@
 # MyCAM .editorconfig
-# 規範說明見 .github/instructions/coding-style-*.instructions.md
+# 規範說明見 .github/team/coding-*.md
 root = true
 
 # ============================================================
@@ -20,6 +20,10 @@ trim_trailing_whitespace = false
 # 批次檔：UTF-8 不可帶 BOM（cmd 會把 BOM 當成第一行指令的一部分）
 [*.{bat,cmd}]
 charset = utf-8
+
+# PowerShell 腳本：Windows PowerShell 5.1 會把無 BOM 的 UTF-8 當成 ANSI 讀取
+[*.ps1]
+charset = utf-8-bom
 
 # XML 類：VS 預設帶 BOM
 [*.{xml,resx,config,settings,csproj,vcxproj,filters,props,targets,sln}]
