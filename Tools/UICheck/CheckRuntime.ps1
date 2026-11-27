@@ -1,4 +1,4 @@
-param(
+﻿param(
 	[string]$ShotDir = ""
 )
 # The runtime part of UICheck.bat runtime: dialogs and CNC panels in zh-TW and zh-CN, the numeric input, and the
@@ -44,10 +44,12 @@ $checkList.Add(@( $null, "CheckRuntimeLayout.ps1", $layoutArguments ))
 # behavior of the shared numeric input
 $checkList.Add(@( $null, "CheckControls.ps1", @() ))
 
-# main window screenshots go to the temp folder when no screenshot folder is given
+# main window screenshots go to a folder of this run under the temp folder when no screenshot folder is given, so
+# overlapping runs do not overwrite each other's (runs given the same folder do)
 $shots = $ShotDir
 if (-not $shots) {
-	$shots = Join-Path $env:TEMP "UICheck"
+	$shots = Join-Path $env:TEMP ("UICheck\" + (Get-Date -Format "yyyyMMdd-HHmmss") + "_$PID")
+	Write-Host "[UICheck] main window screenshots: $shots"
 }
 # each language x page (CAD start page, CAM, CNC machining) x landscape (maximized) / portrait (1080 x 1880 window),
 # on the specified screen 1920 x 1080 at 100 % (see VirtualDisplayRun.cs)

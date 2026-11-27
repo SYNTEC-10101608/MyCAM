@@ -8,6 +8,15 @@ setlocal
 set "HERE=%~dp0"
 set "RESULT=0"
 
+REM runtime on a machine not marked as unattended (1) or work computer (0): no check runs, CheckRuntime.ps1 explains
+if /i not "%~1"=="runtime" goto :static
+if "%MYCAM_UICHECK_UNATTENDED%"=="0" goto :static
+if "%MYCAM_UICHECK_UNATTENDED%"=="1" goto :static
+powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntime.ps1"
+set "RESULT=2"
+goto :report
+
+:static
 powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckStatic.ps1"
 if errorlevel 1 set "RESULT=1"
 
