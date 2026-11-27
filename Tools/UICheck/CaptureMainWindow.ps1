@@ -21,15 +21,15 @@
 # designer shows them; use it with -Mode CNC, the page the designer shows. It opens no dialog.
 # The language is set in memory only; the setting file is not changed.
 # The runner works on a hidden desktop (HiddenDesktopRun.cs) so it does not take the screen; -Visible shows it.
-# On the hidden desktop the OpenGL 3D view stays empty. The environment variable UICHECK_VISIBLE=1 does the same as
-# -Visible, for a test machine whose screen nobody uses, so UICheck.bat captures the 3D view too.
+# On the hidden desktop the OpenGL 3D view stays empty. The environment variable MYCAM_UICHECK_UNATTENDED=1 marks a
+# machine whose screen nobody uses and does the same as -Visible, so UICheck.bat captures the 3D view too.
 # -Screen runs on the specified screen of the product, 1920 x 1080 at 100 % scaling (VirtualDisplayRun.cs: an attached
 # screen that is one, or else a virtual screen added for the run), and -Width / -Height are ignored: Landscape keeps
 # the main window maximized there as the program shows it; Portrait sizes it 1080 x 1880 on that screen, because
 # MainLayout only looks at the aspect ratio of the window. Exit code 2 when the screen cannot be prepared.
 
 $ErrorActionPreference = "Stop"
-if ($env:UICHECK_VISIBLE -eq "1") {
+if ($env:MYCAM_UICHECK_UNATTENDED -eq "1") {
 	$Visible = $true
 }
 if (-not $Root) {

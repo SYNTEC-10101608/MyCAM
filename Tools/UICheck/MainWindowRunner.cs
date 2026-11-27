@@ -101,7 +101,10 @@ namespace UICheck
 			}
 
 			// the screen VirtualDisplayRun prepared; the window is moved there before it is maximized or sized
-			Screen targetScreen = LayoutRunner.FindTargetScreen();
+			Screen targetScreen;
+			if( LayoutRunner.TryFindTargetScreen( out targetScreen ) == false ) {
+				return 2;
+			}
 			if( targetScreen != null ) {
 				mainForm.WindowState = FormWindowState.Normal;
 				SetWindowPos( mainForm.Handle, IntPtr.Zero, targetScreen.Bounds.X, targetScreen.Bounds.Y, 0, 0,
@@ -131,6 +134,11 @@ namespace UICheck
 					Console.WriteLine( "FAIL  main window is {0}, expected {1}", mainForm.Size, windowSize );
 					return 1;
 				}
+			}
+			string szScreenProblem = LayoutRunner.CheckOnTargetScreen( mainForm, targetScreen );
+			if( szScreenProblem != null ) {
+				Console.WriteLine( "FAIL  main window {0}", szScreenProblem );
+				return 1;
 			}
 
 			// switch the page the way the user does, after resizing so the layout already matches the orientation

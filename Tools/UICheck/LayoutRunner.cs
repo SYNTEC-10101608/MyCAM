@@ -55,7 +55,9 @@ namespace UICheck
 
 			// no main window registers the dialog area here: dialogs are centered and clamped on the screen
 			// VirtualDisplayRun prepared, as they are on the target machine
-			m_TargetScreen = FindTargetScreen();
+			if( TryFindTargetScreen( out m_TargetScreen ) == false ) {
+				return 2;
+			}
 			if( m_TargetScreen != null ) {
 				Rectangle targetArea = m_TargetScreen.WorkingArea;
 				DialogPlacement.AreaProvider = () => targetArea;
@@ -155,6 +157,10 @@ namespace UICheck
 				form.Opacity = 0;
 				form.Show();
 				Application.DoEvents();
+				string szScreenProblem = CheckOnTargetScreen( form, m_TargetScreen );
+				if( szScreenProblem != null ) {
+					problemList.Add( szScreenProblem );
+				}
 				CheckChildren( form, problemList );
 				if( isDialog ) {
 					CheckDesignLayout( form, designClientSize, designBoundsMap, problemList );
@@ -272,20 +278,34 @@ namespace UICheck
 
 		#region Placeholder constructor arguments
 
-		// UICHECK_SCREEN names the screen VirtualDisplayRun prepared; null when the runner is started without it
-		internal static Screen FindTargetScreen()
+		// UICHECK_SCREEN names the screen VirtualDisplayRun prepared; target is null when the runner is started without
+		// it. False when the named screen is gone: a check on another screen would not be on the specified screen.
+		internal static bool TryFindTargetScreen( out Screen target )
 		{
+			target = null;
 			string szDevice = Environment.GetEnvironmentVariable( "UICHECK_SCREEN" );
 			if( string.IsNullOrEmpty( szDevice ) ) {
-				return null;
+				return true;
 			}
 			foreach( Screen screen in Screen.AllScreens ) {
 				if( screen.DeviceName == szDevice ) {
-					return screen;
+					target = screen;
+					return true;
 				}
 			}
-			Console.WriteLine( "screen {0} from UICHECK_SCREEN not found, using the primary screen", szDevice );
-			return null;
+			Console.WriteLine( "FAIL  screen {0} from UICHECK_SCREEN not found", szDevice );
+			return false;
+		}
+
+		// the window must be on the specified screen, which can be gone after the start
+		internal static string CheckOnTargetScreen( Control control, Screen target )
+		{
+			if( target == null ) {
+				return null;
+			}
+			string szDevice = Screen.FromControl( control ).DeviceName;
+			return szDevice == target.DeviceName ? null :
+				"is on screen " + szDevice + ", not on the specified screen " + target.DeviceName;
 		}
 
 		internal static object CreateInstance( Type type )

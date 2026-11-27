@@ -22,7 +22,9 @@ namespace UICheck
 	//      administrator rights once) is added for the run, right of the other screens; only the virtual screen is
 	//      set to the mode and 100 % scaling, and it is removed afterwards. Any failure removes it and stops with exit
 	//      code 2. The driver also removes it about a second after this process stops pinging, so a killed run does
-	//      not leave it behind.
+	//      not leave it behind. An unattended machine (MYCAM_UICHECK_UNATTENDED=1) never adds one: it keeps a
+	//      resident specified screen, so the run stops with exit code 2 instead.
+	// Only one run at a time on a computer: a later run waits for the earlier one.
 	//
 	// Usage: UICheckDisplay.exe <exe> [args ...]
 	// Exit code 2 when the screen cannot be prepared.
@@ -38,6 +40,44 @@ namespace UICheck
 
 			// monitor sizes and DPI are only reported unscaled to a per-monitor DPI aware process
 			SetProcessDpiAwarenessContext( new IntPtr( DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ) );
+
+			// one run at a time on this computer: two runs would cover each other's windows on a visible screen, and a
+			// screen added by one run could be taken for the other's
+			using( Mutex runLock = new Mutex( false, RUN_LOCK_NAME ) ) {
+				if( AcquireRunLock( runLock ) == false ) {
+					return 2;
+				}
+				try {
+					return RunOnSpecScreen( commandArray );
+				}
+				finally {
+					runLock.ReleaseMutex();
+				}
+			}
+		}
+
+		static bool AcquireRunLock( Mutex runLock )
+		{
+			try {
+				if( runLock.WaitOne( 0 ) ) {
+					return true;
+				}
+				Console.WriteLine( "[display] waiting for another UICheck run on this computer to end" );
+				if( runLock.WaitOne( RUN_LOCK_TIMEOUT_MS ) ) {
+					return true;
+				}
+				Console.Error.WriteLine( "[display] another UICheck run did not end within " +
+					RUN_LOCK_TIMEOUT_MS / 60000 + " minutes" );
+				return false;
+			}
+			// a run that was killed leaves the lock abandoned; it is taken over
+			catch( AbandonedMutexException ) {
+				return true;
+			}
+		}
+
+		static int RunOnSpecScreen( string[] commandArray )
+		{
 			int nWidth = SPEC_WIDTH;
 			int nHeight = SPEC_HEIGHT;
 			List<DisplayState> originalList = GetAttachedDisplays();
@@ -52,6 +92,15 @@ namespace UICheck
 					}
 					return RunCommand( commandArray, display.DeviceName );
 				}
+			}
+
+			// an unattended machine keeps a resident specified screen; adding a screen there could change the
+			// arrangement while nobody watches (a laptop with the lid closed may turn its panel off)
+			if( Environment.GetEnvironmentVariable( UNATTENDED_VARIABLE ) == "1" ) {
+				Console.Error.WriteLine( "[display] no screen is " + nWidth + "x" + nHeight + " at 96 DPI; an " +
+					"unattended machine (" + UNATTENDED_VARIABLE + "=1) uses a resident virtual screen as the " +
+					"primary screen, see .github/project/tool-uicheck.md" );
+				return 2;
 			}
 			return RunOnVirtualScreen( commandArray, nWidth, nHeight, originalList );
 		}
@@ -166,6 +215,18 @@ namespace UICheck
 			public bool IsPrimary;
 			public int X;
 			public int Y;
+			public int Width;
+			public int Height;
+			public int Orientation;
+			public int Frequency;
+			public uint Dpi;
+
+			public bool IsSame( DisplayState other )
+			{
+				return other != null && other.X == X && other.Y == Y && other.IsPrimary == IsPrimary &&
+					other.Width == Width && other.Height == Height && other.Orientation == Orientation &&
+					other.Frequency == Frequency && other.Dpi == Dpi;
+			}
 		}
 
 		static List<DisplayState> GetAttachedDisplays()
@@ -183,6 +244,12 @@ namespace UICheck
 					display.IsPrimary = ( device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE ) != 0;
 					display.X = mode.dmPositionX;
 					display.Y = mode.dmPositionY;
+					display.Width = mode.dmPelsWidth;
+					display.Height = mode.dmPelsHeight;
+					display.Orientation = mode.dmDisplayOrientation;
+					display.Frequency = mode.dmDisplayFrequency;
+					MONITORINFOEX info;
+					GetMonitor( device.DeviceName, out info, out display.Dpi );
 					displayList.Add( display );
 				}
 				device.cb = Marshal.SizeOf( typeof( DISPLAY_DEVICE ) );
@@ -191,7 +258,9 @@ namespace UICheck
 		}
 
 		// the screen this run added: new since the start and on the Parsec adapter; another screen attached at the
-		// same time could otherwise be taken for it and changed
+		// same time could otherwise be taken for it and changed. The driver does not tell which screen its index is,
+		// so a screen another Parsec client adds at the same moment cannot be told apart; another UICheck run cannot
+		// add one, it waits for the run lock.
 		static string WaitForNewDisplay( List<DisplayState> originalList )
 		{
 			for( int nWaited = 0; nWaited < APPEAR_TIMEOUT_MS; nWaited += POLL_INTERVAL_MS ) {
@@ -235,35 +304,33 @@ namespace UICheck
 				"cannot set the virtual screen to " + nWidth + "x" + nHeight + " (" + nResult + ")";
 		}
 
-		// the screens that were there keep their attachment, place and primary state
+		// the screens that were there keep their attachment, place, primary state, mode and scaling
 		static bool IsUnchanged( List<DisplayState> originalList )
 		{
-			List<DisplayState> currentList = GetAttachedDisplays();
-			foreach( DisplayState original in originalList ) {
-				DisplayState current = currentList.Find( display => display.DeviceName == original.DeviceName );
-				bool isSame = current != null && current.X == original.X && current.Y == original.Y &&
-					current.IsPrimary == original.IsPrimary;
-				if( isSame == false ) {
-					return false;
-				}
-			}
-			return true;
+			return FindChanged( originalList ).Count == 0;
 		}
 
 		// the other screens are never changed; a difference after the run is reported, not repaired
 		static void WarnIfChanged( List<DisplayState> originalList )
 		{
 			Thread.Sleep( SETTLE_TIME_MS );
+			foreach( string szDevice in FindChanged( originalList ) ) {
+				Console.Error.WriteLine( "[display] WARNING " + szDevice + " is no longer attached at its place " +
+					"in its mode and scaling after the run; check the display settings" );
+			}
+		}
+
+		static List<string> FindChanged( List<DisplayState> originalList )
+		{
 			List<DisplayState> currentList = GetAttachedDisplays();
+			List<string> changedList = new List<string>();
 			foreach( DisplayState original in originalList ) {
 				DisplayState current = currentList.Find( display => display.DeviceName == original.DeviceName );
-				bool isSame = current != null && current.X == original.X && current.Y == original.Y &&
-					current.IsPrimary == original.IsPrimary;
-				if( isSame == false ) {
-					Console.Error.WriteLine( "[display] WARNING " + original.DeviceName +
-						" is no longer attached at its place after the run; check the display settings" );
+				if( original.IsSame( current ) == false ) {
+					changedList.Add( original.DeviceName );
 				}
 			}
+			return changedList;
 		}
 		static bool IsSpecScreen( string szDevice, int nWidth, int nHeight )
 		{
@@ -485,13 +552,13 @@ namespace UICheck
 						false );
 
 					// timed out: the request still uses the buffers, so it is cancelled and waited for before they
-					// are freed
+					// are freed; it can still have completed in between, then its result counts (a screen it added
+					// is removed at the end)
 					if( isDone == false ) {
 						CancelIoEx( m_hDevice, pOverlapped );
-						GetOverlappedResult( m_hDevice, pOverlapped, out nTransferred, true );
-						return -1;
+						isDone = GetOverlappedResult( m_hDevice, pOverlapped, out nTransferred, true );
 					}
-					return Marshal.ReadInt32( pOutput );
+					return isDone ? Marshal.ReadInt32( pOutput ) : -1;
 				}
 				finally {
 					CloseHandle( hEvent );
@@ -505,6 +572,9 @@ namespace UICheck
 		#endregion
 
 		const string SCREEN_VARIABLE = "UICHECK_SCREEN";
+		const string UNATTENDED_VARIABLE = "MYCAM_UICHECK_UNATTENDED";
+		const string RUN_LOCK_NAME = @"Global\MyCAM_UICheck_Screen";
+		const int RUN_LOCK_TIMEOUT_MS = 30 * 60 * 1000;
 		static readonly object m_IoLock = new object();
 		static IntPtr m_hDevice;
 		static volatile bool m_isStopping;

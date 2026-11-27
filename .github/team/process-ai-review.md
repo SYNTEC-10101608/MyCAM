@@ -12,7 +12,7 @@
 
 1. 施工方列出 reviewer 工具可用的模型、費用等級與各模型支援的推理強度，並提出建議：與施工方不同家族、可用的最高等級；由人決定。
 2. 施工方提交待審的修改，在工作目錄根目錄寫 `REVIEW-REQUEST.md`（範本見第 4 節，由 `.gitignore` 排除）。請求檔寫明 reviewer 規則，reviewer 不需要讀本文件。
-3. 啟動 reviewer：可自動執行的工具由施工方在背景啟動，做法見該工具的 `tool-` 文件（如 [tool-copilot-cli.md](tool-copilot-cli.md)）；其他工具由人在該工具中輸入「依 `REVIEW-REQUEST.md` 做 review」。
+3. 啟動 reviewer：可自動執行的工具由施工方在背景啟動，做法見該工具的 `tool-` 文件（如 [tool-copilot-cli.md](tool-copilot-cli.md)）；其他工具由人在該工具中輸入「依 `REVIEW-REQUEST.md` 做 review」。以 Copilot 的模型 review 時（含在 VS Copilot 中選用的模型），一律由施工方以 `.github/scripts/Invoke-CopilotReview.ps1` 執行，不請人在 IDE 中啟動。
 4. Reviewer 完成後，施工方先確認 HEAD 與分支沒變、工作樹只改了報告檔與請求檔，再逐項分析：同意、不同意（附理由）、需要人決定；需要人決定的依[團隊概觀](../instructions/team-overview.instructions.md)協作原則第 3 項列出。
 5. 人決定後，施工方依 [process-review.md](process-review.md) 第 3 節填處置、修正並 commit。
 
