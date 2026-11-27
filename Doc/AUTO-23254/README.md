@@ -18,6 +18,7 @@
 | [Review.md](Review.md) | Review 報告（REV） |
 | [Discussion.md](Discussion.md) | 討論記錄：依主題整理的共識與決策（DEC） |
 | [FollowUp.md](FollowUp.md) | 範圍外的後續處理（TODO）與議題清單 |
+| [Appendix-VirtualDisplay.md](Appendix-VirtualDisplay.md) | 附錄：在沒有 Claude Code 的電腦上手動安裝常駐虛擬螢幕並設為同步顯示（TODO-24 的先行策略） |
 
 專案指引：`.github/project/coding-ui-style.md`、`.github/project/coding-icon-design.md`；UI 檢查工具與截圖環境見
 `.github/project/tool-uicheck.md`。
