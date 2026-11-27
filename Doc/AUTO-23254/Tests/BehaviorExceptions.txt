@@ -18,7 +18,7 @@ TypeReplace AddPathDlg m_num* TextBox -> DebouncedNumericUpDown (D1 0.001 to 90 
 TypeReplace LeadDlg m_lblLeadIn title moved to m_pnlLeadIn
 TypeReplace LeadDlg label3 title moved to m_pnlLeadOut
 TypeReplace PatternSettingDlg label1 renamed to m_lblPathType (its language ID)
-TypeReplace PatternSettingDlg m_num* TextBox -> DebouncedNumericUpDown (default range, 3 decimals); the Leave / Enter handlers still validate the text
+TypeReplace PatternSettingDlg m_num* TextBox -> DebouncedNumericUpDown (default range -99999 to 99999, 3 decimals; larger values that the TextBox accepted are rejected, decision 2026-11-27 DEC-20); the Leave / Enter handlers still validate the text
 TypeReplace ToolVectorDlg m_lblOnePntToolVecAdjust title moved to m_pnlToolVecInfo
 TypeReplace ToolVectorDlg m_lblToolDirQuickSetBtn title moved to m_pnlQuickSet
 TypeReplace ToolVectorDlg m_lblSetBtn title moved to m_pnlSetting
@@ -38,7 +38,7 @@ SameProperties ThreePtTransformDlg m_lblCAD*Value TabStop the former disabled te
 SameProperties AxisTransformDlg m_num* Minimum designer default only, set in the constructor
 SameProperties AxisTransformDlg m_num* Maximum designer default only, set in the constructor
 SameProperties AxisTransformDlg m_num* DecimalPlaces designer default only, set in the constructor
-TypeReplace ThreePtTransformDlg m_numMachine* TextBox -> DebouncedNumericUpDown (3 decimals, same default values); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
+TypeReplace ThreePtTransformDlg m_numMachine* TextBox -> DebouncedNumericUpDown (default range -99999 to 99999, 3 decimals, same default values; decision 2026-11-27 DEC-20); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
 TypeReplace DesignSupportBracketDlg m_lblSection* section title labels moved to the m_pnl* section titles
 TypeReplace CNCAlarmPanel m_lblTitle title moved to the m_pnlAlarm section title
 

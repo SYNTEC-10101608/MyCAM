@@ -97,7 +97,7 @@
 2. 多個控制項共用、或執行時才決定的文字：在程式中以 `TryGetString` 取得，ID 不可等於任何控制項名稱，
    並在 `ApplyLanguage` 之後設定。
 3. 共用的按鈕文字（確定、取消、重設、預覽、關閉）以 `ThemedButton.CommonText` 指定，集中在 `CommonUI` 的語系檔。
-4. Designer 上的文字寫 zh-TW；`Language/` 中所有語系的 XML 同步維護。
+4. Designer 上的文字寫 zh-TW；語系檔的位置與同步規則見 [coding-general.md](coding-general.md) 的「多語系」。
 
 ## 8. 共識的特例
 
@@ -109,8 +109,8 @@
 | 承載單一內容的視窗（`CNCDlg`、`LoadingBarDlg`、`VNCUserControl`） | 內容 `Dock = Fill`；`CNCDlg` 大小隨遠端畫面，直式時定位到 CNC 區域 |
 | `CNCInfoPanel` 直式 | 卡片改為上下排列，是唯一依方向改排列的畫面 |
 | 資料色 | 具名常數，登錄為 `DataColor` |
-| `CNCThreePointDlg` 的工件點與誤差欄 | 維持 `TextBox`：空白代表「尚未輸入」；可為空的數值框完成後移除 |
-| `ComboBox` | 暫時保留，之後改為 `RadioButton` |
+| `CNCThreePointDlg` 的工件點與誤差欄 | 維持 `TextBox`：空白代表「尚未輸入」，數值框無法表示（AUTO-23254 TODO-6） |
+| `ComboBox` | 允許使用；是否改為 `RadioButton` 尚未決定（AUTO-23254 TODO-7） |
 | `ToolTip` | 只用於長度不固定、可能被截斷的執行時文字 |
 
 ## 9. Designer 檔

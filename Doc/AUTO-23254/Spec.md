@@ -27,7 +27,7 @@
 | SPEC-11 | **Designer 如實呈現**：外觀屬性在基底與元件建構子設定並標為不序列化；所有畫面 `AutoScaleMode = None`；`InitializeComponent()` 之後不寫外觀程式 | REQ-5 |
 | SPEC-12 | **版面機制**：對話框為 Designer 固定座標，執行時只透過 `SectionStack`（補位、按鈕列、換頁）；嵌入式面板以 `ResponsiveLayout` 縮放；主視窗以 `MainLayout` 純計算區域（`Calculate` 只算尺寸、`Update` 套用），不使用 `TableLayoutPanel`，Designer 寫入橫式加工頁的計算結果 | REQ-2、REQ-5 |
 | SPEC-13 | **置中**：`DialogPlacement` 一處計算，`DialogBase.OnLoad` 與 `FormBase.Show` 呼叫；CAM 區域由主視窗註冊 | REQ-2 |
-| SPEC-14 | **多語系**：控制項名稱即 ID、表單標題 ID 為類別名稱，由三個基底的 `ApplyLanguage` 經 `LanguageApplier` 套用，取代各畫面手寫的套用程式；共用按鈕文字集中於 `CommonUI_<語系>.xml` | REQ-2 |
+| SPEC-14 | **多語系**：控制項名稱即 ID、表單標題 ID 為類別名稱，由三個基底的 `ApplyLanguage` 經 `LanguageApplier` 套用，取代各畫面手寫的套用程式；本語系未定義的 ID 保留 Designer 文字、不記錄缺 ID（`LanguageManager` 新增 `HasString` 查詢）；共用按鈕文字集中於 `CommonUI_<語系>.xml` | REQ-2 |
 | SPEC-15 | **控制項白名單與命名**：畫面只用白名單型別，欄位名稱為「型別前綴 + PascalCase」，全域改名（309 筆），語系 ID 同步 | REQ-2、REQ-3 |
 | SPEC-16 | **特例**：承載單一內容的視窗、`CNCInfoPanel` 直式改排列、資料色、`CNCThreePointDlg` 可為空的欄位、`ComboBox` 暫留、`ToolTip` 的用途，各有定義並登錄（指引「共識的特例」） | REQ-3 |
 | SPEC-17 | **檢查機制**：可持續使用的檢查放在 `Tools/UICheck`，規則以名稱識別；本議題限定的檢查放在 `Tests/`，基準固定為 rebase 目標 `bd0fa270`（DEC-12）。檢查需要的狀態以反射呼叫產品既有方法觸發，runner 執行結束即從建置輸出刪除 | REQ-6、REQ-7 |
@@ -55,7 +55,7 @@
 ### 操作外觀（非資料相容性，合併說明時一併告知現場）
 
 1. 對話框不可改大小、不出現在工作列（SPEC-2）。
-2. 數值欄位改為數值框的細節差異：可用上下鍵與滾輪、小數位數固定、非法輸入回復合法值（SPEC-5）。
+2. 數值欄位改為數值框的細節差異：可用上下鍵與滾輪、小數位數固定、非法輸入回復合法值；原本是 `TextBox` 的欄位多了上下限，未另設範圍的為 ±99999（SPEC-5，DEC-20）。
 3. 只顯示的座標改為標籤後不能選取複製（SPEC-5）。
 4. 橫式主視窗的警報在一般狀態位於日誌右側（SPEC-6）。
 

@@ -16,7 +16,7 @@ Tools/UICheck（可持續檢查）、Tests/（本議題檢查）──> 建置�
 | `CommonUI.Controls` | `SectionPanel`、`ThemedButton`（`ButtonKind`、`ButtonIndicator`、`CommonButtonText`）、`ThemedLabel`、`DebouncedNumericUpDown`（`ValueRejectedEventArgs`）、`MultiSelectTreeView`、`ThemedDataGridView`、`RemovableValueRow`、`ColorSwatch`（`SwatchShape`）、`LoadingBar`、`RoundedProgressBar` | SPEC-5、SPEC-10、SPEC-15 |
 | `CommonUI.Forms` | `DialogBase`、`PanelBase`、`MainWindowBase` | SPEC-8、SPEC-11 |
 | `CommonUI.Layout` | `SectionStack`、`DialogPlacement`、`ResponsiveLayout` | SPEC-12、SPEC-13 |
-| `CommonUI.Language` | `LanguageApplier`、`CommonTexts`（`Language/CommonUI_<語系>.xml`） | SPEC-14 |
+| `CommonUI.Language` | `LanguageApplier`、`CommonTexts`（`Language/CommonUI_<語系>.xml`）；依賴 `LanguageManager` 新增的 `HasString` | SPEC-14 |
 | `MyCAM` 主視窗 | `MainLayout`（純計算區域）、`MainLayoutRegions`、`PathLayerColor`（圖層資料色單一定義）、`MyApp.Initialize()`（字族） | SPEC-6、SPEC-12 |
 | 畫面 | 31 個對話框、4 個嵌入式面板、主視窗改用上述基底與元件；語系 XML 與 60 個工具列圖示（`MyCAM/Resource/IconSource` 產生） | SPEC-1–SPEC-7 |
 | `Tools/UICheck` | 靜態檢查、執行時版面、數值框操作、主視窗檢查與輔助工具（`DesignerDiff.ps1`、`FixTabOrder.ps1`） | SPEC-17 |
@@ -63,8 +63,9 @@ Tools/UICheck（可持續檢查）、Tests/（本議題檢查）──> 建置�
 | 語系 | 所有語系 XML 依新 ID 修改；兩個語系檔改名；新增 `CommonUI_<語系>.xml` |
 | 資源 | 60 個工具列圖示重新產生為透明背景 PNG（檔名不變），新增「加工 / 不加工」2 個 |
 | 刪除 | `GroupPanel`、`PanelButton`、`MyCAM` 內的 `DebouncedNumericUpDown`、`SupportPositionRow`、`MultiSelectTreeView`、`CncUI/Helper/ResponsiveLayout`；`TextRole.Title` |
-| 指引 | 新增 `project/coding-ui-style.md`、`project/coding-icon-design.md`；修改專案概觀的專案指引索引、`project/coding-architecture.md`（`CommonUI`）、`project/coding-general.md`（語系措辭、Designer）、`project/process-review.md`（門檻加入 `UICheck`）；新增 `project/tool-uicheck.md`（UICheck 指令與截圖環境）；團隊概觀協作原則第 2 項補第 4 點。理由：UI 規範依新分類屬依時機讀取的專案程式規範，不常駐；截圖環境屬使用工具時的做法（DEC-12～DEC-14） |
-| 檢查工具 | `Tools/UICheck` 新增 `VirtualDisplayRun.cs`；`MainWindowRunner.cs`、`LayoutRunner.cs`、`CaptureMainWindow.ps1`、`CheckRuntimeLayout.ps1`、`UICheck.bat` 改在規格螢幕上執行 |
+| 指引 | 新增 `project/coding-ui-style.md`、`project/coding-icon-design.md`；修改專案概觀的專案指引索引、`project/coding-architecture.md`（`CommonUI`）、`project/coding-general.md`（語系措辭、Designer）、`project/process-review.md`（門檻加入 `UICheck`）；新增 `project/tool-uicheck.md`（UICheck 指令與截圖環境）；團隊概觀協作原則第 2 項補第 4 點；`team/process-ai-review.md` 第 2 節第 3 項補 Copilot 的模型一律由施工方以腳本執行。理由：UI 規範依新分類屬依時機讀取的專案程式規範，不常駐；截圖環境屬使用工具時的做法；兩項團隊規範補充是本議題執行時發現的誤用：把工具權限全自動當成決策不必先問、請人在 IDE 中啟動 Copilot 而無法自動確認結果（DEC-12～DEC-14、DEC-16）。第 13 回合整理：`project/coding-general.md` 的多語系只留語系檔與取字串，畫面規則連到 `coding-ui-style.md`；`coding-ui-style.md` 特例表不寫後續計畫；`tool-uicheck.md` 的安裝步驟移到 `Tools/UICheck/README.md`、`runtime` 連到建置依賴（DEC-20） |
+| `LanguageManager` | 新增公開查詢 `HasString`：`LanguageApplier` 自動套用時辨識本語系未定義的 ID，保留 Designer 文字且不記錄缺 ID（SPEC-14） |
+| 檢查工具 | `Tools/UICheck` 新增 `VirtualDisplayRun.cs`、`README.md`（常駐虛擬螢幕的安裝步驟）；`MainWindowRunner.cs`、`LayoutRunner.cs`、`CaptureMainWindow.ps1`、`CheckRuntimeLayout.ps1`、`UICheck.bat` 改在規格螢幕上執行 |
 
 ## 4. SPEC 對照
 

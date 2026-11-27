@@ -7,7 +7,7 @@
 | 指令 | 內容 |
 | --- | --- |
 | `Tools\UICheck\UICheck.bat` | 靜態檢查：只讀原始碼，不需建置 |
-| `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | 另以 Debug 建置結果開啟所有畫面，在 zh-TW、zh-CN 下檢查版面、數值框操作與主視窗；需要截圖環境（第 2 節） |
+| `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | 另以 Debug 建置結果開啟所有畫面，在 zh-TW、zh-CN 下檢查版面、數值框操作與主視窗；先依 [env-build.md](env-build.md) 備妥 Debug 建置與執行期依賴，並需要截圖環境（第 2 節） |
 | `Tools\UICheck\DesignerDiff.ps1` | 列出 Designer 檔的語意差異，review 時使用 |
 
 ## 2. 截圖環境
@@ -59,9 +59,4 @@ UI 的執行時檢查（`Tools\UICheck\UICheck.bat runtime`）在**規格螢幕*
 
 ### 2.5 常駐虛擬螢幕的安裝
 
-只用於沒有規格螢幕的終端機（系統管理員權限，一次）。
-
-1. `winget install VirtualDrivers.Virtual-Display-Driver`：只放入驅動檔與 `devcon.exe`（`%LOCALAPPDATA%\Microsoft\WinGet\Packages\VirtualDrivers.Virtual-Display-Driver_*`），不會安裝驅動。
-2. 把套件中 `SignedDrivers\x86\VDD\vdd_settings.xml` 複製到 `C:\VirtualDisplayDriver\`，`resolutions` 只留 1920×1080、更新率 60。
-3. `Dependencies\devcon.exe install SignedDrivers\x86\VDD\MttVDD.inf Root\MttVDD`，Windows 詢問是否安裝裝置軟體時選安裝。
-4. 新螢幕掛上後，在 Windows 顯示設定把它與原本的螢幕（如筆電面板）設為「同步顯示」：程式只看到一個 1920×1080 的螢幕，實機與遠端工具看到同一個畫面；實體螢幕的解析度較低時畫面會縮小，截圖不受影響。確認是 1920×1080、100%。
+只用於沒有規格螢幕的終端機（系統管理員權限，一次）：安裝 VirtualDrivers VDD 並設定只輸出 1920×1080，再與原本的螢幕設為「同步顯示」，讓程式只看到一個規格螢幕。步驟見 [Tools/UICheck/README.md](../../Tools/UICheck/README.md)。

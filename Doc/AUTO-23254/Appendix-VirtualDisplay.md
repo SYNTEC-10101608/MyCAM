@@ -1,6 +1,6 @@
 # 附錄：手動安裝常駐虛擬螢幕（同步顯示）
 
-在客戶電腦等沒有 Claude Code 的電腦上，以人工重現「實體螢幕不是 1920×1080 時，以常駐虛擬螢幕提供 1920×1080 桌面」的做法；用途見 [FollowUp.md](FollowUp.md) 的 TODO-24。內容是 2026-11-27 開發用終端機的實際配置與操作記錄，不是長期規範；UICheck 終端機的規範見 `.github/project/tool-uicheck.md` 第 2 節。
+在客戶電腦等沒有 Claude Code 的電腦上，以人工重現「實體螢幕不是 1920×1080 時，以常駐虛擬螢幕提供 1920×1080 桌面」的做法；用途見 [FollowUp.md](FollowUp.md) 的 TODO-24。內容是 2026-11-27 開發用終端機的實際配置與操作記錄，不是長期規範；UICheck 終端機的規範見 `.github/project/tool-uicheck.md` 第 2 節，持續維護的安裝步驟見 `Tools/UICheck/README.md`。本附錄是給客戶電腦的完整操作記錄（含版本、沒有 winget 時的取得方式與還原），與該 README 的步驟相同的部分以該 README 為準。
 
 ## 1. 參考配置（開發用終端機）
 

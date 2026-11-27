@@ -9,11 +9,10 @@
 
 ## 多語系
 
-1. 每個 Form / Dialog / Action 以自己的類別名稱建立 `new LanguageManager.LanguageManager( "AddPathDlg" )`。
-2. 字串檔位於 `Language/<類別名稱>_<語系>.xml`，每個語系一個檔案（目前有 `zh-TW`、`zh-CN`、`en-US`、`ru-RU`）；zh-TW、zh-CN 為主要維護的語系。
-3. 控制項文字以控制項欄位名稱為 `ID`（`<Message ID="m_rdoManual" Content="..." />`）。
-4. 程式中取字串使用 `m_LanguageManager.TryGetString( "Id", DEFAULT_TEXT )`，`DEFAULT_TEXT` 為類別內的 `const string`。
-5. 新增或修改使用者可見的文字時，`Language/` 中所有語系的 XML 都要同步新增 / 修改。
+1. 字串檔位於 `Language/<類別名稱>_<語系>.xml`，每個語系一個檔案（目前有 `zh-TW`、`zh-CN`、`en-US`、`ru-RU`）；zh-TW、zh-CN 為主要維護的語系。
+2. 程式中取字串時，以自己的類別名稱建立 `new LanguageManager.LanguageManager( "AddPathDlg" )`，再以 `TryGetString( "Id", DEFAULT_TEXT )` 取得，`DEFAULT_TEXT` 為類別內的 `const string`。
+3. 新增或修改使用者可見的文字時，`Language/` 中所有語系的 XML 都要同步新增 / 修改。
+4. 畫面（對話框、面板、主視窗）的控制項文字與 ID 規則見 [coding-ui-style.md](coding-ui-style.md) 的「多語系」。
 
 ## 日誌與訊息
 

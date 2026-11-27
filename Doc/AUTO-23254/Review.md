@@ -188,7 +188,7 @@
 | 門檻 | 結果 |
 | --- | --- |
 | `Build.bat Debug` | 施工方於受審 HEAD 執行通過（0 個錯誤）；Reviewer 未重跑 |
-| `Build.bat Release` | 上一回合受審 HEAD 有通過紀錄；本回合未提供受審 HEAD 的結果，未重跑。本分支未改 C++ 專案 |
+| `Build.bat Release` | 施工方於受審 HEAD 執行通過（0 個錯誤，請求檔漏寫）；Reviewer 未重跑。本分支未改 C++ 專案 |
 | `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | 施工方於受審 HEAD 執行通過；Reviewer 未重跑 |
 | `Tools\UICheck\UICheck.bat` | Reviewer 重跑通過：34 個 Designer 檔、0 個問題 |
 | `Tools\UICheck\UICheck.bat runtime` | Reviewer 依請求未執行；施工方在 DEC-19 記錄終端機流程通過。依 DEC-17 第 3 項，Parsec 成功流程留待 TODO-25 於一般工作電腦驗證 |
@@ -198,14 +198,14 @@
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
-| REV-40 | 2 | 提問 | `.github\team\process-ai-review.md:15` | DEC-14 第 8 項已同意釐清工具權限與人員決策的界線，DEC-16 第 8 項也記錄了統一 Copilot 啟動方式的理由，但 `Goal.md` 第 3 節只列專案指引與依既有流程調整分支，未納入修改全團隊流程。兩項內容都可能長期有效，但會隨 UI MR 一起改變其他議題的作法，建議另案交付；若確認留在本 MR，請將團隊規範補充明列在範圍及 STEP，Copilot 指令細節由 `tool-copilot-cli.md` 單一維護。 | 待處置 |
-| REV-41 | 2 | 提問 | `MyCAM\Editor\Dialog\PatternSettingDlg.Designer.cs:168` | DEC-6 同意統一數值框，但圓直徑欄位未覆寫共用 `Maximum = 99999`，而基準版只要求可解析且大於零，原本可輸入的 `100000` 現在會在驗證時被拒。`BehaviorExceptions.txt` 只說採預設範圍，SPEC-5 與相容性說明未列這個新上限；建議確認這是否為可接受的操作差異，同步規格與邊界測試，否則保留原欄位的可接受範圍。 | 待處置 |
-| REV-42 | 4 | 建議 | `.github\project\coding-general.md:12` | 通用規範仍要求每個 Form／Dialog 自建 `LanguageManager`，但只使用固定文字的 `SewPartDlg` 直接呼叫基底 `ApplyLanguage()`，不必自建；控制項 ID 與所有語系同步的規則也與 `coding-ui-style.md` 第 7 節重複。建議通用層保留檔案結構與所有語系同步的原則，畫面套用時機、ID 與何時需要自行取字串交由 UI 規範說明並互連。 | 待處置 |
-| REV-43 | 4 | 建議 | `.github\project\tool-uicheck.md:10` | `runtime` 的入口表只寫使用 Debug 建置結果，沒有連到 `env-build.md` 的執行期依賴；預設 `Build.bat Debug` 只建 C#，語系自動同步也不會準備原生 DLL。建議在入口表補一個連結與「先備妥 Debug 建置及執行期依賴」的說明，讓乾淨工作目錄的使用者能按既有流程準備，不重抄部署命令。 | 待處置 |
-| REV-44 | 6 | 提問 | `.github\project\tool-uicheck.md:60` | DEC-16 第 3 項與 DEC-17 第 4 項把常駐 VDD 的使用情境留在指引，但新增附錄後，套件路徑、`devcon`、XML 及同步顯示步驟已有兩份，且指引把目前套件的內部目錄寫成長期做法。建議指引保留適用機台、前置安全條件與顯示驗收條件，安裝入口以供應商持續維護的文件為準；特定套件版號下的命令、XML 範例與還原紀錄只留在附錄。 | 待處置 |
-| REV-45 | 6 | 建議 | `.github\project\coding-ui-style.md:112` | 特例表把 `ComboBox` 將改 `RadioButton`、三點校正待可空數值框完成後移除例外，寫成長期指引的一部分，但實際施工條件已在 TODO-7、TODO-6。建議指引只保留目前允許的型別、適用範圍與理由；未來的替換計畫留在 `FollowUp.md`，避免讀者把尚未規劃的遷移當成現在的規則。 | 待處置 |
-| REV-46 | 6 | 建議 | `Doc\AUTO-23254\TestPlan.md:42` | TEST-18 把所有規格螢幕的橫式最大化客戶區都定為 Designer 的 1920×1009，但工具只要求螢幕有工作列並記錄實際客戶區，副螢幕工作區與終端機可不同（REV-7）。建議 TEST-18 驗收選中的螢幕、實際工作區及最大化行為；固定 1920×1009 的版面比對留給 TEST-10，避免合規副螢幕仍無法按文件驗收。 | 待處置 |
-| REV-47 | 6 | 建議 | `Doc\AUTO-23254\FollowUp.md:111` | TODO-25 要求在「未設終端機標記」的電腦上實測，但未設定 `MYCAM_UICHECK_UNATTENDED` 會依 DEC-18 在 Parsec 啟動前以 exit 2 結束。請把完成條件明寫成 `MYCAM_UICHECK_UNATTENDED=0`、已安裝 Parsec VDD 且沒有規格螢幕，並保留執行後確認既有螢幕不變、虛擬副螢幕已移除的條件。 | 待處置 |
-| REV-48 | 6 | 建議 | `Doc\AUTO-23254\TestPlan.md:8` | 「最終結果」仍把 2026-11-26 的 Debug 寫成最後一次執行，但後面混列了 DEC-18 後的結果，且未納入 DEC-19 的重跑；README 已勾選的 Release 也無法由這份總表核對到版本。建議依門檻記錄最終一次的受測版本、日期、結果與環境，區分本版與舊版證據，沒有本版結果的項目明寫未驗證。 | 待處置 |
-| REV-49 | 6 | 建議 | `Doc\AUTO-23254\README.md:8` | 狀態欄仍寫待第 9 回合，但同檔 DoD 已記到第 12 回合，交接時無法從入口判斷目前階段。建議入口只保留當前狀態與真正待辦，review 進度連到 `Review.md`，DoD 則在本回合發現處置後再確認。 | 待處置 |
-| REV-50 | 6 | 建議 | `Doc\AUTO-23254\Implementation.md:19` | 多語系步驟記了 `CommonUI` 的自動套用，未記錄 `LanguageManager\LanguageManager.cs:233` 新增的 `HasString` 公開查詢。這是自動套用能辨識本語系未定義的可選 ID、保留既有文字且不刷缺 ID 日誌的必要改動；建議在 SPEC-14 或其 STEP 補上跨專案相依與缺 ID 的預期行為。 | 待處置 |
+| REV-40 | 2 | 建議 | `.github\team\process-ai-review.md:15` | DEC-14 第 8 項已同意釐清工具權限與人員決策的界線，DEC-16 第 8 項也記錄了統一 Copilot 啟動方式的理由，但 `Goal.md` 第 3 節只列專案指引與依既有流程調整分支，未納入修改全團隊流程。兩項內容都可能長期有效，但會隨 UI MR 一起改變其他議題的作法，建議另案交付；若確認留在本 MR，請將團隊規範補充明列在範圍及 STEP，Copilot 指令細節由 `tool-copilot-cli.md` 單一維護。 | 已修正：留在本 MR，`Goal.md` 範圍與 `Implementation.md` 異動範圍寫明兩項補充與理由（DEC-20） |
+| REV-41 | 2 | 建議 | `MyCAM\Editor\Dialog\PatternSettingDlg.Designer.cs:168` | DEC-6 同意統一數值框，但圓直徑欄位未覆寫共用 `Maximum = 99999`，而基準版只要求可解析且大於零，原本可輸入的 `100000` 現在會在驗證時被拒。`BehaviorExceptions.txt` 只說採預設範圍，SPEC-5 與相容性說明未列這個新上限；建議確認這是否為可接受的操作差異，同步規格與邊界測試，否則保留原欄位的可接受範圍。 | 已修正：接受 ±99999 上限，寫入 SPEC-5 相容性說明、TODO-20 與 `BehaviorExceptions.txt`（DEC-20） |
+| REV-42 | 4 | 建議 | `.github\project\coding-general.md:12` | 通用規範仍要求每個 Form／Dialog 自建 `LanguageManager`，但只使用固定文字的 `SewPartDlg` 直接呼叫基底 `ApplyLanguage()`，不必自建；控制項 ID 與所有語系同步的規則也與 `coding-ui-style.md` 第 7 節重複。建議通用層保留檔案結構與所有語系同步的原則，畫面套用時機、ID 與何時需要自行取字串交由 UI 規範說明並互連。 | 已修正：`coding-general.md` 只留語系檔、取字串與同步規則，畫面規則連到 `coding-ui-style.md`；後者的同步規則改為連結（DEC-20） |
+| REV-43 | 4 | 建議 | `.github\project\tool-uicheck.md:10` | `runtime` 的入口表只寫使用 Debug 建置結果，沒有連到 `env-build.md` 的執行期依賴；預設 `Build.bat Debug` 只建 C#，語系自動同步也不會準備原生 DLL。建議在入口表補一個連結與「先備妥 Debug 建置及執行期依賴」的說明，讓乾淨工作目錄的使用者能按既有流程準備，不重抄部署命令。 | 已修正：`runtime` 一列連到 `env-build.md` 的建置與執行期依賴（DEC-20） |
+| REV-44 | 6 | 建議 | `.github\project\tool-uicheck.md:60` | DEC-16 第 3 項與 DEC-17 第 4 項把常駐 VDD 的使用情境留在指引，但新增附錄後，套件路徑、`devcon`、XML 及同步顯示步驟已有兩份，且指引把目前套件的內部目錄寫成長期做法。建議指引保留適用機台、前置安全條件與顯示驗收條件，安裝入口以供應商持續維護的文件為準；特定套件版號下的命令、XML 範例與還原紀錄只留在附錄。 | 已修正：安裝步驟移到持續維護的 `Tools/UICheck/README.md`，指引只留通則與連結；附錄保留客戶電腦的完整操作記錄並註明以 README 為準（DEC-20） |
+| REV-45 | 6 | 建議 | `.github\project\coding-ui-style.md:112` | 特例表把 `ComboBox` 將改 `RadioButton`、三點校正待可空數值框完成後移除例外，寫成長期指引的一部分，但實際施工條件已在 TODO-7、TODO-6。建議指引只保留目前允許的型別、適用範圍與理由；未來的替換計畫留在 `FollowUp.md`，避免讀者把尚未規劃的遷移當成現在的規則。 | 已修正：特例表只留目前的處理與理由，後續以 TODO-6、TODO-7 指向（DEC-20） |
+| REV-46 | 6 | 建議 | `Doc\AUTO-23254\TestPlan.md:42` | TEST-18 把所有規格螢幕的橫式最大化客戶區都定為 Designer 的 1920×1009，但工具只要求螢幕有工作列並記錄實際客戶區，副螢幕工作區與終端機可不同（REV-7）。建議 TEST-18 驗收選中的螢幕、實際工作區及最大化行為；固定 1920×1009 的版面比對留給 TEST-10，避免合規副螢幕仍無法按文件驗收。 | 已修正：TEST-18 改為最大化並列出實際客戶區，固定尺寸比對屬 TEST-10（DEC-20） |
+| REV-47 | 6 | 建議 | `Doc\AUTO-23254\FollowUp.md:111` | TODO-25 要求在「未設終端機標記」的電腦上實測，但未設定 `MYCAM_UICHECK_UNATTENDED` 會依 DEC-18 在 Parsec 啟動前以 exit 2 結束。請把完成條件明寫成 `MYCAM_UICHECK_UNATTENDED=0`、已安裝 Parsec VDD 且沒有規格螢幕，並保留執行後確認既有螢幕不變、虛擬副螢幕已移除的條件。 | 已修正：TODO-25 完成條件改為已安裝 Parsec VDD、`MYCAM_UICHECK_UNATTENDED=0`（DEC-20） |
+| REV-48 | 6 | 建議 | `Doc\AUTO-23254\TestPlan.md:8` | 「最終結果」仍把 2026-11-26 的 Debug 寫成最後一次執行，但後面混列了 DEC-18 後的結果，且未納入 DEC-19 的重跑；README 已勾選的 Release 也無法由這份總表核對到版本。建議依門檻記錄最終一次的受測版本、日期、結果與環境，區分本版與舊版證據，沒有本版結果的項目明寫未驗證。 | 已修正：總表改記最終受測版本、日期與各門檻結果（DEC-20） |
+| REV-49 | 6 | 建議 | `Doc\AUTO-23254\README.md:8` | 狀態欄仍寫待第 9 回合，但同檔 DoD 已記到第 12 回合，交接時無法從入口判斷目前階段。建議入口只保留當前狀態與真正待辦，review 進度連到 `Review.md`，DoD 則在本回合發現處置後再確認。 | 已修正：狀態只留目前階段，review 進度連到本檔；DoD 第 6 項補第 13 回合（DEC-20） |
+| REV-50 | 6 | 建議 | `Doc\AUTO-23254\Implementation.md:19` | 多語系步驟記了 `CommonUI` 的自動套用，未記錄 `LanguageManager\LanguageManager.cs:233` 新增的 `HasString` 公開查詢。這是自動套用能辨識本語系未定義的可選 ID、保留既有文字且不刷缺 ID 日誌的必要改動；建議在 SPEC-14 或其 STEP 補上跨專案相依與缺 ID 的預期行為。 | 已修正：SPEC-14 與 `Implementation.md` 補 `HasString` 與缺 ID 的行為（DEC-20） |
