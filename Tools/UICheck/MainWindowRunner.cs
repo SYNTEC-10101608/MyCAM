@@ -105,6 +105,7 @@ namespace UICheck
 			if( LayoutRunner.TryFindTargetScreen( out targetScreen ) == false ) {
 				return 2;
 			}
+			m_TargetScreen = targetScreen;
 			if( targetScreen != null ) {
 				mainForm.WindowState = FormWindowState.Normal;
 				SetWindowPos( mainForm.Handle, IntPtr.Zero, targetScreen.Bounds.X, targetScreen.Bounds.Y, 0, 0,
@@ -321,17 +322,24 @@ namespace UICheck
 				dialog.Show( mainForm );
 				Wait( 800 );
 
+				// on the specified screen, whether the centering below is compared or not
+				int nProblem = 0;
+				string szScreenProblem = LayoutRunner.CheckOnTargetScreen( dialog, m_TargetScreen );
+				if( szScreenProblem != null ) {
+					Console.WriteLine( "FAIL  {0} {1}", szName, szScreenProblem );
+					nProblem++;
+				}
+
 				// the dialog may be pushed inside the screen working area, which only matters beyond the screen
 				Point expected = new Point( area.Left + ( area.Width - dialog.Width ) / 2,
 					area.Top + ( area.Height - dialog.Height ) / 2 );
 				Rectangle workingArea = Screen.FromControl( mainForm ).WorkingArea;
 				Rectangle expectedBounds = new Rectangle( expected, dialog.Size );
 				bool isInsideScreen = workingArea.Contains( expectedBounds );
-				int nProblem = 0;
 				if( isInsideScreen && dialog.Location != expected ) {
 					Console.WriteLine( "FAIL  DialogCenter {0} at {1}, expected {2}",
 						szName, dialog.Location, expected );
-					nProblem = 1;
+					nProblem++;
 				}
 				else {
 					Console.WriteLine( "OK    {0} at {1}{2}", szName, dialog.Location,
@@ -376,13 +384,22 @@ namespace UICheck
 			try {
 				dialog = (Form)LayoutRunner.CreateInstance( type );
 				Point shownLocation = Point.Empty;
+				string szScreenProblem = null;
 				Form shownDialog = dialog;
 				shownDialog.Shown += ( sender, e ) =>
 				{
 					shownLocation = shownDialog.Location;
+					szScreenProblem = LayoutRunner.CheckOnTargetScreen( shownDialog, m_TargetScreen );
 					shownDialog.BeginInvoke( new Action( shownDialog.Close ) );
 				};
 				dialog.ShowDialog( mainForm );
+
+				// on the specified screen, whether the centering below is compared or not
+				int nProblem = 0;
+				if( szScreenProblem != null ) {
+					Console.WriteLine( "FAIL  {0} (ShowDialog) {1}", szName, szScreenProblem );
+					nProblem++;
+				}
 				Point expected = new Point( area.Left + ( area.Width - dialog.Width ) / 2,
 					area.Top + ( area.Height - dialog.Height ) / 2 );
 				Rectangle workingArea = Screen.FromControl( mainForm ).WorkingArea;
@@ -390,11 +407,11 @@ namespace UICheck
 				if( isInsideScreen && shownLocation != expected ) {
 					Console.WriteLine( "FAIL  DialogCenter {0} (ShowDialog) at {1}, expected {2}",
 						szName, shownLocation, expected );
-					return 1;
+					return nProblem + 1;
 				}
 				Console.WriteLine( "OK    {0} (ShowDialog) at {1}{2}", szName, shownLocation,
 					isInsideScreen ? "" : " (expected " + expected + " is outside the screen)" );
-				return 0;
+				return nProblem;
 			}
 			catch( Exception ex ) {
 				Exception inner = ex is TargetInvocationException && ex.InnerException != null ? ex.InnerException : ex;
@@ -644,6 +661,9 @@ namespace UICheck
 		const string VALUE_FAMILY = "Consolas";
 
 		static string m_szDesignerFile;
+
+		// the screen VirtualDisplayRun prepared, null without it
+		static Screen m_TargetScreen;
 		static string m_szExpectedFamily;
 		static string m_szLanguage;
 		static Assembly m_App;

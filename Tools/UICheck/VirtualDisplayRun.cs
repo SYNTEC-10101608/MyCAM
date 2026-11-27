@@ -24,7 +24,8 @@ namespace UICheck
 	//      code 2. The driver also removes it about a second after this process stops pinging, so a killed run does
 	//      not leave it behind. An unattended machine (MYCAM_UICHECK_UNATTENDED=1) never adds one: it keeps a
 	//      resident specified screen, so the run stops with exit code 2 instead.
-	// Only one run at a time on a computer: a later run waits for the earlier one.
+	// Only one run at a time on a computer: a later run waits for the earlier one (a whole UICheck.bat runtime holds
+	// the lock in CheckRuntime.ps1).
 	//
 	// Usage: UICheckDisplay.exe <exe> [args ...]
 	// Exit code 2 when the screen cannot be prepared.
@@ -42,7 +43,11 @@ namespace UICheck
 			SetProcessDpiAwarenessContext( new IntPtr( DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ) );
 
 			// one run at a time on this computer: two runs would cover each other's windows on a visible screen, and a
-			// screen added by one run could be taken for the other's
+			// screen added by one run could be taken for the other's. CheckRuntime.ps1 holds the same lock for a whole
+			// UICheck.bat runtime and says so to the commands it starts.
+			if( Environment.GetEnvironmentVariable( LOCK_HELD_VARIABLE ) == "1" ) {
+				return RunOnSpecScreen( commandArray );
+			}
 			using( Mutex runLock = new Mutex( false, RUN_LOCK_NAME ) ) {
 				if( AcquireRunLock( runLock ) == false ) {
 					return 2;
@@ -149,9 +154,11 @@ namespace UICheck
 
 				// Windows applies the layout it saved for this set of screens, which can make the new screen primary
 				// and move the others; the check does not run on a changed desktop, removing the screen restores it
-				if( szError == null && IsUnchanged( originalList ) == false ) {
-					szError = "Windows rearranged the existing screens when the virtual screen was added (a saved " +
-						"display layout); arrange the screens once with the virtual screen to the right";
+				List<string> changedList = szError == null ? FindChanged( originalList ) : new List<string>();
+				if( changedList.Count > 0 ) {
+					szError = "the existing screens " + string.Join( ", ", changedList ) + " changed or cannot be " +
+						"read after the virtual screen was added (Windows applies a saved display layout); arrange " +
+						"the screens once with the virtual screen to the right";
 				}
 				if( szError == null && IsSpecScreen( szDevice, nWidth, nHeight ) == false ) {
 					szError = "the virtual screen is not " + nWidth + "x" + nHeight + " at 96 DPI";
@@ -221,9 +228,10 @@ namespace UICheck
 			public int Frequency;
 			public uint Dpi;
 
+			// a screen whose scaling could not be read (Dpi 0) is never the same, so the check stops
 			public bool IsSame( DisplayState other )
 			{
-				return other != null && other.X == X && other.Y == Y && other.IsPrimary == IsPrimary &&
+				return other != null && Dpi > 0 && other.X == X && other.Y == Y && other.IsPrimary == IsPrimary &&
 					other.Width == Width && other.Height == Height && other.Orientation == Orientation &&
 					other.Frequency == Frequency && other.Dpi == Dpi;
 			}
@@ -249,7 +257,9 @@ namespace UICheck
 					display.Orientation = mode.dmDisplayOrientation;
 					display.Frequency = mode.dmDisplayFrequency;
 					MONITORINFOEX info;
-					GetMonitor( device.DeviceName, out info, out display.Dpi );
+					if( GetMonitor( device.DeviceName, out info, out display.Dpi ) == false ) {
+						display.Dpi = 0;
+					}
 					displayList.Add( display );
 				}
 				device.cb = Marshal.SizeOf( typeof( DISPLAY_DEVICE ) );
@@ -304,12 +314,6 @@ namespace UICheck
 				"cannot set the virtual screen to " + nWidth + "x" + nHeight + " (" + nResult + ")";
 		}
 
-		// the screens that were there keep their attachment, place, primary state, mode and scaling
-		static bool IsUnchanged( List<DisplayState> originalList )
-		{
-			return FindChanged( originalList ).Count == 0;
-		}
-
 		// the other screens are never changed; a difference after the run is reported, not repaired
 		static void WarnIfChanged( List<DisplayState> originalList )
 		{
@@ -320,6 +324,7 @@ namespace UICheck
 			}
 		}
 
+		// the screens that were there and no longer keep their attachment, place, primary state, mode and scaling
 		static List<string> FindChanged( List<DisplayState> originalList )
 		{
 			List<DisplayState> currentList = GetAttachedDisplays();
@@ -381,10 +386,12 @@ namespace UICheck
 			{
 				MONITORINFOEX info = new MONITORINFOEX();
 				info.cbSize = Marshal.SizeOf( typeof( MONITORINFOEX ) );
-				if( GetMonitorInfo( hMonitor, ref info ) && info.szDevice == szDevice ) {
-					uint nDpiX;
-					uint nDpiY;
-					GetDpiForMonitor( hMonitor, MDT_EFFECTIVE_DPI, out nDpiX, out nDpiY );
+				uint nDpiX;
+				uint nDpiY;
+
+				// a screen whose scaling cannot be read is not found: a DPI of 0 before and after is no comparison
+				if( GetMonitorInfo( hMonitor, ref info ) && info.szDevice == szDevice &&
+					GetDpiForMonitor( hMonitor, MDT_EFFECTIVE_DPI, out nDpiX, out nDpiY ) == 0 && nDpiX > 0 ) {
 					result = info;
 					nResultDpi = nDpiX;
 					isFound = true;
@@ -574,6 +581,7 @@ namespace UICheck
 		const string SCREEN_VARIABLE = "UICHECK_SCREEN";
 		const string UNATTENDED_VARIABLE = "MYCAM_UICHECK_UNATTENDED";
 		const string RUN_LOCK_NAME = @"Global\MyCAM_UICheck_Screen";
+		const string LOCK_HELD_VARIABLE = "UICHECK_LOCK_HELD";
 		const int RUN_LOCK_TIMEOUT_MS = 30 * 60 * 1000;
 		static readonly object m_IoLock = new object();
 		static IntPtr m_hDevice;

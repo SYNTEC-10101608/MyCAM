@@ -115,9 +115,9 @@
 
 | REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
 | --- | --- | --- | --- | --- | --- |
-| REV-23 | 2 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs:46` | 全系統鎖只包單次 `UICheckDisplay.exe` 子命令，兩個 `UICheck.bat runtime` 仍可在語系與截圖案例之間交錯，也會在取得鎖前編譯、釋鎖後刪除同一建置目錄的 runner。第二個檢查可能在等待前就因檔案使用中而失敗，或清掉第一個檢查還要用的 runner。應在整次 `runtime` 的入口取得同一把鎖，涵蓋編譯至清理，並用同一工作目錄同時啟動兩次完整指令驗證。 | 待處置 |
-| REV-24 | 2 | 必修 | `Tools/UICheck/UICheck.bat:21` | 終端機沒有規格螢幕時，版面子指令傳回 2，但 `runtime` 入口把它轉成一般失敗 1，並繼續執行數值框檢查及 13 次主視窗截圖嘗試。呼叫端無法用 exit 2 區分環境未就緒，也不符合 DEC-16 的中止行為；應在第一個螢幕準備失敗時停止整次 `runtime` 並保留 exit 2。 | 待處置 |
-| REV-25 | 3 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs:252` | 新增的 DPI 快照忽略 `GetMonitor` 是否找到該螢幕，底層也未檢查 `GetDpiForMonitor` 的 HRESULT；例如前後都找不到螢幕時，兩筆 DPI 都是 0，仍可被判為縮放未變。應區分有效 DPI 與讀取失敗，無法取得任一既有螢幕的有效基準或核對值時，應指出裝置並中止虛擬螢幕檢查。 | 待處置 |
-| REV-26 | 3 | 必修 | `Tools/UICheck/MainWindowRunner.cs:167` | 主視窗 runner 只驗證主視窗所在螢幕，之後以 `Show` 或 `ShowDialog` 開啟的對話框都未檢查；預期矩形超出工作區時，置中檢查仍可能印出 `OK`。應把指定螢幕傳給這兩條路徑，在對話框可見時核對實際所在螢幕，與是否略過置中比對分開判定。 | 待處置 |
-| REV-27 | 6 | 建議 | `Doc/AUTO-23254/TestPlan.md:42` | TEST-18 仍把沒有規格螢幕一律描述為加入 Parsec 副螢幕，第 8 節也未區分一般電腦與終端機，讀者可能用錯準備方式。應補上終端機在無合規螢幕時不呼叫 Parsec、由 `UICheck.bat runtime` 回傳 2 的驗收案例，並區分受審 HEAD 的結果與前回合的副螢幕驗證。 | 待處置 |
-| REV-28 | 6 | 建議 | `.github/project/tool-uicheck.md:26` | DEC-16 已接受鎖只協調 UICheck、無法排除其他 Parsec 用戶端同時加入的限制，但操作者查閱的截圖指引沒有提到。應在 Parsec 使用段落補一句：檢查期間避免讓其他 Parsec 用戶端新增虛擬螢幕，以免工具誤認新增的顯示裝置。 | 待處置 |
+| REV-23 | 2 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs:46` | 全系統鎖只包單次 `UICheckDisplay.exe` 子命令，兩個 `UICheck.bat runtime` 仍可在語系與截圖案例之間交錯，也會在取得鎖前編譯、釋鎖後刪除同一建置目錄的 runner。第二個檢查可能在等待前就因檔案使用中而失敗，或清掉第一個檢查還要用的 runner。應在整次 `runtime` 的入口取得同一把鎖，涵蓋編譯至清理，並用同一工作目錄同時啟動兩次完整指令驗證。 | 已修正：新增 `CheckRuntime.ps1` 為 `runtime` 入口，整次持有同一把鎖並以 `UICHECK_LOCK_HELD=1` 告知子程序；同一工作目錄同時啟動兩次，後者等待（DEC-17） |
+| REV-24 | 2 | 必修 | `Tools/UICheck/UICheck.bat:21` | 終端機沒有規格螢幕時，版面子指令傳回 2，但 `runtime` 入口把它轉成一般失敗 1，並繼續執行數值框檢查及 13 次主視窗截圖嘗試。呼叫端無法用 exit 2 區分環境未就緒，也不符合 DEC-16 的中止行為；應在第一個螢幕準備失敗時停止整次 `runtime` 並保留 exit 2。 | 已修正：`CheckRuntime.ps1` 遇到第一個 exit 2 即停止，`UICheck.bat` 保留 2；以未建置的情境驗證（DEC-17） |
+| REV-25 | 3 | 必修 | `Tools/UICheck/VirtualDisplayRun.cs:252` | 新增的 DPI 快照忽略 `GetMonitor` 是否找到該螢幕，底層也未檢查 `GetDpiForMonitor` 的 HRESULT；例如前後都找不到螢幕時，兩筆 DPI 都是 0，仍可被判為縮放未變。應區分有效 DPI 與讀取失敗，無法取得任一既有螢幕的有效基準或核對值時，應指出裝置並中止虛擬螢幕檢查。 | 已修正：DPI 讀取失敗視為找不到螢幕，DPI 為 0 的螢幕一律判為有變動，中止訊息列出裝置（DEC-17） |
+| REV-26 | 3 | 必修 | `Tools/UICheck/MainWindowRunner.cs:167` | 主視窗 runner 只驗證主視窗所在螢幕，之後以 `Show` 或 `ShowDialog` 開啟的對話框都未檢查；預期矩形超出工作區時，置中檢查仍可能印出 `OK`。應把指定螢幕傳給這兩條路徑，在對話框可見時核對實際所在螢幕，與是否略過置中比對分開判定。 | 已修正：`Show` 與 `ShowDialog` 開啟的對話框都核對所在螢幕，與置中比對分開判定（DEC-17） |
+| REV-27 | 6 | 建議 | `Doc/AUTO-23254/TestPlan.md:42` | TEST-18 仍把沒有規格螢幕一律描述為加入 Parsec 副螢幕，第 8 節也未區分一般電腦與終端機，讀者可能用錯準備方式。應補上終端機在無合規螢幕時不呼叫 Parsec、由 `UICheck.bat runtime` 回傳 2 的驗收案例，並區分受審 HEAD 的結果與前回合的副螢幕驗證。 | 已修正：TEST-18 補終端機中止與 `runtime` 回傳 2 的條件，第 8 節第 5、6 項區分兩類電腦並記錄 Parsec 成功流程未實測（TODO-25）（DEC-17） |
+| REV-28 | 6 | 建議 | `.github/project/tool-uicheck.md:26` | DEC-16 已接受鎖只協調 UICheck、無法排除其他 Parsec 用戶端同時加入的限制，但操作者查閱的截圖指引沒有提到。應在 Parsec 使用段落補一句：檢查期間避免讓其他 Parsec 用戶端新增虛擬螢幕，以免工具誤認新增的顯示裝置。 | 已修正：`tool-uicheck.md` 第 2.4 節狀況表補上（DEC-17） |

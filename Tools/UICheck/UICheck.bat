@@ -12,41 +12,25 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckStatic.ps1"
 if errorlevel 1 set "RESULT=1"
 
 if /i not "%~1"=="runtime" goto :report
+REM the runtime checks, one run at a time on this computer (CheckRuntime.ps1); a screenshot folder as a full path,
+REM the layout runner works in the build output folder
 if "%~2"=="" (
-	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntimeLayout.ps1"
+	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntime.ps1"
 ) else (
-	REM full path, the layout runner works in the build output folder
-	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntimeLayout.ps1" -ShotDir "%~f2"
+	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntime.ps1" -ShotDir "%~f2"
 )
-if errorlevel 1 set "RESULT=1"
-
-REM behavior of the shared numeric input
-powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckControls.ps1"
-if errorlevel 1 set "RESULT=1"
-
-REM main window screenshots go to the temp folder when no screenshot folder is given
-set "SHOTS=%~f2"
-if "%~2"=="" set "SHOTS=%TEMP%\UICheck"
-REM each language x page (CAD start page, CAM, CNC machining) x landscape (maximized) / portrait (1080 x 1880 window),
-REM on the specified screen 1920 x 1080 at 100 % (a virtual screen when this machine has none, see VirtualDisplayRun.cs)
-for %%L in (zh-TW zh-CN) do (
-	for %%M in (CAD CAM CNC) do (
-		echo ## main window: %%L %%M
-		powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Language %%L -Mode %%M -Screen Landscape -OutFile "%SHOTS%\MainWindow_%%L_%%M_Landscape.png"
-		if errorlevel 1 set "RESULT=1"
-		powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Language %%L -Mode %%M -Screen Portrait -OutFile "%SHOTS%\MainWindow_%%L_%%M_Portrait.png"
-		if errorlevel 1 set "RESULT=1"
-	)
+REM 2: no build or the screen could not be prepared, so the runtime checks did not run
+if errorlevel 2 (
+	set "RESULT=2"
+) else if errorlevel 1 (
+	set "RESULT=1"
 )
-
-REM MainDesignerRegion: the regions at the client size and page of the designer are where the designer shows them
-echo ## main window: designer layout
-powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CaptureMainWindow.ps1" -Mode CNC -Screen Landscape -DesignerLayout -OutFile "%SHOTS%\MainWindow_Designer.png"
-if errorlevel 1 set "RESULT=1"
 
 :report
 if "%RESULT%"=="0" (
 	echo [UICheck] all checks passed.
+) else if "%RESULT%"=="2" (
+	echo [UICheck] the runtime checks could not run ^(no build or no specified screen^), see above.
 ) else (
 	echo [UICheck] some checks reported problems, see above.
 )
