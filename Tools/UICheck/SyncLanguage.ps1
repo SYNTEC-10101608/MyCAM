@@ -14,8 +14,18 @@ function Sync-LanguageFiles( [string]$szRoot, [string]$szBinDir ) {
 		$isSame = (Test-Path $copy) -and
 			((Get-FileHash $copy -Algorithm SHA1).Hash -eq (Get-FileHash $file.FullName -Algorithm SHA1).Hash)
 		if (-not $isSame) {
-			Copy-Item $file.FullName $copy -Force
-			$nCopied++
+			# another run in the same build output may copy the same file at the same moment; the copy only has to
+			# end up the same as the source
+			try {
+				Copy-Item $file.FullName $copy -Force
+				$nCopied++
+			}
+			catch [System.IO.IOException] {
+				Start-Sleep -Milliseconds 500
+				if ((Get-FileHash $copy -Algorithm SHA1).Hash -ne (Get-FileHash $file.FullName -Algorithm SHA1).Hash) {
+					throw
+				}
+			}
 		}
 	}
 	if ($nCopied -gt 0) {

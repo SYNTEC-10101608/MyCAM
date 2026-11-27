@@ -12,14 +12,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckStatic.ps1"
 if errorlevel 1 set "RESULT=1"
 
 if /i not "%~1"=="runtime" goto :report
-REM the runtime checks, one run at a time on this computer (CheckRuntime.ps1); a screenshot folder as a full path,
-REM the layout runner works in the build output folder
+REM the runtime checks (CheckRuntime.ps1); a screenshot folder as a full path, the layout runner works in the build
+REM output folder
 if "%~2"=="" (
 	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntime.ps1"
 ) else (
 	powershell -NoProfile -ExecutionPolicy Bypass -File "%HERE%CheckRuntime.ps1" -ShotDir "%~f2"
 )
-REM 2: no build or the screen could not be prepared, so the runtime checks did not run
+REM 2: a runtime check could not run (machine not marked, no build, no specified screen), the rest did not run
 if errorlevel 2 (
 	set "RESULT=2"
 ) else if errorlevel 1 (
@@ -30,7 +30,7 @@ if errorlevel 2 (
 if "%RESULT%"=="0" (
 	echo [UICheck] all checks passed.
 ) else if "%RESULT%"=="2" (
-	echo [UICheck] the runtime checks could not run ^(no build or no specified screen^), see above.
+	echo [UICheck] the runtime checks did not complete, see the reason above.
 ) else (
 	echo [UICheck] some checks reported problems, see above.
 )

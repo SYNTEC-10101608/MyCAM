@@ -22,10 +22,9 @@ namespace UICheck
 	//      administrator rights once) is added for the run, right of the other screens; only the virtual screen is
 	//      set to the mode and 100 % scaling, and it is removed afterwards. Any failure removes it and stops with exit
 	//      code 2. The driver also removes it about a second after this process stops pinging, so a killed run does
-	//      not leave it behind. An unattended machine (MYCAM_UICHECK_UNATTENDED=1) never adds one: it keeps a
-	//      resident specified screen, so the run stops with exit code 2 instead.
-	// Only one run at a time on a computer: a later run waits for the earlier one (a whole UICheck.bat runtime holds
-	// the lock in CheckRuntime.ps1).
+	//      not leave it behind. Only a work computer (MYCAM_UICHECK_UNATTENDED=0) adds one: an unattended machine (1)
+	//      keeps a resident specified screen, and a machine not marked yet could be one, so they stop with exit code 2.
+	// Only one command at a time on a computer: a later one waits for the earlier one.
 	//
 	// Usage: UICheckDisplay.exe <exe> [args ...]
 	// Exit code 2 when the screen cannot be prepared.
@@ -42,12 +41,9 @@ namespace UICheck
 			// monitor sizes and DPI are only reported unscaled to a per-monitor DPI aware process
 			SetProcessDpiAwarenessContext( new IntPtr( DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ) );
 
-			// one run at a time on this computer: two runs would cover each other's windows on a visible screen, and a
-			// screen added by one run could be taken for the other's. CheckRuntime.ps1 holds the same lock for a whole
-			// UICheck.bat runtime and says so to the commands it starts.
-			if( Environment.GetEnvironmentVariable( LOCK_HELD_VARIABLE ) == "1" ) {
-				return RunOnSpecScreen( commandArray );
-			}
+			// one command at a time on this computer: two would cover each other's windows on a visible screen, and a
+			// screen added by one could be taken for the other's. This process holds the lock itself, so it stays held
+			// while the command runs even when the script that started it was killed.
 			using( Mutex runLock = new Mutex( false, RUN_LOCK_NAME ) ) {
 				if( AcquireRunLock( runLock ) == false ) {
 					return 2;
@@ -100,11 +96,18 @@ namespace UICheck
 			}
 
 			// an unattended machine keeps a resident specified screen; adding a screen there could change the
-			// arrangement while nobody watches (a laptop with the lid closed may turn its panel off)
-			if( Environment.GetEnvironmentVariable( UNATTENDED_VARIABLE ) == "1" ) {
+			// arrangement while nobody watches (a laptop with the lid closed may turn its panel off). A machine not
+			// marked yet could be one, so nothing is added either.
+			string szUnattended = Environment.GetEnvironmentVariable( UNATTENDED_VARIABLE );
+			if( szUnattended == "1" ) {
 				Console.Error.WriteLine( "[display] no screen is " + nWidth + "x" + nHeight + " at 96 DPI; an " +
 					"unattended machine (" + UNATTENDED_VARIABLE + "=1) uses a resident virtual screen as the " +
 					"primary screen, see .github/project/tool-uicheck.md" );
+				return 2;
+			}
+			if( szUnattended != "0" ) {
+				Console.Error.WriteLine( "[display] " + UNATTENDED_VARIABLE + " is not set to 0 or 1, see " +
+					".github/project/tool-uicheck.md" );
 				return 2;
 			}
 			return RunOnVirtualScreen( commandArray, nWidth, nHeight, originalList );
@@ -113,6 +116,15 @@ namespace UICheck
 		static int RunOnVirtualScreen( string[] commandArray, int nWidth, int nHeight,
 			List<DisplayState> originalList )
 		{
+			// the existing screens are compared after the screen is added; one whose scaling cannot be read now could
+			// not be compared, so nothing is added
+			List<string> unreadList = originalList.FindAll( display => display.Dpi == 0 )
+				.ConvertAll( display => display.DeviceName );
+			if( unreadList.Count > 0 ) {
+				Console.Error.WriteLine( "[display] the scaling of " + string.Join( ", ", unreadList ) + " cannot be " +
+					"read, so a change by adding a virtual screen could not be noticed; nothing is added" );
+				return 2;
+			}
 			IntPtr hDevice = OpenParsecDevice();
 
 			// the driver is not installed (or not running)
@@ -581,7 +593,6 @@ namespace UICheck
 		const string SCREEN_VARIABLE = "UICHECK_SCREEN";
 		const string UNATTENDED_VARIABLE = "MYCAM_UICHECK_UNATTENDED";
 		const string RUN_LOCK_NAME = @"Global\MyCAM_UICheck_Screen";
-		const string LOCK_HELD_VARIABLE = "UICHECK_LOCK_HELD";
 		const int RUN_LOCK_TIMEOUT_MS = 30 * 60 * 1000;
 		static readonly object m_IoLock = new object();
 		static IntPtr m_hDevice;

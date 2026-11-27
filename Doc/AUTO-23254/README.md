@@ -40,7 +40,7 @@
 3. [ ] `TestPlan.md` 附最終執行結果：TEST-19 待人工確認，其餘已附。
 4. [x] 每個 STEP 可追溯到 commit：STEP-1～STEP-11 依 `Implementation.md` 人工對照，STEP-12 之後以標題標示（DEC-12）。
 5. [x] 門檻通過：`Build.bat Debug`、`Build.bat Release`、`UICheck.bat runtime`（含靜態檢查）、`RunIssueChecks.bat`。
-6. [ ] Review 報告寫入 `Review.md`，「必修」全部已修正：第 7～10 回合已處置完畢（DEC-16、DEC-17）；第 11 回合（增量）待執行。
+6. [ ] Review 報告寫入 `Review.md`，「必修」全部已修正：第 7～11 回合已處置完畢（DEC-16～DEC-18）；第 12 回合（增量，只審 DEC-18 的設計）待執行。
 7. [x] 範圍外項目寫入 `FollowUp.md`。
 8. [x] Release note 寫入本文件。
 9. [x] 各確認點分別經人確認：原範圍 2026-11-23；rebase 與截圖環境（REQ-8、SPEC-19、SPEC-20）2026-11-26（DEC-14）。

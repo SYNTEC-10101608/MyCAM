@@ -341,7 +341,7 @@ namespace UICheck
 						szName, dialog.Location, expected );
 					nProblem++;
 				}
-				else {
+				else if( nProblem == 0 ) {
 					Console.WriteLine( "OK    {0} at {1}{2}", szName, dialog.Location,
 						isInsideScreen ? "" : " (expected " + expected + " is outside the screen)" );
 				}
@@ -409,8 +409,10 @@ namespace UICheck
 						szName, shownLocation, expected );
 					return nProblem + 1;
 				}
-				Console.WriteLine( "OK    {0} (ShowDialog) at {1}{2}", szName, shownLocation,
-					isInsideScreen ? "" : " (expected " + expected + " is outside the screen)" );
+				if( nProblem == 0 ) {
+					Console.WriteLine( "OK    {0} (ShowDialog) at {1}{2}", szName, shownLocation,
+						isInsideScreen ? "" : " (expected " + expected + " is outside the screen)" );
+				}
 				return nProblem;
 			}
 			catch( Exception ex ) {

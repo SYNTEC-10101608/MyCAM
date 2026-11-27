@@ -17,7 +17,9 @@ $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer
 $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" |
 	Select-Object -First 1
 $csc = Join-Path (Split-Path $msbuild) "Roslyn\csc.exe"
-$runner = Join-Path $binDir "UICheckControls.exe"
+. (Join-Path $PSScriptRoot "RunnerFiles.ps1")
+Remove-StaleRunners $binDir
+$runner = Get-RunnerPath $binDir "UICheckControls"
 $references = @( "System.dll", "System.Core.dll", "System.Drawing.dll", "System.Windows.Forms.dll",
 	(Join-Path $binDir "CommonUI.dll") ) | ForEach-Object { "/r:$_" }
 # the runner only lives in the build output while it runs, so it is never shipped with it; the cleanup also covers

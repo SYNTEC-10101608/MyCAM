@@ -22,7 +22,8 @@
 # The language is set in memory only; the setting file is not changed.
 # The runner works on a hidden desktop (HiddenDesktopRun.cs) so it does not take the screen; -Visible shows it.
 # On the hidden desktop the OpenGL 3D view stays empty. The environment variable MYCAM_UICHECK_UNATTENDED=1 marks a
-# machine whose screen nobody uses and does the same as -Visible, so UICheck.bat captures the 3D view too.
+# machine whose screen nobody uses and does the same as -Visible, so UICheck.bat captures the 3D view too (0 marks a
+# work computer, see .github/project/tool-uicheck.md).
 # -Screen runs on the specified screen of the product, 1920 x 1080 at 100 % scaling (VirtualDisplayRun.cs: an attached
 # screen that is one, or else a virtual screen added for the run), and -Width / -Height are ignored: Landscape keeps
 # the main window maximized there as the program shows it; Portrait sizes it 1080 x 1880 on that screen, because
@@ -48,12 +49,14 @@ $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer
 $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" |
 	Select-Object -First 1
 $csc = Join-Path (Split-Path $msbuild) "Roslyn\csc.exe"
-$runner = Join-Path $binDir "UICheckMainWindow.exe"
+. (Join-Path $PSScriptRoot "RunnerFiles.ps1")
+Remove-StaleRunners $binDir
+$runner = Get-RunnerPath $binDir "UICheckMainWindow"
 $references = @( "System.dll", "System.Core.dll", "System.Drawing.dll", "System.Windows.Forms.dll", "System.Xml.dll",
 	(Join-Path $binDir "CommonUI.dll"), (Join-Path $binDir "LanguageManager.dll") ) | ForEach-Object { "/r:$_" }
 $sources = @( (Join-Path $PSScriptRoot "MainWindowRunner.cs"), (Join-Path $PSScriptRoot "LayoutRunner.cs") )
-$hidden = Join-Path $binDir "UICheckHidden.exe"
-$display = Join-Path $binDir "UICheckDisplay.exe"
+$hidden = Get-RunnerPath $binDir "UICheckHidden"
+$display = Get-RunnerPath $binDir "UICheckDisplay"
 # the runners only live in the build output while they run, so they are never shipped with it; the cleanup also
 # covers a failed compile or preparation
 try {

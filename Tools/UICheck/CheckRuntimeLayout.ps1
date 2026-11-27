@@ -28,11 +28,13 @@ $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer
 $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" |
 	Select-Object -First 1
 $csc = Join-Path (Split-Path $msbuild) "Roslyn\csc.exe"
-$runner = Join-Path $binDir "UICheckRunner.exe"
+. (Join-Path $PSScriptRoot "RunnerFiles.ps1")
+Remove-StaleRunners $binDir
+$runner = Get-RunnerPath $binDir "UICheckRunner"
 $references = @( "System.dll", "System.Core.dll", "System.Drawing.dll", "System.Windows.Forms.dll", "System.Xml.dll",
 	(Join-Path $binDir "CommonUI.dll"), (Join-Path $binDir "LanguageManager.dll") ) | ForEach-Object { "/r:$_" }
-$hidden = Join-Path $binDir "UICheckHidden.exe"
-$display = Join-Path $binDir "UICheckDisplay.exe"
+$hidden = Get-RunnerPath $binDir "UICheckHidden"
+$display = Get-RunnerPath $binDir "UICheckDisplay"
 # the runners only live in the build output while they run, so they are never shipped with it; the cleanup also
 # covers a failed compile or preparation
 try {
