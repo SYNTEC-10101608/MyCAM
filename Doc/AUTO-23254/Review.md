@@ -121,3 +121,28 @@
 | REV-26 | 3 | 必修 | `Tools/UICheck/MainWindowRunner.cs:167` | 主視窗 runner 只驗證主視窗所在螢幕，之後以 `Show` 或 `ShowDialog` 開啟的對話框都未檢查；預期矩形超出工作區時，置中檢查仍可能印出 `OK`。應把指定螢幕傳給這兩條路徑，在對話框可見時核對實際所在螢幕，與是否略過置中比對分開判定。 | 已修正：`Show` 與 `ShowDialog` 開啟的對話框都核對所在螢幕，與置中比對分開判定（DEC-17） |
 | REV-27 | 6 | 建議 | `Doc/AUTO-23254/TestPlan.md:42` | TEST-18 仍把沒有規格螢幕一律描述為加入 Parsec 副螢幕，第 8 節也未區分一般電腦與終端機，讀者可能用錯準備方式。應補上終端機在無合規螢幕時不呼叫 Parsec、由 `UICheck.bat runtime` 回傳 2 的驗收案例，並區分受審 HEAD 的結果與前回合的副螢幕驗證。 | 已修正：TEST-18 補終端機中止與 `runtime` 回傳 2 的條件，第 8 節第 5、6 項區分兩類電腦並記錄 Parsec 成功流程未實測（TODO-25）（DEC-17） |
 | REV-28 | 6 | 建議 | `.github/project/tool-uicheck.md:26` | DEC-16 已接受鎖只協調 UICheck、無法排除其他 Parsec 用戶端同時加入的限制，但操作者查閱的截圖指引沒有提到。應在 Parsec 使用段落補一句：檢查期間避免讓其他 Parsec 用戶端新增虛擬螢幕，以免工具誤認新增的顯示裝置。 | 已修正：`tool-uicheck.md` 第 2.4 節狀況表補上（DEC-17） |
+
+## 第 11 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-23254 |
+| 分支 | `AUTO-23254_f_UIStyleUnify` |
+| 比對基準 | `bd0fa270`；受審 HEAD `a608bc9a`（僅審 `d7fb29fd` → `a608bc9a` 的差異，排除僅新增第 10 回合報告的 `b2cf1614`） |
+| 工具與模型 | GitHub Copilot CLI（`Invoke-CopilotReview.ps1`）、gpt-6.2-sol、推理強度 high |
+| 日期 | 2026-11-27 |
+
+| 門檻 | 結果 |
+| --- | --- |
+| `Build.bat Debug`、`Build.bat Release` | 施工方於受審 HEAD 執行通過；Reviewer 未重跑，本回合未改 C++ |
+| `Tools\UICheck\UICheck.bat` | Reviewer 重跑通過：34 個 Designer 檔、0 個問題 |
+| `Tools\UICheck\UICheck.bat runtime` | 施工方於受審 HEAD 在終端機的 1920×1080 主螢幕執行通過；同一工作目錄第二次同時啟動會等待，未建置時回傳 2。Reviewer 依請求未執行；Parsec 成功流程依 DEC-17 不在受審機台驗證，留待 TODO-25 於一般工作電腦實測 |
+| `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | 施工方於受審 HEAD 執行通過；Reviewer 未重跑 |
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-29 | 3 | 必修 | `Tools\UICheck\CheckRuntime.ps1:95` | 子程序只憑 `UICHECK_LOCK_HELD=1` 略過取鎖；若只終止持鎖的 PowerShell，Windows 不保證一併終止仍在執行畫面檢查或清理的子程序。第二次 `runtime` 可在前一次子程序仍使用螢幕或共用 runner 時取得鎖並開始，造成畫面互相干擾或檔案衝突。應讓接手鎖前能確定前次子程序已停止，例如讓持鎖程序管理整個子程序樹的生命週期。 | 待處置 |
+| REV-30 | 3 | 必修 | `Tools\UICheck\CheckRuntime.ps1:77` | 整次鎖只在新入口取得，單獨執行文件仍提供的 `CheckRuntimeLayout.ps1 -CurrentScreen` 會直接在同一建置目錄編譯及刪除 `UICheckRunner.exe`、`UICheckHidden.exe` 和 `UICheckDisplay.exe`，連 `-CurrentScreen` 不會編譯的顯示 runner 也會刪除。因此即使 `runtime` 持鎖，快速檢查仍可能覆寫或刪除它下一步需要的 runner。應在可單獨呼叫的入口也保護編譯到清理，或使用各次執行獨立的 runner 檔案。 | 待處置 |
+| REV-31 | 3 | 必修 | `Tools\UICheck\VirtualDisplayRun.cs:157` | 讀不到既有螢幕的 DPI 時，初始快照已標記為 0，卻要等新增 Parsec 螢幕並嘗試設定模式與縮放後才檢查。初始狀態已無法核對時仍會觸發 Windows 套用記住的顯示配置，而且事後也無法確認既有螢幕已恢復。應在呼叫 `IOCTL_ADD` 前列出 DPI 基準無法讀取的裝置並回傳 2；新增後再核對有效的快照。 | 待處置 |
+| REV-32 | 3 | 建議 | `Tools\UICheck\MainWindowRunner.cs:345` | `Show` 與 `ShowDialog` 都會在螢幕核對失敗後，只要置中符合或略過比對，就對同一個對話框再印出 `OK`。結束碼雖仍是 1，操作者卻會看到互相矛盾的結果；應只在沒有失敗時印出 `OK`，或把置中結果明確標成另一項檢查。 | 待處置 |
+| REV-33 | 3 | 建議 | `Tools\UICheck\UICheck.bat:33` | exit 2 的總結把所有中止都寫成「未執行檢查，未建置或沒有規格螢幕」，但已通過前面幾項後仍可能有截圖子指令回傳 2，鎖等待逾時或 runner 編譯失敗也會回傳 2。應保留 exit 2，把總結改為「執行時檢查未完成，原因見上方」，避免把部分完成或其他環境錯誤誤報為未執行。 | 待處置 |
