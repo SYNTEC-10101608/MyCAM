@@ -146,3 +146,31 @@
 | REV-31 | 3 | 必修 | `Tools\UICheck\VirtualDisplayRun.cs:157` | 讀不到既有螢幕的 DPI 時，初始快照已標記為 0，卻要等新增 Parsec 螢幕並嘗試設定模式與縮放後才檢查。初始狀態已無法核對時仍會觸發 Windows 套用記住的顯示配置，而且事後也無法確認既有螢幕已恢復。應在呼叫 `IOCTL_ADD` 前列出 DPI 基準無法讀取的裝置並回傳 2；新增後再核對有效的快照。 | 已修正：加入虛擬螢幕前就列出讀不到縮放的既有螢幕並回傳 2，不加入（DEC-18） |
 | REV-32 | 3 | 建議 | `Tools\UICheck\MainWindowRunner.cs:345` | `Show` 與 `ShowDialog` 都會在螢幕核對失敗後，只要置中符合或略過比對，就對同一個對話框再印出 `OK`。結束碼雖仍是 1，操作者卻會看到互相矛盾的結果；應只在沒有失敗時印出 `OK`，或把置中結果明確標成另一項檢查。 | 已修正：只在沒有失敗時印出 `OK`（DEC-18） |
 | REV-33 | 3 | 建議 | `Tools\UICheck\UICheck.bat:33` | exit 2 的總結把所有中止都寫成「未執行檢查，未建置或沒有規格螢幕」，但已通過前面幾項後仍可能有截圖子指令回傳 2，鎖等待逾時或 runner 編譯失敗也會回傳 2。應保留 exit 2，把總結改為「執行時檢查未完成，原因見上方」，避免把部分完成或其他環境錯誤誤報為未執行。 | 已修正：總結改為「執行時檢查未完成，原因見上方」（DEC-18） |
+
+## 第 12 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-23254 |
+| 分支 | `AUTO-23254_f_UIStyleUnify` |
+| 比對基準 | `bd0fa270`；受審 HEAD `44d3ceea`（僅審 `a608bc9a` → `44d3ceea` 的 DEC-18 修改，排除僅新增第 11 回合報告的 `c20926e8`） |
+| 工具與模型 | GitHub Copilot CLI（`Invoke-CopilotReview.ps1`）、gpt-6.2-sol、推理強度 high |
+| 日期 | 2026-11-27 |
+
+| 門檻 | 結果 |
+| --- | --- |
+| `Build.bat Debug`、`Build.bat Release` | 施工方於受審 HEAD 執行通過；Reviewer 未重跑，本回合未改 C++ |
+| `Tools\UICheck\UICheck.bat` | Reviewer 重跑通過：34 個 Designer 檔、0 個問題 |
+| `Tools\UICheck\UICheck.bat runtime` | 施工方於受審 HEAD 在終端機的 1920×1080 主螢幕執行通過；同時執行 `-CurrentScreen` 快速檢查與主視窗檢查，三者皆通過且未留下 runner 檔，未標記或未建置時回傳 2。Reviewer 未執行；依 DEC-17 第 3 項，Parsec 成功流程不在受審機台驗證，留待 TODO-25 於一般工作電腦實測 |
+| `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | 施工方於受審 HEAD 執行通過；Reviewer 未重跑 |
+
+靜態核對確認：加入 Parsec 螢幕前會拒絕無法讀取的 DPI 基準（REV-31）；非模態與模態對話框核對失敗後不再印出 `OK`（REV-32）；exit 2 的總結指出執行時檢查未完成（REV-33）。
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-34 | 2 | 建議 | `Tools\UICheck\UICheck.bat:11` | 未標記或標記無效時，批次檔先執行靜態檢查，才由 `CheckRuntime.ps1` 印出提示並回傳 2，與 DEC-18 第 3 項及指引的「不執行任何檢查」不一致。建議只對 `runtime` 入口在靜態檢查前驗證標記，保留不帶參數的靜態檢查行為。 | 待處置 |
+| REV-35 | 3 | 必修 | `Tools\UICheck\SyncLanguage.ps1:14` | 同一建置目錄的兩次檢查都判定語系檔過期時，後一次可在前一次 runner 讀取 XML 時直接覆寫；同時建目錄或讀取目的檔雜湊的失敗也不在重試範圍內。除了讓正常的並行檢查中止，若共用語系檔讀取失敗回退成預設文字，也可能漏報文字裁切。應只對同一建置目錄的語系同步加短鎖，在鎖內建立目錄及重新核對內容，再以完整的暫存檔原子替換，避免讀到寫入中的內容。 | 待處置 |
+| REV-36 | 3 | 建議 | `Tools\UICheck\RunnerFiles.ps1:16` | 清理只查檔名中的 PowerShell PID；若該程序在規格螢幕子程序等鎖時被終止，下一次檢查會把同一組尚未啟動的 hidden／layout runner 當成殘留。仍在執行的 display runner 本身雖然無法被刪除，取得鎖後卻可能因要啟動的檔案已刪除而失敗。建議把同組仍在執行的子程序納入存活判定，等整組無程序使用再清理。 | 待處置 |
+| REV-37 | 3 | 建議 | `Tools\UICheck\RunnerFiles.ps1:13` | 清理把所有不符 PID 格式的 `UICheck*.exe` 都視為舊 runner，未驗證是否為工具曾產生的檔名，也未限制只列檔案。建置目錄內同前綴的其他診斷程式可能被無聲刪除；建議只列出檔案，且刪除範圍限於三支腳本使用的 runner 名稱及其舊版檔名。 | 待處置 |
+| REV-38 | 3 | 建議 | `Tools\UICheck\CheckRuntime.ps1:50` | 同時執行的 `runtime` 預設把主視窗截圖寫到同一個 `%TEMP%\UICheck`，且檔名只區分案例。規格螢幕鎖只防止同時畫面操作，不能防止逐項覆寫；即使兩次檢查都通過，不同 worktree 的截圖仍可能混在同一份結果裡。建議預設使用每次執行獨立的截圖目錄並印出其位置；並行時若明確指定目錄，也應使用不同路徑。 | 待處置 |
+| REV-39 | 4 | 建議 | `Tools\UICheck\RunnerFiles.ps1:1` | 新增的 PowerShell 腳本缺少 `.editorconfig` 規定的 UTF-8 BOM；目前只有 ASCII，不影響執行，但日後加入非 ASCII 文字時，Windows PowerShell 5.1 可能以 ANSI 解讀。建議補上 BOM，與呼叫它的三支腳本一致。 | 待處置 |
