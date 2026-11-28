@@ -38,9 +38,9 @@
 
 1. [x] 每個 REQ 有 SPEC、每個 SPEC 有 TEST（`Spec.md` 第 4 節、`TestPlan.md` 第 9 節）。
 2. [x] 相容性異動已寫明。
-3. [ ] `TestPlan.md` 附執行結果；主從軸鎖定視窗的 Designer 修正後重驗通過，最新 rebase 的輪廓編輯 Designer 與 3D 操作仍待人工確認（TEST-19）。
+3. [x] `TestPlan.md` 附執行結果；最新 rebase 的 Designer（TEST-15）及輪廓編輯功能回歸（TEST-19）已由使用者確認正常。
 4. [x] 每個 STEP 可追溯到 commit：STEP-1～STEP-11 依 `Implementation.md` 人工對照，STEP-12 起以標題標示（DEC-12）。
-5. [x] 門檻通過：`Build.bat Debug`、`Build.bat Release`、`UICheck.bat runtime`（含靜態檢查）、議題的行為、分支規則與主視窗版面比對（結果見 [TestPlan.md](TestPlan.md#1-總表與最終結果)）。
+5. [ ] 建置、UI 檢查、行為與主視窗版面比對通過；分支規則只剩本機未提交的 `CommonUI.csproj` 格式異動未通過（結果見 [TestPlan.md](TestPlan.md#1-總表與最終結果)）。
 6. [x] Review 報告寫入 `Review.md`，「必修」全部已修正；第 14 回合依 DEC-21 處置。
 7. [x] 範圍外項目寫入 `FollowUp.md`。
 8. [x] Release note 寫入本文件。

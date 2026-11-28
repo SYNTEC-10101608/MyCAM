@@ -735,7 +735,7 @@ foreach ($file in $designerFiles) {
 		continue
 	}
 	$szClass = $screen.ClassName
-	$isDialog = $screen.BaseType -match "^(DialogBase|FormBase|EditDialogBase<.+>|UntypedEditDialogBase)$"
+	$isDialog = $screen.BaseType -match "^(DialogBase|FormBase|EditDialogBase<.+>)$"
 	$isPanel = $screen.BaseType -match "^(PanelBase|UserControl)$"
 	$codePath = $file.FullName -replace "\.Designer\.cs$", ".cs"
 	$script:CurrentCode = if (Test-Path $codePath) { Get-Content $codePath -Raw -Encoding UTF8 } else { "" }
