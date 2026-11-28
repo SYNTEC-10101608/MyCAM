@@ -16,7 +16,6 @@
 	<Message ID="m_lblDZ" Content="Z偏移" />
 	<Message ID="m_lblUnit" Content="(單位：mm)" />
 
-	<Message ID="m_lblRelativeCurrentPath" Content="（相對當前路徑）" />
 	<Message ID="m_lblTotalDiff" Content="總偏移" />
 	
 	<Message ID="m_btnAdd" Content="新增控制點" />

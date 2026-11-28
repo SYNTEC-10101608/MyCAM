@@ -1,6 +1,6 @@
 ﻿param(
 	[string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path,
-	[string]$Base = "bd0fa270"
+	[string]$Base = "af5a2e8d"
 )
 # Issue-only check of the UI style unification (AUTO-23254): the files this issue added or
 # changed since the master commit the branch was rebased onto (the branch started from a4b3826d before the rebase)

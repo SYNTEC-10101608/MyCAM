@@ -47,7 +47,6 @@
 			this.m_lblDZ = new CommonUI.Controls.ThemedLabel();
 			this.m_numDZ = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblTotalDZ = new CommonUI.Controls.ThemedLabel();
-			this.m_lblRelativeCurrentPath = new CommonUI.Controls.ThemedLabel();
 			this.m_btnAdd = new CommonUI.Controls.ThemedButton();
 			this.m_btnRemove = new CommonUI.Controls.ThemedButton();
 			this.m_btnReset = new CommonUI.Controls.ThemedButton();
@@ -76,7 +75,6 @@
 			this.m_pnlIndexParam.Controls.Add(this.m_lblDZ);
 			this.m_pnlIndexParam.Controls.Add(this.m_numDZ);
 			this.m_pnlIndexParam.Controls.Add(this.m_lblTotalDZ);
-			this.m_pnlIndexParam.Controls.Add(this.m_lblRelativeCurrentPath);
 			this.m_pnlIndexParam.Controls.Add(this.m_btnAdd);
 			this.m_pnlIndexParam.Controls.Add(this.m_btnRemove);
 			this.m_pnlIndexParam.Controls.Add(this.m_btnReset);
@@ -84,7 +82,7 @@
 			this.m_pnlIndexParam.Controls.Add(this.m_btnSave);
 			this.m_pnlIndexParam.Location = new System.Drawing.Point(12, 12);
 			this.m_pnlIndexParam.Name = "m_pnlIndexParam";
-			this.m_pnlIndexParam.Size = new System.Drawing.Size(416, 309);
+			this.m_pnlIndexParam.Size = new System.Drawing.Size(416, 279);
 			this.m_pnlIndexParam.TabIndex = 0;
 			this.m_pnlIndexParam.Text = "控制點參數";
 			// 
@@ -282,66 +280,56 @@
 			this.m_lblTotalDZ.TabIndex = 12;
 			this.m_lblTotalDZ.Text = "0.000";
 			// 
-			// m_lblRelativeCurrentPath
-			// 
-			this.m_lblRelativeCurrentPath.AutoSize = true;
-			this.m_lblRelativeCurrentPath.Location = new System.Drawing.Point(110, 220);
-			this.m_lblRelativeCurrentPath.Name = "m_lblRelativeCurrentPath";
-			this.m_lblRelativeCurrentPath.Role = CommonUI.Theme.TextRole.Secondary;
-			this.m_lblRelativeCurrentPath.Size = new System.Drawing.Size(103, 16);
-			this.m_lblRelativeCurrentPath.TabIndex = 13;
-			this.m_lblRelativeCurrentPath.Text = "（相對當前路徑）";
-			// 
 			// m_btnAdd
 			// 
-			this.m_btnAdd.Location = new System.Drawing.Point(10, 246);
+			this.m_btnAdd.Location = new System.Drawing.Point(10, 216);
 			this.m_btnAdd.Name = "m_btnAdd";
 			this.m_btnAdd.Size = new System.Drawing.Size(110, 23);
-			this.m_btnAdd.TabIndex = 14;
+			this.m_btnAdd.TabIndex = 13;
 			this.m_btnAdd.Text = "新增控制點";
 			this.m_btnAdd.Click += new System.EventHandler(this.m_btnAdd_Click);
 			// 
 			// m_btnRemove
 			// 
 			this.m_btnRemove.Kind = CommonUI.Controls.ButtonKind.Danger;
-			this.m_btnRemove.Location = new System.Drawing.Point(128, 246);
+			this.m_btnRemove.Location = new System.Drawing.Point(128, 216);
 			this.m_btnRemove.Name = "m_btnRemove";
 			this.m_btnRemove.Size = new System.Drawing.Size(110, 23);
-			this.m_btnRemove.TabIndex = 15;
+			this.m_btnRemove.TabIndex = 14;
 			this.m_btnRemove.Text = "移除控制點";
 			this.m_btnRemove.Click += new System.EventHandler(this.m_btnRemove_Click);
 			// 
 			// m_btnReset
 			// 
-			this.m_btnReset.Location = new System.Drawing.Point(10, 276);
+			this.m_btnReset.Location = new System.Drawing.Point(10, 246);
 			this.m_btnReset.Name = "m_btnReset";
 			this.m_btnReset.Size = new System.Drawing.Size(110, 23);
-			this.m_btnReset.TabIndex = 16;
+			this.m_btnReset.TabIndex = 15;
 			this.m_btnReset.Text = "重置資料";
 			this.m_btnReset.Click += new System.EventHandler(this.m_btnReset_Click);
 			// 
 			// m_btnClear
 			// 
-			this.m_btnClear.Location = new System.Drawing.Point(128, 276);
+			this.m_btnClear.Location = new System.Drawing.Point(128, 246);
 			this.m_btnClear.Name = "m_btnClear";
 			this.m_btnClear.Size = new System.Drawing.Size(110, 23);
-			this.m_btnClear.TabIndex = 17;
+			this.m_btnClear.TabIndex = 16;
 			this.m_btnClear.Text = "清除資料";
 			this.m_btnClear.Click += new System.EventHandler(this.m_btnClear_Click);
 			// 
 			// m_btnSave
 			// 
 			this.m_btnSave.Kind = CommonUI.Controls.ButtonKind.Primary;
-			this.m_btnSave.Location = new System.Drawing.Point(296, 276);
+			this.m_btnSave.Location = new System.Drawing.Point(296, 246);
 			this.m_btnSave.Name = "m_btnSave";
 			this.m_btnSave.Size = new System.Drawing.Size(110, 23);
-			this.m_btnSave.TabIndex = 18;
+			this.m_btnSave.TabIndex = 17;
 			this.m_btnSave.Text = "儲存資料";
 			this.m_btnSave.Click += new System.EventHandler(this.m_btnSave_Click);
 			// 
 			// ContourEditDlg
 			// 
-			this.ClientSize = new System.Drawing.Size(440, 333);
+			this.ClientSize = new System.Drawing.Size(440, 303);
 			this.Controls.Add(this.m_pnlIndexParam);
 			this.Name = "ContourEditDlg";
 			this.Text = "輪廓編輯";
@@ -380,7 +368,6 @@
 		private CommonUI.Controls.ThemedLabel m_lblDZ;
 		private CommonUI.Controls.DebouncedNumericUpDown m_numDZ;
 		private CommonUI.Controls.ThemedLabel m_lblTotalDZ;
-		private CommonUI.Controls.ThemedLabel m_lblRelativeCurrentPath;
 		private CommonUI.Controls.ThemedButton m_btnAdd;
 		private CommonUI.Controls.ThemedButton m_btnRemove;
 		private CommonUI.Controls.ThemedButton m_btnReset;

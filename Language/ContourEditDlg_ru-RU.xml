@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="ContourEditDlg" Content="Редактирование контура" />
 	<Message ID="m_pnlIndexParam" Content="Параметры контрольной точки" />
@@ -16,7 +16,6 @@
 	<Message ID="m_lblDZ" Content="Смещение по Z" />
 	<Message ID="m_lblUnit" Content="(единица: мм)" />
 
-	<Message ID="m_lblRelativeCurrentPath" Content="(Относительно текущего пути)" />
 	<Message ID="m_lblTotalDiff" Content="Общее смещение" />
 
 	<Message ID="m_btnAdd" Content="Добавить контрольную точку" />

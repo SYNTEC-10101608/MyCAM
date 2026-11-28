@@ -30,9 +30,9 @@
 | SPEC-14 | **多語系**：控制項名稱即 ID、表單標題 ID 為類別名稱，由三個基底的 `ApplyLanguage` 經 `LanguageApplier` 套用，取代各畫面手寫的套用程式；本語系未定義的 ID 保留 Designer 文字、不記錄缺 ID（`LanguageManager` 新增 `HasString` 查詢）；共用按鈕文字集中於 `CommonUI_<語系>.xml` | REQ-2 |
 | SPEC-15 | **控制項白名單與命名**：畫面只用白名單型別，欄位名稱為「型別前綴 + PascalCase」，全域改名（309 筆），語系 ID 同步 | REQ-2、REQ-3 |
 | SPEC-16 | **特例**：承載單一內容的視窗、`CNCInfoPanel` 直式改排列、資料色、`CNCThreePointDlg` 可為空的欄位、`ComboBox` 暫留、`ToolTip` 的用途，各有定義並登錄（指引「共識的特例」） | REQ-3 |
-| SPEC-17 | **檢查機制**：可持續使用的檢查放在 `Tools/UICheck`，規則以名稱識別；本議題限定的檢查放在 `Tests/`，基準固定為 rebase 目標 `bd0fa270`（DEC-12）。檢查需要的狀態以反射呼叫產品既有方法觸發，runner 執行結束即從建置輸出刪除 | REQ-6、REQ-7 |
+| SPEC-17 | **檢查機制**：可持續使用的檢查放在 `Tools/UICheck`，規則以名稱識別；本議題限定的檢查放在 `Tests/`，行為比對與分支規則固定使用最後一次 rebase 的基準（見 README）。檢查需要的狀態以反射呼叫產品既有方法觸發，runner 執行結束即從建置輸出刪除 | REQ-6、REQ-7 |
 | SPEC-18 | **專案指引**：`project/coding-ui-style.md` 只寫原則與共識的特例，`project/coding-icon-design.md` 寫圖示的產生方式，皆依時機讀取、不常駐；數值、API 與規則細節由程式與註解說明。程式註解不引用文件內容或章節，出處只寫議題編號 | REQ-7 |
-| SPEC-19 | **併入 `master`**：rebase 到 `bd0fa270`；`master` 的修正（AUTO-23220 主從軸鎖定、AUTO-23240 三點校正圖面點、AUTO-23275 四軸控制器隱藏第二旋轉軸、應用程式圖示）保留原行為，套用本議題的控制項與外觀；表單圖示改由 `Properties.Resources` 指定，`ApplicationIcon` 指向實際檔案位置。指引依新分類移到 `project/`、議題文件依 `process-docs.md` 重整（DEC-12） | REQ-4、REQ-7 |
+| SPEC-19 | **併入 `master`**：`master` 的修正（AUTO-23220 主從軸鎖定、AUTO-23240 三點校正圖面點、AUTO-23275 四軸控制器隱藏第二旋轉軸、AUTO-23284 輪廓編輯控制點、應用程式圖示）保留原行為，套用本議題的控制項與外觀；表單圖示改由 `Properties.Resources` 指定，`ApplicationIcon` 指向實際檔案位置。指引依新分類移到 `project/`、議題文件依 `process-docs.md` 重整（DEC-12） | REQ-4、REQ-7 |
 | SPEC-20 | **規格螢幕的截圖環境**：執行時檢查（`UICheck.bat runtime`）在 1920×1080、96 DPI、有工作列的螢幕上進行，不更動既有的螢幕：已有符合的螢幕就使用，否則以虛擬螢幕驅動（Parsec VDD）在檢查期間加入虛擬副螢幕，縮放固定 100%，檢查結束即移除；機台以 `MYCAM_UICHECK_UNATTENDED` 標記為終端機（`1`）或一般工作電腦（`0`），未標記時 `runtime` 不執行並說明設定方式；終端機不加入虛擬副螢幕而中止，改以常駐的虛擬主螢幕當規格螢幕；同一台電腦上用到規格螢幕的檢查一次只執行一項；指定的螢幕找不到或視窗不在該螢幕上判為失敗；橫式主視窗依產品行為最大化，直式在同一螢幕上以高大於寬的視窗呈現（`MainLayout` 只看長寬比）；對話框與 CNC 面板也在該螢幕上開啟；終端機的主視窗在可見桌面截圖（DEC-13、DEC-16、DEC-18） | REQ-8 |
 
 ## 3. 相容性異動
@@ -43,7 +43,7 @@
 
 | # | 異動 | 既有資料的處理 |
 | --- | --- | --- |
-| 1 | **語系 ID 改名與刪除**：ID 改為控制項名稱、控制項欄位依前綴改名，並刪除無用 ID；以 zh-TW 計，30 個語系檔共 173 個舊 ID 不再使用。客製語系檔（`Custom/Language`）以 ID 逐筆覆蓋標準語系，舊 ID 的客製文字失效，畫面改顯示標準文字，不會出錯 | 不再支援舊 ID（2026-11-15 決議）。有客製語系檔的現場，依 `git diff bd0fa270 <合併 commit> -- Language/` 的新舊 ID 對照改寫客製檔 |
+| 1 | **語系 ID 改名與刪除**：ID 改為控制項名稱、控制項欄位依前綴改名，並刪除無用 ID。客製語系檔（`Custom/Language`）以 ID 逐筆覆蓋標準語系；改名後未更新 ID 則顯示標準文字，已刪除的控制項不再顯示（含 AUTO-23284 已移除的輪廓編輯 `m_lblRelativeCurrentPath`） | 不再支援舊 ID（2026-11-15 決議）。有客製語系檔的現場，依 `git diff af5a2e8d <合併 commit> -- Language/` 的新舊 ID 對照改寫客製檔；已移除提示的 ID 可刪除 |
 | 2 | **語系檔改名**：`LockABDlg_<語系>.xml` → `LockMSAxisDlg_<語系>.xml`、`CNCThreePointDialog_<語系>.xml` → `CNCThreePointDlg_<語系>.xml` | 舊檔名不再讀取；客製檔改為新檔名 |
 | 3 | **共用按鈕文字改為全域**：26 個設定 `CommonText` 的按鈕（確定、取消、重設、預覽、關閉）一律讀 `CommonUI_<語系>.xml` 的 `Confirm`、`Cancel`、`Reset`、`Preview`、`Close`，不再讀畫面自己的 ID | 要保留的客製文字改寫到 `Custom/Language/CommonUI_<語系>.xml`；同一種按鈕的文字全畫面一致，不能再依畫面不同 |
 | 4 | 機構、後處理、專案等其他設定與資料檔 | 無 |

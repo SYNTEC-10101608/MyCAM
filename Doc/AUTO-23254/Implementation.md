@@ -50,8 +50,9 @@ Tools/UICheck（可持續檢查）、Tests/（本議題檢查）──> 建置�
 | STEP-13 | 規格螢幕的截圖環境 | `VirtualDisplayRun.cs`；主視窗 runner 的最大化模式；`CaptureMainWindow.ps1 -Screen`、`CheckRuntimeLayout.ps1` 在規格螢幕上執行；`STATE_MAP` 依 `master` 的新簽章與四軸狀態；`project/tool-uicheck.md`（DEC-13、DEC-14） | SPEC-20 | TEST-6、TEST-18 |
 | STEP-14 | 數值格式與語系限制 | `DebouncedNumericUpDown` 在 Enter／Leave 事件送達畫面前拒絕非法文字；`AddPathDlg` 的 D1 即時回饋與進階欄位驗證使用同一解析與範圍。`ControlRunner` 新增 `NumCommitFormat`；記錄已建立 CNC 面板的換字族限制，README 補 UICheck 操作入口與寫入警告（DEC-21） | SPEC-1、SPEC-5、SPEC-17 | TEST-7、TEST-9、TEST-16 |
 | STEP-15 | 主從軸鎖定 Designer 載入 | `LockMSAxisDlg` 經由非泛型的 `UntypedEditDialogBase` 繼承原本的 `EditDialogBase<object>`；不改版面或編輯事件。`ScreenBase` 識別此行為基底 | SPEC-8、SPEC-11、SPEC-19 | TEST-1、TEST-6、TEST-15、TEST-19 |
+| STEP-16 | 整合 GitLab `master` 的輪廓編輯 | `ContourEditDlg` 保留 AUTO-23284 的控制點按鈕狀態及總偏移更新，沿用議題的主題與語系套用；Designer 移除舊提示並收合按鈕區上方空行，四個標準語系移除該 ID。行為比對與分支規則固定到新基準 | SPEC-17、SPEC-19 | TEST-6、TEST-11、TEST-12、TEST-19 |
 
-每一步的程式、測試、文件分開提交；逐檔異動以 `git diff bd0fa270` 與 `Tools/UICheck/DesignerDiff.ps1 -Base bd0fa270 -Head HEAD`
+每一步的程式、測試、文件分開提交；逐檔異動以 `git diff af5a2e8d` 與 `Tools/UICheck/DesignerDiff.ps1 -Base af5a2e8d -Head HEAD`
 查閱。STEP-1～STEP-11 的 commit 在新規範之前，標題沒有 `(STEP-n)`，依上表的內容人工對照（DEC-12）；STEP-12 之後依新規範標示。
 
 ## 3. 異動範圍
@@ -86,7 +87,7 @@ Tools/UICheck（可持續檢查）、Tests/（本議題檢查）──> 建置�
 | SPEC-13、SPEC-14 | STEP-4 |
 | SPEC-15 | STEP-6 |
 | SPEC-16 | STEP-8 |
-| SPEC-17 | STEP-2、STEP-8、STEP-9、STEP-11、STEP-14 |
+| SPEC-17 | STEP-2、STEP-8、STEP-9、STEP-11、STEP-14、STEP-16 |
 | SPEC-18 | STEP-1、STEP-11 |
-| SPEC-19 | STEP-12、STEP-15 |
+| SPEC-19 | STEP-12、STEP-15、STEP-16 |
 | SPEC-20 | STEP-13 |

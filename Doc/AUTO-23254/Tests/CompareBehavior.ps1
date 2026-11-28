@@ -1,6 +1,6 @@
 ﻿param(
 	[string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path,
-	[string]$Base = "bd0fa270",
+	[string]$Base = "af5a2e8d",
 	[string]$Only = ""
 )
 # Issue-only check of the UI style unification (AUTO-23254): behavior comparison against

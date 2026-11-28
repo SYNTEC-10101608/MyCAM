@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="ContourEditDlg" Content="Contour Edit" />
 	<Message ID="m_pnlIndexParam" Content="Control Point Parameters" />
@@ -16,7 +16,6 @@
 	<Message ID="m_lblDZ" Content="Z Offset" />
 	<Message ID="m_lblUnit" Content="(Unit: mm)" />
 
-	<Message ID="m_lblRelativeCurrentPath" Content="(Relative to Current Path)" />
 	<Message ID="m_lblTotalDiff" Content="Total Offset" />
 	
 	<Message ID="m_btnAdd" Content="Add Control Point" />

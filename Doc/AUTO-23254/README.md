@@ -3,7 +3,7 @@
 | 項目 | 內容 |
 | --- | --- |
 | 分支 | `AUTO-23254_f_UIStyleUnify` |
-| 分支起點 | `bd0fa270`（`master`，2026-11-26，rebase 後）；原起點 `a4b3826d`（2026-11-15），rebase 前的版本在本機分支 `backup/AUTO-23254_before_rebase` |
+| 分支起點 | `af5a2e8d`（GitLab `master`，`RLS_0.49.0`）；前次基準 `bd0fa270`，原起點 `a4b3826d` |
 | 級別 | L |
 | 狀態 | Review 與人工驗收完成；主從軸鎖定視窗的 Designer 重驗通過（TEST-15／TEST-19），待確認 push 與送 MR |
 
@@ -38,7 +38,7 @@
 
 1. [x] 每個 REQ 有 SPEC、每個 SPEC 有 TEST（`Spec.md` 第 4 節、`TestPlan.md` 第 9 節）。
 2. [x] 相容性異動已寫明。
-3. [x] `TestPlan.md` 附最終執行結果；主從軸鎖定視窗的 Designer 修正後重驗通過。
+3. [ ] `TestPlan.md` 附執行結果；主從軸鎖定視窗的 Designer 修正後重驗通過，最新 rebase 的輪廓編輯 Designer 與 3D 操作仍待人工確認（TEST-19）。
 4. [x] 每個 STEP 可追溯到 commit：STEP-1～STEP-11 依 `Implementation.md` 人工對照，STEP-12 起以標題標示（DEC-12）。
 5. [x] 門檻通過：`Build.bat Debug`、`Build.bat Release`、`UICheck.bat runtime`（含靜態檢查）、議題的行為、分支規則與主視窗版面比對（結果見 [TestPlan.md](TestPlan.md#1-總表與最終結果)）。
 6. [x] Review 報告寫入 `Review.md`，「必修」全部已修正；第 14 回合依 DEC-21 處置。

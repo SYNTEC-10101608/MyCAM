@@ -49,7 +49,7 @@
 
 ## 4. 議題限定 × 靜態 × 自動
 
-基準固定為 rebase 目標 `bd0fa270`（分支原起點 `a4b3826d`，DEC-12），合併後仍可重現。
+行為比對與分支規則固定使用最後一次 rebase 的基準 `af5a2e8d`；合併後仍可重現。主視窗區域快照基準不變。
 
 | 編號 | 目的 | 檢查檔 / 規則 | 對應 |
 | --- | --- | --- | --- |
@@ -82,6 +82,8 @@
 | TEST-16 | 數值框實機操作 | `AxisTransformDlg`、`AddPathDlg`、`PatternSettingDlg`、`ThreePtTransformDlg`、`AutoSortPathDlg` 的輸入與預覽。DEC-21 回歸：以圖形設定的圓直徑 25 為起點，分別鍵入及貼上 `1e2`、`100`，分別按 Enter 或離開欄位，再按確定；`1e2` 不得讓預覽或確定採用 100（仍是 25），`100` 則三者一致為 100。新增路徑的 D1 門檻以 `3e1`、`30` 對照，即時回饋與提交應同樣拒絕前者、接受後者 | 2026-11-28 表單事件模擬（zh-TW、zh-CN）及人工回報的實機回歸均通過 |
 | TEST-17 | CNC 實際連線 | 三個 CNC 面板的數值、燈號、警報清單；直式 `CNCDlg`（VNC）定位到 CNC 區域；卡片間距、監控卡片與 3D 畫布對齊、警報位置 | 2026-11-23 確認 |
 | TEST-19 | 併入 `master` 的修正仍有效 | 鎖定主從軸（`LockMSAxisDlg`，AUTO-23220）與三點校正（`CNCThreePointDlg`，含 CNC 連線，AUTO-23240）的操作與 Designer；四軸控制器連線時 CNC 面板、監控面板、偏置視窗隱藏第二旋轉軸（AUTO-23275）；主視窗與 exe 的圖示 | 2026-11-28 人工驗收通過；原未通過的 `LockMSAxisDlg` Designer 於 STEP-15 修正後重驗通過（見 TEST-15） |
+
+STEP-16 新基準回歸（TEST-19）：用含控制點的路徑切換起點、終點與中間點，依 AUTO-23284 驗證新增／移除控制點、3D 更新及總偏移顯示，並用 Visual Studio Designer 開啟 `ContourEditDlg`，確認無舊提示且控制項可編輯。繁簡執行時版面（TEST-6）、基準行為比對（TEST-11）、分支規則（TEST-12）及主視窗區域比對（TEST-14）通過；Designer 與 3D 操作待人工確認。
 
 ## 7. 反向測試
 
