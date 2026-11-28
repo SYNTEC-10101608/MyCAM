@@ -40,7 +40,7 @@
 2. [x] 相容性異動已寫明。
 3. [x] `TestPlan.md` 附執行結果；最新 rebase 的 Designer（TEST-15）及輪廓編輯功能回歸（TEST-19）已由使用者確認正常。
 4. [x] 每個 STEP 可追溯到 commit：STEP-1～STEP-11 依 `Implementation.md` 人工對照，STEP-12 起以標題標示（DEC-12）。
-5. [ ] 建置、UI 檢查、行為與主視窗版面比對通過；分支規則只剩本機未提交的 `CommonUI.csproj` 格式異動未通過（結果見 [TestPlan.md](TestPlan.md#1-總表與最終結果)）。
+5. [x] 建置、UI 檢查、行為比對、分支規則與主視窗版面比對均通過（結果見 [TestPlan.md](TestPlan.md#1-總表與最終結果)）。
 6. [x] Review 報告寫入 `Review.md`，「必修」全部已修正；第 14 回合依 DEC-21 處置。
 7. [x] 範圍外項目寫入 `FollowUp.md`。
 8. [x] Release note 寫入本文件。

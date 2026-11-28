@@ -11,7 +11,7 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | 2 | 長期 | 靜態 | 自動 | `Tools\UICheck\UICheck.bat` | TEST-1–TEST-5 | 34 個 Designer 檔，0 個問題 |
 | 3 | 長期 | 動態 | 自動 | `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | TEST-6–TEST-10、TEST-18 | 一般工作電腦以既有規格螢幕檢查：zh-TW、zh-CN 各 45 個畫面狀態、數值框 56 個案例、主視窗 12 組截圖、Designer 10 個區域，皆 0 個問題；特殊情境見下方 |
-| 4 | 議題限定 | 靜態 | 自動 | `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | TEST-11–TEST-13 | 以 `af5a2e8d` 比對行為，0 個差異；分支規則檢查 358 個檔案，僅未提交的 `CommonUI.csproj` 未通過 `FinalNewline` |
+| 4 | 議題限定 | 靜態 | 自動 | `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | TEST-11–TEST-13 | 以 `af5a2e8d` 比對行為，0 個差異；排除本機無關的專案格式異動後，分支規則檢查 358 個檔案，0 個問題 |
 | 5 | 議題限定 | 動態 | 自動 | 同上 | TEST-14 | 12 個情境、152 行，0 個差異 |
 | 6 | 議題限定 | — | 人工 | — | TEST-15–TEST-17、TEST-19 | 通過；2026-11-28 使用者確認最新繼承方式下的 Designer 及 rebase 後的功能正常 |
 
