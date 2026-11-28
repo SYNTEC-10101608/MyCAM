@@ -37,17 +37,18 @@ Tools/UICheck（可持續檢查）、Tests/（本議題檢查）──> 建置�
 | --- | --- | --- | --- | --- |
 | STEP-1 | 盤點與規範定稿 | 現況盤點、設計草案、專案指引初版 | SPEC-18 | — |
 | STEP-2 | 基礎建設 | `CommonUI` 主題 token、外觀基底、共用元件、三個控制項移入、圖示產生腳本、檢查腳本 | SPEC-9～SPEC-11、SPEC-17 | TEST-1、TEST-2、TEST-5 |
-| STEP-3 | 主視窗外觀 | `MainWindowBase`、工具列繪製、移除寫死顏色與 Magenta 透明色、字族初始化移到 `MyApp` | SPEC-1、SPEC-6、SPEC-9 | TEST-9 |
+| STEP-3 | 主視窗外觀 | `MainWindowBase`、工具列繪製、移除寫死顏色與 Magenta 透明色、字族初始化移到 `MyApp`；`LogHandler` 在執行時以 `ThemedLabel`／`TextRole` 建立日誌標籤 | SPEC-1、SPEC-6、SPEC-9 | TEST-2（程式外觀規則）、TEST-9（主視窗，不驗日誌標籤的角色字型） |
 | STEP-4 | 對話框遷移 | 31 個對話框分八批：改繼承 `DialogBase`、卡片與固定座標、數值框、語系自動套用 | SPEC-1～SPEC-5、SPEC-8、SPEC-11～SPEC-14 | TEST-3、TEST-4、TEST-6、TEST-11、TEST-15、TEST-16 |
 | STEP-5 | 嵌入式面板 | CNC 面板改 `PanelBase`、卡片標題、`ThemeMetrics`、移除 `DeviceDpi`；刪除 `GroupPanel`、`PanelButton` | SPEC-7、SPEC-10、SPEC-12 | TEST-6、TEST-9、TEST-17 |
 | STEP-6 | 全域命名 | 控制項欄位依型別前綴改名 309 筆，事件方法、`.resx`、語系 ID 同步（對照表 `Tests/RenameMap.txt`） | SPEC-15 | TEST-1、TEST-4、TEST-11 |
 | STEP-7 | 主視窗版面 | `MainLayout` 改純計算、移除 `TableLayoutPanel` 與多餘的工具列容器、Designer 寫入計算結果 | SPEC-6、SPEC-12 | TEST-10、TEST-14 |
-| STEP-8 | 規範與檢查補強 | `CommonUI` 五類重整、XML 文件註解、Designer 協作（`DesignerDiff.ps1`、`DesignerReadable`）、資料色元件 `ColorSwatch` | SPEC-9、SPEC-10、SPEC-16、SPEC-17 | TEST-1、TEST-2、TEST-5、TEST-13 |
+| STEP-8 | 規範與檢查補強 | `CommonUI` 五類重整、XML 文件註解、Designer 協作（`DesignerDiff.ps1`、`DesignerReadable`）；資料色元件 `ColorSwatch`；`ToolVecInterpolateColor` 讓 `ToolVectorDlg` 圖例與 `ToolVecEditRender` 的 3D 路徑共用色表；`DataColor.ToScreenColor` 將 OCCT 色轉成 sRGB，刀向圖例與 `PathLayerColor` 共用 | SPEC-9～SPEC-11、SPEC-16、SPEC-17 | TEST-1、TEST-2、TEST-5、TEST-13（規則與 Designer，不驗色表一致性或轉換色值） |
 | STEP-9 | 整體 review 修正 | 數值框的回復與通知、行為比對防線、runner 清理（Round 1–4） | SPEC-5、SPEC-17 | TEST-7、TEST-11 |
 | STEP-10 | 人工確認的修正 | 新增類圖示補「+」、區域與 CNC 卡片間距統一、橫式警報左右並排、監控卡片對齊 3D 畫布 | SPEC-6、SPEC-7 | TEST-14、TEST-17 |
 | STEP-11 | 文件與檢查整理 | 專案指引精簡、檢查規則改以名稱識別、程式註解不引用文件、議題文件依新分類重整 | SPEC-17、SPEC-18 | TEST-12 |
 | STEP-12 | 併入 `master` 與依新規範調整 | rebase 到 `bd0fa270` 並解衝突（DEC-12）；主視窗圖示改由專案資源檔指定、修正 `ApplicationIcon` 路徑；指引移到 `project/`、專案指引索引與專案規範；`IconSource` 腳本補 BOM；議題檢查基準改為 `bd0fa270`；議題文件依 `process-docs.md` 重整 | SPEC-19 | TEST-11、TEST-12、TEST-19 |
 | STEP-13 | 規格螢幕的截圖環境 | `VirtualDisplayRun.cs`；主視窗 runner 的最大化模式；`CaptureMainWindow.ps1 -Screen`、`CheckRuntimeLayout.ps1` 在規格螢幕上執行；`STATE_MAP` 依 `master` 的新簽章與四軸狀態；`project/tool-uicheck.md`（DEC-13、DEC-14） | SPEC-20 | TEST-6、TEST-18 |
+| STEP-14 | 數值格式與語系限制 | `DebouncedNumericUpDown` 在 Enter／Leave 事件送達畫面前拒絕非法文字；`AddPathDlg` 的 D1 即時回饋與進階欄位驗證使用同一解析與範圍。`ControlRunner` 新增 `NumCommitFormat`；記錄已建立 CNC 面板的換字族限制，README 補 UICheck 操作入口與寫入警告（DEC-21） | SPEC-1、SPEC-5、SPEC-17 | TEST-7、TEST-9、TEST-16 |
 
 每一步的程式、測試、文件分開提交；逐檔異動以 `git diff bd0fa270` 與 `Tools/UICheck/DesignerDiff.ps1 -Base bd0fa270 -Head HEAD`
 查閱。STEP-1～STEP-11 的 commit 在新規範之前，標題沒有 `(STEP-n)`，依上表的內容人工對照（DEC-12）；STEP-12 之後依新規範標示。
@@ -71,19 +72,20 @@ Tools/UICheck（可持續檢查）、Tests/（本議題檢查）──> 建置�
 
 | SPEC | STEP |
 | --- | --- |
-| SPEC-1～SPEC-4 | STEP-3、STEP-4 |
-| SPEC-5 | STEP-4、STEP-9 |
+| SPEC-1 | STEP-3、STEP-4、STEP-14 |
+| SPEC-2～SPEC-4 | STEP-4 |
+| SPEC-5 | STEP-4、STEP-9、STEP-14 |
 | SPEC-6 | STEP-3、STEP-7、STEP-10 |
 | SPEC-7 | STEP-5、STEP-10 |
 | SPEC-8 | STEP-4 |
 | SPEC-9 | STEP-2、STEP-3、STEP-8 |
 | SPEC-10 | STEP-2、STEP-5、STEP-8 |
-| SPEC-11 | STEP-2、STEP-4 |
+| SPEC-11 | STEP-2、STEP-4、STEP-8 |
 | SPEC-12 | STEP-4、STEP-5、STEP-7 |
 | SPEC-13、SPEC-14 | STEP-4 |
 | SPEC-15 | STEP-6 |
 | SPEC-16 | STEP-8 |
-| SPEC-17 | STEP-2、STEP-8、STEP-9、STEP-11 |
+| SPEC-17 | STEP-2、STEP-8、STEP-9、STEP-11、STEP-14 |
 | SPEC-18 | STEP-1、STEP-11 |
 | SPEC-19 | STEP-12 |
 | SPEC-20 | STEP-13 |

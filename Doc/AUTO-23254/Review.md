@@ -209,3 +209,36 @@
 | REV-48 | 6 | 建議 | `Doc\AUTO-23254\TestPlan.md:8` | 「最終結果」仍把 2026-11-26 的 Debug 寫成最後一次執行，但後面混列了 DEC-18 後的結果，且未納入 DEC-19 的重跑；README 已勾選的 Release 也無法由這份總表核對到版本。建議依門檻記錄最終一次的受測版本、日期、結果與環境，區分本版與舊版證據，沒有本版結果的項目明寫未驗證。 | 已修正：總表改記最終受測版本、日期與各門檻結果（DEC-20） |
 | REV-49 | 6 | 建議 | `Doc\AUTO-23254\README.md:8` | 狀態欄仍寫待第 9 回合，但同檔 DoD 已記到第 12 回合，交接時無法從入口判斷目前階段。建議入口只保留當前狀態與真正待辦，review 進度連到 `Review.md`，DoD 則在本回合發現處置後再確認。 | 已修正：狀態只留目前階段，review 進度連到本檔；DoD 第 6 項補第 13 回合（DEC-20） |
 | REV-50 | 6 | 建議 | `Doc\AUTO-23254\Implementation.md:19` | 多語系步驟記了 `CommonUI` 的自動套用，未記錄 `LanguageManager\LanguageManager.cs:233` 新增的 `HasString` 公開查詢。這是自動套用能辨識本語系未定義的可選 ID、保留既有文字且不刷缺 ID 日誌的必要改動；建議在 SPEC-14 或其 STEP 補上跨專案相依與缺 ID 的預期行為。 | 已修正：SPEC-14 與 `Implementation.md` 補 `HasString` 與缺 ID 的行為（DEC-20） |
+
+## 第 14 回合
+
+| 項目 | 內容 |
+| --- | --- |
+| 議題 | AUTO-23254 |
+| 分支 | `AUTO-23254_f_UIStyleUnify_rebased` |
+| 比對基準 | `bd0fa270`；受審 HEAD `734c6b05` |
+| 工具與模型 | Visual Studio GitHub Copilot |
+| 日期 | 2026-11-27 |
+
+整體 review：逐層核對實作、測試、規格、目標及後續處理，不重提已決議的取捨。`Tools/UICheck` 的正式入口不呼叫議題專用測試；固定基準、改名對照、行為例外與版面快照留在 `Doc/AUTO-23254/Tests`。議題測試共用長期工具的解析能力是單向依賴，不影響長期入口獨立執行。
+
+| 門檻 | 本回合結果 |
+| --- | --- |
+| `Build.bat Debug` / `Build.bat Release` | 都通過，分別 3、6 個警告，皆 0 個錯誤；本分支未改 C++ 專案 |
+| `UICheck.bat` / `UICheck.bat runtime` | 都通過：34 個 Designer 檔、zh-TW 與 zh-CN 各 45 個畫面狀態、46 個數值框案例、12 組主視窗截圖及 10 個 Designer 區域，皆 0 個問題。使用一般工作電腦既有的 1920×1080、96 DPI 主螢幕；此結果不涵蓋新增 Parsec 副螢幕的路徑 |
+| `RunIssueChecks.bat` | 通過：行為比對 0 個差異，分支規則 358 個檔案、0 個問題，版面基準 12 情境／152 行、0 個差異 |
+| `DesignerDiff.ps1 -Base bd0fa270 -Head HEAD` | 39 個檔案，38 個有語意差異、1 個僅格式差異 |
+
+| REV | 段 | 嚴重度 | 位置 | 說明 | 處置 |
+| --- | --- | --- | --- | --- | --- |
+| REV-51 | 2 | 必修 | `Doc\AUTO-23254\Goal.md:63` | REQ-4 的一律延期與既有已核准例外矛盾。 | 已修正（回溯至 REQ-4；DEC-21） |
+| REV-52 | 2 | 必修 | `Doc\AUTO-23254\Implementation.md:45` | 漏記刀向圖例與 3D 路徑共用色表、OCCT → sRGB 轉換及動態日誌標籤的 `TextRole`。 | 已修正（STEP-3、STEP-8 補實作與測試邊界） |
+| REV-53 | 2 | 必修 | `Doc\AUTO-23254\Spec.md:58` | `1e2` 可被畫面舊解析器接受並更新預覽，卻被共用數值框拒絕。 | 已修正（回溯至 SPEC-5；DEC-21 採一般十進位，拒絕早於預覽與提交） |
+| REV-54 | 6 | 建議 | `Doc\AUTO-23254\Implementation.md:74` | `SPEC → STEP` 與 STEP 欄不一致，SPEC-19 的規範檢查與合入行為未區分。 | 已修正（雙向對照與驗收邊界） |
+| REV-55 | 6 | 建議 | `Doc\AUTO-23254\TestPlan.md:53` | TEST-11 漏記 9 組 fixture，總表混寫未標記及未建置。 | 已修正（補自測通過條件及兩種中止情境） |
+| REV-56 | 6 | 建議 | `Tools\UICheck\README.md:3` | README 缺工具入口與 `FixTabOrder` 寫入警告。 | 已修正（基本指令、前置條件、指引連結與寫入範例） |
+| REV-57 | 2 | 建議 | `Doc\AUTO-23254\FollowUp.md:36` | 切換語系後既有 CNC 面板的字族限制未寫入規格。 | 已修正（回溯至 SPEC-1；即時刷新依 DEC-21 保留 TODO-10） |
+
+TODO-25 對應 SPEC-20 的 Parsec 成功路徑，技術上是本議題的驗證，不是新需求；DEC-17 第 3 項已同意在其他電腦補驗且不擋 push，本回合保留該決議，不把它記成已通過。TEST-19 仍是本議題待完成的人工驗收。
+
+處置後自我驗收（2026-11-28）見 [TestPlan.md](TestPlan.md#1-總表與最終結果)。新增的共用測試只驗 `DebouncedNumericUpDown`，未引用議題測試；以實際表單模擬事件確認圓直徑預覽／提交及 D1 即時回饋。TEST-16 的實機鍵入、貼上與 3D 預覽未重跑。

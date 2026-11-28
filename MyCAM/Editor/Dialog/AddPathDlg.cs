@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using CommonUI.Controls;
 using CommonUI.Forms;
 using CommonUI.Layout;
 using MyCAM.App;
@@ -272,35 +273,36 @@ namespace MyCAM.Editor.Dialog
 
 		void m_numD1Threshold_TextChanged( object sender, EventArgs e )
 		{
-			if( TryGetValidD1ThresholdFromTextBox( out double d1Threshold ) ) {
+			if( TryGetValidD1Threshold( out double d1Threshold ) ) {
 				D1ThresholdChanged?.Invoke( d1Threshold );
 			}
 		}
 
 		void m_numD1Threshold_Validating( object sender, System.ComponentModel.CancelEventArgs e )
 		{
-			ValidatePositiveTextBox( m_numD1Threshold, ref m_lastValidD1Threshold, IsD1ThresholdInRange );
+			ValidatePositiveInput( m_numD1Threshold, ref m_lastValidD1Threshold, IsD1ThresholdInRange );
 		}
 
 		void m_numMaxChordError_Validating( object sender, System.ComponentModel.CancelEventArgs e )
 		{
-			ValidatePositiveTextBox( m_numMaxChordError, ref m_lastValidMaxChordError );
+			ValidatePositiveInput( m_numMaxChordError, ref m_lastValidMaxChordError );
 		}
 
 		void m_numMaxLineLength_Validating( object sender, System.ComponentModel.CancelEventArgs e )
 		{
-			ValidatePositiveTextBox( m_numMaxLineLength, ref m_lastValidMaxLineLength );
+			ValidatePositiveInput( m_numMaxLineLength, ref m_lastValidMaxLineLength );
 		}
 
-		void ValidatePositiveTextBox( Control txb, ref double lastValid, Func<double, bool> rangeCheck = null )
+		void ValidatePositiveInput( DebouncedNumericUpDown numeric, ref double lastValid,
+			Func<double, bool> rangeCheck = null )
 		{
-			if( double.TryParse( txb.Text, out double value ) && value > 0
-				&& ( rangeCheck == null || rangeCheck( value ) ) ) {
-				lastValid = value;
+			if( numeric.TryGetInputValue( out decimal value ) && value > 0
+				&& ( rangeCheck == null || rangeCheck( ( double )value ) ) ) {
+				lastValid = ( double )value;
 				ClearError();
 				return;
 			}
-			txb.Text = lastValid.ToString();
+			numeric.Text = lastValid.ToString();
 		}
 
 		static bool IsD1ThresholdInRange( double value )
@@ -308,9 +310,11 @@ namespace MyCAM.Editor.Dialog
 			return value >= D1_THRESHOLD_MIN && value <= D1_THRESHOLD_MAX;
 		}
 
-		bool TryGetValidD1ThresholdFromTextBox( out double value )
+		bool TryGetValidD1Threshold( out double value )
 		{
-			return double.TryParse( m_numD1Threshold.Text, out value ) && IsD1ThresholdInRange( value );
+			bool isValid = m_numD1Threshold.TryGetInputValue( out decimal parsed );
+			value = ( double )parsed;
+			return isValid && IsD1ThresholdInRange( value );
 		}
 
 		void ReadAdvancedParams()

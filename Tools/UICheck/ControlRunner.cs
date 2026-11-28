@@ -13,6 +13,8 @@ namespace UICheck
 	//   NumRejectInput    rejected input (unparseable or out of range) restores the latest valid value, even one that
 	//                     is not notified yet or is more precise than the shown decimals, and the restore itself raises
 	//                     no ValueChanged; the range limits themselves are accepted
+	//   NumCommitFormat   exponent notation is invalid for live input, Enter and Leave; subscribers do not see
+	//                     rejected text, while decimal input still reaches them and commits
 	//   NumDebounce       a change of one step of the last decimal place raises DebouncedValueChanged once; changes
 	//                     within the debounce interval are notified once, with the last value, not before the interval
 	//                     after the last change (a late notification, e.g. while the UI thread is busy, is accepted)
@@ -31,6 +33,7 @@ namespace UICheck
 		{
 			CheckRejectedInput();
 			CheckRangeLimits();
+			CheckCommitFormat();
 			CheckLastDecimalStep();
 			CheckDebounceMerge();
 			CheckMouseWheel();
@@ -95,6 +98,40 @@ namespace UICheck
 			numeric.EnterText( "1000.001" );
 			Expect( "NumRejectInput", "just above maximum rejected", 1000m, numeric.Value );
 			ExpectEvents( "NumRejectInput", "range limits", new decimal[] { 0m, 1000m }, valueList );
+		}
+
+		static void CheckCommitFormat()
+		{
+			using( ProbeNumeric numeric = CreateNumeric( 25m, 0m, 1000m ) ) {
+				List<string> enterList = new List<string>();
+				List<string> leaveList = new List<string>();
+				numeric.KeyDown += ( sender, e ) => enterList.Add( numeric.Text );
+				numeric.Leave += ( sender, e ) => leaveList.Add( numeric.Text );
+				string szPrevious = numeric.Text;
+				numeric.TypeText( "1e2" );
+				ExpectTrue( "NumCommitFormat", "live reading rejects exponent", !numeric.TryGetInputValue( out _ ) );
+				KeyEventArgs keyArgs = numeric.PressEnter();
+				ExpectTrue( "NumCommitFormat", "invalid Enter is consumed before KeyDown subscribers",
+					keyArgs.Handled && keyArgs.SuppressKeyPress && enterList.Count == 0 );
+				ExpectTrue( "NumCommitFormat", "invalid Enter restores the displayed value",
+					numeric.Text == szPrevious );
+				Expect( "NumCommitFormat", "invalid Enter keeps the value", 25m, numeric.Value );
+				numeric.TypeText( "1e2" );
+				numeric.LeaveField();
+				ExpectTrue( "NumCommitFormat", "Leave subscribers see restored text",
+					leaveList.Count == 1 && leaveList[ 0 ] == szPrevious );
+				Expect( "NumCommitFormat", "invalid Leave keeps the value", 25m, numeric.Value );
+				numeric.TypeText( "100" );
+				ExpectTrue( "NumCommitFormat", "live reading accepts decimal",
+					numeric.TryGetInputValue( out decimal value ) && value == 100m );
+				numeric.PressEnter();
+				ExpectTrue( "NumCommitFormat", "valid Enter reaches KeyDown subscribers",
+					enterList.Count == 1 && enterList[ 0 ] == "100" );
+				Expect( "NumCommitFormat", "valid Enter commits", 100m, numeric.Value );
+				numeric.TypeText( "50" );
+				numeric.LeaveField();
+				Expect( "NumCommitFormat", "valid Leave commits", 50m, numeric.Value );
+			}
 		}
 
 		static void CheckLastDecimalStep()
@@ -382,12 +419,14 @@ namespace UICheck
 			public KeyEventArgs PressEnter()
 			{
 				KeyEventArgs keyArgs = new KeyEventArgs( Keys.Enter );
-				OnKeyDown( keyArgs );
+				OnTextBoxKeyDown( this, keyArgs );
 				return keyArgs;
 			}
 
 			public void LeaveField()
 			{
+				OnLeave( EventArgs.Empty );
+				OnTextBoxLostFocus( this, EventArgs.Empty );
 				OnLostFocus( EventArgs.Empty );
 			}
 		}

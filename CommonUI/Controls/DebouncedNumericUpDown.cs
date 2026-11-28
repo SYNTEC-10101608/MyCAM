@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace CommonUI.Controls
@@ -17,8 +18,8 @@ namespace CommonUI.Controls
 	/// pending notification.</item>
 	/// <item>The mouse wheel and the up / down keys change the value by one Increment and stop at the limits;
 	/// ReadOnly blocks them. Typed text that is not validated yet is accepted or rejected first, then stepped.</item>
-	/// <item>Enter or leaving an empty field restores the latest valid value (that Enter is consumed); leaving the
-	/// field sends a pending notification at once.</item>
+	/// <item>Rejects invalid edits before Enter or Leave reaches consumers; Enter on a rejected edit is consumed.
+	/// Leaving the field sends a pending notification at once.</item>
 	/// </list>
 	/// </summary>
 	public class DebouncedNumericUpDown : NumericUpDown
@@ -143,6 +144,20 @@ namespace CommonUI.Controls
 		[Category( "Behavior" )]
 		public event EventHandler<ValueRejectedEventArgs> ValueRejected;
 
+		/// <summary>
+		/// Reads the current text without committing it, using the same format and limits as validation.
+		/// </summary>
+		public bool TryGetInputValue( out decimal value )
+		{
+			return TryParseInput( out value ) && value >= Minimum && value <= Maximum;
+		}
+
+		protected override void OnLeave( EventArgs e )
+		{
+			RejectInvalidEdit();
+			base.OnLeave( e );
+		}
+
 		protected override void OnLostFocus( EventArgs e )
 		{
 			if( RevertOnOutOfRange && !m_IsProgrammaticChange && string.IsNullOrWhiteSpace( Text ) ) {
@@ -156,9 +171,7 @@ namespace CommonUI.Controls
 
 		protected override void OnKeyDown( KeyEventArgs e )
 		{
-			if( e.KeyCode == Keys.Enter && RevertOnOutOfRange && !m_IsProgrammaticChange
-				&& string.IsNullOrWhiteSpace( Text ) ) {
-				RevertToLastValue( 0m, Minimum, isBelowMin: true );
+			if( e.KeyCode == Keys.Enter && RejectInvalidEdit() ) {
 				e.Handled = true;
 				e.SuppressKeyPress = true;
 				return;
@@ -172,23 +185,31 @@ namespace CommonUI.Controls
 			if( !UserEdit ) {
 				return;
 			}
-			if( RevertOnOutOfRange && !m_IsProgrammaticChange ) {
-				if( !decimal.TryParse( Text, System.Globalization.NumberStyles.Number,
-					System.Globalization.CultureInfo.CurrentCulture, out decimal parsed ) ) {
-					// empty or unparseable input, treat as invalid
-					RevertToLastValue( 0m, Minimum, isBelowMin: true );
-					return;
-				}
-				if( parsed < Minimum ) {
-					RevertToLastValue( parsed, Minimum, isBelowMin: true );
-					return;
-				}
-				if( parsed > Maximum ) {
-					RevertToLastValue( parsed, Maximum, isBelowMin: false );
-					return;
-				}
+			if( !RejectInvalidEdit() ) {
+				base.ValidateEditText();
 			}
-			base.ValidateEditText();
+		}
+
+		bool RejectInvalidEdit()
+		{
+			if( !UserEdit || !RevertOnOutOfRange || m_IsProgrammaticChange ) {
+				return false;
+			}
+			if( !TryParseInput( out decimal parsed ) ) {
+				RevertToLastValue( 0m, Minimum, isBelowMin: true );
+				return true;
+			}
+			if( parsed >= Minimum && parsed <= Maximum ) {
+				return false;
+			}
+			bool isBelowMin = parsed < Minimum;
+			RevertToLastValue( parsed, isBelowMin ? Minimum : Maximum, isBelowMin );
+			return true;
+		}
+
+		bool TryParseInput( out decimal value )
+		{
+			return decimal.TryParse( Text, NumberStyles.Number, CultureInfo.CurrentCulture, out value );
 		}
 
 		void RaiseValueChangeImmediately()

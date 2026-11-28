@@ -5,16 +5,19 @@
 
 ## 1. 總表與最終結果
 
-最後一次執行：2026-11-27，第 13 回合的處置版本（受審 HEAD `1181e066` 之後只改文件）：`.\Build.bat Debug`、`.\Build.bat Release` 各 0 個錯誤（於 `1181e066`），下表各類於處置版本執行。rebase 前的結果
+最後一次建置：2026-11-28，第 14 回合的處置版本；`.\Build.bat Debug`、`.\Build.bat Release` 各 0 個錯誤。rebase 前的結果
 （2026-11-23，版本 `c4e6dd64`，在 1920×1080 的開發機）見備份分支 `backup/AUTO-23254_before_rebase`。
 
 | 類 | 維護週期 | 時機 | 執行者 | 入口 | 測試項目 | 結果 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2 | 長期 | 靜態 | 自動 | `Tools\UICheck\UICheck.bat` | TEST-1–TEST-5 | 34 個 Designer 檔，0 個問題 |
-| 3 | 長期 | 動態 | 自動 | `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | TEST-6–TEST-10、TEST-18 | 在常駐 1920×1080 虛擬主螢幕上（終端機，`MYCAM_UICHECK_UNATTENDED=1`，工作區域 1920×1032）：版面 zh-TW、zh-CN 各 45 個畫面狀態、數值框 46 個案例、主視窗 12 組截圖（橫式客戶區 1920×1009）與 Designer 10 個區域，皆 0 個問題。以下情境於 DEC-18、DEC-19 的版本（`4c02da72`）驗證，之後未改 `Tools/UICheck` 的程式：加入虛擬副螢幕的路徑另以失敗情境驗證會移除副螢幕且不影響主螢幕；`runtime` 執行中，同一工作目錄另啟動 `-CurrentScreen` 快速檢查與主視窗檢查：快速檢查直接完成、主視窗檢查等規格螢幕空出後完成，三者皆通過且未留下 runner 檔；被中斷留下的 runner 檔於下次執行清除；指定的螢幕不存在時 exit 2；未建置或機台未標記時 `runtime` 不執行檢查並回傳 2（未標記時列出兩類的說明與 `setx` 指令）；加入 Parsec 副螢幕的成功流程尚未實測（第 8 節第 6 項） |
-| 4 | 議題限定 | 靜態 | 自動 | `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | TEST-11–TEST-13 | 行為比對 0 個差異；程式碼風格 357 個檔案 0 個問題 |
+| 3 | 長期 | 動態 | 自動 | `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | TEST-6–TEST-10、TEST-18 | 一般工作電腦以既有規格螢幕檢查：zh-TW、zh-CN 各 45 個畫面狀態、數值框 56 個案例、主視窗 12 組截圖、Designer 10 個區域，皆 0 個問題；特殊情境見下方 |
+| 4 | 議題限定 | 靜態 | 自動 | `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | TEST-11–TEST-13 | 行為比對 0 個差異；修正兩處行長後，在 runtime 結束後單獨重跑 `CheckBranchRules.ps1`，358 個檔案、0 個問題 |
 | 5 | 議題限定 | 動態 | 自動 | 同上 | TEST-14 | 12 個情境、152 行，0 個差異 |
-| 6 | 議題限定 | — | 人工 | — | TEST-15–TEST-17、TEST-19 | TEST-15–TEST-17：2026-11-23 確認（`c4e6dd64`）；TEST-19 待確認 |
+| 6 | 議題限定 | — | 人工 | — | TEST-15–TEST-17、TEST-19 | 2026-11-28 人工回報：TEST-16 實機回歸通過；TEST-15／TEST-19 的 `LockMSAxisDlg` Designer 開啟失敗，其餘通過 |
+
+1. `runtime` 機台未標記或標記非法：不執行任何檢查，印出說明與 `setx` 指令後回傳 2。標記合法但未建置：先執行靜態檢查，靜態通過後由 runtime 檢查回傳 2。
+2. DEC-18、DEC-19 的版本已驗證：虛擬副螢幕新增失敗會清理且不影響主螢幕；並行的 `-CurrentScreen` 不排隊、主視窗檢查等規格螢幕空出才執行；下次執行會清掉已中止的 runner；指定的螢幕不存在時回傳 2。Parsec 成功流程仍待驗（第 8 節第 6 項）。
 
 ## 2. 長期維護 × 靜態 × 自動（`CheckStatic.ps1`）
 
@@ -35,9 +38,9 @@
 | 編號 | 目的 | 檢查檔 / 規則 | 對象 | 對應 |
 | --- | --- | --- | --- | --- |
 | TEST-6 | 文字與控制項在實際字型下不截斷、不重疊、不超出，開啟後版面等於 Designer，文字取自語系檔 | `LayoutRunner.cs`：`TextClipped`、`TextOverflow`、`TitleOverflow`、`ControlOverlap`、`ControlOutside`、`LoadLayout`、`LanguageText` | 所有對話框與 CNC 面板；精靈與多狀態畫面逐一狀態（`STATE_MAP`，含四軸控制器隱藏第二旋轉軸） | REQ-1、REQ-5、SPEC-3、SPEC-14 |
-| TEST-7 | 數值框的操作約定 | `ControlRunner.cs`：`NumRejectInput`、`NumDebounce`、`NumStep`、`NumSilentRestore` | `DebouncedNumericUpDown`（不開視窗） | REQ-1、REQ-4、SPEC-5 |
+| TEST-7 | 數值框的操作約定 | `ControlRunner.cs`：`NumRejectInput`、`NumCommitFormat`、`NumDebounce`、`NumStep`、`NumSilentRestore`。`1e2` 不能用於即時回饋；Enter 在呼叫訂閱者前消耗按鍵並回復，Leave 訂閱者只見恢復的值；一般十進位輸入仍可提交 | `DebouncedNumericUpDown`（不開視窗） | REQ-1、REQ-4、SPEC-5 |
 | TEST-8 | 對話框置中 | `MainWindowRunner.cs`：`DialogCenter`、`PortraitCamArea` | `Show` 開啟的 3 個與 `ShowDialog` 開啟的 2 個對話框，橫式與直式 | REQ-1、SPEC-2、SPEC-13 |
-| TEST-9 | 主視窗的字族、語系文字與 CNC 面板 | `MainWindowRunner.cs`：`MainFontFamily`、`MenuLanguageText`、`PanelInWindow` | 主視窗 CAD / CAM / CNC 頁面 × 橫式（1920×1080 螢幕最大化）/ 直式（同一螢幕上 1080×1880 的視窗） | REQ-1、SPEC-6、SPEC-7、SPEC-14 |
+| TEST-9 | 主視窗的字族、語系文字與 CNC 面板 | `MainWindowRunner.cs`：`MainFontFamily`、`MenuLanguageText`、`PanelInWindow` | 主視窗 CAD / CAM / CNC 頁面 × 橫式（1920×1080 螢幕最大化）/ 直式（同一螢幕上 1080×1880 的視窗）；驗證以各語系建立畫面，不驗已建立面板的即時字族刷新 | REQ-1、SPEC-1、SPEC-6、SPEC-7、SPEC-14 |
 | TEST-10 | 主視窗 Designer 如實呈現 | `MainWindowRunner.cs`：`MainDesignerRegion` | 以 Designer 的客戶區 1920×1009 開加工頁，比對 10 個區域 | REQ-5、SPEC-12 |
 | TEST-18 | 規格螢幕 | `VirtualDisplayRun.cs`：沒有規格螢幕時，一般工作電腦加入 Parsec 虛擬副螢幕，終端機（`MYCAM_UICHECK_UNATTENDED=1`）不加入而中止；`[display]` 一行列出螢幕大小、DPI 與工作區域，不符規格或沒有工作列時中止；主視窗的 `main window maximized` 一行列出客戶區 | 1920×1080、96 DPI；通過條件：螢幕與 DPI 符合規格、有工作列、橫式主視窗在所選螢幕上最大化並列出實際客戶區（固定 1920×1009 的版面比對屬 TEST-10）、執行前後其他螢幕維持原狀、加入的虛擬螢幕已移除；終端機沒有規格螢幕時 `UICheck.bat runtime` 不加入螢幕、回傳 2；機台未標記時 `runtime` 不執行並回傳 2；螢幕無法準備時 `runtime` 在第一個檢查就停止並回傳 2 | REQ-8、SPEC-20 |
 
@@ -57,6 +60,7 @@
 判斷原則：
 
 1. `SameProperties` 在型別改變時比對生效值（沒寫的屬性以反射讀預設值，本議題刪除的舊型別從分支起點原始碼編譯），因此需要先建置 Debug。
+   TEST-11 每次正式比對前必跑 9 組 `EFFECTIVE_FIXTURES`，涵蓋預設值相同及不同、單側明列、以及已刪除的基準型別。每組必須可比對，且有無回報差異須符合預期；否則以 `FIXTURE` 列為失敗。
 2. 行為比對讀的是宣告（屬性、事件、狀態賦值），不是操作結果；共用控制項的操作由 TEST-7 檢查，各畫面的實機操作由 TEST-16 確認。
 3. 程式碼風格只檢查本議題寫入的部分：整檔規則在「分支起點的版本符合、現在不符合」或新檔時報，行規則只看新增的行；
    行長只檢查 C#（`.editorconfig`），Designer 檔不套用行規則。
@@ -75,9 +79,9 @@
 | 編號 | 目的 | 內容 | 結果 |
 | --- | --- | --- | --- |
 | TEST-15 | Designer 能開啟且與執行時一致 | 以 Visual Studio Designer 開啟所有畫面（含泛型基底的對話框、`StartupForm`、三個 CNC 面板） | 2026-11-23 確認 |
-| TEST-16 | 數值框實機操作 | `AxisTransformDlg`、`AddPathDlg`、`PatternSettingDlg`、`ThreePtTransformDlg`、`AutoSortPathDlg` 的輸入與預覽 | 2026-11-23 確認 |
+| TEST-16 | 數值框實機操作 | `AxisTransformDlg`、`AddPathDlg`、`PatternSettingDlg`、`ThreePtTransformDlg`、`AutoSortPathDlg` 的輸入與預覽。DEC-21 回歸：以圖形設定的圓直徑 25 為起點，分別鍵入及貼上 `1e2`、`100`，分別按 Enter 或離開欄位，再按確定；`1e2` 不得讓預覽或確定採用 100（仍是 25），`100` 則三者一致為 100。新增路徑的 D1 門檻以 `3e1`、`30` 對照，即時回饋與提交應同樣拒絕前者、接受後者 | 2026-11-28 表單事件模擬（zh-TW、zh-CN）及人工回報的實機回歸均通過 |
 | TEST-17 | CNC 實際連線 | 三個 CNC 面板的數值、燈號、警報清單；直式 `CNCDlg`（VNC）定位到 CNC 區域；卡片間距、監控卡片與 3D 畫布對齊、警報位置 | 2026-11-23 確認 |
-| TEST-19 | 併入 `master` 的修正仍有效 | 鎖定主從軸（`LockMSAxisDlg`，AUTO-23220）與三點校正（`CNCThreePointDlg`，含 CNC 連線，AUTO-23240）的操作與 Designer；四軸控制器連線時 CNC 面板、監控面板、偏置視窗隱藏第二旋轉軸（AUTO-23275）；主視窗與 exe 的圖示 | 待確認 |
+| TEST-19 | 併入 `master` 的修正仍有效 | 鎖定主從軸（`LockMSAxisDlg`，AUTO-23220）與三點校正（`CNCThreePointDlg`，含 CNC 連線，AUTO-23240）的操作與 Designer；四軸控制器連線時 CNC 面板、監控面板、偏置視窗隱藏第二旋轉軸（AUTO-23275）；主視窗與 exe 的圖示 | 2026-11-28 人工回報：僅 `LockMSAxisDlg` Designer 失敗，無法載入泛型基底 `MyCAM.Editor.EditDialogBase<T>`；其餘通過 |
 
 ## 7. 反向測試
 
@@ -125,5 +129,5 @@
 | SPEC-16 | TEST-1、TEST-2（`StaticExceptions.txt`） |
 | SPEC-17 | TEST-13 |
 | SPEC-18 | 連結有效與抽查（`process-docs.md` 第 4 節第 4 項） |
-| SPEC-19 | TEST-11、TEST-12、TEST-19 |
+| SPEC-19 | 行為：TEST-11 比對宣告，TEST-19 驗收合入的實際操作與圖示；規範與文件：TEST-12 只驗分支程式碼風格，指引移動與文件重整以連結及分類抽查驗證 |
 | SPEC-20 | TEST-18 |

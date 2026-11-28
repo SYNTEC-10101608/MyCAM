@@ -5,7 +5,7 @@
 | 分支 | `AUTO-23254_f_UIStyleUnify` |
 | 分支起點 | `bd0fa270`（`master`，2026-11-26，rebase 後）；原起點 `a4b3826d`（2026-11-15），rebase 前的版本在本機分支 `backup/AUTO-23254_before_rebase` |
 | 級別 | L |
-| 狀態 | Review 已結束（進度見 [Review.md](Review.md)）；待人工確認 `master` 修正（TEST-19），再推送與發 MR |
+| 狀態 | 第 14 回合處置見 [Review.md](Review.md)；數值輸入實機回歸通過，待修復主從軸鎖定視窗無法開啟 Designer（TEST-15／TEST-19） |
 
 ## 文件
 
@@ -38,10 +38,10 @@
 
 1. [x] 每個 REQ 有 SPEC、每個 SPEC 有 TEST（`Spec.md` 第 4 節、`TestPlan.md` 第 9 節）。
 2. [x] 相容性異動已寫明。
-3. [ ] `TestPlan.md` 附最終執行結果：TEST-19 待人工確認，其餘已附。
-4. [x] 每個 STEP 可追溯到 commit：STEP-1～STEP-11 依 `Implementation.md` 人工對照，STEP-12 之後以標題標示（DEC-12）。
-5. [x] 門檻通過：`Build.bat Debug`、`Build.bat Release`、`UICheck.bat runtime`（含靜態檢查）、`RunIssueChecks.bat`。
-6. [x] Review 報告寫入 `Review.md`，「必修」全部已修正：第 7～13 回合已處置完畢；增量 review 結束於第 12 回合，第 13 回合為使用者要求的整體 review（DEC-16～DEC-20）。
+3. [ ] `TestPlan.md` 附最終執行結果：僅主從軸鎖定視窗的 Designer 待修後重驗。
+4. [x] 每個 STEP 可追溯到 commit：STEP-1～STEP-11 依 `Implementation.md` 人工對照，STEP-12 起以標題標示（DEC-12）。
+5. [x] 門檻通過：`Build.bat Debug`、`Build.bat Release`、`UICheck.bat runtime`（含靜態檢查）、議題的行為、分支規則與主視窗版面比對（結果見 [TestPlan.md](TestPlan.md#1-總表與最終結果)）。
+6. [x] Review 報告寫入 `Review.md`，「必修」全部已修正；第 14 回合依 DEC-21 處置。
 7. [x] 範圍外項目寫入 `FollowUp.md`。
 8. [x] Release note 寫入本文件。
 9. [x] 各確認點分別經人確認：原範圍 2026-11-23；rebase 與截圖環境（REQ-8、SPEC-19、SPEC-20）2026-11-26（DEC-14）。
@@ -49,10 +49,10 @@
 
 ## Release Note
 
-1. 修改 所有對話框、CNC 面板與主視窗改為統一的淺色主題（色票、字型、圓角按鈕、卡片與標題列），字型依介面語系。
+1. 修改 所有對話框、CNC 面板與主視窗改為統一的淺色主題（色票、字型、圓角按鈕、卡片與標題列），字型依介面語系；執行中切換語系後，已開啟的 CNC 面板可在重啟後完整套用新字族。
 2. 修改 對話框統一為工具視窗，不可改大小、不出現在工作列；開啟時置中，橫式在主視窗中央、直式在上半部 CAM 區域。
 3. 修改 對話框的區塊改為卡片排列，按鈕列主要動作在最右、取消在其左；確定鍵文字統一為「確定」。
-4. 修改 數值欄位統一為同一種數值框，可用上下鍵與滾輪調整，非法或超出範圍的輸入回復為最近的合法值。
+4. 修改 數值欄位統一為同一種數值框，可用上下鍵與滾輪調整，非法或超出範圍的輸入回復為最近的合法值。原可輸入指數記號的欄位請改用等值小數，如以 `100` 取代 `1e2`。
 5. 修改 只顯示的座標改為文字標籤，不能再選取複製。
 6. 修改 工具列圖示統一為透明背景，新增類的圖示右下角加「+」。
 7. 修改 主視窗各區域與 CNC 卡片的間距統一；橫式加工頁的警報移到日誌右側，監控卡片與 3D 畫面對齊。
