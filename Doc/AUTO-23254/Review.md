@@ -239,6 +239,6 @@
 | REV-56 | 6 | 建議 | `Tools\UICheck\README.md:3` | README 缺工具入口與 `FixTabOrder` 寫入警告。 | 已修正（基本指令、前置條件、指引連結與寫入範例） |
 | REV-57 | 2 | 建議 | `Doc\AUTO-23254\FollowUp.md:36` | 切換語系後既有 CNC 面板的字族限制未寫入規格。 | 已修正（回溯至 SPEC-1；即時刷新依 DEC-21 保留 TODO-10） |
 
-TODO-25 對應 SPEC-20 的 Parsec 成功路徑，技術上是本議題的驗證，不是新需求；DEC-17 第 3 項已同意在其他電腦補驗且不擋 push，本回合保留該決議，不把它記成已通過。TEST-19 仍是本議題待完成的人工驗收。
+TODO-25 對應 SPEC-20 的 Parsec 成功路徑，技術上是本議題的驗證，不是新需求；DEC-17 第 3 項已同意在其他電腦補驗且不擋 push，本回合保留該決議，不把它記成已通過。
 
-處置後自我驗收（2026-11-28）見 [TestPlan.md](TestPlan.md#1-總表與最終結果)。新增的共用測試只驗 `DebouncedNumericUpDown`，未引用議題測試；以實際表單模擬事件確認圓直徑預覽／提交及 D1 即時回饋。TEST-16 的實機鍵入、貼上與 3D 預覽未重跑。
+處置後驗收（2026-11-28）見 [TestPlan.md](TestPlan.md#1-總表與最終結果)。新增的共用測試只驗 `DebouncedNumericUpDown`，未引用議題測試；TEST-16 實機回歸通過。TEST-19 原僅 `LockMSAxisDlg` 的 Designer 無法載入泛型基底；STEP-15 保留既有編輯行為，改用非泛型的直接基底，使用者重驗確認可正常開啟，TEST-15／TEST-19 通過。

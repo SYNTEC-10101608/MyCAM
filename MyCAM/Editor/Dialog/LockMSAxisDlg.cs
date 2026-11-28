@@ -6,7 +6,7 @@ using MyCAM.Helper;
 
 namespace MyCAM.Editor
 {
-	internal partial class LockMSAxisDlg : EditDialogBase<object>
+	internal partial class LockMSAxisDlg : UntypedEditDialogBase
 	{
 		public event Action<bool> OnNormalMode;
 		public Action<bool> FlipRotaryAxis;

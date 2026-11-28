@@ -11,7 +11,7 @@
 #   ControlInCommonUI    only CommonUI defines control classes (MyCAM and CncUI use the CommonUI controls)
 #   CommonUINamespace    a file in CommonUI\<Folder> is in namespace CommonUI.<Folder>
 #   FieldPrefix          control field names start with the prefix of their type ($PREFIX_MAP), also in the main window
-#   ScreenBase           every dialog derives from DialogBase (directly or through FormBase / EditDialogBase), every
+#   ScreenBase           every dialog derives from DialogBase (directly or through a supported behavior base), every
 #                        embedded panel from PanelBase
 # Appearance comes from the theme
 #   DesignerAppearance   designer files contain no appearance (font, colors, frame, auto scaling, flat style,
@@ -735,14 +735,14 @@ foreach ($file in $designerFiles) {
 		continue
 	}
 	$szClass = $screen.ClassName
-	$isDialog = $screen.BaseType -match "^(DialogBase|FormBase|EditDialogBase<.+>)$"
+	$isDialog = $screen.BaseType -match "^(DialogBase|FormBase|EditDialogBase<.+>|UntypedEditDialogBase)$"
 	$isPanel = $screen.BaseType -match "^(PanelBase|UserControl)$"
 	$codePath = $file.FullName -replace "\.Designer\.cs$", ".cs"
 	$script:CurrentCode = if (Test-Path $codePath) { Get-Content $codePath -Raw -Encoding UTF8 } else { "" }
 
 	# ScreenBase base class
 	if (-not $isDialog -and -not $isPanel) {
-		Report "ScreenBase" $szClass "*" "derives from $($screen.BaseType), expected DialogBase / FormBase / EditDialogBase"
+		Report "ScreenBase" $szClass "*" "derives from $($screen.BaseType), expected DialogBase or a supported behavior base"
 	}
 	if ($screen.BaseType -eq "UserControl") {
 		Report "ScreenBase" $szClass "*" "derives from UserControl, expected PanelBase"

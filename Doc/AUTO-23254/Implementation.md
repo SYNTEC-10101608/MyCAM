@@ -49,6 +49,7 @@ Tools/UICheck（可持續檢查）、Tests/（本議題檢查）──> 建置�
 | STEP-12 | 併入 `master` 與依新規範調整 | rebase 到 `bd0fa270` 並解衝突（DEC-12）；主視窗圖示改由專案資源檔指定、修正 `ApplicationIcon` 路徑；指引移到 `project/`、專案指引索引與專案規範；`IconSource` 腳本補 BOM；議題檢查基準改為 `bd0fa270`；議題文件依 `process-docs.md` 重整 | SPEC-19 | TEST-11、TEST-12、TEST-19 |
 | STEP-13 | 規格螢幕的截圖環境 | `VirtualDisplayRun.cs`；主視窗 runner 的最大化模式；`CaptureMainWindow.ps1 -Screen`、`CheckRuntimeLayout.ps1` 在規格螢幕上執行；`STATE_MAP` 依 `master` 的新簽章與四軸狀態；`project/tool-uicheck.md`（DEC-13、DEC-14） | SPEC-20 | TEST-6、TEST-18 |
 | STEP-14 | 數值格式與語系限制 | `DebouncedNumericUpDown` 在 Enter／Leave 事件送達畫面前拒絕非法文字；`AddPathDlg` 的 D1 即時回饋與進階欄位驗證使用同一解析與範圍。`ControlRunner` 新增 `NumCommitFormat`；記錄已建立 CNC 面板的換字族限制，README 補 UICheck 操作入口與寫入警告（DEC-21） | SPEC-1、SPEC-5、SPEC-17 | TEST-7、TEST-9、TEST-16 |
+| STEP-15 | 主從軸鎖定 Designer 載入 | `LockMSAxisDlg` 經由非泛型的 `UntypedEditDialogBase` 繼承原本的 `EditDialogBase<object>`；不改版面或編輯事件。`ScreenBase` 識別此行為基底 | SPEC-8、SPEC-11、SPEC-19 | TEST-1、TEST-6、TEST-15、TEST-19 |
 
 每一步的程式、測試、文件分開提交；逐檔異動以 `git diff bd0fa270` 與 `Tools/UICheck/DesignerDiff.ps1 -Base bd0fa270 -Head HEAD`
 查閱。STEP-1～STEP-11 的 commit 在新規範之前，標題沒有 `(STEP-n)`，依上表的內容人工對照（DEC-12）；STEP-12 之後依新規範標示。
@@ -77,15 +78,15 @@ Tools/UICheck（可持續檢查）、Tests/（本議題檢查）──> 建置�
 | SPEC-5 | STEP-4、STEP-9、STEP-14 |
 | SPEC-6 | STEP-3、STEP-7、STEP-10 |
 | SPEC-7 | STEP-5、STEP-10 |
-| SPEC-8 | STEP-4 |
+| SPEC-8 | STEP-4、STEP-15 |
 | SPEC-9 | STEP-2、STEP-3、STEP-8 |
 | SPEC-10 | STEP-2、STEP-5、STEP-8 |
-| SPEC-11 | STEP-2、STEP-4、STEP-8 |
+| SPEC-11 | STEP-2、STEP-4、STEP-8、STEP-15 |
 | SPEC-12 | STEP-4、STEP-5、STEP-7 |
 | SPEC-13、SPEC-14 | STEP-4 |
 | SPEC-15 | STEP-6 |
 | SPEC-16 | STEP-8 |
 | SPEC-17 | STEP-2、STEP-8、STEP-9、STEP-11、STEP-14 |
 | SPEC-18 | STEP-1、STEP-11 |
-| SPEC-19 | STEP-12 |
+| SPEC-19 | STEP-12、STEP-15 |
 | SPEC-20 | STEP-13 |

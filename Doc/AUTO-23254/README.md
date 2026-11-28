@@ -5,7 +5,7 @@
 | 分支 | `AUTO-23254_f_UIStyleUnify` |
 | 分支起點 | `bd0fa270`（`master`，2026-11-26，rebase 後）；原起點 `a4b3826d`（2026-11-15），rebase 前的版本在本機分支 `backup/AUTO-23254_before_rebase` |
 | 級別 | L |
-| 狀態 | 第 14 回合處置見 [Review.md](Review.md)；數值輸入實機回歸通過，待修復主從軸鎖定視窗無法開啟 Designer（TEST-15／TEST-19） |
+| 狀態 | Review 與人工驗收完成；主從軸鎖定視窗的 Designer 重驗通過（TEST-15／TEST-19），待確認 push 與送 MR |
 
 ## 文件
 
@@ -38,7 +38,7 @@
 
 1. [x] 每個 REQ 有 SPEC、每個 SPEC 有 TEST（`Spec.md` 第 4 節、`TestPlan.md` 第 9 節）。
 2. [x] 相容性異動已寫明。
-3. [ ] `TestPlan.md` 附最終執行結果：僅主從軸鎖定視窗的 Designer 待修後重驗。
+3. [x] `TestPlan.md` 附最終執行結果；主從軸鎖定視窗的 Designer 修正後重驗通過。
 4. [x] 每個 STEP 可追溯到 commit：STEP-1～STEP-11 依 `Implementation.md` 人工對照，STEP-12 起以標題標示（DEC-12）。
 5. [x] 門檻通過：`Build.bat Debug`、`Build.bat Release`、`UICheck.bat runtime`（含靜態檢查）、議題的行為、分支規則與主視窗版面比對（結果見 [TestPlan.md](TestPlan.md#1-總表與最終結果)）。
 6. [x] Review 報告寫入 `Review.md`，「必修」全部已修正；第 14 回合依 DEC-21 處置。

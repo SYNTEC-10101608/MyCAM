@@ -14,7 +14,7 @@
 | 3 | 長期 | 動態 | 自動 | `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | TEST-6–TEST-10、TEST-18 | 一般工作電腦以既有規格螢幕檢查：zh-TW、zh-CN 各 45 個畫面狀態、數值框 56 個案例、主視窗 12 組截圖、Designer 10 個區域，皆 0 個問題；特殊情境見下方 |
 | 4 | 議題限定 | 靜態 | 自動 | `Doc\AUTO-23254\Tests\RunIssueChecks.bat` | TEST-11–TEST-13 | 行為比對 0 個差異；修正兩處行長後，在 runtime 結束後單獨重跑 `CheckBranchRules.ps1`，358 個檔案、0 個問題 |
 | 5 | 議題限定 | 動態 | 自動 | 同上 | TEST-14 | 12 個情境、152 行，0 個差異 |
-| 6 | 議題限定 | — | 人工 | — | TEST-15–TEST-17、TEST-19 | 2026-11-28 人工回報：TEST-16 實機回歸通過；TEST-15／TEST-19 的 `LockMSAxisDlg` Designer 開啟失敗，其餘通過 |
+| 6 | 議題限定 | — | 人工 | — | TEST-15–TEST-17、TEST-19 | 通過；2026-11-28 確認數值輸入實機回歸、合入行為及主從軸鎖定視窗的 Designer 修正 |
 
 1. `runtime` 機台未標記或標記非法：不執行任何檢查，印出說明與 `setx` 指令後回傳 2。標記合法但未建置：先執行靜態檢查，靜態通過後由 runtime 檢查回傳 2。
 2. DEC-18、DEC-19 的版本已驗證：虛擬副螢幕新增失敗會清理且不影響主螢幕；並行的 `-CurrentScreen` 不排隊、主視窗檢查等規格螢幕空出才執行；下次執行會清掉已中止的 runner；指定的螢幕不存在時回傳 2。Parsec 成功流程仍待驗（第 8 節第 6 項）。
@@ -78,10 +78,10 @@
 
 | 編號 | 目的 | 內容 | 結果 |
 | --- | --- | --- | --- |
-| TEST-15 | Designer 能開啟且與執行時一致 | 以 Visual Studio Designer 開啟所有畫面（含泛型基底的對話框、`StartupForm`、三個 CNC 面板） | 2026-11-23 確認 |
+| TEST-15 | Designer 能開啟且與執行時一致 | 以 Visual Studio Designer 開啟所有畫面（含泛型基底的對話框、`StartupForm`、三個 CNC 面板）；回歸重開 `LockMSAxisDlg`，確認顯示表單而非載入錯誤頁 | 原案例 2026-11-23 確認；2026-11-28 使用者確認 STEP-15 的 `LockMSAxisDlg` Designer 正常開啟。Debug／Release、靜態 UI 檢查及該表單雙語執行時版面均通過 |
 | TEST-16 | 數值框實機操作 | `AxisTransformDlg`、`AddPathDlg`、`PatternSettingDlg`、`ThreePtTransformDlg`、`AutoSortPathDlg` 的輸入與預覽。DEC-21 回歸：以圖形設定的圓直徑 25 為起點，分別鍵入及貼上 `1e2`、`100`，分別按 Enter 或離開欄位，再按確定；`1e2` 不得讓預覽或確定採用 100（仍是 25），`100` 則三者一致為 100。新增路徑的 D1 門檻以 `3e1`、`30` 對照，即時回饋與提交應同樣拒絕前者、接受後者 | 2026-11-28 表單事件模擬（zh-TW、zh-CN）及人工回報的實機回歸均通過 |
 | TEST-17 | CNC 實際連線 | 三個 CNC 面板的數值、燈號、警報清單；直式 `CNCDlg`（VNC）定位到 CNC 區域；卡片間距、監控卡片與 3D 畫布對齊、警報位置 | 2026-11-23 確認 |
-| TEST-19 | 併入 `master` 的修正仍有效 | 鎖定主從軸（`LockMSAxisDlg`，AUTO-23220）與三點校正（`CNCThreePointDlg`，含 CNC 連線，AUTO-23240）的操作與 Designer；四軸控制器連線時 CNC 面板、監控面板、偏置視窗隱藏第二旋轉軸（AUTO-23275）；主視窗與 exe 的圖示 | 2026-11-28 人工回報：僅 `LockMSAxisDlg` Designer 失敗，無法載入泛型基底 `MyCAM.Editor.EditDialogBase<T>`；其餘通過 |
+| TEST-19 | 併入 `master` 的修正仍有效 | 鎖定主從軸（`LockMSAxisDlg`，AUTO-23220）與三點校正（`CNCThreePointDlg`，含 CNC 連線，AUTO-23240）的操作與 Designer；四軸控制器連線時 CNC 面板、監控面板、偏置視窗隱藏第二旋轉軸（AUTO-23275）；主視窗與 exe 的圖示 | 2026-11-28 人工驗收通過；原未通過的 `LockMSAxisDlg` Designer 於 STEP-15 修正後重驗通過（見 TEST-15） |
 
 ## 7. 反向測試
 
